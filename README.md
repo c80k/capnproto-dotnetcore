@@ -18,3 +18,20 @@ Solution/project structure is as follows:
   * capnpc-csharp is the compiler backend for C# language
   * Capnp.Net.Runtime.Tests is an MS Unit Testing assembly, containing - you guessed it - the test suite
 - CapnpCompatTest.sln compiles to a native x86 executable which depends on the original Cap'n Proto C++ implementation. It is (partially) required by the test suite for interoperability testing.
+
+## Features
+
+The following Cap'n Proto features are currently implemented:
+- Serialization/deserialization of all kinds ofdata (structs, groups, unions, lists, capabilities, data, text, enums, even primitives)
+- Generics
+- Level 1 RPC, including promise pipelining, embargos, and automatic tail calls
+- Security (pointer validation, protection against amplification and stack overflow DoS attacks)
+- Compiler backend generates reader/writer classes, interfaces, proxies, skeletons (as you know it from the C++ implementation), and additionally so-called "domain classes" for all struct types. A domain class is like a "plain old C# class" for representing a schema-defined struct, but it is decoupled from any underlying message. It provides serialize/deserialize methods for assembling/disassembling the actual message. This provides more convenience, but comes at the price of non-zero serialization overhead (not "infinitely" faster anymore).
+
+These features are not yet implemented:
+- Level N RPC with N >= 2
+- Packing
+- Compression
+- Canonicalization
+- Dynamic Reflection
+- mmap
