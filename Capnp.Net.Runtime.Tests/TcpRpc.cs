@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Capnp.Rpc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.Extensions.Log­ging;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
 namespace Capnp.Net.Runtime.Tests
