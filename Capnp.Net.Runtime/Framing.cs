@@ -66,7 +66,8 @@ namespace Capnp
                 {
                     throw new InvalidDataException("Expected more bytes according to framing header");
                 }
-                            
+                
+                // Fastest way to do this without /unsafe
                 for (int j = 0; j < buffers[i].Length; j++)
                 {
                     var value = BitConverter.ToUInt64(tmpBuffer, j*8);
