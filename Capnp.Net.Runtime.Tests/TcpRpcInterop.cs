@@ -95,7 +95,7 @@ namespace Capnp.Net.Runtime.Tests
             Assert.AreEqual(expected, line.Result);
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void BasicClient()
         {
             LaunchCompatTestProcess("server:Interface", stdout =>
@@ -126,7 +126,7 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void BasicServer()
         {
             using (var server = SetupServer())
@@ -143,7 +143,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void PipelineClient()
         {
             LaunchCompatTestProcess("server:Pipeline", stdout =>
@@ -180,7 +180,7 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void PipelineServer()
         {
             using (var server = SetupServer())
@@ -198,7 +198,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void ReleaseClient()
         {
             LaunchCompatTestProcess("server:MoreStuff", stdout =>
@@ -231,7 +231,7 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void ReleaseServer()
         {
             using (var server = SetupServer())
@@ -259,7 +259,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void ReleaseOnCancelClient()
         {
             // Since we have a threaded model, there is no way to deterministically provoke the situation
@@ -337,7 +337,7 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void ReleaseOnCancelServer()
         {
             using (var server = SetupServer())
@@ -354,7 +354,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void TestTailCallClient()
         {
             LaunchCompatTestProcess("server:TailCaller", stdout =>
@@ -389,7 +389,7 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void TestTailCallServer()
         {
             using (var server = SetupServer())
@@ -408,7 +408,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void CancelationServer()
         {
             LaunchCompatTestProcess("server:MoreStuff", stdout =>
@@ -432,13 +432,13 @@ namespace Capnp.Net.Runtime.Tests
                         cts.Cancel();
 
                         Assert.IsTrue(destroyed.Task.Wait(MediumNonDbgTimeout));
-                        Assert.IsFalse(cancelTask.IsCompletedSuccessfully);
+                        Assert.IsFalse(cancelTask.IsCompleted && !cancelTask.IsCanceled);
                     }
                 }
             });
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void CancelationClient()
         {
             using (var server = SetupServer())
@@ -455,7 +455,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void PromiseResolveServer()
         {
             LaunchCompatTestProcess("server:MoreStuff", stdout =>
@@ -497,7 +497,7 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void PromiseResolveClient()
         {
             using (var server = SetupServer())
@@ -516,7 +516,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void RetainAndReleaseServer()
         {
             var destructionPromise = new TaskCompletionSource<int>();
@@ -594,7 +594,7 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void RetainAndReleaseClient()
         {
             using (var server = SetupServer())
@@ -614,7 +614,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void CancelServer()
         {
             LaunchCompatTestProcess("server:MoreStuff", stdout =>
@@ -655,7 +655,7 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void CancelClient()
         {
             using (var server = SetupServer())
@@ -672,7 +672,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void SendTwiceServer()
         {
             LaunchCompatTestProcess("server:MoreStuff", stdout =>
@@ -716,7 +716,7 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void SendTwiceClient()
         {
             using (var server = SetupServer())
@@ -736,7 +736,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void EmbargoServer()
         {
             LaunchCompatTestProcess("server:MoreStuff", stdout =>
@@ -803,7 +803,7 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void EmbargoClient()
         {
             using (var server = SetupServer())
@@ -873,13 +873,13 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void EmbargoErrorServer()
         {
             LaunchCompatTestProcess("server:MoreStuff", EmbargoErrorImpl);
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void RepeatedEmbargoError()
         {
             LaunchCompatTestProcess("server:MoreStuff", stdout =>
@@ -891,7 +891,7 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void EmbargoErrorClient()
         {
             using (var server = SetupServer())
@@ -907,7 +907,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void EmbargoNullServer()
         {
             LaunchCompatTestProcess("server:MoreStuff", stdout =>
@@ -956,7 +956,7 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void EmbargoNullClient()
         {
             using (var server = SetupServer())
@@ -972,7 +972,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void CallBrokenPromiseServer()
         {
             LaunchCompatTestProcess("server:MoreStuff", stdout =>
@@ -1009,7 +1009,7 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void CallBrokenPromiseClient()
         {
             using (var server = SetupServer())

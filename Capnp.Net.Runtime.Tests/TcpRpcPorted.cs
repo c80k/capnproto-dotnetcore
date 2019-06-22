@@ -212,7 +212,7 @@ namespace Capnp.Net.Runtime.Tests
                     cts.Cancel();
 
                     Assert.IsTrue(destroyed.Task.Wait(MediumNonDbgTimeout));
-                    Assert.IsFalse(cancelTask.IsCompletedSuccessfully);
+                    Assert.IsFalse(cancelTask.IsCompleted && !cancelTask.IsCanceled);
                 }
 
             }

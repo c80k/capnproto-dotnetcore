@@ -188,12 +188,10 @@ namespace Capnp.Rpc
         {
             _rpcEngine = new RpcEngine();
             _listener = new TcpListener(localAddr, port);
+            _listener.ExclusiveAddressUse = false;
             _listener.Start();
 
-            _acceptorThread = new Thread(() =>
-            {
-                AcceptClients();
-            });
+            _acceptorThread = new Thread(AcceptClients);
 
             _acceptorThread.Start();
         }

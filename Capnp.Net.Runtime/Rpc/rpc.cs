@@ -2528,7 +2528,7 @@ namespace Capnp.Rpc
         }
     }
 
-    public class Exception : ICapnpSerializable
+    public class Exception : System.Exception, ICapnpSerializable
     {
         void ICapnpSerializable.Deserialize(DeserializerState arg_)
         {

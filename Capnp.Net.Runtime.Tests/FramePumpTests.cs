@@ -111,7 +111,9 @@ namespace Capnp.Net.Runtime.Tests
                     Assert.AreEqual(expectedCount - i, length);
                     for (int j = 0; j < length; j++)
                     {
-                        Assert.AreEqual((ulong)(length - j), frame.Segments[i].Span[j]);
+                        var expected = (ulong) (length - j);
+                        var actual = frame.Segments[i].Span[j];
+                        Assert.AreEqual(expected, actual);
                     }
                 }
 
@@ -165,7 +167,7 @@ namespace Capnp.Net.Runtime.Tests
                     txPump.Send(PackFrame(4));
                     txPump.Send(PackFrame(5));
 
-                    Assert.IsTrue(SpinWait.SpinUntil(() => bc.Count == 8, 500));
+                    Assert.IsTrue(SpinWait.SpinUntil(() => bc.Count == 8, 50000));
 
                     UnpackAndVerifyFrame(bc.Take(), 1);
                     UnpackAndVerifyFrame(bc.Take(), 8);

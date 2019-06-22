@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Capnp.Net.Runtime", "Capnp.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "capnpc-csharp", "capnpc-csharp\capnpc-csharp.csproj", "{D19E5EA7-D35B-4A1F-99CB-ED136316B577}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "capnpc-binblob", "capnpc-binblob\capnpc-binblob.csproj", "{8C17F147-D784-4584-80FF-21BE03AC0D17}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Capnp.Net.Runtime.Tests", "Capnp.Net.Runtime.Tests\Capnp.Net.Runtime.Tests.csproj", "{9ED38750-F83F-4B10-B3A3-4FD6183F9E86}"
 EndProject
 Global

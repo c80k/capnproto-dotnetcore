@@ -21,39 +21,57 @@ namespace Capnp
         /// <exception cref="EndOfStreamException">The end of the stream is reached.</exception>
         /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
         /// <exception cref="IOException">An I/O error occurs.</exception>
-        /// <exception cref="OverflowException">Encountered invalid framing data.</exception>
+        /// <exception cref="InvalidDataException">Encountered invalid framing data.</exception>
         /// <exception cref="OutOfMemoryException">Too many or too large segments, probably due to invalid framing data.</exception>
         public static WireFrame ReadSegments(Stream stream)
         {
             using (var reader = new BinaryReader(stream, Encoding.Default, true))
             {
-                uint scountm = reader.ReadUInt32();
-                uint scount = checked(scountm + 1);
-                var buffers = new Memory<ulong>[scount];
+                return reader.ReadWireFrame();
+            }
+        }
 
-                for (uint i = 0; i < scount; i++)
+        public static WireFrame ReadWireFrame(this BinaryReader reader)
+        {
+            uint scount = reader.ReadUInt32();
+            if(scount++ == UInt32.MaxValue) throw new InvalidDataException("Encountered Invalid Framing Data");
+            var buffers = new Memory<ulong>[scount];
+
+            for (uint i = 0; i < scount; i++)
+            {
+                uint size = reader.ReadUInt32();
+                if(size==0) throw new EndOfStreamException("Stream Closed");
+                buffers[i] = new Memory<ulong>(new ulong[size]);
+            }
+
+            if ((scount & 1) == 0)
+            {
+                // Padding
+                reader.ReadUInt32();
+            }
+
+            FillBuffersFromFrames(buffers, scount, reader);
+
+            return new WireFrame(buffers);
+        }
+        
+        public static void FillBuffersFromFrames(Memory<ulong>[] buffers, uint segmentCount, BinaryReader reader)
+        {
+            for (uint i = 0; i < segmentCount; i++)
+            {
+                var buffer = MemoryMarshal.Cast<ulong, byte>(buffers[i].Span.ToArray());
+                var tmpBuffer = reader.ReadBytes(buffer.Length);
+
+                if (tmpBuffer.Length != buffer.Length)
                 {
-                    uint size = reader.ReadUInt32();
-                    buffers[i] = new Memory<ulong>(new ulong[size]);
+                    throw new InvalidDataException("Expected more bytes according to framing header");
                 }
-
-                if ((scount & 1) == 0)
+                            
+                for (int j = 0; j < buffers[i].Length; j++)
                 {
-                    // Padding
-                    reader.ReadUInt32();
+                    var value = BitConverter.ToUInt64(tmpBuffer, j*8);
+                    buffers[i].Span[j] = value;
                 }
-
-                for (uint i = 0; i < scount; i++)
-                {
-                    var buffer = MemoryMarshal.Cast<ulong, byte>(buffers[i].Span);
-
-                    if (reader.Read(buffer) != buffer.Length)
-                    {
-                        throw new EndOfStreamException("Expected more bytes according to framing header");
-                    }
-                }
-
-                return new WireFrame(buffers);
             }
         }
     }

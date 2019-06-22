@@ -285,9 +285,9 @@ namespace Capnp
         public static float ReadDataFloat<T>(this T d, ulong bitOffset, float defaultValue = 0)
             where T : IStructDeserializer
         {
-            int defaultBits = BitConverter.SingleToInt32Bits(defaultValue);
+            int defaultBits = defaultValue.SingleToInt32();
             int bits = (int)d.StructReadData(bitOffset, 32) ^ defaultBits;
-            return BitConverter.Int32BitsToSingle(bits);
+            return bits.Int32ToSingle();
         }
 
         /// <summary>
@@ -301,8 +301,8 @@ namespace Capnp
         public static void WriteData<T>(this T d, ulong bitOffset, float value, float defaultValue = 0.0f)
             where T : IStructSerializer
         {
-            int bits = BitConverter.SingleToInt32Bits(value);
-            int defaultBits = BitConverter.SingleToInt32Bits(defaultValue);
+            int bits = value.SingleToInt32();
+            int defaultBits = defaultValue.SingleToInt32();
             WriteData(d, bitOffset, bits, defaultBits);
         }
 

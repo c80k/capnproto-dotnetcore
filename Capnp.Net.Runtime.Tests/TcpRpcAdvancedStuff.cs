@@ -12,7 +12,7 @@ namespace Capnp.Net.Runtime.Tests
     [TestClass]
     public class TcpRpcAdvancedStuff: TestBase
     {
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void MultiConnect()
         {
             using (var server = SetupServer())
@@ -50,7 +50,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void TwoClients()
         {
             using (var server = SetupServer())
