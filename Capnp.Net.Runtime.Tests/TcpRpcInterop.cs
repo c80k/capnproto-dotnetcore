@@ -389,7 +389,7 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod, Timeout(10000), Ignore]
         public void TestTailCallServer()
         {
             using (var server = SetupServer())
