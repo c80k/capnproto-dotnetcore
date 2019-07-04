@@ -1,0 +1,98 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Capnp.Net.Runtime\AnyPointer.cs" Link="AnyPointer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\CapnpSerializable.cs" Link="CapnpSerializable.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\DeserializationException.cs" Link="DeserializationException.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\DeserializerState.cs" Link="DeserializerState.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\DynamicSerializerState.cs" Link="DynamicSerializerState.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\EmptyList.cs" Link="EmptyList.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\EmptyListDeserializer.cs" Link="EmptyListDeserializer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\FramePump.cs" Link="FramePump.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Framing.cs" Link="Framing.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\ICapnpSerializable.cs" Link="ICapnpSerializable.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\ISegmentAllocator.cs" Link="ISegmentAllocator.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\IStructDeserializer.cs" Link="IStructDeserializer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\IStructSerializer.cs" Link="IStructSerializer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\ListDeserializer.cs" Link="ListDeserializer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\ListKind.cs" Link="ListKind.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\ListOfBitsDeserializer.cs" Link="ListOfBitsDeserializer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\ListOfBitsSerializer.cs" Link="ListOfBitsSerializer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\ListOfCapsDeserializer.cs" Link="ListOfCapsDeserializer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\ListOfCapsSerializer.cs" Link="ListOfCapsSerializer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\ListOfEmptyDeserializer.cs" Link="ListOfEmptyDeserializer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\ListOfEmptySerializer.cs" Link="ListOfEmptySerializer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\ListOfPointersDeserializer.cs" Link="ListOfPointersDeserializer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\ListOfPointersSerializer.cs" Link="ListOfPointersSerializer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\ListOfPrimitivesDeserializer.cs" Link="ListOfPrimitivesDeserializer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\ListOfPrimitivesSerializer.cs" Link="ListOfPrimitivesSerializer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\ListOfStructsDeserializer.cs" Link="ListOfStructsDeserializer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\ListOfStructsSerializer.cs" Link="ListOfStructsSerializer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\ListOfTextSerializer.cs" Link="ListOfTextSerializer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Logging.cs" Link="Logging.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\MessageBuilder.cs" Link="MessageBuilder.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\ObjectKind.cs" Link="ObjectKind.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\PrimitiveCoder.cs" Link="PrimitiveCoder.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\ReadOnlyListExtensions.cs" Link="ReadOnlyListExtensions.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Reserializing.cs" Link="Reserializing.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\AnswerOrCounterquestion.cs" Link="Rpc\AnswerOrCounterquestion.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\BareProxy.cs" Link="Rpc\BareProxy.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\CapabilityReflection.cs" Link="Rpc\CapabilityReflection.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\ConsumedCapability.cs" Link="Rpc\ConsumedCapability.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\IEndpoint.cs" Link="Rpc\IEndpoint.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\IMonoSkeleton.cs" Link="Rpc\IMonoSkeleton.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\Impatient.cs" Link="Rpc\Impatient.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\ImportedCapability.cs" Link="Rpc\ImportedCapability.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\InvalidCapabilityInterfaceException.cs" Link="Rpc\InvalidCapabilityInterfaceException.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\IPromisedAnswer.cs" Link="Rpc\IPromisedAnswer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\IProvidedCapability.cs" Link="Rpc\IProvidedCapability.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\IResolvingCapability.cs" Link="Rpc\IResolvingCapability.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\IRpcEndpoint.cs" Link="Rpc\IRpcEndpoint.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\LazyCapability.cs" Link="Rpc\LazyCapability.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\LocalAnswer.cs" Link="Rpc\LocalAnswer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\LocalAnswerCapability.cs" Link="Rpc\LocalAnswerCapability.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\LocalCapability.cs" Link="Rpc\LocalCapability.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\MemberAccessPath.cs" Link="Rpc\MemberAccessPath.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\PendingAnswer.cs" Link="Rpc\PendingAnswer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\PendingQuestion.cs" Link="Rpc\PendingQuestion.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\PolySkeleton.cs" Link="Rpc\PolySkeleton.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\PromisedCapability.cs" Link="Rpc\PromisedCapability.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\Proxy.cs" Link="Rpc\Proxy.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\ProxyAttribute.cs" Link="Rpc\ProxyAttribute.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\RefCountingCapability.cs" Link="Rpc\RefCountingCapability.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\RemoteAnswerCapability.cs" Link="Rpc\RemoteAnswerCapability.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\RemoteCapability.cs" Link="Rpc\RemoteCapability.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\RemoteResolvingCapability.cs" Link="Rpc\RemoteResolvingCapability.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\ResolvingCapabilityExtensions.cs" Link="Rpc\ResolvingCapabilityExtensions.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\rpc.cs" Link="Rpc\rpc.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\RpcEngine.cs" Link="Rpc\RpcEngine.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\RpcException.cs" Link="Rpc\RpcException.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\RpcUnimplementedException.cs" Link="Rpc\RpcUnimplementedException.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\Skeleton.cs" Link="Rpc\Skeleton.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\SkeletonAttribute.cs" Link="Rpc\SkeletonAttribute.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\TcpRpcClient.cs" Link="Rpc\TcpRpcClient.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\TcpRpcServer.cs" Link="Rpc\TcpRpcServer.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\Rpc\Vine.cs" Link="Rpc\Vine.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\SecurityOptions.cs" Link="SecurityOptions.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\SegmentAllocator.cs" Link="SegmentAllocator.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\SegmentSlice.cs" Link="SegmentSlice.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\SerializerExtensions.cs" Link="SerializerExtensions.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\SerializerState.cs" Link="SerializerState.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\UtilityExtensions.cs" Link="UtilityExtensions.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\WireFrame.cs" Link="WireFrame.cs" />
+    <Compile Include="..\Capnp.Net.Runtime\WirePointer.cs" Link="WirePointer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Rpc\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
+  </ItemGroup>
+
+</Project>

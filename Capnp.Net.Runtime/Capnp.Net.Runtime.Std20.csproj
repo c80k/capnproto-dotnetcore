@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Capnp</RootNamespace>
     <LangVersion>7.2</LangVersion>
+    <AssemblyName>Capnp.Net.Runtime.Std20</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -7,7 +7,6 @@ using Capnp.Rpc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
-using Exception = Capnp.Rpc.Exception;
 
 namespace Capnp.Net.Runtime.Tests
 {
@@ -68,7 +67,7 @@ namespace Capnp.Net.Runtime.Tests
                     SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
                     Assert.AreEqual(1, server.ConnectionCount);
                 }
-                catch (Exception e)
+                catch (System.Exception e)
                 {
                     Console.WriteLine(e);
                     throw;

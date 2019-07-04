@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Capnp.Net.Runtime.Tests\CallContext.cs" Link="CallContext.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\DeserializationTests.cs" Link="DeserializationTests.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\DynamicSerializerStateTests.cs" Link="DynamicSerializerStateTests.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\FramePumpTests.cs" Link="FramePumpTests.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\General.cs" Link="General.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\JobUtil.cs" Link="JobUtil.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\MessageBuilderTests.cs" Link="MessageBuilderTests.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\ProvidedCapabilityMock.cs" Link="ProvidedCapabilityMock.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\ProvidedCapabilityMultiCallMock.cs" Link="ProvidedCapabilityMultiCallMock.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\RpcSchemaTests.cs" Link="RpcSchemaTests.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\SegmentAllocatorTests.cs" Link="SegmentAllocatorTests.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\TcpRpc.cs" Link="TcpRpc.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\TcpRpcAdvancedStuff.cs" Link="TcpRpcAdvancedStuff.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\TcpRpcInterop.cs" Link="TcpRpcInterop.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\TcpRpcPorted.cs" Link="TcpRpcPorted.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\TcpRpcStress.cs" Link="TcpRpcStress.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\test.cs" Link="test.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\TestBase.cs" Link="TestBase.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\TestCapImplementations.cs" Link="TestCapImplementations.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\TestInterfaces.cs" Link="TestInterfaces.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\WirePointerTests.cs" Link="WirePointerTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.2.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="1.4.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Capnp.Net.Runtime.Core21\Capnp.Net.Runtime.Core21.csproj" />
+  </ItemGroup>
+
+</Project>

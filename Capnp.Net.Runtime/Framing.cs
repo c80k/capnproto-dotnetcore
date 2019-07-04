@@ -34,13 +34,20 @@ namespace Capnp
         public static WireFrame ReadWireFrame(this BinaryReader reader)
         {
             uint scount = reader.ReadUInt32();
-            if(scount++ == UInt32.MaxValue) throw new InvalidDataException("Encountered Invalid Framing Data");
+            if (scount++ == uint.MaxValue)
+            {
+                throw new InvalidDataException("Encountered invalid framing data");
+            }
+
             var buffers = new Memory<ulong>[scount];
 
             for (uint i = 0; i < scount; i++)
             {
                 uint size = reader.ReadUInt32();
-                if(size==0) throw new EndOfStreamException("Stream Closed");
+                if (size == 0)
+                {
+                    throw new EndOfStreamException("Stream closed");
+                }
                 buffers[i] = new Memory<ulong>(new ulong[size]);
             }
 
@@ -55,10 +62,11 @@ namespace Capnp
             return new WireFrame(buffers);
         }
         
-        public static void FillBuffersFromFrames(Memory<ulong>[] buffers, uint segmentCount, BinaryReader reader)
+        static void FillBuffersFromFrames(Memory<ulong>[] buffers, uint segmentCount, BinaryReader reader)
         {
             for (uint i = 0; i < segmentCount; i++)
             {
+#if NETSTANDARD2_0
                 var buffer = MemoryMarshal.Cast<ulong, byte>(buffers[i].Span.ToArray());
                 var tmpBuffer = reader.ReadBytes(buffer.Length);
 
@@ -73,6 +81,10 @@ namespace Capnp
                     var value = BitConverter.ToUInt64(tmpBuffer, j*8);
                     buffers[i].Span[j] = value;
                 }
+#else
+                var buffer = MemoryMarshal.Cast<ulong, byte>(buffers[i].Span);
+                reader.Read(buffer);
+#endif
             }
         }
     }

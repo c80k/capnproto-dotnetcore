@@ -63,12 +63,8 @@ namespace Capnp.Rpc
             {
                 throw new RpcException("TcpRpcClient is unable to connect", exception);
             }
-            catch (Exception e)
-            {
-                Logger.LogError("UNHANDLED EXCEPTION");
-            }
-
         }
+
         async Task Connect(string host, int port)
         {
             await ConnectAsync(host, port);

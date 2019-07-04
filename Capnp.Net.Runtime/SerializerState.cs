@@ -1068,7 +1068,11 @@ namespace Capnp
         {
             var bytes = ListGetBytes();
             if (bytes.Length == 0) return string.Empty;
+#if NETSTANDARD2_0
             return Encoding.UTF8.GetString(bytes.Slice(0, bytes.Length - 1).ToArray());
+#else
+            return Encoding.UTF8.GetString(bytes.Slice(0, bytes.Length - 1));
+#endif
         }
 
         /// <summary>
@@ -1164,8 +1168,8 @@ namespace Capnp
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is out of bounds.</exception>
         public void ListWriteValue(int index, float value, float defaultValue = 0)
         {
-            int rcastValue = value.SingleToInt32();
-            int rcastDefaultValue = defaultValue.SingleToInt32();
+            int rcastValue = value.ReplacementSingleToInt32Bits();
+            int rcastDefaultValue = defaultValue.ReplacementSingleToInt32Bits();
             ListWriteValue(index, rcastValue, rcastDefaultValue);
         }
 

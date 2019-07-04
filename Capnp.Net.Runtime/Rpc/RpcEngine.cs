@@ -179,9 +179,7 @@ namespace Capnp.Rpc
 
             uint RandId()
             {
-                var holder = new byte[4];
-                _random.NextBytes(holder);
-                return BitConverter.ToUInt32(holder,0);
+                return unchecked((uint)_random.Next(int.MinValue, int.MaxValue));
             }
 
             uint AllocateExport(Skeleton providedCapability, out bool first)

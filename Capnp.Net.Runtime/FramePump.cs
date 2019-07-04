@@ -81,8 +81,6 @@ namespace Capnp
                 if (segment.Length == 0)
                     throw new ArgumentException("Segment must not have zero length");
             }
-            
-            
 
             lock (_writeLock)
             {
@@ -101,7 +99,11 @@ namespace Capnp
 
                 foreach (var segment in frame.Segments)
                 {
+#if NETSTANDARD2_0
                     var bytes = MemoryMarshal.Cast<ulong, byte>(segment.Span).ToArray();
+#else
+                    var bytes = MemoryMarshal.Cast<ulong, byte>(segment.Span);
+#endif
                     _writer.Write(bytes);
                 }
             }

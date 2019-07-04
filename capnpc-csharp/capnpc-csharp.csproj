@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Capnp.Net.Runtime\Capnp.Net.Runtime.csproj" />
+    <ProjectReference Include="..\Capnp.Net.Runtime\Capnp.Net.Runtime.Std20.csproj" />
   </ItemGroup>
 
 </Project>
