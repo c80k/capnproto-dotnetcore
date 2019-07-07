@@ -751,7 +751,19 @@ namespace Capnp.Net.Runtime.Tests
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
                         var resolving = main as IResolvingCapability;
-                        if (!resolving.WhenResolved.Wait(MediumNonDbgTimeout))
+
+                        bool success;
+
+                        try
+                        {
+                            success = resolving.WhenResolved.Wait(MediumNonDbgTimeout);
+                        }
+                        catch
+                        {
+                            success = false;
+                        }
+
+                        if (!success)
                         {
                             if (++retry == 5)
                             {
@@ -917,13 +929,24 @@ namespace Capnp.Net.Runtime.Tests
                 label:
                 using (var client = new TcpRpcClient("localhost", TcpPort))
                 {
-
                     Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
                         var resolving = main as IResolvingCapability;
-                        if (!resolving.WhenResolved.Wait(MediumNonDbgTimeout))
+
+                        bool success;
+
+                        try
+                        {
+                            success = resolving.WhenResolved.Wait(MediumNonDbgTimeout);
+                        }
+                        catch
+                        {
+                            success = false;
+                        }
+
+                        if (!success)
                         {
                             if (++retry == 5)
                             {

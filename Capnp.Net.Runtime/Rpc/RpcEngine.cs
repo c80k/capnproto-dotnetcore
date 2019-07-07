@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -97,7 +98,14 @@ namespace Capnp.Rpc
                 {
                     _exportTable.Clear();
                     _revExportTable.Clear();
-                    _questionTable.Clear();
+
+                    foreach (var question in _questionTable.Values.ToList())
+                    {
+                        question.OnException(new RpcException("RPC connection is broken. Task would never return."));
+                    }
+
+                    Debug.Assert(_questionTable.Count == 0);
+
                     _answerTable.Clear();
                     _pendingDisembargos.Clear();
                 }
