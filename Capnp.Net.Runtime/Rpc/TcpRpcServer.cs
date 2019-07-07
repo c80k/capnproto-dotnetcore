@@ -169,9 +169,16 @@ namespace Capnp.Rpc
                 }
             }
 
-            if (!_acceptorThread.Join(500))
+            try
             {
-                Logger.LogError("Unable to join TCP acceptor thread within timeout");
+                if (!_acceptorThread.Join(500))
+                {
+                    Logger.LogError("Unable to join TCP acceptor thread within timeout");
+                }
+            }
+            catch (ThreadStateException)
+            {
+                // If acceptor thread was not yet started this is not a problem. Ignore.
             }
 
             GC.SuppressFinalize(this);
@@ -189,7 +196,20 @@ namespace Capnp.Rpc
             _rpcEngine = new RpcEngine();
             _listener = new TcpListener(localAddr, port);
             _listener.ExclusiveAddressUse = false;
-            _listener.Start();
+
+            for (int retry = 0; retry < 5; retry++)
+            {
+                try
+                {
+                    _listener.Start();
+                    break;
+                }
+                catch (SocketException socketException)
+                {
+                    Logger.LogWarning($"Failed to listen on port {port}, attempt {retry}: {socketException}");
+                    Thread.Sleep(10);
+                }
+            }
 
             _acceptorThread = new Thread(AcceptClients);
 

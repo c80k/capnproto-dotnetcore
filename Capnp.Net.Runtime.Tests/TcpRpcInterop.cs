@@ -102,7 +102,7 @@ namespace Capnp.Net.Runtime.Tests
             {
                 using (var client = new TcpRpcClient("localhost", TcpPort))
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                    client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestInterface>())
                     {
@@ -152,7 +152,7 @@ namespace Capnp.Net.Runtime.Tests
 
                 using (var client = new TcpRpcClient("localhost", TcpPort))
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                    client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestPipeline>())
                     {
@@ -205,7 +205,7 @@ namespace Capnp.Net.Runtime.Tests
             {
                 using (var client = new TcpRpcClient("localhost", TcpPort))
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                    client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
@@ -271,7 +271,7 @@ namespace Capnp.Net.Runtime.Tests
             {
                 using (var client = new TcpRpcClient("localhost", TcpPort))
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                    client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
@@ -361,7 +361,7 @@ namespace Capnp.Net.Runtime.Tests
             {
                 using (var client = new TcpRpcClient("localhost", TcpPort))
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                    client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestTailCaller>())
                     {
@@ -417,7 +417,7 @@ namespace Capnp.Net.Runtime.Tests
 
                 using (var client = new TcpRpcClient("localhost", TcpPort))
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                    client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
@@ -462,7 +462,7 @@ namespace Capnp.Net.Runtime.Tests
             {
                 using (var client = new TcpRpcClient("localhost", TcpPort))
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                    client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
@@ -528,7 +528,7 @@ namespace Capnp.Net.Runtime.Tests
 
                 using (var client = new TcpRpcClient("localhost", TcpPort))
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                    client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
@@ -621,7 +621,7 @@ namespace Capnp.Net.Runtime.Tests
             {
                 using (var client = new TcpRpcClient("localhost", TcpPort))
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                    client.WhenConnected.Wait();
 
                     var destructionPromise = new TaskCompletionSource<int>();
                     var destructionTask = destructionPromise.Task;
@@ -679,7 +679,7 @@ namespace Capnp.Net.Runtime.Tests
             {
                 using (var client = new TcpRpcClient("localhost", TcpPort))
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                    client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
@@ -836,7 +836,7 @@ namespace Capnp.Net.Runtime.Tests
             using (var client = new TcpRpcClient("localhost", TcpPort))
             {
 
-                Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                client.WhenConnected.Wait();
 
                 using (var main = client.GetMain<ITestMoreStuff>())
                 {
@@ -929,7 +929,7 @@ namespace Capnp.Net.Runtime.Tests
                 label:
                 using (var client = new TcpRpcClient("localhost", TcpPort))
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                    client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
@@ -1002,7 +1002,7 @@ namespace Capnp.Net.Runtime.Tests
             {
                 using (var client = new TcpRpcClient("localhost", TcpPort))
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                    client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {

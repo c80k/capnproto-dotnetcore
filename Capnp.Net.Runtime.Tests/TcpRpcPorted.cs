@@ -22,7 +22,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestInterfaceImpl(counters);
@@ -52,7 +52,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestPipelineImpl(counters);
@@ -87,7 +87,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
@@ -120,7 +120,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
@@ -159,7 +159,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestTailCallerImpl(counters);
@@ -196,7 +196,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
@@ -226,7 +226,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 var impl = new TestMoreStuffImpl(counters);
@@ -268,7 +268,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                client.WhenConnected.Wait();
 
                 var destructionPromise = new TaskCompletionSource<int>();
                 var destructionTask = destructionPromise.Task;
@@ -345,7 +345,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                client.WhenConnected.Wait();
 
                 var destructionPromise = new TaskCompletionSource<int>();
                 var destructionTask = destructionPromise.Task;
@@ -388,7 +388,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                client.WhenConnected.Wait();
 
                 var destructionPromise = new TaskCompletionSource<int>();
                 var destructionTask = destructionPromise.Task;
@@ -435,7 +435,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 var impl = new TestMoreStuffImpl(counters);
@@ -496,7 +496,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 var impl = new TestMoreStuffImpl(counters);
@@ -553,7 +553,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 var impl = new TestMoreStuffImpl(counters);
@@ -590,7 +590,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 var impl = new TestMoreStuffImpl(counters);

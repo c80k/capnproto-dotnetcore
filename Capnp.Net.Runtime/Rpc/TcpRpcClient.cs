@@ -55,13 +55,22 @@ namespace Capnp.Rpc
 
         async Task ConnectAsync(string host, int port)
         {
-            try
+            for (int retry = 0; ; retry++)
             {
-                await _client.ConnectAsync(host, port);
-            }
-            catch (SocketException exception)
-            {
-                throw new RpcException("TcpRpcClient is unable to connect", exception);
+                try
+                {
+                    await _client.ConnectAsync(host, port);
+
+                    return;
+                }
+                catch (SocketException exception) when (retry < 240 && exception.SocketErrorCode == SocketError.AddressAlreadyInUse)
+                {
+                    await Task.Delay(1000);
+                }
+                catch (SocketException exception)
+                {
+                    throw new RpcException("TcpRpcClient is unable to connect", exception);
+                }
             }
         }
 

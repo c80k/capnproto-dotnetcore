@@ -43,7 +43,7 @@ namespace Capnp.Net.Runtime.Tests
                 using (server)
                 using (client)
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                    client.WhenConnected.Wait();
 
                     var counters = new Counters();
                     var impl = new TestMoreStuffImpl(counters);
