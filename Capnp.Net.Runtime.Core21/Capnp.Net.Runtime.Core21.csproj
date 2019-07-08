@@ -2,6 +2,21 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>Capnp.Net.Runtime</PackageId>
+    <Authors>Christian Köllner and contributors</Authors>
+    <Company />
+    <Product>capnproto-dotnetcore</Product>
+    <Description>A Cap'n Proto implementation for .NET Core, runtime assembly for .NET Core 2.1</Description>
+    <Copyright>Christian Köllner and contributors</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseFile></PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/c80k/capnproto-dotnetcore</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/c80k/capnproto-dotnetcore</RepositoryUrl>
+    <AssemblyName>Capnp.Net.Runtime</AssemblyName>
+    <RootNamespace>Capnp</RootNamespace>
+    <RepositoryType>Git</RepositoryType>
+    <PackageTags>capnp "Cap'n Proto" RPC serialization cerealization</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

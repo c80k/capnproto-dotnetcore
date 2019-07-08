@@ -38,7 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Capnp.Net.Runtime.Core21\Capnp.Net.Runtime.Core21.csproj" />
+    <ProjectReference Include="..\Capnp.Net.Runtime\Capnp.Net.Runtime.csproj" />
   </ItemGroup>
 
 </Project>
