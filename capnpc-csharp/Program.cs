@@ -1,8 +1,6 @@
 ﻿using Capnp;
 using System;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace CapnpC
 {
@@ -17,22 +15,33 @@ namespace CapnpC
                 input = new FileStream(args[0], FileMode.Open, FileAccess.Read);
             }
             else
-            {
+            { 
+                Console.WriteLine("Cap'n Proto C# code generator backend");
+                Console.WriteLine("expecting binary-encoded code generation request from standard input");
+
                 input = Console.OpenStandardInput();
             }
 
-            WireFrame segments;
-
-            using (input)
+            try
             {
-                segments = Framing.ReadSegments(input);
-            }
+                WireFrame segments;
 
-            var dec = DeserializerState.CreateRoot(segments);
-            var reader = Schema.CodeGeneratorRequest.Reader.Create(dec);
-            var model = Model.SchemaModel.Create(reader);
-            var codeGen = new Generator.CodeGenerator(model, new Generator.GeneratorOptions());
-            codeGen.Generate();
+                using (input)
+                {
+                    segments = Framing.ReadSegments(input);
+                }
+
+                var dec = DeserializerState.CreateRoot(segments);
+                var reader = Schema.CodeGeneratorRequest.Reader.Create(dec);
+                var model = Model.SchemaModel.Create(reader);
+                var codeGen = new Generator.CodeGenerator(model, new Generator.GeneratorOptions());
+                codeGen.Generate();
+            }
+            catch (Exception exception)
+            {
+                Console.Error.WriteLine(exception.Message);
+                Environment.ExitCode = -1;
+            }
         }
     }
 }

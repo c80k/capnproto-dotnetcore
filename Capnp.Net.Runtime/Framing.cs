@@ -21,7 +21,7 @@ namespace Capnp
         /// <exception cref="EndOfStreamException">The end of the stream is reached.</exception>
         /// <exception cref="ObjectDisposedException">The stream is closed.</exception>
         /// <exception cref="IOException">An I/O error occurs.</exception>
-        /// <exception cref="InvalidDataException">Encountered invalid framing data.</exception>
+        /// <exception cref="InvalidDataException">Encountered invalid framing data, too many or too large segments</exception>
         /// <exception cref="OutOfMemoryException">Too many or too large segments, probably due to invalid framing data.</exception>
         public static WireFrame ReadSegments(Stream stream)
         {
@@ -39,15 +39,28 @@ namespace Capnp
                 throw new InvalidDataException("Encountered invalid framing data");
             }
 
+            // Cannot have more segments than the traversal limit
+            if (scount >= SecurityOptions.TraversalLimit)
+            {
+                throw new InvalidDataException("Too many segments. Probably invalid data. Try increasing the traversal limit.");
+            }
+
             var buffers = new Memory<ulong>[scount];
 
             for (uint i = 0; i < scount; i++)
             {
                 uint size = reader.ReadUInt32();
+
                 if (size == 0)
                 {
                     throw new EndOfStreamException("Stream closed");
                 }
+
+                if (size >= SecurityOptions.TraversalLimit)
+                {
+                    throw new InvalidDataException("Too large segment. Probably invalid data. Try increasing the traversal limit.");
+                }
+
                 buffers[i] = new Memory<ulong>(new ulong[size]);
             }
 

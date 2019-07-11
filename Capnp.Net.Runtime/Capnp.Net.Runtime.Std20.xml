@@ -540,7 +540,7 @@
             <exception cref="T:System.IO.EndOfStreamException">The end of the stream is reached.</exception>
             <exception cref="T:System.ObjectDisposedException">The stream is closed.</exception>
             <exception cref="T:System.IO.IOException">An I/O error occurs.</exception>
-            <exception cref="T:System.IO.InvalidDataException">Encountered invalid framing data.</exception>
+            <exception cref="T:System.IO.InvalidDataException">Encountered invalid framing data, too many or too large segments</exception>
             <exception cref="T:System.OutOfMemoryException">Too many or too large segments, probably due to invalid framing data.</exception>
         </member>
         <member name="T:Capnp.ICapnpSerializable">
