@@ -31,6 +31,11 @@ namespace Capnp
             }
         }
 
+        /// <summary>
+        /// Deserializes the next Cap'n Proto message from given stream.
+        /// </summary>
+        /// <param name="reader">The stream to read from</param>
+        /// <returns>The message</returns>
         public static WireFrame ReadWireFrame(this BinaryReader reader)
         {
             uint scount = reader.ReadUInt32();

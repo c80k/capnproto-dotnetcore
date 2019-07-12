@@ -62,6 +62,16 @@
             This exception gets thrown when a Cap'n Proto object could not be deserialized correctly.
             </summary>
         </member>
+        <member name="M:Capnp.DeserializationException.#ctor(System.String)">
+            <summary>
+            Constructs an instance
+            </summary>
+        </member>
+        <member name="M:Capnp.DeserializationException.#ctor(System.String,System.Exception)">
+            <summary>
+            Constructs an instance with message and inner exception
+            </summary>
+        </member>
         <member name="T:Capnp.DeserializerState">
             <summary>
             Implements the heart of deserialization. This stateful helper struct exposes all functionality to traverse serialized data.
@@ -279,6 +289,9 @@
             </summary>
             <typeparam name="T">Capability interface</typeparam>
             <param name="index">index within this struct's pointer table</param>
+            <param name="memberName">debugging aid</param>
+            <param name="sourceFilePath">debugging aid</param>
+            <param name="sourceLineNumber">debugging aid</param>
             <returns>capability instance or null if pointer was null</returns>
             <exception cref="T:System.IndexOutOfRangeException">negative index</exception>
             <exception cref="T:Capnp.DeserializationException">state does not represent a struct, invalid pointer,
@@ -331,8 +344,36 @@
             </summary>
             <param name="state">The deserializer state to convert</param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Capnp.DynamicSerializerState.Link(System.Int32,Capnp.SerializerState,System.Boolean)" -->
-        <!-- Badly formed XML comment ignored for member "M:Capnp.DynamicSerializerState.LinkToCapability(System.Int32,System.UInt32)" -->
+        <member name="M:Capnp.DynamicSerializerState.Link(System.Int32,Capnp.SerializerState,System.Boolean)">
+            <summary>
+            Links a sub-item (struct field or list element) of this state to another state. Usually, this operation is not necessary, since objects are constructed top-down.
+            However, there might be some advanced scenarios where you want to reference the same object twice (also interesting for designing amplification attacks).
+            The Cap'n Proto serialization intrinsically supports this, since messages are object graphs, not trees.
+            </summary>
+            <param name="slot">If this state describes a struct: Index into this struct's pointer table. 
+            If this state describes a list of pointers: List element index.</param>
+            <param name="target">state to be linked</param>
+            <param name="allowCopy">Whether to deep copy the target state if it belongs to a different message builder than this state.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="target"/> is null</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="slot"/> out of range</exception>
+            <exception cref="T:System.InvalidOperationException"><list type="bullet">
+            <item><description>This state does neither describe a struct, nor a list of pointers</description></item>
+            <item><description>Another state is already linked to the specified position (sorry, no overwrite allowed)</description></item>
+            <item><description>This state and <paramref name="target"/> belong to different message builder, and<paramref name="allowCopy"/> is false</description></item></list>
+            </exception>
+        </member>
+        <member name="M:Capnp.DynamicSerializerState.LinkToCapability(System.Int32,System.UInt32)">
+            <summary>
+            Links a sub-item (struct field or list element) of this state to a capability.
+            </summary>
+            <param name="slot">If this state describes a struct: Index into this struct's pointer table. 
+            If this state describes a list of pointers: List element index.</param>
+            <param name="capabilityIndex">capability index inside the capability table</param>
+            <exception cref="T:System.InvalidOperationException"><list type="bullet">
+            <item><description>This state does neither describe a struct, nor a list of pointers</description></item>
+            <item><description>Another state is already linked to the specified position (sorry, no overwrite allowed)</description></item></list>
+            </exception>
+        </member>
         <member name="M:Capnp.DynamicSerializerState.SetStruct(System.UInt16,System.UInt16)">
             <summary>
             Determines the underlying object to be a struct.
@@ -369,7 +410,37 @@
             <exception cref="T:System.InvalidOperationException">The object type was already set to something different</exception>
             <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="totalCount"/> negative, or total word count would exceed 2^29-1</exception>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Capnp.DynamicSerializerState.SetObject(System.Object)" -->
+        <member name="M:Capnp.DynamicSerializerState.SetObject(System.Object)">
+            <summary>
+            Constructs the underlying object from the given representation.
+            </summary>
+            <param name="obj">Object representation. Must be one of the following:
+            <list type="bullet">
+            <item><description>An instance implementing <see cref="T:Capnp.ICapnpSerializable"/></description></item>
+            <item><description>null</description></item>
+            <item><description>A <see cref="T:System.String"/></description></item>
+            <item><description>A <code><![CDATA[IReadOnlyList<byte>]]></code></description></item>
+            <item><description>A <code><![CDATA[IReadOnlyList<sbyte>]]></code></description></item>
+            <item><description>A <code><![CDATA[IReadOnlyList<ushort>]]></code></description></item>
+            <item><description>A <code><![CDATA[IReadOnlyList<short>]]></code></description></item>
+            <item><description>A <code><![CDATA[IReadOnlyList<int>]]></code></description></item>
+            <item><description>A <code><![CDATA[IReadOnlyList<uint>]]></code></description></item>
+            <item><description>A <code><![CDATA[IReadOnlyList<long>]]></code></description></item>
+            <item><description>A <code><![CDATA[IReadOnlyList<ulong>]]></code></description></item>
+            <item><description>A <code><![CDATA[IReadOnlyList<float>]]></code></description></item>
+            <item><description>A <code><![CDATA[IReadOnlyList<double>]]></code></description></item>
+            <item><description>A <code><![CDATA[IReadOnlyList<bool>]]></code></description></item>
+            <item><description>A <code><![CDATA[IReadOnlyList<string>]]></code></description></item>
+            <item><description>Another <see cref="T:Capnp.DeserializerState"/></description></item>
+            <item><description>Another <see cref="T:Capnp.SerializerState"/></description></item>
+            <item><description>Low-level capability object (<see cref="T:Capnp.Rpc.ConsumedCapability"/>)</description></item>
+            <item><description>Proxy object (<see cref="T:Capnp.Rpc.Proxy"/>)</description></item>
+            <item><description>Skeleton object (<see cref="T:Capnp.Rpc.Skeleton"/>)</description></item>
+            <item><description>Capability interface implementation</description></item>
+            <item><description>A <code><![CDATA[IReadOnlyList<object>]]></code> whereby each list item is one of the things listed here.</description></item>
+            </list>
+            </param>
+        </member>
         <member name="T:Capnp.EmptyList`1">
             <summary>
             Implements an empty <see cref="T:System.Collections.Generic.IReadOnlyList`1"/>.
@@ -411,43 +482,47 @@
         </member>
         <member name="M:Capnp.EmptyListDeserializer.CastBool">
             <summary>
-            Returns an empty <see cref="T:System.Collections.Generic.IReadOnlyList`1"/>.
+            Returns an empty <code><![CDATA[IReadOnlyList<bool>]]></code>/>.
             </summary>
         </member>
         <member name="M:Capnp.EmptyListDeserializer.CastByte">
             <summary>
-            Returns an empty <see cref="T:System.Collections.Generic.IReadOnlyList`1"/>.
+            Returns an empty <code><![CDATA[IReadOnlyList<byte>]]></code>/>.
             </summary>
         </member>
         <member name="M:Capnp.EmptyListDeserializer.CastDouble">
             <summary>
-            Returns an empty <see cref="T:System.Collections.Generic.IReadOnlyList`1"/>.
+            Returns an empty <code><![CDATA[IReadOnlyList<double>]]></code>/>.
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Capnp.EmptyListDeserializer.CastFloat" -->
+        <member name="M:Capnp.EmptyListDeserializer.CastFloat">
+            <summary>
+            Returns an empty <code><![CDATA[IReadOnlyList<float>]]></code>.
+            </summary>
+        </member>
         <member name="M:Capnp.EmptyListDeserializer.CastInt">
             <summary>
-            Returns an empty <see cref="T:System.Collections.Generic.IReadOnlyList`1"/>.
+            Returns an empty <code><![CDATA[IReadOnlyList<int>]]></code>.
             </summary>
         </member>
         <member name="M:Capnp.EmptyListDeserializer.CastList">
             <summary>
-            Returns an empty <see cref="T:System.Collections.Generic.IReadOnlyList`1"/>.
+            Returns an empty <code><![CDATA[IReadOnlyList<ListDeserializer>]]></code>.
             </summary>
         </member>
         <member name="M:Capnp.EmptyListDeserializer.CastLong">
             <summary>
-            Returns an empty <see cref="T:System.Collections.Generic.IReadOnlyList`1"/>.
+            Returns an empty <code><![CDATA[IReadOnlyList<long>]]></code>/>.
             </summary>
         </member>
         <member name="M:Capnp.EmptyListDeserializer.CastSByte">
             <summary>
-            Returns an empty <see cref="T:System.Collections.Generic.IReadOnlyList`1"/>.
+            Returns an empty <code><![CDATA[IReadOnlyList<sbyte>]]></code>.
             </summary>
         </member>
         <member name="M:Capnp.EmptyListDeserializer.CastShort">
             <summary>
-            Returns an empty <see cref="T:System.Collections.Generic.IReadOnlyList`1"/>.
+            Returns an empty <code><![CDATA[IReadOnlyList<short>]]></code>.
             </summary>
         </member>
         <member name="M:Capnp.EmptyListDeserializer.CastText">
@@ -457,17 +532,17 @@
         </member>
         <member name="M:Capnp.EmptyListDeserializer.CastUInt">
             <summary>
-            Returns an empty <see cref="T:System.Collections.Generic.IReadOnlyList`1"/>.
+            Returns an empty <code><![CDATA[IReadOnlyList<uint>]]></code>.
             </summary>
         </member>
         <member name="M:Capnp.EmptyListDeserializer.CastULong">
             <summary>
-            Returns an empty <see cref="T:System.Collections.Generic.IReadOnlyList`1"/>.
+            Returns an empty <code><![CDATA[IReadOnlyList<ulong>]]></code>.
             </summary>
         </member>
         <member name="M:Capnp.EmptyListDeserializer.CastUShort">
             <summary>
-            Returns an empty <see cref="T:System.Collections.Generic.IReadOnlyList`1"/>.
+            Returns an empty <code><![CDATA[IReadOnlyList<ushort>]]></code>.
             </summary>
         </member>
         <member name="T:Capnp.FramePump">
@@ -542,6 +617,13 @@
             <exception cref="T:System.IO.IOException">An I/O error occurs.</exception>
             <exception cref="T:System.IO.InvalidDataException">Encountered invalid framing data, too many or too large segments</exception>
             <exception cref="T:System.OutOfMemoryException">Too many or too large segments, probably due to invalid framing data.</exception>
+        </member>
+        <member name="M:Capnp.Framing.ReadWireFrame(System.IO.BinaryReader)">
+            <summary>
+            Deserializes the next Cap'n Proto message from given stream.
+            </summary>
+            <param name="reader">The stream to read from</param>
+            <returns>The message</returns>
         </member>
         <member name="T:Capnp.ICapnpSerializable">
             <summary>
@@ -876,6 +958,13 @@
             <returns>The desired representation</returns>
             <exception cref="T:System.NotSupportedException">If this list cannot be represented in the desired manner.</exception>
         </member>
+        <member name="M:Capnp.ListDeserializer.CastLong">
+            <summary>
+            Represents this list as List(Int64).
+            </summary>
+            <returns>The desired representation</returns>
+            <exception cref="T:System.NotSupportedException">If this list cannot be represented in the desired manner.</exception>
+        </member>
         <member name="M:Capnp.ListDeserializer.CastULong">
             <summary>
             Represents this list as List(UInt64).
@@ -962,7 +1051,7 @@
         </member>
         <member name="M:Capnp.ListOfBitsDeserializer.GetEnumerator">
             <summary>
-            Implements <see cref="!:IEnumerable&lt;bool&gt;"/>
+            Implements <see cref="T:System.Collections.Generic.IEnumerable`1"/>
             </summary>
             <returns></returns>
         </member>
@@ -1039,7 +1128,12 @@
             Always throws <see cref="T:System.NotSupportedException"/>, since it is not intended to convert a capability list to anything else.
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Capnp.ListOfCapsDeserializer`1.GetEnumerator" -->
+        <member name="M:Capnp.ListOfCapsDeserializer`1.GetEnumerator">
+            <summary>
+            Implements <see cref="T:System.Collections.Generic.IEnumerable`1"/>.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:Capnp.ListOfCapsSerializer`1">
             <summary>
             SerializerState specialization for a list of capabilities.
@@ -1084,7 +1178,12 @@
             This list's element count.
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Capnp.ListOfCapsSerializer`1.GetEnumerator" -->
+        <member name="M:Capnp.ListOfCapsSerializer`1.GetEnumerator">
+            <summary>
+            Implements <see cref="T:System.Collections.Generic.IEnumerable`1"/>.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:Capnp.ListOfEmptyDeserializer">
             <summary>
             ListDeserializer specialization for List(Void).
@@ -1403,7 +1502,11 @@
             <param name="cons">The selector function</param>
             <returns>The new list representation</returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Capnp.ListOfStructsDeserializer.GetEnumerator" -->
+        <member name="M:Capnp.ListOfStructsDeserializer.GetEnumerator">
+            <summary>
+            Implements <see cref="T:System.Collections.Generic.IEnumerable`1"/>.
+            </summary>
+        </member>
         <member name="T:Capnp.ListOfStructsSerializer`1">
             <summary>
             SerializerState specialization for List(T) when T is a known struct (i.e. a list of fixed-width composites).
@@ -1625,7 +1728,18 @@
             Provides extension methods for <see cref="T:System.Collections.Generic.IReadOnlyList`1"/>
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Capnp.ReadOnlyListExtensions.LazyListSelect``2(System.Collections.Generic.IReadOnlyList{``0},System.Func{``0,``1})" -->
+        <member name="M:Capnp.ReadOnlyListExtensions.LazyListSelect``2(System.Collections.Generic.IReadOnlyList{``0},System.Func{``0,``1})">
+            <summary>
+            LINQ-like "Select" operator for <see cref="T:System.Collections.Generic.IReadOnlyList`1"/>, with the addition that the resulting elements are accessible by index.
+            The operator implements lazy semantics, which means that the selector function results are not cached./>
+            </summary>
+            <typeparam name="From">Source element type</typeparam>
+            <typeparam name="To">Target element type</typeparam>
+            <param name="source">Source list</param>
+            <param name="selector">Selector function</param>
+            <returns>A read-only list in which each element corresponds to the source element after applying the selector function</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="source"/> or <paramref name="selector"/> is null.</exception>
+        </member>
         <member name="M:Capnp.ReadOnlyListExtensions.ToReadOnlyList``2(System.Collections.Generic.IReadOnlyList{``0},System.Func{``0,``1})">
             <summary>
             Applies a selector function to each list element and stores the result in a new list.
@@ -1662,6 +1776,28 @@
             Helper struct to support tail calls
             </summary>
         </member>
+        <member name="M:Capnp.Rpc.AnswerOrCounterquestion.op_Implicit(Capnp.SerializerState)~Capnp.Rpc.AnswerOrCounterquestion">
+            <summary>
+            Wraps a SerializerState
+            </summary>
+            <param name="answer">object to wrap</param>
+        </member>
+        <member name="M:Capnp.Rpc.AnswerOrCounterquestion.op_Implicit(Capnp.Rpc.PendingQuestion)~Capnp.Rpc.AnswerOrCounterquestion">
+            <summary>
+            Wraps a PendingQuestion
+            </summary>
+            <param name="counterquestion">object to wrap</param>
+        </member>
+        <member name="P:Capnp.Rpc.AnswerOrCounterquestion.Answer">
+            <summary>
+            SerializerState, if applicable
+            </summary>
+        </member>
+        <member name="P:Capnp.Rpc.AnswerOrCounterquestion.Counterquestion">
+            <summary>
+            PendingQuestion, if applicable
+            </summary>
+        </member>
         <member name="T:Capnp.Rpc.BareProxy">
             <summary>
             Generic Proxy implementation which exposes the (usually protected) Call method.
@@ -1673,13 +1809,13 @@
             </summary>
             <param name="impl">Capability implementation</param>
             <returns>Proxy</returns>
-            <exception cref="!:ArgumentNullException"><paramref name="impl"/> is null.</exception>
+            <exception cref="T:System.ArgumentNullException"><paramref name="impl"/> is null.</exception>
             <exception cref="T:Capnp.Rpc.InvalidCapabilityInterfaceException">No <see cref="T:Capnp.Rpc.SkeletonAttribute"/> found on implemented interface(s).</exception>
-            <exception cref="!:InvalidOperationException">Mismatch between generic type arguments (if capability interface is generic).</exception>
-            <exception cref="!:ArgumentException">Mismatch between generic type arguments (if capability interface is generic).</exception>
+            <exception cref="T:System.InvalidOperationException">Mismatch between generic type arguments (if capability interface is generic).</exception>
+            <exception cref="T:System.ArgumentException">Mismatch between generic type arguments (if capability interface is generic).</exception>
             <exception cref="T:System.Reflection.TargetInvocationException">Problem with instatiating the Skeleton (constructor threw exception).</exception>
-            <exception cref="!:MemberAccessException">Caller does not have permission to invoke the Skeleton constructor.</exception>
-            <exception cref="!:TypeLoadException">Problem with building the Skeleton type, or problem with loading some dependent class.</exception>
+            <exception cref="T:System.MemberAccessException">Caller does not have permission to invoke the Skeleton constructor.</exception>
+            <exception cref="T:System.TypeLoadException">Problem with building the Skeleton type, or problem with loading some dependent class.</exception>
         </member>
         <member name="M:Capnp.Rpc.BareProxy.#ctor">
             <summary>
@@ -1746,6 +1882,9 @@
             </summary>
             <typeparam name="TInterface">Capability interface. Must be annotated with <see cref="T:Capnp.Rpc.ProxyAttribute"/>.</typeparam>
             <param name="cap">low-level capability</param>
+            <param name="memberName">debugging aid</param>
+            <param name="sourceFilePath">debugging aid</param>
+            <param name="sourceLineNumber">debugging aid</param>
             <returns>The Proxy instance which implements <typeparamref name="TInterface"/>.</returns>
             <exception cref="T:System.ArgumentNullException"><paramref name="cap"/> is null.</exception>
             <exception cref="T:Capnp.Rpc.InvalidCapabilityInterfaceException"><typeparamref name="TInterface"/> did not qualify as capability interface.</exception>
@@ -1824,10 +1963,52 @@
             </summary>
             <typeparam name="TInterface">Capability interface type</typeparam>
             <param name="task">The task</param>
+            <param name="memberName">debugging aid</param>
+            <param name="sourceFilePath">debugging aid</param>
+            <param name="sourceLineNumber">debugging aid</param>
             <returns>A proxy for the given task.</returns>
             <exception cref="T:System.ArgumentNullException"><paramref name="task"/> is null.</exception>
             <exception cref="T:Capnp.Rpc.InvalidCapabilityInterfaceException"><typeparamref name="TInterface"/> did not
             quality as capability interface.</exception>
+        </member>
+        <member name="M:Capnp.Rpc.Impatient.MaybeTailCall``1(System.Threading.Tasks.Task{``0},System.Func{``0,Capnp.SerializerState})">
+            <summary>
+            Checks whether a given task belongs to a pending RPC and requests a tail call if applicable.
+            </summary>
+            <typeparam name="T">Task result type</typeparam>
+            <param name="task">Task to request</param>
+            <param name="func">Converts the task's result to a SerializerState</param>
+            <returns>Tail-call aware task</returns>
+        </member>
+        <member name="M:Capnp.Rpc.Impatient.MaybeTailCall``2(System.Threading.Tasks.Task{System.ValueTuple{``0,``1}},System.Func{``0,``1,Capnp.SerializerState})">
+            <summary>
+            Overload for tuple-typed tasks
+            </summary>
+        </member>
+        <member name="M:Capnp.Rpc.Impatient.MaybeTailCall``3(System.Threading.Tasks.Task{System.ValueTuple{``0,``1,``2}},System.Func{``0,``1,``2,Capnp.SerializerState})">
+            <summary>
+            Overload for tuple-typed tasks
+            </summary>
+        </member>
+        <member name="M:Capnp.Rpc.Impatient.MaybeTailCall``4(System.Threading.Tasks.Task{System.ValueTuple{``0,``1,``2,``3}},System.Func{``0,``1,``2,``3,Capnp.SerializerState})">
+            <summary>
+            Overload for tuple-typed tasks
+            </summary>
+        </member>
+        <member name="M:Capnp.Rpc.Impatient.MaybeTailCall``5(System.Threading.Tasks.Task{System.ValueTuple{``0,``1,``2,``3,``4}},System.Func{``0,``1,``2,``3,``4,Capnp.SerializerState})">
+            <summary>
+            Overload for tuple-typed tasks
+            </summary>
+        </member>
+        <member name="M:Capnp.Rpc.Impatient.MaybeTailCall``6(System.Threading.Tasks.Task{System.ValueTuple{``0,``1,``2,``3,``4,``5}},System.Func{``0,``1,``2,``3,``4,``5,Capnp.SerializerState})">
+            <summary>
+            Overload for tuple-typed tasks
+            </summary>
+        </member>
+        <member name="M:Capnp.Rpc.Impatient.MaybeTailCall``7(System.Threading.Tasks.Task{System.ValueTuple{``0,``1,``2,``3,``4,``5,``6}},System.Func{``0,``1,``2,``3,``4,``5,``6,Capnp.SerializerState})">
+            <summary>
+            Overload for tuple-typed tasks
+            </summary>
         </member>
         <member name="T:Capnp.Rpc.ImportedCapability">
             <summary>
@@ -1839,6 +2020,16 @@
             Will be thrown if a type did not qualify as capability interface.
             In order to qualify the type must be properly annotated with a <see cref="T:Capnp.Rpc.ProxyAttribute"/> and <see cref="T:Capnp.Rpc.SkeletonAttribute"/>.
             See descriptions of these attributes for further details.
+            </summary>
+        </member>
+        <member name="M:Capnp.Rpc.InvalidCapabilityInterfaceException.#ctor(System.String)">
+            <summary>
+            Constructs an instance.
+            </summary>
+        </member>
+        <member name="M:Capnp.Rpc.InvalidCapabilityInterfaceException.#ctor(System.String,System.Exception)">
+            <summary>
+            Constructs an instance with message an inner exception.
             </summary>
         </member>
         <member name="T:Capnp.Rpc.IPromisedAnswer">
@@ -1892,6 +2083,18 @@
             A path from an outer Cap'n Proto struct to an inner (probably deeply nested) struct member.
             </summary>
         </member>
+        <member name="F:Capnp.Rpc.MemberAccessPath.BootstrapAccess">
+            <summary>
+            Path to the bootstrap capability (which is an empty path)
+            </summary>
+        </member>
+        <member name="M:Capnp.Rpc.MemberAccessPath.Deserialize(Capnp.Rpc.PromisedAnswer.READER)">
+            <summary>
+            Deserializes a MemberAccessPath from Cap'n Proto representation.
+            </summary>
+            <param name="promisedAnswer">Cap'n Proto representation</param>
+            <returns>The MemberAccessPath</returns>
+        </member>
         <member name="M:Capnp.Rpc.MemberAccessPath.#ctor(System.Collections.Generic.IReadOnlyList{Capnp.Rpc.MemberAccessPath.MemberAccess})">
             <summary>
             Constructs a path from <see cref="T:Capnp.Rpc.MemberAccessPath.MemberAccess"/> qualifiers.
@@ -1913,6 +2116,13 @@
             But there might be further specializations in the future, the most obvious one being an "ArrayElementAccess".
             Now we already have a suitable design pattern, mainly to show the abstract concept behind a member access path.
             </remarks>
+        </member>
+        <member name="M:Capnp.Rpc.MemberAccessPath.MemberAccess.Deserialize(Capnp.Rpc.PromisedAnswer.Op.READER)">
+            <summary>
+            Deserializes a MemberAccess instance from Cap'n Proto representation.
+            </summary>
+            <param name="op">Cap'n Proto representation</param>
+            <returns>Deserialized instance</returns>
         </member>
         <member name="M:Capnp.Rpc.MemberAccessPath.MemberAccess.Serialize(Capnp.Rpc.PromisedAnswer.Op.WRITER)">
             <summary>
@@ -1984,6 +2194,72 @@
             the ongoing call.
             </remarks>
         </member>
+        <member name="T:Capnp.Rpc.PendingQuestion.State">
+            <summary>
+            Question lifetime management state
+            </summary>
+        </member>
+        <member name="F:Capnp.Rpc.PendingQuestion.State.None">
+            <summary>
+            The question has not yet been sent.
+            </summary>
+        </member>
+        <member name="F:Capnp.Rpc.PendingQuestion.State.TailCall">
+            <summary>
+            Tail call flag
+            </summary>
+        </member>
+        <member name="F:Capnp.Rpc.PendingQuestion.State.Sent">
+            <summary>
+            The question has been sent.
+            </summary>
+        </member>
+        <member name="F:Capnp.Rpc.PendingQuestion.State.Returned">
+            <summary>
+            The question has been answered.
+            </summary>
+        </member>
+        <member name="F:Capnp.Rpc.PendingQuestion.State.FinishRequested">
+            <summary>
+            A 'finish' request was sent to the peer, indicating that no further requests will refer
+            to this question.
+            </summary>
+        </member>
+        <member name="F:Capnp.Rpc.PendingQuestion.State.Disposed">
+            <summary>
+            Question object was disposed.
+            </summary>
+        </member>
+        <member name="F:Capnp.Rpc.PendingQuestion.State.Finalized">
+            <summary>
+            Question object was finalized by GC. 
+            This flag should only be observable when debugging the finalizer itself.
+            </summary>
+        </member>
+        <member name="P:Capnp.Rpc.PendingQuestion.WhenReturned">
+            <summary>
+            Eventually returns the server answer
+            </summary>
+        </member>
+        <member name="M:Capnp.Rpc.PendingQuestion.Access(Capnp.Rpc.MemberAccessPath)">
+            <summary>
+            Refer to a (possibly nested) member of this question's (possibly future) result and return
+            it as a capability.
+            </summary>
+            <param name="access">Access path</param>
+            <returns>Low-level capability</returns>
+            <exception cref="T:Capnp.DeserializationException">The referenced member does not exist or does not resolve to a capability pointer.</exception>
+        </member>
+        <member name="M:Capnp.Rpc.PendingQuestion.Finalize">
+            <summary>
+            Finalizer
+            </summary>
+        </member>
+        <member name="M:Capnp.Rpc.PendingQuestion.Dispose">
+            <summary>
+            Implements <see cref="T:System.IDisposable"/>.
+            </summary>
+        </member>
         <member name="T:Capnp.Rpc.PolySkeleton">
             <summary>
             Combines multiple skeletons to represent objects which implement multiple interfaces.
@@ -2024,6 +2300,11 @@
             Will eventually give the resolved capability, if this is a promised capability.
             </summary>
         </member>
+        <member name="P:Capnp.Rpc.Proxy.ConsumedCap">
+            <summary>
+            Underlying low-level capability
+            </summary>
+        </member>
         <member name="P:Capnp.Rpc.Proxy.IsNull">
             <summary>
             Whether is this a broken capability.
@@ -2041,11 +2322,21 @@
             <returns>An answer promise</returns>
             <exception cref="T:System.ObjectDisposedException">This instance was disposed, or transport-layer stream was disposed.</exception>
             <exception cref="T:System.InvalidOperationException">Capability is broken.</exception>
-            <exception cref="!:IOException">An I/O error occurs.</exception>
+            <exception cref="T:System.IO.IOException">An I/O error occurs.</exception>
+        </member>
+        <member name="M:Capnp.Rpc.Proxy.#ctor">
+            <summary>
+            Constructs a null instance.
+            </summary>
         </member>
         <member name="M:Capnp.Rpc.Proxy.Dispose(System.Boolean)">
             <summary>
             Dispose pattern implementation
+            </summary>
+        </member>
+        <member name="M:Capnp.Rpc.Proxy.Finalize">
+            <summary>
+            Finalizer
             </summary>
         </member>
         <member name="M:Capnp.Rpc.Proxy.Dispose">
@@ -2106,6 +2397,16 @@
             Thrown when an RPC-related error condition occurs.
             </summary>
         </member>
+        <member name="M:Capnp.Rpc.RpcException.#ctor(System.String)">
+            <summary>
+            Constructs an instance.
+            </summary>
+        </member>
+        <member name="M:Capnp.Rpc.RpcException.#ctor(System.String,System.Exception)">
+            <summary>
+            Constructs an instance with message and inner exception.
+            </summary>
+        </member>
         <member name="T:Capnp.Rpc.Skeleton">
             <summary>
             A skeleton is a wrapper around a capability interface implementation which adapts it in the way it is
@@ -2133,6 +2434,11 @@
         <member name="M:Capnp.Rpc.Skeleton.Dispose(System.Boolean)">
             <summary>
             Dispose pattern implementation
+            </summary>
+        </member>
+        <member name="M:Capnp.Rpc.Skeleton.Finalize">
+            <summary>
+            Finalizer
             </summary>
         </member>
         <member name="T:Capnp.Rpc.Skeleton`1">
@@ -2262,6 +2568,36 @@
             Cap'n Proto RPC TCP server.
             </summary>
         </member>
+        <member name="T:Capnp.Rpc.TcpRpcServer.IConnection">
+            <summary>
+            Models an incoming connection.
+            </summary>
+        </member>
+        <member name="P:Capnp.Rpc.TcpRpcServer.IConnection.LocalPort">
+            <summary>
+            Server-side port
+            </summary>
+        </member>
+        <member name="P:Capnp.Rpc.TcpRpcServer.IConnection.RecvCount">
+            <summary>
+            Receive message counter
+            </summary>
+        </member>
+        <member name="P:Capnp.Rpc.TcpRpcServer.IConnection.SendCount">
+            <summary>
+            Sent message counter
+            </summary>
+        </member>
+        <member name="P:Capnp.Rpc.TcpRpcServer.IConnection.IsComputing">
+            <summary>
+            Whether the RPC engine is currently computing.
+            </summary>
+        </member>
+        <member name="P:Capnp.Rpc.TcpRpcServer.IConnection.IsWaitingForData">
+            <summary>
+            Whether the connection is idle, waiting for data to receive.
+            </summary>
+        </member>
         <member name="P:Capnp.Rpc.TcpRpcServer.ConnectionCount">
             <summary>
             Gets the number of currently active inbound TCP connections.
@@ -2350,6 +2686,16 @@
         <member name="T:Capnp.SegmentSlice">
             <summary>
             Helper struct to represent the tuple (segment index, offset)
+            </summary>
+        </member>
+        <member name="F:Capnp.SegmentSlice.SegmentIndex">
+            <summary>
+            Segment index
+            </summary>
+        </member>
+        <member name="F:Capnp.SegmentSlice.Offset">
+            <summary>
+            Word offset within segment
             </summary>
         </member>
         <member name="T:Capnp.SerializerExtensions">
@@ -2646,8 +2992,37 @@
             anymore (e.g. changing from struct to list, or modifying the struct's section sizes).
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Capnp.SerializerState.Link(System.Int32,Capnp.SerializerState,System.Boolean)" -->
-        <!-- Badly formed XML comment ignored for member "M:Capnp.SerializerState.LinkToCapability(System.Int32,System.UInt32)" -->
+        <member name="M:Capnp.SerializerState.Link(System.Int32,Capnp.SerializerState,System.Boolean)">
+            <summary>
+            Links a sub-item (struct field or list element) of this state to another state. Usually, this operation is not necessary, since objects are constructed top-down.
+            However, there might be some advanced scenarios where you want to reference the same object twice (also interesting for designing amplification attacks).
+            The Cap'n Proto serialization intrinsically supports this, since messages are object graphs, not trees.
+            </summary>
+            <param name="slot">If this state describes a struct: Index into this struct's pointer table. 
+            If this state describes a list of pointers: List element index.</param>
+            <param name="target">state to be linked</param>
+            <param name="allowCopy">Whether to deep copy the target state if it belongs to a different message builder than this state.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="target"/> is null</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="slot"/> out of range</exception>
+            <exception cref="T:System.InvalidOperationException"><list type="bullet">
+            <item><description>This state does neither describe a struct, nor a list of pointers</description></item>
+            <item><description>Another state is already linked to the specified position (sorry, no overwrite allowed)</description></item>
+            <item><description>This state and <paramref name="target"/> belong to different message builder, and<paramref name="allowCopy"/> is false</description></item>
+            </list>
+            </exception>
+        </member>
+        <member name="M:Capnp.SerializerState.LinkToCapability(System.Int32,System.UInt32)">
+            <summary>
+            Links a sub-item (struct field or list element) of this state to a capability.
+            </summary>
+            <param name="slot">If this state describes a struct: Index into this struct's pointer table. 
+            If this state describes a list of pointers: List element index.</param>
+            <param name="capabilityIndex">capability index inside the capability table</param>
+            <exception cref="T:System.InvalidOperationException"><list type="bullet">
+            <item><description>This state does neither describe a struct, nor a list of pointers</description></item>
+            <item><description>Another state is already linked to the specified position (sorry, no overwrite allowed)</description></item></list>
+            </exception>
+        </member>
         <member name="M:Capnp.SerializerState.SetStruct(System.UInt16,System.UInt16)">
             <summary>
             Determines the underlying object to be a struct.
@@ -2715,8 +3090,8 @@
             <param name="count">Number of bits to read</param>
             <returns>Data bits which were read</returns>
             <exception cref="T:System.InvalidOperationException">The object was not determined to be a struct</exception>
-            <exception cref="T:System.ArgumentOutOfRangeException">The data slice specified by <paramref name="bitOffset"/> and <paramref name="bitCount"/>
-            is not completely within the struct's data section, misaligned, exceeds one word, or <paramref name="bitCount"/> is negative</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">The data slice specified by <paramref name="bitOffset"/> and <paramref name="count"/>
+            is not completely within the struct's data section, misaligned, exceeds one word, or <paramref name="count"/> is negative</exception>
         </member>
         <member name="M:Capnp.SerializerState.BuildPointer``1(System.Int32)">
             <summary>
@@ -2771,6 +3146,15 @@
             <item><description>Object at given position is not compatible with the desired target serializer type.</description></item>
             </list></exception>
             <exception cref="T:System.IndexOutOfRangeException"><paramref name="index"/> is out of bounds.</exception>
+        </member>
+        <member name="M:Capnp.SerializerState.ReadText(System.Int32,System.String)">
+            <summary>
+            Reads text from a struct field or list element.
+            </summary>
+            <param name="index">If the underlying object is a struct: index into the struct's pointer section.
+            If the underlying object is a list of pointers: Element index</param>
+            <param name="defaultText">String to return in case of null</param>
+            <returns>The decoded text</returns>
         </member>
         <member name="M:Capnp.SerializerState.WriteText(System.Int32,System.String)">
             <summary>
@@ -2975,7 +3359,7 @@
             <summary>
             Adds an entry to the capability table if the provided capability does not yet exist.
             </summary>
-            <param name="capability">The capability, in one of the following forms:<list type="bullet">
+            <param name="obj">The capability, in one of the following forms:<list type="bullet">
             <item><description>Low-level capability object (<code>Rpc.ConsumedCapability</code>)</description></item>
             <item><description>Proxy object (<code>Rpc.Proxy</code>)</description></item>
             <item><description>Skeleton object (<code>Rpc.Skeleton</code>)</description></item>
@@ -2984,8 +3368,41 @@
             <returns>Index of the given capability in the capability table</returns>
             <exception cref="T:System.InvalidOperationException">The underlying message builder was not configured for capability table support.</exception>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Capnp.SerializerState.LinkObject``1(System.Int32,``0)" -->
-        <!-- Badly formed XML comment ignored for member "M:Capnp.SerializerState.ReadCap``1(System.Int32)" -->
+        <member name="M:Capnp.SerializerState.LinkObject``1(System.Int32,``0)">
+            <summary>
+            Links a sub-item (struct field or list element) of this state to another object. 
+            In contrast to <see cref="M:Capnp.SerializerState.Link(System.Int32,Capnp.SerializerState,System.Boolean)"/>, this method also accepts deserializer states, domain objects, capabilites, and lists thereof.
+            If necessary, it will perform a deep copy.
+            </summary>
+            <param name="slot">If this state describes a struct: Index into this struct's pointer table. 
+            If this state describes a list of pointers: List element index.</param>
+            <param name="obj">Object to be linked. Must be one of the following:<list type="bullet">
+            <item><description>Another <see cref="T:Capnp.SerializerState"/></description></item>
+            <item><description>A <see cref="T:Capnp.DeserializerState"/> (will always deep copy)</description></item>
+            <item><description>An object implementing <see cref="T:Capnp.ICapnpSerializable"/></description></item>
+            <item><description>A low-level capability object (<see cref="T:Capnp.Rpc.ConsumedCapability"/>)</description></item>
+            <item><description>A proxy object (<see cref="T:Capnp.Rpc.Proxy"/>)</description></item>
+            <item><description>A skeleton object (<see cref="T:Capnp.Rpc.Skeleton"/>)</description></item>
+            <item><description>A capability interface implementation</description></item>
+            <item><description>A <see cref="T:System.Collections.Generic.IReadOnlyList`1"/> of one of the things listed here.</description></item>
+            </list></param>
+            <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="slot"/> is out of range.</exception>
+            <exception cref="T:System.InvalidOperationException"><list type="bullet">
+            <item><description>This state does neither describe a struct, nor a list of pointers</description></item>
+            <item><description>Another state is already linked to the specified position (sorry, no overwrite allowed)</description></item></list>
+            </exception>
+        </member>
+        <member name="M:Capnp.SerializerState.ReadCap``1(System.Int32)">
+            <summary>
+            Reads a struct field as capability and returns a proxy to that capability. 
+            </summary>
+            <typeparam name="T">Desired capability interface</typeparam>
+            <param name="slot">Index into this struct's pointer table.</param>
+            <returns>The proxy instance</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="slot"/> is out of range.</exception>
+            <exception cref="T:System.ArgumentException">The desired interface does not qualify as capability interface (<see cref="T:Capnp.Rpc.ProxyAttribute"/>)</exception>
+            <exception cref="T:System.InvalidOperationException">This state does not represent a struct.</exception>
+        </member>
         <member name="M:Capnp.SerializerState.ReadCap(System.Int32)">
             <summary>
             Reads a struct field as capability and returns a bare (generic) proxy to that capability. 
@@ -3022,7 +3439,6 @@
             This method exists until NET Standard 2.1 is released
             </summary>
             <param name="task"></param>
-            <typeparam name="T"></typeparam>
             <returns></returns>
         </member>
         <member name="T:Capnp.WireFrame">
@@ -3042,7 +3458,27 @@
         </member>
         <member name="T:Capnp.PointerKind">
             <summary>
-            Pointer tag, <see cref="!:https://capnproto.org/encoding.html"/>
+            Pointer tag, see https://capnproto.org/encoding.html/>
+            </summary>
+        </member>
+        <member name="F:Capnp.PointerKind.Struct">
+            <summary>
+            Struct pointer
+            </summary>
+        </member>
+        <member name="F:Capnp.PointerKind.List">
+            <summary>
+            List pointer
+            </summary>
+        </member>
+        <member name="F:Capnp.PointerKind.Far">
+            <summary>
+            Far pointer
+            </summary>
+        </member>
+        <member name="F:Capnp.PointerKind.Other">
+            <summary>
+            Other (capability) pointer
             </summary>
         </member>
         <member name="T:Capnp.WirePointer">

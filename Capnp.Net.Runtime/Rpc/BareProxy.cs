@@ -10,13 +10,13 @@
         /// </summary>
         /// <param name="impl">Capability implementation</param>
         /// <returns>Proxy</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="impl"/> is null.</exception>
+        /// <exception cref="System.ArgumentNullException"><paramref name="impl"/> is null.</exception>
         /// <exception cref="InvalidCapabilityInterfaceException">No <see cref="SkeletonAttribute"/> found on implemented interface(s).</exception>
-        /// <exception cref="InvalidOperationException">Mismatch between generic type arguments (if capability interface is generic).</exception>
-        /// <exception cref="ArgumentException">Mismatch between generic type arguments (if capability interface is generic).</exception>
+        /// <exception cref="System.InvalidOperationException">Mismatch between generic type arguments (if capability interface is generic).</exception>
+        /// <exception cref="System.ArgumentException">Mismatch between generic type arguments (if capability interface is generic).</exception>
         /// <exception cref="System.Reflection.TargetInvocationException">Problem with instatiating the Skeleton (constructor threw exception).</exception>
-        /// <exception cref="MemberAccessException">Caller does not have permission to invoke the Skeleton constructor.</exception>
-        /// <exception cref="TypeLoadException">Problem with building the Skeleton type, or problem with loading some dependent class.</exception>
+        /// <exception cref="System.MemberAccessException">Caller does not have permission to invoke the Skeleton constructor.</exception>
+        /// <exception cref="System.TypeLoadException">Problem with building the Skeleton type, or problem with loading some dependent class.</exception>
         public static BareProxy FromImpl(object impl)
         {
             return new BareProxy(LocalCapability.Create(CapabilityReflection.CreateSkeleton(impl)));

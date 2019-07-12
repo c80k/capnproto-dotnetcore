@@ -35,6 +35,9 @@ namespace Capnp.Rpc
             }
         }
 
+        /// <summary>
+        /// Underlying low-level capability
+        /// </summary>
         protected internal ConsumedCapability ConsumedCap { get; private set; }
 
         /// <summary>
@@ -68,7 +71,7 @@ namespace Capnp.Rpc
         /// <returns>An answer promise</returns>
         /// <exception cref="ObjectDisposedException">This instance was disposed, or transport-layer stream was disposed.</exception>
         /// <exception cref="InvalidOperationException">Capability is broken.</exception>
-        /// <exception cref="IOException">An I/O error occurs.</exception>
+        /// <exception cref="System.IO.IOException">An I/O error occurs.</exception>
         protected internal IPromisedAnswer Call(ulong interfaceId, ushort methodId, DynamicSerializerState args, bool tailCall, CancellationToken cancellationToken = default)
         {
             if (_disposedValue)
@@ -87,6 +90,9 @@ namespace Capnp.Rpc
             return answer;
         }
 
+        /// <summary>
+        /// Constructs a null instance.
+        /// </summary>
         public Proxy()
         {
         }
@@ -135,6 +141,9 @@ namespace Capnp.Rpc
             }
         }
 
+        /// <summary>
+        /// Finalizer
+        /// </summary>
         ~Proxy()
         {
 #if DebugFinalizers

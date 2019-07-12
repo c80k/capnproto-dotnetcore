@@ -61,8 +61,8 @@ namespace Capnp
         /// <exception cref="ArgumentNullException"><paramref name="target"/> is null</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="slot"/> out of range</exception>
         /// <exception cref="InvalidOperationException"><list type="bullet">
-        /// <item><description>This state does neither describe a struct, nor a list of pointers</description></item></list>
-        /// <item><description>Another state is already linked to the specified position (sorry, no overwrite allowed)</description></item></list>
+        /// <item><description>This state does neither describe a struct, nor a list of pointers</description></item>
+        /// <item><description>Another state is already linked to the specified position (sorry, no overwrite allowed)</description></item>
         /// <item><description>This state and <paramref name="target"/> belong to different message builder, and<paramref name="allowCopy"/> is false</description></item></list>
         /// </exception>
         public new void Link(int slot, SerializerState target, bool allowCopy = true) => base.Link(slot, target, allowCopy);
@@ -74,7 +74,7 @@ namespace Capnp
         /// If this state describes a list of pointers: List element index.</param>
         /// <param name="capabilityIndex">capability index inside the capability table</param>
         /// <exception cref="InvalidOperationException"><list type="bullet">
-        /// <item><description>This state does neither describe a struct, nor a list of pointers</description></item></list>
+        /// <item><description>This state does neither describe a struct, nor a list of pointers</description></item>
         /// <item><description>Another state is already linked to the specified position (sorry, no overwrite allowed)</description></item></list>
         /// </exception>
         public new void LinkToCapability(int slot, uint capabilityIndex) => base.LinkToCapability(slot, capabilityIndex);
@@ -123,24 +123,25 @@ namespace Capnp
         /// <item><description>An instance implementing <see cref="ICapnpSerializable"/></description></item>
         /// <item><description>null</description></item>
         /// <item><description>A <see cref="String"/></description></item>
-        /// <item><description>A <see cref="IReadOnlyList{Byte}"/></description></item>
-        /// <item><description>A <see cref="IReadOnlyList{SByte}"/></description></item>
-        /// <item><description>A <see cref="IReadOnlyList{UInt16}"/></description></item>
-        /// <item><description>A <see cref="IReadOnlyList{Int16}"/></description></item>
-        /// <item><description>A <see cref="IReadOnlyList{UInt32}"/></description></item>
-        /// <item><description>A <see cref="IReadOnlyList{Int64}"/></description></item>
-        /// <item><description>A <see cref="IReadOnlyList{UInt64}"/></description></item>
-        /// <item><description>A <see cref="IReadOnlyList{Single}"/></description></item>
-        /// <item><description>A <see cref="IReadOnlyList{Double}"/></description></item>
-        /// <item><description>A <see cref="IReadOnlyList{Boolean}/></description></item>
-        /// <item><description>A <see cref="IReadOnlyList{String}"/></description></item>
+        /// <item><description>A <code><![CDATA[IReadOnlyList<byte>]]></code></description></item>
+        /// <item><description>A <code><![CDATA[IReadOnlyList<sbyte>]]></code></description></item>
+        /// <item><description>A <code><![CDATA[IReadOnlyList<ushort>]]></code></description></item>
+        /// <item><description>A <code><![CDATA[IReadOnlyList<short>]]></code></description></item>
+        /// <item><description>A <code><![CDATA[IReadOnlyList<int>]]></code></description></item>
+        /// <item><description>A <code><![CDATA[IReadOnlyList<uint>]]></code></description></item>
+        /// <item><description>A <code><![CDATA[IReadOnlyList<long>]]></code></description></item>
+        /// <item><description>A <code><![CDATA[IReadOnlyList<ulong>]]></code></description></item>
+        /// <item><description>A <code><![CDATA[IReadOnlyList<float>]]></code></description></item>
+        /// <item><description>A <code><![CDATA[IReadOnlyList<double>]]></code></description></item>
+        /// <item><description>A <code><![CDATA[IReadOnlyList<bool>]]></code></description></item>
+        /// <item><description>A <code><![CDATA[IReadOnlyList<string>]]></code></description></item>
         /// <item><description>Another <see cref="DeserializerState"/></description></item>
         /// <item><description>Another <see cref="SerializerState"/></description></item>
         /// <item><description>Low-level capability object (<see cref="Rpc.ConsumedCapability"/>)</description></item>
         /// <item><description>Proxy object (<see cref="Rpc.Proxy"/>)</description></item>
         /// <item><description>Skeleton object (<see cref="Rpc.Skeleton"/>)</description></item>
         /// <item><description>Capability interface implementation</description></item>
-        /// <item><description>A <see cref="IReadOnlyList{Object}"/> whereby each list item is one of the things listed here.</description></item>
+        /// <item><description>A <code><![CDATA[IReadOnlyList<object>]]></code> whereby each list item is one of the things listed here.</description></item>
         /// </list>
         /// </param>
         public void SetObject(object obj)

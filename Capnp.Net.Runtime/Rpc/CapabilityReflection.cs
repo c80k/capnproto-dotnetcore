@@ -252,6 +252,9 @@ namespace Capnp.Rpc
         /// </summary>
         /// <typeparam name="TInterface">Capability interface. Must be annotated with <see cref="ProxyAttribute"/>.</typeparam>
         /// <param name="cap">low-level capability</param>
+        /// <param name="memberName">debugging aid</param>
+        /// <param name="sourceFilePath">debugging aid</param>
+        /// <param name="sourceLineNumber">debugging aid</param>
         /// <returns>The Proxy instance which implements <typeparamref name="TInterface"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="cap"/> is null.</exception>
         /// <exception cref="InvalidCapabilityInterfaceException"><typeparamref name="TInterface"/> did not qualify as capability interface.</exception>

@@ -9,8 +9,16 @@ namespace Capnp.Rpc
     /// </summary>
     public class MemberAccessPath
     {
+        /// <summary>
+        /// Path to the bootstrap capability (which is an empty path)
+        /// </summary>
         public static readonly MemberAccessPath BootstrapAccess = new MemberAccessPath(new List<MemberAccess>());
 
+        /// <summary>
+        /// Deserializes a MemberAccessPath from Cap'n Proto representation.
+        /// </summary>
+        /// <param name="promisedAnswer">Cap'n Proto representation</param>
+        /// <returns>The MemberAccessPath</returns>
         public static MemberAccessPath Deserialize(PromisedAnswer.READER promisedAnswer)
         {
             var ops = new MemberAccess[promisedAnswer.Transform.Count];
@@ -55,6 +63,11 @@ namespace Capnp.Rpc
         /// </remarks>
         public abstract class MemberAccess
         {
+            /// <summary>
+            /// Deserializes a MemberAccess instance from Cap'n Proto representation.
+            /// </summary>
+            /// <param name="op">Cap'n Proto representation</param>
+            /// <returns>Deserialized instance</returns>
             public static MemberAccess Deserialize(PromisedAnswer.Op.READER op)
             {
                 switch (op.which)

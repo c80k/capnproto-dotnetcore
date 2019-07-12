@@ -5,13 +5,28 @@ using System.Text;
 namespace Capnp
 {
     /// <summary>
-    /// Pointer tag, <see cref="https://capnproto.org/encoding.html"/>
+    /// Pointer tag, see https://capnproto.org/encoding.html/>
     /// </summary>
     public enum PointerKind : byte
     {
+        /// <summary>
+        /// Struct pointer
+        /// </summary>
         Struct = 0,
+
+        /// <summary>
+        /// List pointer
+        /// </summary>
         List = 1,
+
+        /// <summary>
+        /// Far pointer
+        /// </summary>
         Far = 2,
+
+        /// <summary>
+        /// Other (capability) pointer
+        /// </summary>
         Other = 3
     }
 

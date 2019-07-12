@@ -66,7 +66,7 @@ namespace Capnp
         }
 
         /// <summary>
-        /// Implements <see cref="IEnumerable{DeserializerState}"./>
+        /// Implements <see cref="IEnumerable{DeserializerState}"/>.
         /// </summary>
         public IEnumerator<DeserializerState> GetEnumerator()
         {

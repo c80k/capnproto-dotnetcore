@@ -15,15 +15,47 @@ namespace Capnp.Rpc
     /// </remarks>
     public sealed class PendingQuestion: IPromisedAnswer
     {
+        /// <summary>
+        /// Question lifetime management state
+        /// </summary>
         [Flags]
         public enum State
         {
+            /// <summary>
+            /// The question has not yet been sent.
+            /// </summary>
             None = 0,
+
+            /// <summary>
+            /// Tail call flag
+            /// </summary>
             TailCall = 1,
+
+            /// <summary>
+            /// The question has been sent.
+            /// </summary>
             Sent = 2,
+
+            /// <summary>
+            /// The question has been answered.
+            /// </summary>
             Returned = 4,
+
+            /// <summary>
+            /// A 'finish' request was sent to the peer, indicating that no further requests will refer
+            /// to this question.
+            /// </summary>
             FinishRequested = 8,
+
+            /// <summary>
+            /// Question object was disposed.
+            /// </summary>
             Disposed = 16,
+
+            /// <summary>
+            /// Question object was finalized by GC. 
+            /// This flag should only be observable when debugging the finalizer itself.
+            /// </summary>
             Finalized = 32
         }
 
@@ -59,7 +91,12 @@ namespace Capnp.Rpc
         internal object ReentrancyBlocker { get; } = new object();
         internal uint QuestionId => _questionId;
         internal State StateFlags { get; private set; }
+
+        /// <summary>
+        /// Eventually returns the server answer
+        /// </summary>
         public Task<DeserializerState> WhenReturned => _tcs.Task;
+
         internal bool IsTailCall
         {
             get => StateFlags.HasFlag(State.TailCall);
@@ -189,6 +226,13 @@ namespace Capnp.Rpc
             DeleteMyQuestion();
         }
 
+        /// <summary>
+        /// Refer to a (possibly nested) member of this question's (possibly future) result and return
+        /// it as a capability.
+        /// </summary>
+        /// <param name="access">Access path</param>
+        /// <returns>Low-level capability</returns>
+        /// <exception cref="DeserializationException">The referenced member does not exist or does not resolve to a capability pointer.</exception>
         public ConsumedCapability Access(MemberAccessPath access)
         {
             lock (ReentrancyBlocker)
@@ -296,11 +340,17 @@ namespace Capnp.Rpc
             ReleaseCaps(target, inParams);
         }
 
+        /// <summary>
+        /// Finalizer
+        /// </summary>
         ~PendingQuestion()
         {
             Dispose(false);
         }
 
+        /// <summary>
+        /// Implements <see cref="IDisposable"/>.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);

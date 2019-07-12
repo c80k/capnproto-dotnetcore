@@ -38,7 +38,7 @@ namespace Capnp
         }
 
         /// <summary>
-        /// LINQ-like "Select" operator for <see cref="IReadOnlyList{T}", with the addition that the resulting elements are accessible by index.
+        /// LINQ-like "Select" operator for <see cref="IReadOnlyList{T}"/>, with the addition that the resulting elements are accessible by index.
         /// The operator implements lazy semantics, which means that the selector function results are not cached./>
         /// </summary>
         /// <typeparam name="From">Source element type</typeparam>

@@ -55,7 +55,6 @@ namespace Capnp
         /// This method exists until NET Standard 2.1 is released
         /// </summary>
         /// <param name="task"></param>
-        /// <typeparam name="T"></typeparam>
         /// <returns></returns>
 #if NETSTANDARD2_0
         public static bool ReplacementTaskIsCompletedSuccessfully(this Task task)

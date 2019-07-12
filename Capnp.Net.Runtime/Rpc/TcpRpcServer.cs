@@ -14,12 +14,34 @@ namespace Capnp.Rpc
     /// </summary>
     public class TcpRpcServer: IDisposable
     {
+        /// <summary>
+        /// Models an incoming connection.
+        /// </summary>
         public interface IConnection
         {
+            /// <summary>
+            /// Server-side port
+            /// </summary>
             int LocalPort { get; }
+
+            /// <summary>
+            /// Receive message counter
+            /// </summary>
             long RecvCount { get; }
+
+            /// <summary>
+            /// Sent message counter
+            /// </summary>
             long SendCount { get; }
+
+            /// <summary>
+            /// Whether the RPC engine is currently computing.
+            /// </summary>
             bool IsComputing { get; }
+
+            /// <summary>
+            /// Whether the connection is idle, waiting for data to receive.
+            /// </summary>
             bool IsWaitingForData { get; }
         }
 
