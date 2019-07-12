@@ -1,14 +1,12 @@
 $id = "capnpc-csharp"
-$version = "1.0.0"
+$id_win_x86 = "capnpc-csharp-win-x86"
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$prefix = "$id.$version"
 $chocoDir = "$scriptDir\..\chocolatey"
-$nuspecFile = "$prefix.nuspec"
-$nuspecPath = "$chocoDir\$nuspecFile"
-$deployDir = "$chocoDir\deploy"
-$installDir = "$chocoDir\install"
 $csprojDir = "$scriptDir\..\capnpc-csharp"
 $csprojFile = "capnpc-csharp.csproj"
 
-dotnet publish -c Release -r win-x86 --self-contained -o $deployDir "$csprojDir\$csprojFile"
-choco pack $nuspecPath --outputdirectory $installDir
+dotnet publish -c Release -r win-x86 --self-contained -o "$chocoDir\$id_win_x86\bin" "$csprojDir\$csprojFile"
+dotnet publish -c Release -o "$chocoDir\$id\bin" "$csprojDir\$csprojFile"
+
+choco pack "$chocoDir\$id\$id.nuspec" --outputdirectory "$chocoDir\$id\bin"
+choco pack "$chocoDir\$id_win_x86\$id_win_x86.nuspec" --outputdirectory "$chocoDir\$id_win_x86\bin"
