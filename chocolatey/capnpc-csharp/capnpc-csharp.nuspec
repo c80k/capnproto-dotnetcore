@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>capnpc-csharp-win-x86</id>
+    <version>1.0.0</version>
+    <authors>Christian Köllner and contributors</authors>
+    <owners>Christian Köllner and contributors</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <!--<license type="expression">MIT</license>-->
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <projectUrl>https://github.com/c80k/capnproto-dotnetcore</projectUrl>
+    <description>Cap'n Proto C# code generator backend, portable .NET Core 2.1</description>
+    <copyright>Christian Köllner and contributors</copyright>
+    <tags>capnp capnpc RPC serialization cerealization</tags>
+    <!--<repository type="Git" />-->
+  </metadata>
+<files>
+    <file src="chocolateyinstall.ps1" target="tools" />
+    <file src="chocolateyuninstall.ps1" target="tools" />
+    <file src=".\bin\**" target="tools" />
+  </files>
+</package>

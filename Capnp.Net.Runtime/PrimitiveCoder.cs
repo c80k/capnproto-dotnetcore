@@ -24,10 +24,10 @@ namespace Capnp
             Coder<ulong>.Fn = (x, y) => x ^ y;
             Coder<float>.Fn = (x, y) =>
             {
-                int xi = BitConverter.SingleToInt32Bits(x);
-                int yi = BitConverter.SingleToInt32Bits(y);
+                int xi = x.ReplacementSingleToInt32Bits();
+                int yi = y.ReplacementSingleToInt32Bits();
                 int zi = xi ^ yi;
-                return BitConverter.Int32BitsToSingle(zi);
+                return BitConverter.ToSingle(BitConverter.GetBytes(zi), 0);
             };
             Coder<double>.Fn = (x, y) =>
             {

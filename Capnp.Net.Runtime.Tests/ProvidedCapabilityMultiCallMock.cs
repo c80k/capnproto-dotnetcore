@@ -1,8 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using Capnp.Rpc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Threading.Tasks.Dataflow;
 
 namespace Capnp.Net.Runtime.Tests
 {

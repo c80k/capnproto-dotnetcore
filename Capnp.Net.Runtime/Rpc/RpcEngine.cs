@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -97,7 +98,14 @@ namespace Capnp.Rpc
                 {
                     _exportTable.Clear();
                     _revExportTable.Clear();
-                    _questionTable.Clear();
+
+                    foreach (var question in _questionTable.Values.ToList())
+                    {
+                        question.OnException(new RpcException("RPC connection is broken. Task would never return."));
+                    }
+
+                    Debug.Assert(_questionTable.Count == 0);
+
                     _answerTable.Clear();
                     _pendingDisembargos.Clear();
                 }
@@ -179,13 +187,7 @@ namespace Capnp.Rpc
 
             uint RandId()
             {
-                uint id = 0;
-                var idSpan = MemoryMarshal.CreateSpan(ref id, 1);
-                var idBytes = MemoryMarshal.Cast<uint, byte>(idSpan);
-
-                _random.NextBytes(idBytes);
-
-                return id;
+                return unchecked((uint)_random.Next(int.MinValue, int.MaxValue));
             }
 
             uint AllocateExport(Skeleton providedCapability, out bool first)
@@ -237,7 +239,7 @@ namespace Capnp.Rpc
 
                 lock (_reentrancyBlocker)
                 {
-                    while (!_questionTable.TryAdd(questionId, question))
+                    while (!_questionTable.ReplacementTryAdd(questionId, question))
                     {
                         questionId = RandId();
                         var oldQuestion = question;
@@ -277,7 +279,7 @@ namespace Capnp.Rpc
                 {
                     uint id = RandId();
 
-                    while (!_pendingDisembargos.TryAdd(id, tcs))
+                    while (!_pendingDisembargos.ReplacementTryAdd(id, tcs))
                     {
                         id = RandId();
                     }
@@ -323,7 +325,7 @@ namespace Capnp.Rpc
                 bool added;
                 lock (_reentrancyBlocker)
                 {
-                    added = _answerTable.TryAdd(req.QuestionId, pendingAnswer);
+                    added = _answerTable.ReplacementTryAdd(req.QuestionId, pendingAnswer);
                 }
 
                 if (!added)
@@ -382,7 +384,7 @@ namespace Capnp.Rpc
                     bool added;
                     lock (_reentrancyBlocker)
                     {
-                        added = _answerTable.TryAdd(req.QuestionId, pendingAnswer);
+                        added = _answerTable.ReplacementTryAdd(req.QuestionId, pendingAnswer);
                     }
 
                     if (!added)
@@ -876,7 +878,7 @@ namespace Capnp.Rpc
 
                 lock (_reentrancyBlocker)
                 {
-                    exists = _pendingDisembargos.Remove(disembargo.Context.ReceiverLoopback, out tcs);
+                    exists = _pendingDisembargos.ReplacementTryRemove(disembargo.Context.ReceiverLoopback, out tcs);
                 }
 
                 if (exists)
@@ -950,7 +952,7 @@ namespace Capnp.Rpc
 
                 lock (_reentrancyBlocker)
                 {
-                    exists = _answerTable.Remove(finish.QuestionId, out answer);
+                    exists = _answerTable.ReplacementTryRemove(finish.QuestionId, out answer);
                 }
 
                 if (exists)
@@ -988,7 +990,7 @@ namespace Capnp.Rpc
                             if (rc.RefCount == 0)
                             {
                                 _exportTable.Remove(id);
-                                _revExportTable.Remove(rc.Cap, out uint _);
+                                _revExportTable.ReplacementTryRemove(rc.Cap, out uint _);
                             }
                         }
                         catch (System.Exception)

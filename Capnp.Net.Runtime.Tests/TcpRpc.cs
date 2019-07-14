@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -29,6 +30,7 @@ namespace Capnp.Net.Runtime.Tests
         {
             ExpectingLogOutput = true;
 
+            Logging.LoggerFactory?.Dispose();
             Logging.LoggerFactory = new LoggerFactory().AddConsole((msg, level) =>
             {
                 if (!ExpectingLogOutput && level != LogLevel.Debug)
@@ -41,7 +43,7 @@ namespace Capnp.Net.Runtime.Tests
 
         int MediumTimeout => Debugger.IsAttached ? Timeout.Infinite : 2000;
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void CreateAndDispose()
         {
             (var server, var client) = SetupClientServerPair();
@@ -52,7 +54,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void ConnectAndDispose()
         {
             (var server, var client) = SetupClientServerPair();
@@ -60,13 +62,21 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumTimeout));
-                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
-                Assert.AreEqual(1, server.ConnectionCount);
+                try
+                {
+                    client.WhenConnected.Wait();
+                    SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
+                    Assert.AreEqual(1, server.ConnectionCount);
+                }
+                catch (System.Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void ConnectNoServer()
         {
             using (var client = new TcpRpcClient("localhost", TcpPort))
@@ -75,7 +85,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void ConnectAndBootstrap()
         {
             (var server, var client) = SetupClientServerPair();
@@ -83,7 +93,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumTimeout));
+                client.WhenConnected.Wait();
                 SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 
@@ -94,7 +104,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void ConnectNoBootstrap()
         {
             (var server, var client) = SetupClientServerPair();
@@ -102,7 +112,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumTimeout));
+                client.WhenConnected.Wait();
                 SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 
@@ -112,7 +122,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void CallReturn()
         {
             (var server, var client) = SetupClientServerPair();
@@ -120,7 +130,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumTimeout));
+                client.WhenConnected.Wait();
                 SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 
@@ -153,7 +163,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void CallCancelOnServer()
         {
             (var server, var client) = SetupClientServerPair();
@@ -161,7 +171,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumTimeout));
+                client.WhenConnected.Wait();
                 SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 
@@ -188,7 +198,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void CallCancelOnClient()
         {
             ExpectingLogOutput = false;
@@ -200,7 +210,7 @@ namespace Capnp.Net.Runtime.Tests
             {
                 try
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumTimeout));
+                    client.WhenConnected.Wait();
                     SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
                     Assert.AreEqual(1, server.ConnectionCount);
 
@@ -233,7 +243,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void CallReturnAfterClientSideCancel()
         {
             ExpectingLogOutput = false;
@@ -244,7 +254,7 @@ namespace Capnp.Net.Runtime.Tests
             {
                 try
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumTimeout));
+                    client.WhenConnected.Wait();
                     SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
                     Assert.AreEqual(1, server.ConnectionCount);
 
@@ -295,7 +305,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void CallServerSideException()
         {
             (var server, var client) = SetupClientServerPair();
@@ -303,7 +313,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumTimeout));
+                client.WhenConnected.Wait();
                 SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 
@@ -332,7 +342,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void PipelineBeforeReturn()
         {
             (var server, var client) = SetupClientServerPair();
@@ -340,7 +350,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumTimeout));
+                client.WhenConnected.Wait();
                 SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 
@@ -405,7 +415,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void PipelineAfterReturn()
         {
             (var server, var client) = SetupClientServerPair();
@@ -413,7 +423,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumTimeout));
+                client.WhenConnected.Wait();
                 SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 
@@ -481,7 +491,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void PipelineMultiple()
         {
             (var server, var client) = SetupClientServerPair();
@@ -489,7 +499,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumTimeout));
+                client.WhenConnected.Wait();
                 SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 
@@ -598,7 +608,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void PipelineCallAfterDisposal()
         {
             (var server, var client) = SetupClientServerPair();
@@ -606,7 +616,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumTimeout));
+                client.WhenConnected.Wait();
                 SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 
@@ -631,11 +641,21 @@ namespace Capnp.Net.Runtime.Tests
                 args2.SetStruct(1, 0);
                 args2.WriteData(0, 654321);
 
-                Assert.ThrowsException<System.ObjectDisposedException>(() => pipelined.Call(0x8765432187654321, 0x4444, args2, false));
+                try
+                {
+                    pipelined.Call(0x8765432187654321, 0x4444, args2, false);
+                    Assert.Fail("Expected an exception here");
+                }
+                catch (ObjectDisposedException)
+                {
+                }
+                catch (TaskCanceledException)
+                {
+                }
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void PipelineCallDuringDisposal()
         {
             (var server, var client) = SetupClientServerPair();
@@ -643,7 +663,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                Assert.IsTrue(client.WhenConnected.Wait(MediumTimeout));
+                client.WhenConnected.Wait();
                 SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 

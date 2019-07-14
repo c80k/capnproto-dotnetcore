@@ -38,9 +38,15 @@ namespace Capnp.Rpc
             {
                 async void SetupCancellation()
                 {
-                    using (var registration = cancellationToken.Register(promisedAnswer.Dispose))
+                    try
                     {
-                        await promisedAnswer.WhenReturned;
+                        using (var registration = cancellationToken.Register(promisedAnswer.Dispose))
+                        {
+                            await promisedAnswer.WhenReturned;
+                        }
+                    }
+                    catch
+                    {
                     }
                 }
 

@@ -7,10 +7,16 @@
     /// </summary>
     public class InvalidCapabilityInterfaceException : System.Exception
     {
+        /// <summary>
+        /// Constructs an instance.
+        /// </summary>
         public InvalidCapabilityInterfaceException(string message) : base(message)
         {
         }
 
+        /// <summary>
+        /// Constructs an instance with message an inner exception.
+        /// </summary>
         public InvalidCapabilityInterfaceException(string message, System.Exception innerException) : base(message, innerException)
         {
         }

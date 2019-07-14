@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 namespace Capnp.Net.Runtime.Tests
 {
     [TestClass]
-    public class TcpRpcAdvancedStuff: TestBase
+    public class TcpRpcAdvancedStuff : TestBase
     {
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void MultiConnect()
         {
             using (var server = SetupServer())
@@ -25,7 +25,7 @@ namespace Capnp.Net.Runtime.Tests
                 {
                     using (var client = SetupClient())
                     {
-                        Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                        client.WhenConnected.Wait();
 
                         using (var main = client.GetMain<ITestInterface>())
                         {
@@ -50,7 +50,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod]
+        [TestMethod, Timeout(10000)]
         public void TwoClients()
         {
             using (var server = SetupServer())
@@ -84,6 +84,38 @@ namespace Capnp.Net.Runtime.Tests
                     using (var main = client2.GetMain<ITestMoreStuff>())
                     {
                         ExpectPromiseThrows(main.CallHeld());
+                    }
+                }
+            }
+        }
+
+        [TestMethod, Timeout(10000)]
+        public void ClosingServerWhileRequestingBootstrap()
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                var server = SetupServer();
+                var counters = new Counters();
+                var tcs = new TaskCompletionSource<int>();
+                server.Main = new TestInterfaceImpl(counters, tcs);
+
+                using (var client = SetupClient())
+                {
+                    client.WhenConnected.Wait();
+
+                    using (var main = client.GetMain<ITestInterface>())
+                    {
+                        server.Dispose();
+
+                        // Resolution must either succeed or be cancelled. A hanging resolution would be inacceptable.
+
+                        try
+                        {
+                            Assert.IsTrue(((IResolvingCapability)main).WhenResolved.Wait(MediumNonDbgTimeout));
+                        }
+                        catch (AggregateException)
+                        {
+                        }
                     }
                 }
             }

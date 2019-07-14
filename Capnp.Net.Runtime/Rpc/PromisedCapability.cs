@@ -77,7 +77,8 @@ namespace Capnp.Rpc
         {
             lock (_reentrancyBlocker)
             {
-                if (_resolvedCap.Task.IsCompletedSuccessfully)
+                
+                if (_resolvedCap.Task.ReplacementTaskIsCompletedSuccessfully())
                 {
                     _resolvedCap.Task.Result.Export(endpoint, writer);
                 }

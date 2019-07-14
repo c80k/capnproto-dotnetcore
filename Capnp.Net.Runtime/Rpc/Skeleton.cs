@@ -101,6 +101,9 @@ namespace Capnp.Rpc
         {
         }
 
+        /// <summary>
+        /// Finalizer
+        /// </summary>
         ~Skeleton()
         {
             Dispose(false);

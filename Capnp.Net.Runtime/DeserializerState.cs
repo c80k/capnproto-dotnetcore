@@ -637,6 +637,9 @@ namespace Capnp
         /// </summary>
         /// <typeparam name="T">Capability interface</typeparam>
         /// <param name="index">index within this struct's pointer table</param>
+        /// <param name="memberName">debugging aid</param>
+        /// <param name="sourceFilePath">debugging aid</param>
+        /// <param name="sourceLineNumber">debugging aid</param>
         /// <returns>capability instance or null if pointer was null</returns>
         /// <exception cref="IndexOutOfRangeException">negative index</exception>
         /// <exception cref="DeserializationException">state does not represent a struct, invalid pointer,

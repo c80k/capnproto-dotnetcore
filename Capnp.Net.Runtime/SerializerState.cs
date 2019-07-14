@@ -406,9 +406,10 @@ namespace Capnp
         /// <exception cref="ArgumentNullException"><paramref name="target"/> is null</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="slot"/> out of range</exception>
         /// <exception cref="InvalidOperationException"><list type="bullet">
-        /// <item><description>This state does neither describe a struct, nor a list of pointers</description></item></list>
-        /// <item><description>Another state is already linked to the specified position (sorry, no overwrite allowed)</description></item></list>
-        /// <item><description>This state and <paramref name="target"/> belong to different message builder, and<paramref name="allowCopy"/> is false</description></item></list>
+        /// <item><description>This state does neither describe a struct, nor a list of pointers</description></item>
+        /// <item><description>Another state is already linked to the specified position (sorry, no overwrite allowed)</description></item>
+        /// <item><description>This state and <paramref name="target"/> belong to different message builder, and<paramref name="allowCopy"/> is false</description></item>
+        /// </list>
         /// </exception>
         protected void Link(int slot, SerializerState target, bool allowCopy = true)
         {
@@ -461,7 +462,7 @@ namespace Capnp
         /// If this state describes a list of pointers: List element index.</param>
         /// <param name="capabilityIndex">capability index inside the capability table</param>
         /// <exception cref="InvalidOperationException"><list type="bullet">
-        /// <item><description>This state does neither describe a struct, nor a list of pointers</description></item></list>
+        /// <item><description>This state does neither describe a struct, nor a list of pointers</description></item>
         /// <item><description>Another state is already linked to the specified position (sorry, no overwrite allowed)</description></item></list>
         /// </exception>
         protected void LinkToCapability(int slot, uint capabilityIndex)
@@ -706,8 +707,8 @@ namespace Capnp
         /// <param name="count">Number of bits to read</param>
         /// <returns>Data bits which were read</returns>
         /// <exception cref="InvalidOperationException">The object was not determined to be a struct</exception>
-        /// <exception cref="ArgumentOutOfRangeException">The data slice specified by <paramref name="bitOffset"/> and <paramref name="bitCount"/>
-        /// is not completely within the struct's data section, misaligned, exceeds one word, or <paramref name="bitCount"/> is negative</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The data slice specified by <paramref name="bitOffset"/> and <paramref name="count"/>
+        /// is not completely within the struct's data section, misaligned, exceeds one word, or <paramref name="count"/> is negative</exception>
         public ulong StructReadData(ulong bitOffset, int count)
         {
             if (Kind != ObjectKind.Struct)
@@ -818,6 +819,13 @@ namespace Capnp
         /// <exception cref="IndexOutOfRangeException"><paramref name="index"/> is out of bounds.</exception>
         public SerializerState TryGetPointer(int index) => TryGetPointer<SerializerState>(index);
 
+        /// <summary>
+        /// Reads text from a struct field or list element.
+        /// </summary>
+        /// <param name="index">If the underlying object is a struct: index into the struct's pointer section.
+        /// If the underlying object is a list of pointers: Element index</param>
+        /// <param name="defaultText">String to return in case of null</param>
+        /// <returns>The decoded text</returns>
         public string ReadText(int index, string defaultText = null)
         {
             var b = BuildPointer(index);
@@ -1068,7 +1076,11 @@ namespace Capnp
         {
             var bytes = ListGetBytes();
             if (bytes.Length == 0) return string.Empty;
+#if NETSTANDARD2_0
+            return Encoding.UTF8.GetString(bytes.Slice(0, bytes.Length - 1).ToArray());
+#else
             return Encoding.UTF8.GetString(bytes.Slice(0, bytes.Length - 1));
+#endif
         }
 
         /// <summary>
@@ -1164,8 +1176,8 @@ namespace Capnp
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is out of bounds.</exception>
         public void ListWriteValue(int index, float value, float defaultValue = 0)
         {
-            int rcastValue = BitConverter.SingleToInt32Bits(value);
-            int rcastDefaultValue = BitConverter.SingleToInt32Bits(defaultValue);
+            int rcastValue = value.ReplacementSingleToInt32Bits();
+            int rcastDefaultValue = defaultValue.ReplacementSingleToInt32Bits();
             ListWriteValue(index, rcastValue, rcastDefaultValue);
         }
 
@@ -1256,7 +1268,7 @@ namespace Capnp
         /// <summary>
         /// Adds an entry to the capability table if the provided capability does not yet exist.
         /// </summary>
-        /// <param name="capability">The capability, in one of the following forms:<list type="bullet">
+        /// <param name="obj">The capability, in one of the following forms:<list type="bullet">
         /// <item><description>Low-level capability object (<code>Rpc.ConsumedCapability</code>)</description></item>
         /// <item><description>Proxy object (<code>Rpc.Proxy</code>)</description></item>
         /// <item><description>Skeleton object (<code>Rpc.Skeleton</code>)</description></item>
@@ -1297,7 +1309,7 @@ namespace Capnp
         /// </list></param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="slot"/> is out of range.</exception>
         /// <exception cref="InvalidOperationException"><list type="bullet">
-        /// <item><description>This state does neither describe a struct, nor a list of pointers</description></item></list>
+        /// <item><description>This state does neither describe a struct, nor a list of pointers</description></item>
         /// <item><description>Another state is already linked to the specified position (sorry, no overwrite allowed)</description></item></list>
         /// </exception>
         public void LinkObject<T>(int slot, T obj)
@@ -1355,7 +1367,7 @@ namespace Capnp
         /// <param name="slot">Index into this struct's pointer table.</param>
         /// <returns>The proxy instance</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="slot"/> is out of range.</exception>
-        /// <exception cref="ArgumentException">The desired interface does not qualify as capability interface (<see cref="Rpc.ProxyAttribute")/></exception>
+        /// <exception cref="ArgumentException">The desired interface does not qualify as capability interface (<see cref="Rpc.ProxyAttribute"/>)</exception>
         /// <exception cref="InvalidOperationException">This state does not represent a struct.</exception>
         public T ReadCap<T>(int slot) where T : class
         {

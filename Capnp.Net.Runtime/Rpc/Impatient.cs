@@ -81,6 +81,9 @@ namespace Capnp.Rpc
         /// </summary>
         /// <typeparam name="TInterface">Capability interface type</typeparam>
         /// <param name="task">The task</param>
+        /// <param name="memberName">debugging aid</param>
+        /// <param name="sourceFilePath">debugging aid</param>
+        /// <param name="sourceLineNumber">debugging aid</param>
         /// <returns>A proxy for the given task.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="task"/> is null.</exception>
         /// <exception cref="InvalidCapabilityInterfaceException"><typeparamref name="TInterface"/> did not
@@ -101,6 +104,13 @@ namespace Capnp.Rpc
             set { _askingEndpoint.Value = value; }
         }
 
+        /// <summary>
+        /// Checks whether a given task belongs to a pending RPC and requests a tail call if applicable.
+        /// </summary>
+        /// <typeparam name="T">Task result type</typeparam>
+        /// <param name="task">Task to request</param>
+        /// <param name="func">Converts the task's result to a SerializerState</param>
+        /// <returns>Tail-call aware task</returns>
         public static async Task<AnswerOrCounterquestion> MaybeTailCall<T>(Task<T> task, Func<T, SerializerState> func)
         {
             if (TryGetAnswer(task) is PendingQuestion pendingQuestion &&
@@ -115,31 +125,49 @@ namespace Capnp.Rpc
             }
         }
 
+        /// <summary>
+        /// Overload for tuple-typed tasks
+        /// </summary>
         public static Task<AnswerOrCounterquestion> MaybeTailCall<T1, T2>(Task<(T1, T2)> task, Func<T1, T2, SerializerState> func)
         {
             return MaybeTailCall(task, (ValueTuple<T1, T2> t) => func(t.Item1, t.Item2));
         }
 
+        /// <summary>
+        /// Overload for tuple-typed tasks
+        /// </summary>
         public static Task<AnswerOrCounterquestion> MaybeTailCall<T1, T2, T3>(Task<(T1, T2, T3)> task, Func<T1, T2, T3, SerializerState> func)
         {
             return MaybeTailCall(task, (ValueTuple<T1, T2, T3> t) => func(t.Item1, t.Item2, t.Item3));
         }
 
+        /// <summary>
+        /// Overload for tuple-typed tasks
+        /// </summary>
         public static Task<AnswerOrCounterquestion> MaybeTailCall<T1, T2, T3, T4>(Task<(T1, T2, T3, T4)> task, Func<T1, T2, T3, T4, SerializerState> func)
         {
             return MaybeTailCall(task, (ValueTuple<T1, T2, T3, T4> t) => func(t.Item1, t.Item2, t.Item3, t.Item4));
         }
 
+        /// <summary>
+        /// Overload for tuple-typed tasks
+        /// </summary>
         public static Task<AnswerOrCounterquestion> MaybeTailCall<T1, T2, T3, T4, T5>(Task<(T1, T2, T3, T4, T5)> task, Func<T1, T2, T3, T4, T5, SerializerState> func)
         {
             return MaybeTailCall(task, (ValueTuple<T1, T2, T3, T4, T5> t) => func(t.Item1, t.Item2, t.Item3, t.Item4, t.Item5));
         }
 
+        /// <summary>
+        /// Overload for tuple-typed tasks
+        /// </summary>
         public static Task<AnswerOrCounterquestion> MaybeTailCall<T1, T2, T3, T4, T5, T6>(Task<(T1, T2, T3, T4, T5, T6)> task, Func<T1, T2, T3, T4, T5, T6, SerializerState> func)
         {
             return MaybeTailCall(task, (ValueTuple<T1, T2, T3, T4, T5, T6> t) => func(t.Item1, t.Item2, t.Item3, t.Item4, t.Item5, t.Item6));
         }
 
+        /// <summary>
+        /// Overload for tuple-typed tasks
+        /// </summary>
         public static Task<AnswerOrCounterquestion> MaybeTailCall<T1, T2, T3, T4, T5, T6, T7>(Task<(T1, T2, T3, T4, T5, T6, T7)> task, Func<T1, T2, T3, T4, T5, T6, T7, SerializerState> func)
         {
             return MaybeTailCall(task, (ValueTuple<T1, T2, T3, T4, T5, T6, T7> t) => func(t.Item1, t.Item2, t.Item3, t.Item4, t.Item5, t.Item6, t.Item7));

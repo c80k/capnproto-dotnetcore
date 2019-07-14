@@ -14,12 +14,34 @@ namespace Capnp.Rpc
     /// </summary>
     public class TcpRpcServer: IDisposable
     {
+        /// <summary>
+        /// Models an incoming connection.
+        /// </summary>
         public interface IConnection
         {
+            /// <summary>
+            /// Server-side port
+            /// </summary>
             int LocalPort { get; }
+
+            /// <summary>
+            /// Receive message counter
+            /// </summary>
             long RecvCount { get; }
+
+            /// <summary>
+            /// Sent message counter
+            /// </summary>
             long SendCount { get; }
+
+            /// <summary>
+            /// Whether the RPC engine is currently computing.
+            /// </summary>
             bool IsComputing { get; }
+
+            /// <summary>
+            /// Whether the connection is idle, waiting for data to receive.
+            /// </summary>
             bool IsWaitingForData { get; }
         }
 
@@ -169,9 +191,16 @@ namespace Capnp.Rpc
                 }
             }
 
-            if (!_acceptorThread.Join(500))
+            try
             {
-                Logger.LogError("Unable to join TCP acceptor thread within timeout");
+                if (!_acceptorThread.Join(500))
+                {
+                    Logger.LogError("Unable to join TCP acceptor thread within timeout");
+                }
+            }
+            catch (ThreadStateException)
+            {
+                // If acceptor thread was not yet started this is not a problem. Ignore.
             }
 
             GC.SuppressFinalize(this);
@@ -188,12 +217,23 @@ namespace Capnp.Rpc
         {
             _rpcEngine = new RpcEngine();
             _listener = new TcpListener(localAddr, port);
-            _listener.Start();
+            _listener.ExclusiveAddressUse = false;
 
-            _acceptorThread = new Thread(() =>
+            for (int retry = 0; retry < 5; retry++)
             {
-                AcceptClients();
-            });
+                try
+                {
+                    _listener.Start();
+                    break;
+                }
+                catch (SocketException socketException)
+                {
+                    Logger.LogWarning($"Failed to listen on port {port}, attempt {retry}: {socketException}");
+                    Thread.Sleep(10);
+                }
+            }
+
+            _acceptorThread = new Thread(AcceptClients);
 
             _acceptorThread.Start();
         }

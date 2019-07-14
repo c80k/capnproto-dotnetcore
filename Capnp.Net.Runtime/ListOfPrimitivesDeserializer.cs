@@ -208,7 +208,7 @@ namespace Capnp
             var utf8Bytes = PrimitiveCast<byte>().Data;
             if (utf8Bytes.Length == 0) return string.Empty;
             var utf8GytesNoZterm = utf8Bytes.Slice(0, utf8Bytes.Length - 1);
-            return Encoding.UTF8.GetString(utf8GytesNoZterm);
+            return Encoding.UTF8.GetString(utf8GytesNoZterm.ToArray());
         }
 
         IEnumerable<T> Enumerate()

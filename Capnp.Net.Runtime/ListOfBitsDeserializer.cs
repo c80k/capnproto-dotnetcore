@@ -50,7 +50,7 @@ namespace Capnp
         }
 
         /// <summary>
-        /// Implements <see cref="IEnumerable{bool}"/>
+        /// Implements <see cref="IEnumerable{T}"/>
         /// </summary>
         /// <returns></returns>
         public IEnumerator<bool> GetEnumerator()

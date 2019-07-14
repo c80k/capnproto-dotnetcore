@@ -1,3 +1,5 @@
+#pragma warning disable CS1591
+
 using Capnp;
 using Capnp.Rpc;
 using System;

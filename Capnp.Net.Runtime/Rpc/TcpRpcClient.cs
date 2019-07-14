@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,16 +55,25 @@ namespace Capnp.Rpc
 
         async Task ConnectAsync(string host, int port)
         {
-            try
+            for (int retry = 0; ; retry++)
             {
-                await _client.ConnectAsync(host, port);
-            }
-            catch (SocketException exception)
-            {
-                throw new RpcException("TcpRpcClient is unable to connect", exception);
-            }
+                try
+                {
+                    await _client.ConnectAsync(host, port);
 
+                    return;
+                }
+                catch (SocketException exception) when (retry < 240 && exception.SocketErrorCode == SocketError.AddressAlreadyInUse)
+                {
+                    await Task.Delay(1000);
+                }
+                catch (SocketException exception)
+                {
+                    throw new RpcException("TcpRpcClient is unable to connect", exception);
+                }
+            }
         }
+
         async Task Connect(string host, int port)
         {
             await ConnectAsync(host, port);
@@ -103,6 +113,7 @@ namespace Capnp.Rpc
         {
             _rpcEngine = new RpcEngine();
             _client = new TcpClient();
+            _client.ExclusiveAddressUse = false;
 
             WhenConnected = Connect(host, port);
         }
@@ -119,7 +130,7 @@ namespace Capnp.Rpc
                 throw new InvalidOperationException("Connection not yet established");
             }
 
-            if (!WhenConnected.IsCompletedSuccessfully)
+            if (!WhenConnected.ReplacementTaskIsCompletedSuccessfully())
             {
                 throw new InvalidOperationException("Connection not successfully established");
             }
@@ -143,8 +154,9 @@ namespace Capnp.Rpc
                     Logger.LogError("Unable to join connection task within timeout");
                 }
             }
-            catch (System.Exception)
+            catch (System.Exception e)
             {
+                Logger.LogError(e, "Failure disposing client");
             }
 
             if (_pumpThread != null && !_pumpThread.Join(500))

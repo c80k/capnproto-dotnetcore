@@ -7,7 +7,14 @@ namespace Capnp
     /// </summary>
     public struct SegmentSlice
     {
+        /// <summary>
+        /// Segment index
+        /// </summary>
         public uint SegmentIndex;
+
+        /// <summary>
+        /// Word offset within segment
+        /// </summary>
         public int Offset;
     }
 }

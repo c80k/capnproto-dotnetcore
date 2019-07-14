@@ -360,12 +360,12 @@ namespace Capnp
             return Cast(sd => sd.ReadDataUInt(0));
         }
 
-        public virtual IReadOnlyList<long> CastLong()
         /// <summary>
         /// Represents this list as List(Int64).
         /// </summary>
         /// <returns>The desired representation</returns>
         /// <exception cref="NotSupportedException">If this list cannot be represented in the desired manner.</exception>
+        public virtual IReadOnlyList<long> CastLong()
         {
             return Cast(sd => sd.ReadDataLong(0));
         }

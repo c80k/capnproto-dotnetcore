@@ -56,7 +56,7 @@ namespace Capnp
         }
 
         /// <summary>
-        /// Implements <see cref="IEnumerable{T}"./>
+        /// Implements <see cref="IEnumerable{T}"/>.
         /// </summary>
         /// <returns></returns>
         public IEnumerator<T> GetEnumerator()

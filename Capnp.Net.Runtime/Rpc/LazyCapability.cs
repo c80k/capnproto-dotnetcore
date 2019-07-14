@@ -52,7 +52,7 @@ namespace Capnp.Rpc
 
         internal override void Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {
-            if (WhenResolved.IsCompletedSuccessfully)
+            if (WhenResolved.ReplacementTaskIsCompletedSuccessfully())
             {
                 WhenResolved.Result.Export(endpoint, writer);
             }

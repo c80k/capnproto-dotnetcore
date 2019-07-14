@@ -75,7 +75,7 @@ namespace Capnp
 
             if (frame.Segments.Count == 0)
                 throw new ArgumentException("Expected at least one segment");
-
+            
             foreach (var segment in frame.Segments)
             {
                 if (segment.Length == 0)
@@ -99,8 +99,11 @@ namespace Capnp
 
                 foreach (var segment in frame.Segments)
                 {
+#if NETSTANDARD2_0
+                    var bytes = MemoryMarshal.Cast<ulong, byte>(segment.Span).ToArray();
+#else
                     var bytes = MemoryMarshal.Cast<ulong, byte>(segment.Span);
-
+#endif
                     _writer.Write(bytes);
                 }
             }
@@ -123,7 +126,7 @@ namespace Capnp
         /// to be part of normal operation. It does pass exceptions which arise due to I/O errors or invalid data.
         /// </summary>
         /// <exception cref="ArgumentException">The underlying stream does not support reading or is already closed.</exception>
-        /// <exception cref="OverflowException">Received invalid data.</exception>
+        /// <exception cref="InvalidDataException">Encountered Invalid Framing Data</exception>
         /// <exception cref="OutOfMemoryException">Received a message with too many or too big segments, probably dues to invalid data.</exception>
         /// <exception cref="IOException">An I/O error occurs.</exception>
         public void Run()
@@ -135,55 +138,19 @@ namespace Capnp
                     while (true)
                     {
                         IsWaitingForData = true;
-
-                        uint scountm = reader.ReadUInt32();
-                        int scount = checked((int)(scountm + 1));
-                        var buffers = new Memory<ulong>[scount];
-
-                        for (uint i = 0; i < scount; i++)
-                        {
-                            int size = checked((int)reader.ReadUInt32());
-
-                            // This implementation will never send empty segments.
-                            // Other implementations should not. An empty segment may also
-                            // indicate and end-of-stream (stream closed) condition.
-                            if (size == 0)
-                            {
-                                Logger.LogInformation("Received zero-sized segment, stopping interaction");
-                                return;
-                            }
-
-                            buffers[i] = new Memory<ulong>(new ulong[size]);
-                        }
-
-                        if ((scount & 1) == 0)
-                        {
-                            // Padding
-                            reader.ReadUInt32();
-                        }
-
-                        for (uint i = 0; i < scount; i++)
-                        {
-                            var buffer = MemoryMarshal.Cast<ulong, byte>(buffers[i].Span);
-
-                            int got = reader.Read(buffer);
-
-                            if (got != buffer.Length)
-                            {
-                                Logger.LogWarning("Received incomplete frame");
-
-                                throw new EndOfStreamException("Expected more bytes according to framing header");
-                            }
-                        }
-
+                        var frame = reader.ReadWireFrame();
                         IsWaitingForData = false;
-
-                        FrameReceived?.Invoke(new WireFrame(new ArraySegment<Memory<ulong>>(buffers, 0, scount)));
+                        FrameReceived?.Invoke(frame);
                     }
                 }
             }
             catch (EndOfStreamException)
             {
+                Logger.LogWarning("Encountered End of Stream");
+            }
+            catch (InvalidDataException e)
+            {
+                Logger.LogWarning(e.Message);
             }
             catch (ObjectDisposedException)
             {

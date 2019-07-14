@@ -13,8 +13,6 @@ namespace Capnp.Net.Runtime.Tests
     [TestClass]
     public class TcpRpcStress: TestBase
     {
-        ILogger Logger { get; set; }
-
         void Repeat(int count, Action action)
         {
             for (int i = 0; i < count; i++)
@@ -22,15 +20,6 @@ namespace Capnp.Net.Runtime.Tests
                 Logger.LogTrace("Repetition {0}", i);
                 action();
             }
-        }
-
-        [TestInitialize]
-        public void InitConsoleLogging()
-        {
-            Logging.LoggerFactory = new LoggerFactory().AddConsole((msg, level) => true);
-            Logger = Logging.CreateLogger<TcpRpcStress>();
-            if (Thread.CurrentThread.Name == null)
-                Thread.CurrentThread.Name = $"Test Thread {Thread.CurrentThread.ManagedThreadId}";
         }
 
         [TestMethod]
@@ -43,7 +32,7 @@ namespace Capnp.Net.Runtime.Tests
                 using (server)
                 using (client)
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                    client.WhenConnected.Wait();
 
                     var counters = new Counters();
                     var impl = new TestMoreStuffImpl(counters);
