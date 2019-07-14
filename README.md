@@ -1,13 +1,48 @@
 # capnproto-dotnetcore
-A Cap'n Proto implementation for .NET Core
+A Cap'n Proto implementation for .NET Standard 2.0 (credits to [lostinplace](https://github.com/lostinplace)) .NET Core 2.1.
 
 ["Cap'n Proto is an insanely fast data interchange format and capability-based RPC system."](https://capnproto.org/) Whilst the original implementation is written in C++ there are several ports to other languages. This is a C# implementation for .NET Core.
 
 Disclaimer: Neither this project nor its author are affiliated with Cap'n Proto. This is just yet another independent implementation of the specification. The following sections assume that you are familiar with [Cap'n Proto](https://capnproto.org/) and probably its [GitHub project](https://github.com/capnproto/capnproto).
 
-## Getting started
+## Getting started: Users
+
+The overall deployment consists of two independent binaries:
+- The C# code generator back end is required for generating `.cs` serialization classes from `.capnp` schema files. It is designed to be used in conjunction with the Cap'n Proto tool set which is maintained at the original site. The tool set is required at compile time.
+- The `Capnp.Net.Runtime` assembly is to be included as a reference into your particular application (or assembly).
+
+### Code generator back end: Windows
+
+The C# code generator back end will be available as [Chocolatey](https://chocolatey.org/) package. You may choose between two flavors: The portable version requires a .NET Core 2.1 (or higher) runtime or SDK (type `dotnet` at command line prompt to check whether you already have one). This is the recommended variant. To install, type
+
+```
+choco install capnpc-csharp
+```
+
+The self-contained version does not require .NET Core but runs only on a x86-compatible Windows machine. To install, type
+
+```
+choco install capnpc-csharp-win-x86
+```
+
+Both versions will also download and install the [Cap'n Proto tool set Chocolatey package](https://www.chocolatey.org/packages/capnproto). Note that the author does not maintain this package and has no influence on its contents.
+
+### Code generator back end: Other OSes
+
+Currently, you are on yourself. Compile the `capnpc-csharp` VS project and install the resulting .NET application manually on your system. This should not be that complicated, see also the [Wiki](https://github.com/c80k/capnproto-dotnetcore/wiki). It would be great to support other package managers, especially [APT](https://wiki.debian.org/Apt). Consider contributing? Author would be happy!
+
+### Runtime assembly
+
+The `Capnp.Net.Runtime` assembly is available as [Nuget package](https://www.nuget.org/packages?q=Capnp.Net.Runtime). E.g. within VS package manage console, type
+
+```
+Install-Package Capnp.Net.Runtime
+```
+
+## Getting started: Developers
 
 For building from scratch you will need Visual Studio >= 2019 (e.g. Community Edition) with suitable workloads for C# / .NET Core (currently .NET Core 2.1) development. For the test suite, you will also need the C++ native workload, [vcpkg](https://github.com/microsoft/vcpkg) and Cap'n Proto release 0.7.0:
+
 ```
 vcpkg install capnproto
 ```
