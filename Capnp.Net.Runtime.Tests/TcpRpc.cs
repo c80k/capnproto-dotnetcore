@@ -30,6 +30,7 @@ namespace Capnp.Net.Runtime.Tests
         {
             ExpectingLogOutput = true;
 
+            Logging.LoggerFactory?.Dispose();
             Logging.LoggerFactory = new LoggerFactory().AddConsole((msg, level) =>
             {
                 if (!ExpectingLogOutput && level != LogLevel.Debug)

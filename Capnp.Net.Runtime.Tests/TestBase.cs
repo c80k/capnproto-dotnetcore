@@ -33,6 +33,7 @@ namespace Capnp.Net.Runtime.Tests
         [TestInitialize]
         public void InitConsoleLogging()
         {
+            Logging.LoggerFactory?.Dispose();
             Logging.LoggerFactory = new LoggerFactory().AddConsole((msg, level) => true);
             Logger = Logging.CreateLogger<TcpRpcStress>();
             if (Thread.CurrentThread.Name == null)

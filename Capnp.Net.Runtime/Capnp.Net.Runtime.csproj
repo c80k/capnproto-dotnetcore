@@ -17,6 +17,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>capnp "Cap'n Proto" RPC serialization cerealization</PackageTags>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
