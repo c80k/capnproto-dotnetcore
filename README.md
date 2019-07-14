@@ -7,7 +7,7 @@ Disclaimer: Neither this project nor its author are affiliated with Cap'n Proto.
 
 ## Getting started: Users
 
-The overall deployment consists of two independent binaries:
+The overall deployment consists of two components:
 - The C# code generator back end is required for generating `.cs` serialization classes from `.capnp` schema files. It is designed to be used in conjunction with the Cap'n Proto tool set which is maintained at the original site. The tool set is required at compile time.
 - The `Capnp.Net.Runtime` assembly is to be included as a reference into your particular application (or assembly).
 
