@@ -2,5 +2,6 @@ VERIFICATION
 Verification is intended to assist the Chocolatey moderators and community
 in verifying that this package's contents are trustworthy.
  
-This package is published by the capnproto-dotnetcore project itself. Any binaries will be 
-identical to other package types published by the project.
+This package is published by the capnproto-dotnetcore project itself. 
+To reproduce this package, obtain the sources from GitHub and execute scripts\capnpc-csharp-pack.ps1 
+The script will generate the exact NuGet package(s) which are to be pushed to Chocolatey.

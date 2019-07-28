@@ -1,5 +1,5 @@
 $ErrorActionPreference = 'Stop'
 
-$toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
+$binDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)\..\bin"
 
-Install-Binfile -Name capnpc-csharp -Path "$toolsDir\capnpc-csharp.exe"
+Install-Binfile -Name capnpc-csharp -Path "$binDir\capnpc-csharp.exe"
