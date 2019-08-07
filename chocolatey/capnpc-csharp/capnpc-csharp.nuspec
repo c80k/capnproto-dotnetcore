@@ -3,7 +3,7 @@
   <metadata>
     <id>capnpc-csharp</id>
     <version>1.0.0</version>
-    <packageSourceUrl>https://chocolatey.org/packages/capnpc-csharp/1.0.0</packageSourceUrl>
+    <packageSourceUrl>https://github.com/c80k/capnproto-dotnetcore/tree/master/chocolatey</packageSourceUrl>
     <authors>Christian Köllner and contributors</authors>
     <owners>Christian Köllner</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
