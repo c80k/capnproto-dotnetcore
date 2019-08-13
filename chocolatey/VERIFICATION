@@ -4,4 +4,4 @@ in verifying that this package's contents are trustworthy.
  
 This package is published by the capnproto-dotnetcore project itself. 
 To reproduce this package, obtain the sources from GitHub and execute scripts\capnpc-csharp-pack.ps1 
-The script will generate the exact NuGet package(s) which are to be pushed to Chocolatey.
+The script will generate the exact NuGet package(s) which are to be pushed to Chocolatey (folder chocolatey\install)
