@@ -18,4 +18,4 @@ Starting from a plain Chocolatey test environment, please follow these steps:
   Run the packaging script:
 > .\capnpc-csharp-pack.ps1
 
-  Verify the generated NuGet packages inside capnproto-dotnetcore\chocolaty\install
+  Verify the generated NuGet packages inside capnproto-dotnetcore\chocolatey\install
