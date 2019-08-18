@@ -1,5 +1,5 @@
 version: '1.0.{build}'
-image: Visual Studio 2017
+image: Visual Studio 2019
 branches:
   only:
   - master
@@ -26,7 +26,7 @@ clone_depth: 1
 test_script:
   # restore packages for our unit tests
   - cmd: dotnet restore ./Capnp.Net.Runtime.Tests.Core21/Capnp.Net.Runtime.Tests.Core21.csproj --verbosity m
-  - cmd: msbuild ./CapnpCompatTest.sln
+  - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Debug;Release"
   - cmd: cd Capnp.Net.Runtime.Tests.Core21
   - cmd: dotnet test
 on_finish :
