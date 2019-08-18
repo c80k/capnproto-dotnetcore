@@ -12,27 +12,31 @@ install:
   - vcpkg install capnproto
   - cd %APPVEYOR_BUILD_FOLDER%
 before_build:
-  # Display .NET Core version
   - cmd: dotnet --version
-  # Display minimal restore text
-  - cmd: dotnet restore ./Capnp.Net.Runtime/Capnp.Net.Runtime.csproj --verbosity m
-  - cmd: dotnet restore ./capnpc-csharp/capnpc-csharp.csproj --verbosity m
+  - cmd: msbuild --ver
 build_script:
+  - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Debug"
+  - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Release"
+  - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Debug"
+  - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Release"
   - cmd: dotnet publish -c Release -r win-x86 --self-contained -o bin\win_x86 ./capnpc-csharp/capnpc-csharp.csproj
+  - cmd: dotnet publish -c Release -o bin\generic ./capnpc-csharp/capnpc-csharp.csproj
 after_build:
   # For once the build has completed
 artifacts:
  - path: 'bin\win_x86'
    name: WebSite
    type: WebDeployPackage
+ - path: 'bin\generic'
+   name: WebSite
+   type: WebDeployPackage
 clone_depth: 1
-test_script:
-  # restore packages for our unit tests
-  - cmd: dotnet restore ./Capnp.Net.Runtime.Tests.Core21/Capnp.Net.Runtime.Tests.Core21.csproj --verbosity m
-  - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Debug"
-  - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Release"
-  - cmd: cd Capnp.Net.Runtime.Tests.Core21
-  - cmd: dotnet test
+test:
+  assemblies:
+    - 'Capnp.Net.Runtime.Tests\bin\Debug\netcoreapp2.2\Capnp.Net.Runtime.Tests.Std20.dll'
+    - 'Capnp.Net.Runtime.Tests\bin\Release\netcoreapp2.2\Capnp.Net.Runtime.Tests.Std20.dll'
+    - 'Capnp.Net.Runtime.Tests.Core21\bin\Debug\netcoreapp2.2\Capnp.Net.Runtime.Tests.Core21.dll'
+    - 'Capnp.Net.Runtime.Tests.Core21\bin\Release\netcoreapp2.2\Capnp.Net.Runtime.Tests.Core21.dll'
 on_finish :
   # any cleanup in here
 deploy: off
