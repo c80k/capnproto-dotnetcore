@@ -13,7 +13,7 @@ install:
   - cd %APPVEYOR_BUILD_FOLDER%
 before_build:
   - cmd: dotnet --version
-  - cmd: msbuild --ver
+  - cmd: msbuild -ver
 build_script:
   - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Debug"
   - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Release"
