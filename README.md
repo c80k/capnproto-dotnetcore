@@ -13,6 +13,8 @@ The overall deployment consists of two components:
 
 ### Code generator back end: Windows
 
+Disclaimer: The mid-term goal is to provide the C# code generator backend as Chocolatey package. It turns out that setting up a correct package verification process (which is a requirement for package approval) requires more effort than expected. See [Issue: Not on Chocolatey](https://github.com/c80k/capnproto-dotnetcore/issues/6) for instructions on how to create and install the package locally. Read on to get an impression on how it's supposed to work in the future.
+
 The C# code generator back end will be available as [Chocolatey](https://chocolatey.org/) package. You may choose between two flavors: The portable version requires a .NET Core 2.1 (or higher) runtime or SDK (type `dotnet` at command line prompt to check whether you already have one). This is the recommended variant. To install, type
 
 ```
