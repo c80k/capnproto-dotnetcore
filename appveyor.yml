@@ -26,7 +26,8 @@ clone_depth: 1
 test_script:
   # restore packages for our unit tests
   - cmd: dotnet restore ./Capnp.Net.Runtime.Tests.Core21/Capnp.Net.Runtime.Tests.Core21.csproj --verbosity m
-  - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Debug;Release"
+  - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Debug"
+  - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Release"
   - cmd: cd Capnp.Net.Runtime.Tests.Core21
   - cmd: dotnet test
 on_finish :
