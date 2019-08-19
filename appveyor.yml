@@ -24,25 +24,28 @@ build_script:
   - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Release"
   - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Debug"
   - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Release"
-  - cmd: dotnet publish -c Release -r win-x86 --self-contained -o "bin/win_x86" ./capnpc-csharp/capnpc-csharp.csproj
-  - cmd: dotnet publish -c Release -o "bin/generic" ./capnpc-csharp/capnpc-csharp.csproj
+  - cmd: scripts\capnpc-csharp-pack.ps1
 after_build:
   # For once the build has completed
 artifacts:
- - path: capnpc-csharp\bin\win_x86
-   name: capnpc-win_x86.1.0.0
-   type: Zip
- - path: capnpc-csharp\bin\generic
-   name: capnpc-generic.1.0.0
-   type: Zip
+ - path: Capnp.Net.Runtime\bin\Debug\Capnp.Net.Runtime.1.0.0.nupkg
+   name: Capnp.Net.Runtime.1.0.0_debug
+   type: NuGetPackage
+ - path: Capnp.Net.Runtime\bin\Release\Capnp.Net.Runtime.1.0.0.nupkg
+   name: Capnp.Net.Runtime.1.0.0
+   type: NuGetPackage
+ - path: chocolatey\install\capnpc-csharp-win-x86.1.0.0.nupkg
+   name: capnpc-csharp-win-x86.1.0.0
+   type: NuGetPackage
+ - path: chocolatey\install\capnpc-csharp.1.0.0.nupkg
+   name: capnpc-csharp.1.0.0
+   type: NuGetPackage
 clone_depth: 1
-test:
-  assemblies:
-    only:
-      - Capnp.Net.Runtime.Tests\bin\Debug\netcoreapp2.2\Capnp.Net.Runtime.Tests.Std20.dll
-      - Capnp.Net.Runtime.Tests\bin\Release\netcoreapp2.2\Capnp.Net.Runtime.Tests.Std20.dll
-      - Capnp.Net.Runtime.Tests.Core21\bin\Debug\netcoreapp2.2\Capnp.Net.Runtime.Tests.Core21.dll
-      - Capnp.Net.Runtime.Tests.Core21\bin\Release\netcoreapp2.2\Capnp.Net.Runtime.Tests.Core21.dll
+test_script:
+  - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Debug\netcoreapp2.2\Capnp.Net.Runtime.Tests.Std20.dll
+  - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\netcoreapp2.2\Capnp.Net.Runtime.Tests.Std20.dll
+  - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests.Core21\bin\Debug\netcoreapp2.2\Capnp.Net.Runtime.Tests.Core21.dll
+  - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests.Core21\bin\Release\netcoreapp2.2\Capnp.Net.Runtime.Tests.Core21.dll
 on_finish :
   # any cleanup in here
 deploy: off
