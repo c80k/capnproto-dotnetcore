@@ -30,7 +30,18 @@ namespace Capnp.Rpc
             }
 
             var rtask = AwaitAnswer();
+
+            // Really weird: We'd expect AwaitAnswer() to initialize a new Task instance upon each invocation.
+            // However, this does not seem to be always true (as indicated by CI test suite). An explanation might be
+            // that the underlying implementation recycles Task instances. Let's work around it.
+
+#if NETSTANDARD2_0
+            _taskTable.Remove(rtask);
             _taskTable.Add(rtask, promise);
+#else
+            _taskTable.AddOrUpdate(rtask, promise);
+#endif
+
             return rtask;
         }
 

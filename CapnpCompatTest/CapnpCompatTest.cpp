@@ -821,9 +821,11 @@ void ReleaseOnCancelTest(capnp::EzRpcClient& rpc)
 		//
 		// TODO(cleanup): This is fragile, but I'm not sure how else to write it without a ton
 		//   of scaffolding.
-		kj::evalLater([]() {}).wait(waitScope);
-		kj::evalLater([]() {}).wait(waitScope);
-		waitScope.poll();
+		//kj::evalLater([]() {}).wait(waitScope);
+		//kj::evalLater([]() {}).wait(waitScope);
+		//waitScope.poll();
+
+		promise.wait(waitScope);
 	}
 
 	for (uint i = 0; i < 16; i++) kj::evalLater([]() {}).wait(waitScope);

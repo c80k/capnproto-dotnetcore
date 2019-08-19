@@ -48,4 +48,8 @@ test_script:
   - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests.Core21\bin\Release\netcoreapp2.2\Capnp.Net.Runtime.Tests.Core21.dll
 on_finish :
   # any cleanup in here
-deploy: off
+deploy:
+  - provider: Environment
+    name: GitHub
+  on:
+    APPVEYOR_REPO_TAG: true 

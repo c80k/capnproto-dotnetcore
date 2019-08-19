@@ -349,7 +349,7 @@ namespace Capnp.Net.Runtime.Tests
                 {
                     AssertOutput(stdout, "ReleaseOnCancel test start");
                     AssertOutput(stdout, "ReleaseOnCancel test end");
-                    Assert.IsTrue(SpinWait.SpinUntil(() => counters.HandleCount == 0, MediumNonDbgTimeout));
+                    Assert.IsTrue(SpinWait.SpinUntil(() => counters.HandleCount == 0, MediumNonDbgTimeout), $"Handle count stuck at {counters.HandleCount}");
                 });
             }
         }
@@ -773,42 +773,44 @@ namespace Capnp.Net.Runtime.Tests
                         }
 
                         var cap = new TestCallOrderImpl();
-
-                        var earlyCall = main.GetCallSequence(0, default);
-
-                        var echo = main.Echo(cap, default);
-
-                        using (var pipeline = echo.Eager())
+                        using (Skeleton.Claim(cap))
                         {
-                            var call0 = pipeline.GetCallSequence(0, default);
-                            var call1 = pipeline.GetCallSequence(1, default);
+                            var earlyCall = main.GetCallSequence(0, default);
 
-                            Assert.IsTrue(earlyCall.Wait(MediumNonDbgTimeout), "early call returns");
+                            var echo = main.Echo(cap, default);
 
-                            var call2 = pipeline.GetCallSequence(2, default);
-
-                            Assert.IsTrue(echo.Wait(MediumNonDbgTimeout));
-                            using (var resolved = echo.Result)
+                            using (var pipeline = echo.Eager())
                             {
-                                var call3 = pipeline.GetCallSequence(3, default);
-                                var call4 = pipeline.GetCallSequence(4, default);
-                                var call5 = pipeline.GetCallSequence(5, default);
+                                var call0 = pipeline.GetCallSequence(0, default);
+                                var call1 = pipeline.GetCallSequence(1, default);
 
-                                Assert.IsTrue(call0.Wait(MediumNonDbgTimeout), "call 0 returns");
-                                Assert.IsTrue(call1.Wait(MediumNonDbgTimeout), "call 1 returns");
-                                Assert.IsTrue(call2.Wait(MediumNonDbgTimeout), "call 2 returns");
-                                Assert.IsTrue(call3.Wait(MediumNonDbgTimeout), "call 3 returns");
-                                Assert.IsTrue(call4.Wait(MediumNonDbgTimeout), "call 4 returns");
-                                Assert.IsTrue(call5.Wait(MediumNonDbgTimeout), "call 5 returns");
+                                Assert.IsTrue(earlyCall.Wait(MediumNonDbgTimeout), "early call returns");
 
-                                Assert.AreEqual(0u, call0.Result);
-                                Assert.AreEqual(1u, call1.Result);
-                                Assert.AreEqual(2u, call2.Result);
-                                Assert.AreEqual(3u, call3.Result);
-                                Assert.AreEqual(4u, call4.Result);
-                                Assert.AreEqual(5u, call5.Result);
+                                var call2 = pipeline.GetCallSequence(2, default);
+
+                                Assert.IsTrue(echo.Wait(MediumNonDbgTimeout));
+                                using (var resolved = echo.Result)
+                                {
+                                    var call3 = pipeline.GetCallSequence(3, default);
+                                    var call4 = pipeline.GetCallSequence(4, default);
+                                    var call5 = pipeline.GetCallSequence(5, default);
+
+                                    Assert.IsTrue(call0.Wait(MediumNonDbgTimeout), "call 0 returns");
+                                    Assert.IsTrue(call1.Wait(MediumNonDbgTimeout), "call 1 returns");
+                                    Assert.IsTrue(call2.Wait(MediumNonDbgTimeout), "call 2 returns");
+                                    Assert.IsTrue(call3.Wait(MediumNonDbgTimeout), "call 3 returns");
+                                    Assert.IsTrue(call4.Wait(MediumNonDbgTimeout), "call 4 returns");
+                                    Assert.IsTrue(call5.Wait(MediumNonDbgTimeout), "call 5 returns");
+
+                                    Assert.AreEqual(0u, call0.Result);
+                                    Assert.AreEqual(1u, call1.Result);
+                                    Assert.AreEqual(2u, call2.Result);
+                                    Assert.AreEqual(3u, call3.Result);
+                                    Assert.AreEqual(4u, call4.Result);
+                                    Assert.AreEqual(5u, call5.Result);
+                                }
+
                             }
-
                         }
                     }
                 }
