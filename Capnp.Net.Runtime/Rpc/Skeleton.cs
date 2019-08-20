@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -27,6 +28,10 @@ namespace Capnp.Rpc
                 _skeleton.Relinquish();
             }
         }
+
+#if DEBUG
+        const int NoDisposeFlag = 0x4000000;
+#endif
 
         static readonly ConditionalWeakTable<object, Skeleton> _implMap =
             new ConditionalWeakTable<object, Skeleton>();
@@ -58,6 +63,29 @@ namespace Capnp.Rpc
             return new SkeletonRelinquisher(GetOrCreateSkeleton(impl, true));
         }
 
+#if DEBUG
+        /// <summary>
+        /// This DEBUG-only diagnostic method states that the Skeleton corresponding to a given capability is not expected to
+        /// be disposed until the next call to EndAssertNotDisposed().
+        /// </summary>
+        /// <typeparam name="T">Capability interface</typeparam>
+        /// <param name="impl">Capability implementation</param>
+        public static void BeginAssertNotDisposed<T>(T impl) where T : class
+        {
+            GetOrCreateSkeleton(impl, false).BeginAssertNotDisposed();
+        }
+
+        /// <summary>
+        /// This DEBUG-only diagnostic method ends a non-disposal period started with BeginAssertNotDisposed.
+        /// </summary>
+        /// <typeparam name="T">Capability interface</typeparam>
+        /// <param name="impl">Capability implementation</param>
+        public static void EndAssertNotDisposed<T>(T impl) where T : class
+        {
+            GetOrCreateSkeleton(impl, false).EndAssertNotDisposed();
+        }
+#endif
+
         int _refCount = 0;
 
         /// <summary>
@@ -75,11 +103,33 @@ namespace Capnp.Rpc
             Interlocked.Increment(ref _refCount);
         }
 
+#if DEBUG
+        internal void BeginAssertNotDisposed()
+        {
+            if ((Interlocked.Add(ref _refCount, NoDisposeFlag) & NoDisposeFlag) == 0)
+            {
+                throw new InvalidOperationException("Flag already set. State is now broken.");
+            }
+        }
+        internal void EndAssertNotDisposed()
+        {
+            if ((Interlocked.Add(ref _refCount, -NoDisposeFlag) & NoDisposeFlag) != 0)
+            {
+                throw new InvalidOperationException("Flag already cleared. State is now broken.");
+            }
+        }
+#endif
+
         internal void Relinquish()
         {
             int count = Interlocked.Decrement(ref _refCount);
+
             if (0 == count)
             {
+#if DEBUG
+                Debug.Assert((_refCount & NoDisposeFlag) == 0, "Skeleton disposal not expected in this state");
+#endif
+
                 Dispose(true);
                 GC.SuppressFinalize(this);
             }
