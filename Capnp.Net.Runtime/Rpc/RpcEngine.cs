@@ -973,7 +973,7 @@ namespace Capnp.Rpc
 
             void ReleaseExport(uint id, uint count)
             {
-                bool exists, badrc = false;
+                bool exists;
 
                 lock (_reentrancyBlocker)
                 {
@@ -993,9 +993,9 @@ namespace Capnp.Rpc
                                 _revExportTable.ReplacementTryRemove(rc.Cap, out uint _);
                             }
                         }
-                        catch (System.Exception)
+                        catch (System.Exception exception)
                         {
-                            badrc = true;
+                            Logger.LogWarning($"Attempting to release capability with invalid reference count: {exception.Message}");
                         }
                     }
                 }
@@ -1003,10 +1003,6 @@ namespace Capnp.Rpc
                 if (!exists)
                 {
                     Logger.LogWarning("Attempting to release unknown capability ID");
-                }
-                else if (badrc)
-                {
-                    Logger.LogWarning("Attempting to release capability with invalid reference count");
                 }
             }
 

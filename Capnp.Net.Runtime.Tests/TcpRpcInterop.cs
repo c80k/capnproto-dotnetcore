@@ -774,6 +774,7 @@ namespace Capnp.Net.Runtime.Tests
 
                         var cap = new TestCallOrderImpl();
                         cap.CountToDispose = 6;
+                        Skeleton.BeginAssertNotDisposed(cap);
                         var earlyCall = main.GetCallSequence(0, default);
 
                         var echo = main.Echo(cap, default);
@@ -807,6 +808,8 @@ namespace Capnp.Net.Runtime.Tests
                                 Assert.AreEqual(3u, call3.Result);
                                 Assert.AreEqual(4u, call4.Result);
                                 Assert.AreEqual(5u, call5.Result);
+
+                                Skeleton.EndAssertNotDisposed(cap);
                             }
                         }
                     }

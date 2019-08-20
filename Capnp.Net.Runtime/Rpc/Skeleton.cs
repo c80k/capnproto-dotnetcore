@@ -29,9 +29,7 @@ namespace Capnp.Rpc
             }
         }
 
-#if DEBUG
         const int NoDisposeFlag = 0x4000000;
-#endif
 
         static readonly ConditionalWeakTable<object, Skeleton> _implMap =
             new ConditionalWeakTable<object, Skeleton>();
@@ -63,7 +61,6 @@ namespace Capnp.Rpc
             return new SkeletonRelinquisher(GetOrCreateSkeleton(impl, true));
         }
 
-#if DEBUG
         /// <summary>
         /// This DEBUG-only diagnostic method states that the Skeleton corresponding to a given capability is not expected to
         /// be disposed until the next call to EndAssertNotDisposed().
@@ -84,7 +81,6 @@ namespace Capnp.Rpc
         {
             GetOrCreateSkeleton(impl, false).EndAssertNotDisposed();
         }
-#endif
 
         int _refCount = 0;
 
@@ -103,7 +99,6 @@ namespace Capnp.Rpc
             Interlocked.Increment(ref _refCount);
         }
 
-#if DEBUG
         internal void BeginAssertNotDisposed()
         {
             if ((Interlocked.Add(ref _refCount, NoDisposeFlag) & NoDisposeFlag) == 0)
@@ -118,7 +113,6 @@ namespace Capnp.Rpc
                 throw new InvalidOperationException("Flag already cleared. State is now broken.");
             }
         }
-#endif
 
         internal void Relinquish()
         {
@@ -126,9 +120,8 @@ namespace Capnp.Rpc
 
             if (0 == count)
             {
-#if DEBUG
-                Debug.Assert((_refCount & NoDisposeFlag) == 0, "Skeleton disposal not expected in this state");
-#endif
+                if ((count & NoDisposeFlag) != 0)
+                    throw new InvalidOperationException("Unexpected Skeleton disposal");
 
                 Dispose(true);
                 GC.SuppressFinalize(this);

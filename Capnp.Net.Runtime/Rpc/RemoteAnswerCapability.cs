@@ -24,6 +24,8 @@ namespace Capnp.Rpc
         {
             _question = question ?? throw new ArgumentNullException(nameof(question));
             _access = access ?? throw new ArgumentNullException(nameof(access));
+
+            _ = AwaitWhenResolved();
         }
 
         async void ReAllowFinishWhenDone(Task task)
@@ -57,21 +59,24 @@ namespace Capnp.Rpc
         {
             get
             {
-                if (_resolvedCap == null && !_question.IsTailCall && _question.IsReturned)
+                lock (_question.ReentrancyBlocker)
                 {
-                    DeserializerState result;
-                    try
+                    if (_resolvedCap == null && !_question.IsTailCall && _question.IsReturned)
                     {
-                        result = _question.WhenReturned.Result;
-                    }
-                    catch (AggregateException exception)
-                    {
-                        throw exception.InnerException;
-                    }
+                        DeserializerState result;
+                        try
+                        {
+                            result = _question.WhenReturned.Result;
+                        }
+                        catch (AggregateException exception)
+                        {
+                            throw exception.InnerException;
+                        }
 
-                    _resolvedCap = new Proxy(_access.Eval(result));
+                        _resolvedCap = new Proxy(_access.Eval(result));
+                    }
+                    return _resolvedCap;
                 }
-                return _resolvedCap;
             }
         }
 
