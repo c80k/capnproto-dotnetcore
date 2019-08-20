@@ -514,8 +514,11 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
 
         public uint Count { get; set; }
 
+        public uint? CountToDispose { get; set; }
+
         public void Dispose()
         {
+            Assert.IsTrue(!CountToDispose.HasValue || Count == CountToDispose, "Must not dispose at this point");
         }
 
         public Task<uint> GetCallSequence(uint expected, CancellationToken cancellationToken_)
