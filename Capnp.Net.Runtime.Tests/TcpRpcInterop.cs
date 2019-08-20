@@ -259,7 +259,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod, Timeout(20000)]
         public void ReleaseOnCancelClient()
         {
             // Since we have a threaded model, there is no way to deterministically provoke the situation
@@ -774,7 +774,9 @@ namespace Capnp.Net.Runtime.Tests
 
                         var cap = new TestCallOrderImpl();
                         cap.CountToDispose = 6;
+#if DEBUG_DISPOSE
                         Skeleton.BeginAssertNotDisposed(cap);
+#endif
                         var earlyCall = main.GetCallSequence(0, default);
 
                         var echo = main.Echo(cap, default);
@@ -809,7 +811,9 @@ namespace Capnp.Net.Runtime.Tests
                                 Assert.AreEqual(4u, call4.Result);
                                 Assert.AreEqual(5u, call5.Result);
 
+#if DEBUG_DISPOSE
                                 Skeleton.EndAssertNotDisposed(cap);
+#endif
                             }
                         }
                     }

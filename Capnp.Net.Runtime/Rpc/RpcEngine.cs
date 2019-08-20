@@ -234,11 +234,11 @@ namespace Capnp.Rpc
 
             PendingQuestion AllocateQuestion(ConsumedCapability target, SerializerState inParams)
             {
-                uint questionId = RandId();
-                var question = new PendingQuestion(this, questionId, target, inParams);
-
                 lock (_reentrancyBlocker)
                 {
+                    uint questionId = RandId();
+                    var question = new PendingQuestion(this, questionId, target, inParams);
+
                     while (!_questionTable.ReplacementTryAdd(questionId, question))
                     {
                         questionId = RandId();
@@ -246,9 +246,9 @@ namespace Capnp.Rpc
                         question = new PendingQuestion(this, questionId, target, inParams);
                         oldQuestion.Dispose();
                     }
-                }
 
-                return question;
+                    return question;
+                }
             }
 
             void DeleteQuestion(uint id, PendingQuestion question)
