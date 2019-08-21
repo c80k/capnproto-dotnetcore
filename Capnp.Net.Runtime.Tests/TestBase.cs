@@ -13,10 +13,17 @@ namespace Capnp.Net.Runtime.Tests
 {
     public class TestBase
     {
-        public static int TcpPort = 33444;
+        public static int TcpPort = 49152;
         public static int MediumNonDbgTimeout => Debugger.IsAttached ? Timeout.Infinite : 5000;
         public static int LargeNonDbgTimeout => Debugger.IsAttached ? Timeout.Infinite : 10000;
         public static int ShortTimeout => 500;
+
+        public static int GetNextTcpPort()
+        {
+            if (++TcpPort == 65535)
+                TcpPort = 49152;
+            return TcpPort;
+        }
 
         protected ILogger Logger { get; set; }
 

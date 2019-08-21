@@ -95,6 +95,15 @@ namespace Capnp.Net.Runtime.Tests
             Assert.AreEqual(expected, line.Result);
         }
 
+        [TestInitialize]
+        public void PrepareNextTest()
+        {
+            if (++TcpPort >= 65534)
+            {
+                TcpPort = 49152;
+            }
+        }
+
         [TestMethod, Timeout(10000)]
         public void BasicClient()
         {
@@ -980,7 +989,7 @@ namespace Capnp.Net.Runtime.Tests
             LaunchCompatTestProcess("server:MoreStuff", EmbargoErrorImpl);
         }
 
-        [TestMethod, Timeout(60000)]
+        [TestMethod, Timeout(120000)]
         public void RepeatedEmbargoError()
         {
             LaunchCompatTestProcess("server:MoreStuff", stdout =>

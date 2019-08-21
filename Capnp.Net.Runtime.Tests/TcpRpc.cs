@@ -14,7 +14,7 @@ namespace Capnp.Net.Runtime.Tests
     [TestClass]
     public class TcpRpc
     {
-        public static int TcpPort = 33444;
+        public static int TcpPort = 49153;
 
         (TcpRpcServer, TcpRpcClient) SetupClientServerPair()
         {

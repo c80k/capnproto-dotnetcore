@@ -1413,7 +1413,7 @@ int main(int argc, const char* argv[])
 			return 2;
 		}
 
-		capnp::EzRpcServer server(mainInterface, argv[2], 33444);
+		capnp::EzRpcServer server(mainInterface, argv[2], 0);
 		auto& waitScope = server.getWaitScope();
 
 		uint port = server.getPort().wait(waitScope);
