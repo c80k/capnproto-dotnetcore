@@ -4,6 +4,7 @@
 // > vcpkg install capnproto
 
 #include <iostream>
+#include <thread>
 #include <capnp/ez-rpc.h>
 #include <kj/common.h>
 #include "test.capnp.h"
@@ -636,7 +637,20 @@ public:
 		return kj::READY_NOW;
 	}
 
-	kj::Promise<void> echo(EchoContext context) 
+	kj::Promise<void> simpleLoop(int rem)
+	{
+		if (rem <= 0) {
+			return kj::READY_NOW;
+		}
+		else {
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			return kj::evalLater([this, rem]() mutable {
+				return simpleLoop(rem - 1);
+			});
+		}
+	}
+
+	kj::Promise<void> echo(EchoContext context)
 	{
 		++callCount;
 		cout << "echo" << endl;
@@ -644,7 +658,7 @@ public:
 		auto params = context.getParams();
 		auto result = context.getResults();
 		result.setCap(params.getCap());
-		return kj::READY_NOW;
+		return simpleLoop(100); // Loop a little to provoke real promise pipelining
 	}
 
 	kj::Promise<void> expectCancel(ExpectCancelContext context) 

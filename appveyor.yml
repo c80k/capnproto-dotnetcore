@@ -11,6 +11,14 @@ install:
   - vcpkg integrate install
   - vcpkg install capnproto
   - cd %APPVEYOR_BUILD_FOLDER%
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj;**\*.props;**\*.fsproj;**\*.xml;**\*.nuspec'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
 before_build:
   - cmd: dotnet --version
   - cmd: msbuild -ver
@@ -28,17 +36,17 @@ build_script:
 after_build:
   # For once the build has completed
 artifacts:
- - path: Capnp.Net.Runtime\bin\Debug\Capnp.Net.Runtime.1.0.0.nupkg
-   name: Capnp.Net.Runtime.1.0.0_debug
+ - path: Capnp.Net.Runtime\bin\Debug
+   name: Capnp.Net.Runtime_debug
    type: NuGetPackage
- - path: Capnp.Net.Runtime\bin\Release\Capnp.Net.Runtime.1.0.0.nupkg
-   name: Capnp.Net.Runtime.1.0.0
+ - path: Capnp.Net.Runtime\bin\Release
+   name: Capnp.Net.Runtime
    type: NuGetPackage
- - path: chocolatey\install\capnpc-csharp-win-x86.1.0.0.nupkg
-   name: capnpc-csharp-win-x86.1.0.0
+ - path: chocolatey\install\capnpc-csharp-win-x86.{version}.nupkg
+   name: capnpc-csharp-win-x86
    type: NuGetPackage
- - path: chocolatey\install\capnpc-csharp.1.0.0.nupkg
-   name: capnpc-csharp.1.0.0
+ - path: chocolatey\install\capnpc-csharp.{version}.nupkg
+   name: capnpc-csharp
    type: NuGetPackage
 clone_depth: 1
 test_script:

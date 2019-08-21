@@ -822,6 +822,89 @@ namespace Capnp.Net.Runtime.Tests
         }
 
         [TestMethod, Timeout(10000)]
+        public void EmbargoServer2()
+        {
+            LaunchCompatTestProcess("server:MoreStuff", stdout =>
+            {
+                int retry = 0;
+
+                label:
+                using (var client = new TcpRpcClient("localhost", TcpPort))
+                {
+                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout), "client connect");
+
+                    using (var main = client.GetMain<ITestMoreStuff>())
+                    {
+                        var resolving = main as IResolvingCapability;
+
+                        bool success;
+
+                        try
+                        {
+                            success = resolving.WhenResolved.Wait(MediumNonDbgTimeout);
+                        }
+                        catch
+                        {
+                            success = false;
+                        }
+
+                        if (!success)
+                        {
+                            if (++retry == 5)
+                            {
+                                Assert.Fail("Attempting to obtain bootstrap interface failed. Bailing out.");
+                            }
+                            goto label;
+                        }
+
+                        var cap = new TestCallOrderImpl();
+                        cap.CountToDispose = 6;
+#if DEBUG_DISPOSE
+                        Skeleton.BeginAssertNotDisposed(cap);
+#endif
+                        var earlyCall = main.GetCallSequence(0, default);
+
+                        var echo = main.Echo(cap, default);
+
+                        using (var pipeline = echo.Result)
+                        {
+                            var call0 = pipeline.GetCallSequence(0, default);
+                            var call1 = pipeline.GetCallSequence(1, default);
+
+                            Assert.IsTrue(earlyCall.Wait(MediumNonDbgTimeout), "early call returns");
+
+                            var call2 = pipeline.GetCallSequence(2, default);
+
+                            Assert.IsTrue(echo.Wait(MediumNonDbgTimeout));
+
+                            var call3 = pipeline.GetCallSequence(3, default);
+                            var call4 = pipeline.GetCallSequence(4, default);
+                            var call5 = pipeline.GetCallSequence(5, default);
+
+                            Assert.IsTrue(call0.Wait(MediumNonDbgTimeout), "call 0 returns");
+                            Assert.IsTrue(call1.Wait(MediumNonDbgTimeout), "call 1 returns");
+                            Assert.IsTrue(call2.Wait(MediumNonDbgTimeout), "call 2 returns");
+                            Assert.IsTrue(call3.Wait(MediumNonDbgTimeout), "call 3 returns");
+                            Assert.IsTrue(call4.Wait(MediumNonDbgTimeout), "call 4 returns");
+                            Assert.IsTrue(call5.Wait(MediumNonDbgTimeout), "call 5 returns");
+
+                            Assert.AreEqual(0u, call0.Result);
+                            Assert.AreEqual(1u, call1.Result);
+                            Assert.AreEqual(2u, call2.Result);
+                            Assert.AreEqual(3u, call3.Result);
+                            Assert.AreEqual(4u, call4.Result);
+                            Assert.AreEqual(5u, call5.Result);
+
+#if DEBUG_DISPOSE
+                            Skeleton.EndAssertNotDisposed(cap);
+#endif
+                        }
+                    }
+                }
+            });
+        }
+
+        [TestMethod, Timeout(10000)]
         public void EmbargoClient()
         {
             using (var server = SetupServer())
@@ -897,7 +980,7 @@ namespace Capnp.Net.Runtime.Tests
             LaunchCompatTestProcess("server:MoreStuff", EmbargoErrorImpl);
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod, Timeout(30000)]
         public void RepeatedEmbargoError()
         {
             LaunchCompatTestProcess("server:MoreStuff", stdout =>
