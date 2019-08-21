@@ -13,7 +13,7 @@ install:
   - cd %APPVEYOR_BUILD_FOLDER%
 dotnet_csproj:
   patch: true
-  file: '**\*.csproj;**\*.props;**\*.fsproj;**\*.xml;**\*.nuspec'
+  file: '**\*.csproj;**\*.props;**\*.fsproj;**\*.xml'
   version: '{version}'
   package_version: '{version}'
   assembly_version: '{version}'

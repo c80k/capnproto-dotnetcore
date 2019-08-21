@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>capnpc-csharp-win-x86</id>
-    <version>1.0.0</version>
+    <version>$version$</version>
     <packageSourceUrl>https://github.com/c80k/capnproto-dotnetcore/tree/master/chocolatey</packageSourceUrl>
     <authors>Christian Köllner and contributors</authors>
     <owners>Christian Köllner</owners>

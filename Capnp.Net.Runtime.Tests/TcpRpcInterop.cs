@@ -980,7 +980,7 @@ namespace Capnp.Net.Runtime.Tests
             LaunchCompatTestProcess("server:MoreStuff", EmbargoErrorImpl);
         }
 
-        [TestMethod, Timeout(30000)]
+        [TestMethod, Timeout(60000)]
         public void RepeatedEmbargoError()
         {
             LaunchCompatTestProcess("server:MoreStuff", stdout =>
