@@ -934,7 +934,7 @@ namespace Capnp.Net.Runtime.Tests
             using (var client = new TcpRpcClient("localhost", TcpPort))
             {
 
-                client.WhenConnected.Wait();
+                Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
 
                 using (var main = client.GetMain<ITestMoreStuff>())
                 {
@@ -989,7 +989,7 @@ namespace Capnp.Net.Runtime.Tests
             LaunchCompatTestProcess("server:MoreStuff", EmbargoErrorImpl);
         }
 
-        [TestMethod, Timeout(120000)]
+        [TestMethod, Timeout(240000)]
         public void RepeatedEmbargoError()
         {
             LaunchCompatTestProcess("server:MoreStuff", stdout =>
