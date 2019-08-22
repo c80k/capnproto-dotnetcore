@@ -308,6 +308,9 @@ namespace Capnp.Net.Runtime.Tests
                                         --handleCount;
                                         break;
 
+                                    case "getCallSequence":
+                                        break;
+
                                     default:
                                         Assert.Fail("Unexpected output");
                                         break;
@@ -318,12 +321,13 @@ namespace Capnp.Net.Runtime.Tests
                         }
 
                         var verifyOutputTask = VerifyOutput();
+                        var taskList = new List<Task>();
 
                         for (int i = 0; i < iterationCount; i++)
                         {
                             var task = main.GetHandle(default);
                             Impatient.GetAnswer(task).Dispose();
-                            task.ContinueWith(t =>
+                            taskList.Add(task.ContinueWith(t =>
                             {
                                 try
                                 {
@@ -332,8 +336,18 @@ namespace Capnp.Net.Runtime.Tests
                                 catch (TaskCanceledException)
                                 {
                                 }
-                            });
+                            }));
                         }
+
+                        // Ensure that all answers either return (probably in canceled state)
+                        Assert.IsTrue(Task.WhenAll(taskList).Wait(LargeNonDbgTimeout));
+
+                        // Not part of original test. "Terminate" sequence with
+                        // call to some different operation: getCallSequence
+                        // Motivation: Cancelling the GetHandle request immediately after sending it might seduce the
+                        // remote RPC implementation to immediately discard the request, before even calling the server
+                        // method. => Cannot rely on receiving *exactly* 2*iterationCount outputs.
+                        var term = main.GetCallSequence(0, default);
 
                         Assert.IsTrue(verifyOutputTask.Wait(LargeNonDbgTimeout));
 
