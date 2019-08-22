@@ -268,7 +268,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(20000)]
+        [TestMethod, Timeout(120000)]
         public void ReleaseOnCancelClient()
         {
             // Since we have a threaded model, there is no way to deterministically provoke the situation
