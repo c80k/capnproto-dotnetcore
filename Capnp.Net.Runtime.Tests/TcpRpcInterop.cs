@@ -345,7 +345,7 @@ namespace Capnp.Net.Runtime.Tests
                             }));
                         }
 
-                        // Ensure that all answers either return (probably in canceled state)
+                        // Ensure that all answers return (probably in canceled state)
                         Assert.IsTrue(Task.WhenAll(taskList).Wait(LargeNonDbgTimeout));
 
                         // Not part of original test. "Terminate" sequence with

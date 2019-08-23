@@ -1453,16 +1453,12 @@ namespace Capnp.Rpc
 
             void IRpcEndpoint.RemoveImport(uint importId)
             {
-                bool exists;
-
                 lock (_reentrancyBlocker)
                 {
-                    exists = _importTable.Remove(importId);
-                }
-
-                if (!exists)
-                {
-                    Logger.LogError("Inconsistent import table detected");
+                    if (!_importTable.Remove(importId))
+                    {
+                        throw new ArgumentException("Given ID does not exist in import table");
+                    }
                 }
             }
 
