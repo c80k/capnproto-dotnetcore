@@ -193,9 +193,19 @@ namespace Capnp.Rpc
 
             try
             {
-                if (!_acceptorThread.Join(500))
+                try
                 {
-                    Logger.LogError("Unable to join TCP acceptor thread within timeout");
+                    if (!_acceptorThread.Join(500))
+                    {
+                        Logger.LogError("Unable to join TCP acceptor thread within timeout");
+                    }
+                }
+                catch (ThreadStateException)
+                {
+                }
+                catch (System.Exception exception)
+                {
+                    Logger.LogError($"Unable to join TCP acceptor thread: {exception.Message}");
                 }
             }
             catch (ThreadStateException)

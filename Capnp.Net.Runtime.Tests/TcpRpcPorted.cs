@@ -446,6 +446,7 @@ namespace Capnp.Net.Runtime.Tests
                     Assert.IsTrue(resolving.WhenResolved.Wait(MediumNonDbgTimeout));
 
                     var cap = new TestCallOrderImpl();
+                    cap.CountToDispose = 6;
 
                     var earlyCall = main.GetCallSequence(0, default);
 
