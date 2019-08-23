@@ -34,7 +34,7 @@ build_script:
   - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Release"
   - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Debug"
   - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Release"
-  - ps: scripts\capnpc-csharp-pack.ps1 $(appveyor_build_version)
+  - ps: scripts\capnpc-csharp-pack.ps1 $env:appveyor_build_version
 after_build:
   # For once the build has completed
 artifacts:
