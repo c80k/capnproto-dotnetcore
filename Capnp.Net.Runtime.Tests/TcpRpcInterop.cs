@@ -338,7 +338,7 @@ namespace Capnp.Net.Runtime.Tests
                                 {
                                     // Scenario 2: Cancellation happened before or while computing the answer.
                                 }
-                                catch (ObjectDisposedException)
+                                catch (AggregateException ex) when (ex.InnerException is ObjectDisposedException)
                                 {
                                     // Scenario 3: Cancellation happened after computing the answer, and after client-side completion.
                                 }
