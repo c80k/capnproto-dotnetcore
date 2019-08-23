@@ -332,9 +332,15 @@ namespace Capnp.Net.Runtime.Tests
                                 try
                                 {
                                     t.Result.Dispose();
+                                    // Scenario 1: Cancellation happened after computing the answer, but before client-side completion.
                                 }
                                 catch (TaskCanceledException)
                                 {
+                                    // Scenario 2: Cancellation happened before or while computing the answer.
+                                }
+                                catch (ObjectDisposedException)
+                                {
+                                    // Scenario 3: Cancellation happened after computing the answer, and after client-side completion.
                                 }
                             }));
                         }
