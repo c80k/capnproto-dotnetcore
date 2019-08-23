@@ -18,6 +18,7 @@ namespace Capnp.Net.Runtime.Tests
             for (int i = 0; i < count; i++)
             {
                 Logger.LogTrace("Repetition {0}", i);
+                IncrementTcpPort();
                 action();
             }
         }

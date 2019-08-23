@@ -8,6 +8,7 @@ using Capnp.Rpc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Capnp.Net.Runtime.Tests.GenImpls;
 using Capnproto_test.Capnp.Test;
+using Microsoft.Extensions.Logging;
 
 namespace Capnp.Net.Runtime.Tests
 {
@@ -470,7 +471,17 @@ namespace Capnp.Net.Runtime.Tests
                             var call4 = pipeline.GetCallSequence(4, default);
                             var call5 = pipeline.GetCallSequence(5, default);
 
-                            Assert.IsTrue(call0.Wait(MediumNonDbgTimeout));
+                            try
+                            {
+                                bool flag = call0.Wait(MediumNonDbgTimeout);
+                                Assert.IsTrue(flag);
+                            }
+                            catch (RpcException exception) when (exception.Message == "Cannot access a disposed object.")
+                            {
+                                Logger.Log(LogLevel.Information, $"Oops, object disposed. Counter = {cap.Count}, tx count = {client.SendCount}, rx count = {client.RecvCount}");
+                                throw;
+                            }
+
                             Assert.IsTrue(call1.Wait(MediumNonDbgTimeout));
                             Assert.IsTrue(call2.Wait(MediumNonDbgTimeout));
                             Assert.IsTrue(call3.Wait(MediumNonDbgTimeout));

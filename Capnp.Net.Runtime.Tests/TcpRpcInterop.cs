@@ -98,10 +98,7 @@ namespace Capnp.Net.Runtime.Tests
         [TestInitialize]
         public void PrepareNextTest()
         {
-            if (++TcpPort >= 65534)
-            {
-                TcpPort = 49152;
-            }
+            IncrementTcpPort();
         }
 
         [TestMethod, Timeout(10000)]

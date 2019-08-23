@@ -18,13 +18,6 @@ namespace Capnp.Net.Runtime.Tests
         public static int LargeNonDbgTimeout => Debugger.IsAttached ? Timeout.Infinite : 20000;
         public static int ShortTimeout => 500;
 
-        public static int GetNextTcpPort()
-        {
-            if (++TcpPort == 65535)
-                TcpPort = 49152;
-            return TcpPort;
-        }
-
         protected ILogger Logger { get; set; }
 
         protected TcpRpcClient SetupClient() => new TcpRpcClient("localhost", TcpPort);
@@ -35,6 +28,14 @@ namespace Capnp.Net.Runtime.Tests
             var server = SetupServer();
             var client = SetupClient();
             return (server, client);
+        }
+
+        public static void IncrementTcpPort()
+        {
+            if (++TcpPort > 49200)
+            {
+                TcpPort = 49152;
+            }
         }
 
         [TestInitialize]

@@ -193,19 +193,27 @@ namespace Capnp.Rpc
 
             try
             {
-                try
+                for (int retry = 0; retry < 5; ++retry)
                 {
-                    if (!_acceptorThread.Join(500))
+                    try
                     {
-                        Logger.LogError("Unable to join TCP acceptor thread within timeout");
+                        if (!_acceptorThread.Join(500))
+                        {
+                            Logger.LogError("Unable to join TCP acceptor thread within timeout");
+                        }
+                        break;
                     }
-                }
-                catch (ThreadStateException)
-                {
-                }
-                catch (System.Exception exception)
-                {
-                    Logger.LogError($"Unable to join TCP acceptor thread: {exception.Message}");
+                    catch (ThreadStateException)
+                    {
+                        // In rare cases it happens that despite _acceptorThread.Start() was called, the thread did not actually start yet.
+                        Logger.LogDebug("Waiting for TCP acceptor thread to start in order to join it");
+                        Thread.Sleep(100);
+                    }
+                    catch (System.Exception exception)
+                    {
+                        Logger.LogError($"Unable to join TCP acceptor thread: {exception.Message}");
+                        break;
+                    }
                 }
             }
             catch (ThreadStateException)
