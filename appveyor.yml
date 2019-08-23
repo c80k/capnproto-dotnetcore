@@ -34,7 +34,7 @@ build_script:
   - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Release"
   - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Debug"
   - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Release"
-  - ps: scripts\capnpc-csharp-pack.ps1
+  - ps: scripts\capnpc-csharp-pack.ps1 $(appveyor_build_version)
 after_build:
   # For once the build has completed
 artifacts:
@@ -44,10 +44,10 @@ artifacts:
  - path: Capnp.Net.Runtime\bin\Release
    name: Capnp.Net.Runtime
    type: NuGetPackage
- - path: chocolatey\install\capnpc-csharp-win-x86.{version}.nupkg
+ - path: chocolatey\install\capnpc-csharp-win-x86.$(appveyor_build_version).nupkg
    name: capnpc-csharp-win-x86
    type: NuGetPackage
- - path: chocolatey\install\capnpc-csharp.{version}.nupkg
+ - path: chocolatey\install\capnpc-csharp.$(appveyor_build_version).nupkg
    name: capnpc-csharp
    type: NuGetPackage
 clone_depth: 1
