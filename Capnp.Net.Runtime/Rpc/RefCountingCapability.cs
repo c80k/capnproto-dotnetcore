@@ -23,7 +23,6 @@ namespace Capnp.Rpc
         // In order to distinguish state A from C, the member _refCount stores the reference count *plus one*. 
         // Value 0 has the special meaning of being in state C.
         int _refCount = 1;
-        string _disposerStackTrace;
 
         ~RefCountingCapability()
         {
@@ -37,6 +36,8 @@ namespace Capnp.Rpc
         {
             if (disposing)
             {
+                _refCount = 0;
+
                 try
                 {
                     ReleaseRemotely();
@@ -44,8 +45,6 @@ namespace Capnp.Rpc
                 catch
                 {
                 }
-
-                _refCount = 0;
             }
             else
             {
@@ -69,7 +68,7 @@ namespace Capnp.Rpc
         {
             if (Interlocked.Increment(ref _refCount) <= 1)
             {
-                throw new ObjectDisposedException(nameof(ConsumedCapability), _disposerStackTrace);
+                throw new ObjectDisposedException(nameof(ConsumedCapability));
             }
         }
 
@@ -77,8 +76,6 @@ namespace Capnp.Rpc
         {
             if (1 >= Interlocked.Decrement(ref _refCount))
             {
-                _disposerStackTrace = Environment.StackTrace;
-
                 Dispose(true);
                 GC.SuppressFinalize(this);
             }
