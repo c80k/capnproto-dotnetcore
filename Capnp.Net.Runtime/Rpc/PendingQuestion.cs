@@ -136,7 +136,10 @@ namespace Capnp.Rpc
             }
             else
             {
-                _tcs.TrySetResult(results);
+                if (!_tcs.TrySetResult(results))
+                {
+                    ReleaseOutCaps(results);
+                }
             }
         }
 
@@ -272,6 +275,14 @@ namespace Capnp.Rpc
             }
         }
 
+        static void ReleaseOutCaps(DeserializerState outParams)
+        {
+            foreach (var cap in outParams.Caps)
+            {
+                cap?.Release();
+            }
+        }
+
         internal void Send()
         {
             SerializerState inParams;
@@ -314,6 +325,7 @@ namespace Capnp.Rpc
         {
             SerializerState inParams;
             ConsumedCapability target;
+            bool justDisposed = false;
 
             lock (ReentrancyBlocker)
             {
@@ -327,6 +339,7 @@ namespace Capnp.Rpc
                     if (!StateFlags.HasFlag(State.Disposed))
                     {
                         StateFlags |= State.Disposed;
+                        justDisposed = true;
 
                         AutoFinish();
                     }
@@ -338,6 +351,11 @@ namespace Capnp.Rpc
             }
 
             ReleaseCaps(target, inParams);
+
+            if (justDisposed)
+            {
+                _tcs.TrySetCanceled();
+            }
         }
 
         /// <summary>

@@ -140,7 +140,13 @@ namespace Capnp.Net.Runtime.Tests
                         cts.Cancel();
                         task.ContinueWith(t =>
                         {
-                            t.Result.Dispose();
+                            try
+                            {
+                                t.Result.Dispose();
+                            }
+                            catch (AggregateException ex) when (ex.InnerException is TaskCanceledException)
+                            {
+                            }
                             cts.Dispose();
                         });
                     }

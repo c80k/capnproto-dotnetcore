@@ -74,7 +74,7 @@ namespace Capnp.Rpc
 
         internal sealed override void Release()
         {
-            if (1 == Interlocked.Decrement(ref _refCount))
+            if (1 >= Interlocked.Decrement(ref _refCount))
             {
                 Dispose(true);
                 GC.SuppressFinalize(this);

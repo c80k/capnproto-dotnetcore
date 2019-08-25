@@ -265,13 +265,13 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(120000)]
+        [TestMethod]
         public void ReleaseOnCancelClient()
         {
             // Since we have a threaded model, there is no way to deterministically provoke the situation
             // where Cancel and Finish message cross paths. Instead, we'll do a lot of such requests and
             // later on verify that the handle count is 0.
-            int iterationCount = 1000;
+            int iterationCount = 5000;
 
             LaunchCompatTestProcess("server:MoreStuff", stdout =>
             {
@@ -305,9 +305,6 @@ namespace Capnp.Net.Runtime.Tests
                                         --handleCount;
                                         break;
 
-                                    case "getCallSequence":
-                                        break;
-
                                     default:
                                         Assert.Fail("Unexpected output");
                                         break;
@@ -323,34 +320,21 @@ namespace Capnp.Net.Runtime.Tests
                         for (int i = 0; i < iterationCount; i++)
                         {
                             var task = main.GetHandle(default);
-                            Impatient.GetAnswer(task).Dispose();
                             taskList.Add(task.ContinueWith(t =>
                             {
                                 try
                                 {
                                     t.Result.Dispose();
-                                    // Scenario 1: Cancellation happened after computing the answer, but before client-side completion.
                                 }
-                                catch (TaskCanceledException)
+                                catch (AggregateException ex) when (ex.InnerException is TaskCanceledException)
                                 {
-                                    // Scenario 2: Cancellation happened before or while computing the answer.
-                                }
-                                catch (AggregateException ex) when (ex.InnerException is ObjectDisposedException)
-                                {
-                                    // Scenario 3: Cancellation happened after computing the answer, and after client-side completion.
                                 }
                             }));
+                            Impatient.GetAnswer(task).Dispose();
                         }
 
                         // Ensure that all answers return (probably in canceled state)
                         Assert.IsTrue(Task.WhenAll(taskList).Wait(LargeNonDbgTimeout));
-
-                        // Not part of original test. "Terminate" sequence with
-                        // call to some different operation: getCallSequence
-                        // Motivation: Cancelling the GetHandle request immediately after sending it might seduce the
-                        // remote RPC implementation to immediately discard the request, before even calling the server
-                        // method. => Cannot rely on receiving *exactly* 2*iterationCount outputs.
-                        var term = main.GetCallSequence(0, default);
 
                         Assert.IsTrue(verifyOutputTask.Wait(LargeNonDbgTimeout));
 

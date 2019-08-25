@@ -52,7 +52,11 @@ namespace Capnp.Rpc
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            _resolvedCap?.Dispose();
+
+            lock (_question.ReentrancyBlocker)
+            {
+                _resolvedCap?.Dispose();
+            }
         }
 
         protected override Proxy ResolvedCap
