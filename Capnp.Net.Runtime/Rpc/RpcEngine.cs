@@ -74,7 +74,6 @@ namespace Capnp.Rpc
             readonly RpcEngine _host;
             readonly IEndpoint _tx;
 
-            readonly Random _random = new Random();
             readonly Dictionary<uint, RefCounted<WeakReference<RemoteCapability>>> _importTable = new Dictionary<uint, RefCounted<WeakReference<RemoteCapability>>>();
             readonly Dictionary<uint, RefCounted<Skeleton>> _exportTable = new Dictionary<uint, RefCounted<Skeleton>>();
             readonly Dictionary<Skeleton, uint> _revExportTable = new Dictionary<Skeleton, uint>();
@@ -85,6 +84,7 @@ namespace Capnp.Rpc
 
             long _recvCount;
             long _sendCount;
+            uint _nextId;
 
             internal RpcEndpoint(RpcEngine host, IEndpoint tx)
             {
@@ -185,9 +185,9 @@ namespace Capnp.Rpc
                 ReleaseExport(preliminaryId, 1);
             }
 
-            uint RandId()
+            uint NextId()
             {
-                return unchecked((uint)_random.Next(int.MinValue, int.MaxValue));
+                return _nextId++;
             }
 
             uint AllocateExport(Skeleton providedCapability, out bool first)
@@ -213,7 +213,7 @@ namespace Capnp.Rpc
                     {
                         do
                         {
-                            id = RandId();
+                            id = NextId();
 
                         } while (_exportTable.ContainsKey(id));
 
@@ -236,12 +236,12 @@ namespace Capnp.Rpc
             {
                 lock (_reentrancyBlocker)
                 {
-                    uint questionId = RandId();
+                    uint questionId = NextId();
                     var question = new PendingQuestion(this, questionId, target, inParams);
 
                     while (!_questionTable.ReplacementTryAdd(questionId, question))
                     {
-                        questionId = RandId();
+                        questionId = NextId();
                         var oldQuestion = question;
                         question = new PendingQuestion(this, questionId, target, inParams);
                         oldQuestion.Dispose();
@@ -277,11 +277,11 @@ namespace Capnp.Rpc
 
                 lock (_reentrancyBlocker)
                 {
-                    uint id = RandId();
+                    uint id = NextId();
 
                     while (!_pendingDisembargos.ReplacementTryAdd(id, tcs))
                     {
-                        id = RandId();
+                        id = NextId();
                     }
 
                     return (tcs, id);
