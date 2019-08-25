@@ -45,8 +45,19 @@ namespace Capnp.Rpc
                 if (rtask.IsCompleted)
                 {
                     // Force .NET to create a new Task instance
-                    var stask = rtask;
-                    rtask = new Task<T>(() => stask.Result);
+                    if (rtask.IsCanceled)
+                    {
+                        rtask = Task.FromCanceled<T>(new CancellationToken(true));
+                    }
+                    else if (rtask.IsFaulted)
+                    {
+                        rtask = Task.FromException<T>(rtask.Exception.InnerException);
+                    }
+                    else
+                    {
+                        rtask = Task.FromResult<T>(rtask.Result);
+                    }
+                    
                     _taskTable.Add(rtask, promise);
                 }
                 else
