@@ -31,22 +31,24 @@ namespace Capnp.Rpc
 
             var rtask = AwaitAnswer();
 
-            // Really weird: We'd expect AwaitAnswer() to initialize a new Task instance upon each invocation.
-            // However, this does not seem to be always true (as indicated by CI test suite). An explanation might be
-            // that the underlying implementation recycles Task instances (um, really? doesn't make sense. But the
-            // obsevation doesn't make sense, either).
-
             try
             {
+                // Really weird: We'd expect AwaitAnswer() to initialize a new Task instance upon each invocation.
+                // However, this does not seem to be always true (as indicated by CI test suite). An explanation might be
+                // that the underlying implementation recycles Task instances (um, really? doesn't make sense. But the
+                // observation doesn't make sense, either).
+
                 _taskTable.Add(rtask, promise);
             }
             catch (ArgumentException)
             {
                 // Force .NET to create a new Task instance
 
+                var stask = rtask;
+
                 async Task<T> AwaitAgain()
                 {
-                    return await rtask;
+                    return await stask;
                 }
 
                 rtask = AwaitAgain();
