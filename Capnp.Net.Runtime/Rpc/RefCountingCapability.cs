@@ -22,7 +22,7 @@ namespace Capnp.Rpc
         // C: Released state: No reference anymore, capability *is* released.
         // In order to distinguish state A from C, the member _refCount stores the reference count *plus one*. 
         // Value 0 has the special meaning of being in state C.
-        int _refCount = 1;
+        long _refCount = 1;
 
         ~RefCountingCapability()
         {
@@ -36,8 +36,6 @@ namespace Capnp.Rpc
         {
             if (disposing)
             {
-                _refCount = 0;
-
                 try
                 {
                     ReleaseRemotely();
@@ -74,10 +72,29 @@ namespace Capnp.Rpc
 
         internal sealed override void Release()
         {
-            if (1 >= Interlocked.Decrement(ref _refCount))
+            while (true)
             {
-                Dispose(true);
-                GC.SuppressFinalize(this);
+                if ((Interlocked.CompareExchange(ref _refCount, 0, 2) == 2) ||
+                    (Interlocked.CompareExchange(ref _refCount, 0, 1) == 1))
+                {
+                    Dispose(true);
+                    GC.SuppressFinalize(this);
+                    return;
+                }
+
+                long oldCount = Interlocked.Read(ref _refCount);
+
+                if (oldCount > 2)
+                {
+                    if (Interlocked.CompareExchange(ref _refCount, oldCount - 1, oldCount) == oldCount)
+                    {
+                        return;
+                    }
+                }
+                else if (oldCount <= 0)
+                {
+                    throw new InvalidOperationException("Capability is already disposed");
+                }
             }
         }
     }
