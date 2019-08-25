@@ -6,6 +6,8 @@ namespace Capnp.Rpc
 {
     abstract class RefCountingCapability: ConsumedCapability
     {
+        readonly object _reentrancyBlocker = new object();
+
         // Note on reference counting: Works in analogy to COM. AddRef() adds a reference,
         // Release() removes it. When the reference count reaches zero, the capability must be
         // released remotely, i.e. we need to tell the remote peer that it can remove this
@@ -64,36 +66,34 @@ namespace Capnp.Rpc
 
         internal sealed override void AddRef()
         {
-            if (Interlocked.Increment(ref _refCount) <= 1)
+            lock (_reentrancyBlocker)
             {
-                throw new ObjectDisposedException(nameof(ConsumedCapability));
+                if (++_refCount <= 1)
+                {
+                    throw new ObjectDisposedException(nameof(ConsumedCapability));
+                }
             }
         }
 
         internal sealed override void Release()
         {
-            while (true)
+            lock (_reentrancyBlocker)
             {
-                if ((Interlocked.CompareExchange(ref _refCount, 0, 2) == 2) ||
-                    (Interlocked.CompareExchange(ref _refCount, 0, 1) == 1))
+                switch (_refCount)
                 {
-                    Dispose(true);
-                    GC.SuppressFinalize(this);
-                    return;
-                }
+                    case 1: // initial state, actually ref. count 0
+                    case 2: // actually ref. count 1
+                        _refCount = 0;
+                        Dispose(true);
+                        GC.SuppressFinalize(this);
+                        break;
 
-                long oldCount = Interlocked.Read(ref _refCount);
+                    case var _ when _refCount > 2:
+                        --_refCount;
+                        break;
 
-                if (oldCount > 2)
-                {
-                    if (Interlocked.CompareExchange(ref _refCount, oldCount - 1, oldCount) == oldCount)
-                    {
-                        return;
-                    }
-                }
-                else if (oldCount <= 0)
-                {
-                    throw new InvalidOperationException("Capability is already disposed");
+                    default:
+                        throw new InvalidOperationException("Capability is already disposed");
                 }
             }
         }

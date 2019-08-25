@@ -42,18 +42,17 @@ namespace Capnp.Rpc
             }
             catch (ArgumentException)
             {
-                // Force .NET to create a new Task instance
-
-                var stask = rtask;
-
-                async Task<T> AwaitAgain()
+                if (rtask.IsCompleted)
                 {
-                    return await stask;
+                    // Force .NET to create a new Task instance
+                    var stask = rtask;
+                    rtask = new Task<T>(() => stask.Result);
+                    _taskTable.Add(rtask, promise);
                 }
-
-                rtask = AwaitAgain();
-
-                _taskTable.Add(rtask, promise);
+                else
+                {
+                    throw new InvalidOperationException("What the heck is wrong with Task?");
+                }
             }
 
             return rtask;
