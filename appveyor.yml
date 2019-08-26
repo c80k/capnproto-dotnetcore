@@ -61,5 +61,9 @@ on_finish :
 deploy:
   - provider: Environment
     name: GitHub Releases
+    description: 'This release is intended for exercising the interaction with CI.'
+    artifact: /.*\.nupkg/
+    draft: true
+    prerelease: true
     on:
       APPVEYOR_REPO_TAG: true 
