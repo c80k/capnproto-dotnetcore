@@ -60,6 +60,6 @@ on_finish :
   # any cleanup in here
 deploy:
   - provider: Environment
-    name: GitHub
+    name: GitHub Releases
     on:
       APPVEYOR_REPO_TAG: true 
