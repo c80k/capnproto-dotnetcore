@@ -13,7 +13,6 @@ namespace Capnp.Rpc
         void RequestPostAction(Action postAction);
         void Finish(uint questionId);
         void ReleaseImport(uint importId);
-        void RemoveImport(uint importId);
         void Resolve(uint preliminaryId, Skeleton preliminaryCap, Func<ConsumedCapability> resolvedCapGetter);
 
         Task RequestSenderLoopback(Action<MessageTarget.WRITER> writer);

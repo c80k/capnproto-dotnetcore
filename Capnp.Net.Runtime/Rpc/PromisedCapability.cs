@@ -242,7 +242,7 @@ namespace Capnp.Rpc
                 _ep.ReleaseImport(_remoteId);
             }
 
-            _ep.RemoveImport(_remoteId);
+            _ep.ReleaseImport(_remoteId);
 
             this.DisposeWhenResolved();
         }

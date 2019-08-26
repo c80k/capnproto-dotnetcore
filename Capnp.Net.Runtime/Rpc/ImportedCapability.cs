@@ -17,7 +17,6 @@ namespace Capnp.Rpc
         protected override void ReleaseRemotely()
         {
             _ep.ReleaseImport(_remoteId);
-            _ep.RemoveImport(_remoteId);
         }
 
         protected override Call.WRITER SetupMessage(DynamicSerializerState args, ulong interfaceId, ushort methodId)

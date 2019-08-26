@@ -97,5 +97,16 @@ namespace Capnp.Rpc
                 }
             }
         }
+
+        internal void Validate()
+        {
+            lock (_reentrancyBlocker)
+            {
+                if (_refCount <= 0)
+                {
+                    throw new ObjectDisposedException(nameof(ConsumedCapability), "Validation failed, capability is already disposed");
+                }
+            }
+        }
     }
 }

@@ -1182,6 +1182,7 @@ namespace Capnp.Rpc
                             {
                                 if (rcw.Cap.TryGetTarget(out var impCap))
                                 {
+                                    impCap.Validate();
                                     rcw.AddRef();
                                     return impCap;
                                 }
@@ -1209,6 +1210,7 @@ namespace Capnp.Rpc
                             {
                                 if (rcwp.Cap.TryGetTarget(out var impCap))
                                 {
+                                    impCap.Validate();
                                     rcwp.AddRef();
                                     return impCap;
                                 }
@@ -1281,6 +1283,7 @@ namespace Capnp.Rpc
                                 if (rcv.Cap.TryGetTarget(out var impCap))
                                 {
                                     rcv.AddRef();
+                                    impCap.Validate();
                                     return impCap;
                                 }
                                 else
@@ -1430,6 +1433,11 @@ namespace Capnp.Rpc
                         count = rc.RefCount;
                         rc.ReleaseAll();
                     }
+
+                    if (exists)
+                    {
+                        _importTable.Remove(importId);
+                    }
                 }
 
                 if (exists && count > 0)
@@ -1447,17 +1455,6 @@ namespace Capnp.Rpc
                     catch (RpcException exception)
                     {
                         Logger.LogWarning($"Unable to release import: {exception.InnerException.Message}");
-                    }
-                }
-            }
-
-            void IRpcEndpoint.RemoveImport(uint importId)
-            {
-                lock (_reentrancyBlocker)
-                {
-                    if (!_importTable.Remove(importId))
-                    {
-                        throw new ArgumentException("Given ID does not exist in import table");
                     }
                 }
             }
