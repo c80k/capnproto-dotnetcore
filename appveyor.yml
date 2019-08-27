@@ -38,9 +38,6 @@ build_script:
 after_build:
   # For once the build has completed
 artifacts:
- - path: Capnp.Net.Runtime\bin\Debug\Capnp.Net.Runtime.$(appveyor_build_version).nupkg
-   name: Capnp.Net.Runtime_debug
-   type: NuGetPackage
  - path: Capnp.Net.Runtime\bin\Release\Capnp.Net.Runtime.$(appveyor_build_version).nupkg
    name: Capnp.Net.Runtime
    type: NuGetPackage
