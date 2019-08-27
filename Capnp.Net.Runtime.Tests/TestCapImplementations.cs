@@ -510,6 +510,8 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
     #region TestCallOrder
     class TestCallOrderImpl : ITestCallOrder
     {
+        readonly object _lock = new object();
+
         ILogger Logger { get; } = Logging.CreateLogger<TestCallOrderImpl>();
 
         public uint Count { get; set; }
@@ -518,12 +520,18 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
 
         public void Dispose()
         {
-            Assert.IsTrue(!CountToDispose.HasValue || Count == CountToDispose, "Must not dispose at this point");
+            lock (_lock)
+            {
+                Assert.IsTrue(!CountToDispose.HasValue || Count == CountToDispose, "Must not dispose at this point");
+            }
         }
 
         public Task<uint> GetCallSequence(uint expected, CancellationToken cancellationToken_)
         {
-            return Task.FromResult(Count++);
+            lock (_lock)
+            {
+                return Task.FromResult(Count++);
+            }
         }
     }
     #endregion TestCallOrder

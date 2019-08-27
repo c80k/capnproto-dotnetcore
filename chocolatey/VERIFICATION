@@ -2,20 +2,6 @@ VERIFICATION
 Verification is intended to assist the Chocolatey moderators and community
 in verifying that this package's contents are trustworthy.
  
-This package is published by the capnproto-dotnetcore project itself.
-Starting from a plain Chocolatey test environment, please follow these steps:
-
-  Install .NET Core SDK 2.2.401:
-> choco install dotnetcore-sdk --version 2.2.401
-
-  Reboot if necessary:
-> shutdown /r
-
-  Clone the master branch from GitHub:
-> git clone git://github.com/c80k/capnproto-dotnetcore.git
-> cd capnproto-dotnetcore\scripts
-
-  Run the packaging script:
-> .\capnpc-csharp-pack.ps1
-
-  Verify the generated NuGet packages inside capnproto-dotnetcore\chocolatey\install
+This package is published by the capnproto-dotnetcore project itself. It must be identical to the 
+package which is published on GitHub (replace $version$ by the appropriate version tag):
+https://github.com/c80k/capnproto-dotnetcore/releases/tag/v$version$
