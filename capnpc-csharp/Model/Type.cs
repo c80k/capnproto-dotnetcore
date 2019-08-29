@@ -9,9 +9,16 @@ namespace CapnpC.Model
 {
     class Type: AbstractType
     {
+        // Representation of a type expression in the schema language
+
         public TypeDefinition Definition { get; set; }
+        // The model for all nodes that are not file nodes - they define types
+
         public GenericParameter Parameter { get; set; }
+        // A reference to type parameter in this scope
+
         public Type ElementType { get; set; }
+        // The type of a list element, if this is a list.
 
         readonly Dictionary<GenericParameter, Type> _parameterBindings =
             new Dictionary<GenericParameter, Type>();

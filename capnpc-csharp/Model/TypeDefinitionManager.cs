@@ -8,7 +8,19 @@ namespace CapnpC.Model
         readonly Dictionary<ulong, TypeDefinition> _id2def =
             new Dictionary<ulong, TypeDefinition>();
 
-        public TypeDefinition GetOrCreate(ulong id, TypeTag tag)
+        public TypeDefinition Create(ulong id, TypeTag tag)
+        {
+            if (_id2def.ContainsKey(id))
+            {
+                throw new ArgumentException(nameof(id), $"Attempting to redefine {tag.ToString()} {id.StrId()}.");
+            }
+
+            var def = new TypeDefinition(tag, id);
+            _id2def.Add(id, def);
+            return def;
+        }
+
+        public TypeDefinition GetExisting(ulong id, TypeTag tag)
         {
             if (_id2def.TryGetValue(id, out var def))
             {
@@ -20,19 +32,9 @@ namespace CapnpC.Model
                 {
                     throw new ArgumentOutOfRangeException(nameof(tag), "Type tag does not match existing type");
                 }
+                return def;
             }
-            else
-            {
-                def = new TypeDefinition(tag, id);
-                _id2def.Add(id, def);
-            }
-
-            return def;
-        }
-
-        public TypeDefinition GetExisting(ulong id)
-        {
-            return _id2def[id];
+            throw new ArgumentOutOfRangeException($"Attempting to retrieve nonexistend node {id.StrId()}.");
         }
     }
 }
