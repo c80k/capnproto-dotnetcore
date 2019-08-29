@@ -22,16 +22,18 @@ namespace CapnpC.Model
 
         public IReadOnlyList<GenFile> FilesToGenerate => _generatedFiles;
 
+        Schema.Node.Reader? IdToNode(ulong id, bool mustExist)
+        {
+            if (_id2node.TryGetValue(id, out var node))
+                return node;
+            if (mustExist)
+                throw new InvalidSchemaException($"Node with ID {id.StrId()} is required by the codegen backend but is missing.");
+            return null;
+        }
+
         Schema.Node.Reader IdToNode(ulong id)
         {
-            try
-            {
-                return _id2node[id];
-            }
-            catch (KeyNotFoundException)
-            {
-                throw new InvalidSchemaException($"Node with ID {id} is missing");
-            }
+            return (Schema.Node.Reader)IdToNode(id, true);
         }
 
         void Build()
@@ -192,6 +194,7 @@ namespace CapnpC.Model
         struct Pass2State
         {
             public Method currentMethod;
+            public bool isGenerated;
             public HashSet<ulong> processedNodes;
         }
 
@@ -202,6 +205,7 @@ namespace CapnpC.Model
             foreach (var file in files)
             {
                 var node = IdToNode(file.Id);
+                state.isGenerated = _request.RequestedFiles.Where(req => req.Id == file.Id).Any();
                 ProcessFileAnnotations(node, file.File);
                 ProcessNestedNodes(node.NestedNodes, state);
             }
@@ -698,7 +702,7 @@ namespace CapnpC.Model
 
         TypeDefinition ProcessNode(ulong id, Pass2State state, TypeTag tag = default)
         {
-            var node = IdToNode(id);
+            if (!(IdToNode(id, state.isGenerated) is Schema.Node.Reader node)) return null;
             var kind = node.GetKind();
             if (tag == TypeTag.Unknown) tag = kind.GetTypeTag();
             var def = _typeDefMgr.GetExisting(id, tag);
