@@ -80,6 +80,15 @@ namespace CapnpC
             // Should not throw 
         }
 
+        [TestMethod]
+        public void Test30SchemaCapnp()
+        {
+            var model = Load(Resources.schema_with_offsets_capnp);
+            var codeGen = NewGeneratorFor(model);
+            codeGen.Transform(model.FilesToGenerate.First());
+            // Should not throw
+        }
+
         static Generator.CodeGenerator NewGeneratorFor(Model.SchemaModel model)
             => new Generator.CodeGenerator(model, new Generator.GeneratorOptions());
 

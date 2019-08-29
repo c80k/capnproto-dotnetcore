@@ -63,6 +63,16 @@ namespace capnpc_csharp.Tests.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] schema_with_offsets_capnp {
+            get {
+                object obj = ResourceManager.GetObject("schema_with_offsets_capnp", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] UnitTest1_capnp {
             get {
                 object obj = ResourceManager.GetObject("UnitTest1_capnp", resourceCulture);

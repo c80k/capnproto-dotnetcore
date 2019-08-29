@@ -133,4 +133,7 @@
   <data name="UnitTest1_capnp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\UnitTest1.capnp.bin;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="schema_with_offsets_capnp" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\schema-with-offsets.capnp.bin;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>
