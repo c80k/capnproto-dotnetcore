@@ -9,30 +9,30 @@ namespace CapnpC.Model
     class SchemaModel
     {
         readonly Schema.CodeGeneratorRequest.Reader _request;
-        readonly List<GenFile> _files = new List<GenFile>();
-        readonly Stack<IHasNestedDefinitions> _typeNest = new Stack<IHasNestedDefinitions>();
-        readonly TypeDefinitionManager _typeDefMgr = new TypeDefinitionManager();
-        Method _currentMethod;
+        readonly List<GenFile> _generatedFiles = new List<GenFile>();
+        readonly DefinitionManager _typeDefMgr = new DefinitionManager();
 
-        Dictionary<ulong, Schema.Node.Reader> _id2node;
+        readonly Dictionary<ulong, Schema.Node.Reader> _id2node = new Dictionary<ulong, Schema.Node.Reader>();
 
         public SchemaModel(Schema.CodeGeneratorRequest.Reader request)
         {
             _request = request;
         }
 
-        public IReadOnlyList<GenFile> FilesToGenerate => _files;
+        public IReadOnlyList<GenFile> FilesToGenerate => _generatedFiles;
+
+        Schema.Node.Reader? IdToNode(ulong id, bool mustExist)
+        {
+            if (_id2node.TryGetValue(id, out var node))
+                return node;
+            if (mustExist)
+                throw new InvalidSchemaException($"Node with ID {id.StrId()} is required by the codegen backend but is missing.");
+            return null;
+        }
 
         Schema.Node.Reader IdToNode(ulong id)
         {
-            try
-            {
-                return _id2node[id];
-            }
-            catch (KeyNotFoundException)
-            {
-                throw new InvalidSchemaException($"Node with ID {id} is missing");
-            }
+            return (Schema.Node.Reader)IdToNode(id, true);
         }
 
         void Build()
@@ -42,69 +42,178 @@ namespace CapnpC.Model
                 throw new InvalidSchemaException("No nodes, nothing to generate");
             }
 
-            try
+            foreach (var node in _request.Nodes)
             {
-                _id2node = _request.Nodes.ToDictionary(n => n.Id);
-            }
-            catch (ArgumentException)
-            {
-                throw new InvalidSchemaException("Nodes with duplicate IDs detected");
-            }
-
-            foreach (var reqFile in _request.RequestedFiles)
-            {
-                var file = new GenFile()
+                if (_id2node.TryGetValue(node.Id, out var existingNode))
                 {
-                    Name = reqFile.Filename
-                };
+                    throw new InvalidSchemaException($"Node {node.StrId()} \"{node.DisplayName}\" has a duplicate ID, prior node was \"{existingNode.DisplayName}\"");
+                }
+                _id2node[node.Id] = node;
+            }
 
-                _files.Add(file);
-                _typeNest.Push(file);
+            var requestedFiles = _request.RequestedFiles.ToDictionary(req => req.Id);
+            BuildPass1(requestedFiles);
+            BuildPass2(requestedFiles);
+        }
 
-                var fileNode = IdToNode(reqFile.Id);
+        // First pass: create type definitions for each node.
 
-                if (!fileNode.IsFile)
-                    throw new InvalidSchemaException("Expected a file node");
+        struct Pass1State
+        {
+            public HashSet<ulong> unprocessedNodes;
+            public bool isGenerated;
+            public IHasNestedDefinitions parent;
+        }
 
-                ProcessFile(fileNode);
-
-                _typeNest.Pop();
+        void BuildPass1(Dictionary<ulong, Schema.CodeGeneratorRequest.RequestedFile.Reader> requestedFiles)
+        {
+            Pass1State state = new Pass1State()
+            {
+                unprocessedNodes = new HashSet<ulong>(_id2node.Keys)
+            };
+            foreach (var node in _id2node.Values.Where(n => n.IsFile))
+            {
+                GenFile file;
+                state.isGenerated = requestedFiles.TryGetValue(node.Id, out var req);
+                state.parent = null;
+                if (state.isGenerated)
+                {
+                    file = (GenFile)ProcessNodePass1(node.Id, req.Filename, state);
+                    _generatedFiles.Add(file);
+                }
+                else
+                {
+                    file = (GenFile)ProcessNodePass1(node.Id, node.DisplayName, state);
+                }
+            }
+            if (state.unprocessedNodes.Count != 0)
+            {
+                throw new InvalidSchemaException("Unreferenced nodes were present in the schema.");
             }
         }
 
-        void ProcessFile(Schema.Node.Reader fileReader)
+        IDefinition ProcessNodePass1(ulong id, string name, Pass1State state)
         {
-            foreach (var annotation in fileReader.Annotations)
+            if (!(IdToNode(id, state.isGenerated) is Schema.Node.Reader node))
+                return null;
+            if (!state.unprocessedNodes.Remove(id))
+                return null;
+
+            IDefinition def = null;
+            bool processNestedNodes = false;
+            bool processFields = false;
+            bool processInterfaceMethods = false;
+
+            switch (node.GetKind())
+            {
+                case NodeKind.Annotation:
+                    return _typeDefMgr.CreateAnnotation(id, state.parent);
+                case NodeKind.Const:
+                    return _typeDefMgr.CreateConstant(id, state.parent);
+                case NodeKind.File:
+                    if (state.parent != null)
+                        throw new InvalidSchemaException("Did not expect file nodes to appear as nested nodes");
+                    var file = _typeDefMgr.CreateFile(id);
+                    file.Namespace = GetNamespaceAnnotation(node);
+                    file.Name = name;
+                    def = file;
+                    processNestedNodes = true;
+                    break;
+                case NodeKind.Enum:
+                    break;
+                case NodeKind.Interface:
+                    processNestedNodes = true;
+                    processFields = true;
+                    processInterfaceMethods = true;
+                    break;
+                case NodeKind.Struct:
+                case NodeKind.Group:
+                    processNestedNodes = true;
+                    processFields = true;
+                    break;
+                default:
+                    throw new InvalidSchemaException($"Don't know how to process node {node.StrId()} \"{node.DisplayName}\"");
+            }
+
+            if (def == null)
+            {
+                var typeDef = _typeDefMgr.CreateTypeDef(id, node.GetTypeTag(), state.parent);
+                typeDef.Name = name;
+                def = typeDef;
+            }
+            state.parent = def as IHasNestedDefinitions;
+            
+            if (processNestedNodes && node.NestedNodes != null)
+                foreach (var nested in node.NestedNodes)
+                {
+                    ProcessNodePass1(nested.Id, nested.Name, state);
+                }
+            if (processFields && node.Fields != null)
+                foreach (var field in node.Fields.Where(f => f.IsGroup))
+                {
+                    var group = IdToNode(field.Group_TypeId);
+                    if (!group.IsStruct || !group.Struct_IsGroup)
+                    {
+                        throw new InvalidSchemaException($"Expected node with id {group.StrId()} to be a struct definition");
+                    }
+                    ProcessNodePass1(field.Group_TypeId, field.Name, state);
+                }
+            if (processInterfaceMethods && node.Interface_Methods != null)
+                foreach (var method in node.Interface_Methods)
+                {
+                    var pnode = IdToNode(method.ParamStructType);
+                    if (pnode.ScopeId == 0) ProcessNodePass1(pnode.Id, null, state); // Anonymous generated type
+                    pnode = IdToNode(method.ResultStructType);
+                    if (pnode.ScopeId == 0) ProcessNodePass1(pnode.Id, null, state); // Anonymous generated type
+                }
+            return def;
+        }
+
+        string[] GetNamespaceAnnotation(Schema.Node.Reader fileNode)
+        {
+            foreach (var annotation in fileNode.Annotations)
             {
                 if (annotation.Id == 0xb9c6f99ebf805f2c) // Cxx namespace
                 {
-                    ((GenFile)_typeNest.Peek()).Namespace = annotation.Value.Text.Split("::");
+                    return annotation.Value.Text.Split(new string[1] { "::" }, default);
                 }
             }
+            return null;
+        }
 
-            foreach (var nestedNode in fileReader.NestedNodes)
+        // 2nd pass: Generate types based on definitions
+
+        struct Pass2State
+        {
+            public Method currentMethod;
+            public bool isGenerated;
+            public HashSet<ulong> processedNodes;
+        }
+
+        void BuildPass2(Dictionary<ulong, Schema.CodeGeneratorRequest.RequestedFile.Reader> requestedFiles)
+        {
+            var state = new Pass2State() { processedNodes = new HashSet<ulong>() };
+            foreach (var file in _typeDefMgr.Files)
             {
-                var node = IdToNode(nestedNode.Id);
-
-                ProcessNode(node, nestedNode.Name);
+                var node = IdToNode(file.Id);
+                state.isGenerated = requestedFiles.ContainsKey(file.Id);
+                ProcessNestedNodes(node.NestedNodes, state);
             }
         }
 
-        TypeDefinition GetOrCreateTypeDef(ulong id, TypeTag tag) => _typeDefMgr.GetOrCreate(id, tag);
-        TypeDefinition GetGroupTypeDef(ulong id, string name)
+        void ProcessNestedNodes(IEnumerable<Schema.Node.NestedNode.Reader> nestedNodes, Pass2State state)
         {
-            var nodeReader = _id2node[id];
-
-            if (!nodeReader.IsStruct)
-                throw new InvalidSchemaException($"Expected node with id {id} to be a struct definition");
-
-            return ProcessStruct(nodeReader, name);
+            foreach (var nestedNode in nestedNodes)
+            {
+                ProcessNode(nestedNode.Id, state);
+            }
         }
-        void ProcessBrand(Schema.Brand.Reader brandReader, Type type)
+
+        void ProcessBrand(Schema.Brand.Reader brandReader, Type type, Pass2State state)
         {
             foreach (var scopeReader in brandReader.Scopes)
             {
-                var whatToBind = GetOrCreateTypeDef(scopeReader.ScopeId, TypeTag.Unknown);
+                var whatToBind = ProcessTypeDef(scopeReader.ScopeId, state);
                 int index = 0;
 
                 switch (0)
@@ -121,7 +230,7 @@ namespace CapnpC.Model
                             switch (0)
                             {
                                 case 0 when bindingReader.IsType:
-                                    type.BindGenericParameter(typeParameter, ProcessType(bindingReader.Type));
+                                    type.BindGenericParameter(typeParameter, ProcessType(bindingReader.Type, state));
                                     break;
 
                                 case 0 when bindingReader.IsUnbound:
@@ -146,7 +255,8 @@ namespace CapnpC.Model
                 }
             }
         }
-        Type ProcessType(Schema.Type.Reader typeReader)
+
+        Type ProcessType(Schema.Type.Reader typeReader, Pass2State state)
         {
             Type result;
 
@@ -159,7 +269,7 @@ namespace CapnpC.Model
                             return Types.FromParameter(
                                 new GenericParameter()
                                 {
-                                    DeclaringEntity = GetOrCreateTypeDef(typeReader.AnyPointer_Parameter_ScopeId, TypeTag.Unknown),
+                                    DeclaringEntity = ProcessTypeDef(typeReader.AnyPointer_Parameter_ScopeId, state),
                                     Index = typeReader.AnyPointer_Parameter_ParameterIndex
                                 });
 
@@ -167,7 +277,7 @@ namespace CapnpC.Model
                             return Types.FromParameter(
                                 new GenericParameter()
                                 {
-                                    DeclaringEntity = _currentMethod ?? throw new InvalidOperationException("current method not set"),
+                                    DeclaringEntity = state.currentMethod ?? throw new InvalidOperationException("current method not set"),
                                     Index = typeReader.AnyPointer_ImplicitMethodParameter_ParameterIndex
                                 });
 
@@ -205,7 +315,7 @@ namespace CapnpC.Model
                     return Types.F64;
 
                 case 0 when typeReader.IsEnum:
-                    return Types.FromDefinition(GetOrCreateTypeDef(typeReader.Enum_TypeId, TypeTag.Enum));
+                    return Types.FromDefinition(ProcessTypeDef(typeReader.Enum_TypeId, state, TypeTag.Enum));
 
                 case 0 when typeReader.IsFloat32:
                     return Types.F32;
@@ -223,16 +333,16 @@ namespace CapnpC.Model
                     return Types.S8;
 
                 case 0 when typeReader.IsInterface:
-                    result = Types.FromDefinition(GetOrCreateTypeDef(typeReader.Interface_TypeId, TypeTag.Interface));
-                    ProcessBrand(typeReader.Interface_Brand, result);
+                    result = Types.FromDefinition(ProcessTypeDef(typeReader.Interface_TypeId, state, TypeTag.Interface));
+                    ProcessBrand(typeReader.Interface_Brand, result, state);
                     return result;
 
                 case 0 when typeReader.IsList:
-                    return Types.List(ProcessType(typeReader.List_ElementType));
+                    return Types.List(ProcessType(typeReader.List_ElementType, state));
 
                 case 0 when typeReader.IsStruct:
-                    result = Types.FromDefinition(GetOrCreateTypeDef(typeReader.Struct_TypeId, TypeTag.Struct));
-                    ProcessBrand(typeReader.Struct_Brand, result);
+                    result = Types.FromDefinition(ProcessTypeDef(typeReader.Struct_TypeId, state, TypeTag.Struct));
+                    ProcessBrand(typeReader.Struct_Brand, result, state);
                     return result;
 
                 case 0 when typeReader.IsText:
@@ -365,7 +475,7 @@ namespace CapnpC.Model
             return value;
         }
 
-        void ProcessFields(Schema.Node.Reader reader, TypeDefinition declaringType, List<Field> fields)
+        void ProcessFields(Schema.Node.Reader reader, TypeDefinition declaringType, List<Field> fields, Pass2State state)
         {
             if (reader.Fields == null)
             {
@@ -389,15 +499,15 @@ namespace CapnpC.Model
                 switch (0)
                 {
                     case 0 when fieldReader.IsGroup:
-                        field.Type = Types.FromDefinition(GetGroupTypeDef(
-                            fieldReader.Group_TypeId, fieldReader.Name));
+                        var def = ProcessTypeDef(fieldReader.Group_TypeId, state, TypeTag.Group);
+                        field.Type = Types.FromDefinition(def);
                         break;
 
                     case 0 when fieldReader.IsSlot:
                         field.DefaultValue = ProcessValue(fieldReader.Slot_DefaultValue);
                         field.DefaultValueIsExplicit = fieldReader.Slot_HadExplicitDefault;
                         field.Offset = fieldReader.Slot_Offset;
-                        field.Type = ProcessType(fieldReader.Slot_Type);
+                        field.Type = ProcessType(fieldReader.Slot_Type, state);
                         field.DefaultValue.Type = field.Type;
                         break;
 
@@ -411,7 +521,7 @@ namespace CapnpC.Model
             }
         }
 
-        void ProcessInterfaceOrStructTail(TypeDefinition def, Schema.Node.Reader reader)
+        TypeDefinition ProcessInterfaceOrStructTail(TypeDefinition def, Schema.Node.Reader reader, Pass2State state)
         {
             def.IsGeneric = reader.IsGeneric;
 
@@ -423,18 +533,9 @@ namespace CapnpC.Model
                 }
             }
 
-            _typeNest.Push(def);
+            ProcessNestedNodes(reader.NestedNodes, state);
 
-            if (reader.NestedNodes != null)
-            {
-                foreach (var nestedReader in reader.NestedNodes)
-                {
-                    var node = IdToNode(nestedReader.Id);
-                    ProcessNode(node, nestedReader.Name);
-                }
-            }
-
-            ProcessFields(reader, def, def.Fields);
+            ProcessFields(reader, def, def.Fields, state);
 
             if (reader.IsInterface)
             {
@@ -450,12 +551,12 @@ namespace CapnpC.Model
                     {
                         method.GenericParameters.Add(implicitParameterReader.Name);
                     }
-                    _currentMethod = method;
+                    state.currentMethod = method;
 
                     def.Methods.Add(method);
 
                     var paramNode = IdToNode(methodReader.ParamStructType);
-                    var paramType = ProcessParameterList(paramNode, methodReader.ParamBrand, method.Params);
+                    var paramType = ProcessParameterList(paramNode, methodReader.ParamBrand, method.Params, state);
                     if (paramType != null)
                     {
                         paramType.SpecialName = SpecialName.MethodParamsStruct;
@@ -470,7 +571,7 @@ namespace CapnpC.Model
                     method.ParamsStruct.InheritFreeParameters(method);
 
                     var resultNode = IdToNode(methodReader.ResultStructType);
-                    var resultType = ProcessParameterList(resultNode, methodReader.ResultBrand, method.Results);
+                    var resultType = ProcessParameterList(resultNode, methodReader.ResultBrand, method.Results, state);
                     if (resultType != null)
                     {
                         resultType.SpecialName = SpecialName.MethodResultStruct;
@@ -485,24 +586,13 @@ namespace CapnpC.Model
                     method.ResultStruct.InheritFreeParameters(method);
                 }
 
-                _currentMethod = null;
+                state.currentMethod = null;
             }
-
-            _typeNest.Pop();
+            return def;
         }
 
-        TypeDefinition ProcessStruct(Schema.Node.Reader structReader, string name)
+        TypeDefinition ProcessStruct(Schema.Node.Reader structReader, TypeDefinition def, Pass2State state)
         {
-            var def = GetOrCreateTypeDef(
-                structReader.Id, 
-                structReader.Struct_IsGroup ? TypeTag.Group : TypeTag.Struct);
-
-            def.DeclaringElement = _typeNest.Peek();
-            if (structReader.Struct_IsGroup)
-                ((TypeDefinition)def.DeclaringElement).NestedGroups.Add(def);
-            else
-                def.DeclaringElement.NestedTypes.Add(def);
-            def.Name = name;
             def.StructDataWordCount = structReader.Struct_DataWordCount;
             def.StructPointerCount = structReader.Struct_PointerCount;
 
@@ -513,12 +603,10 @@ namespace CapnpC.Model
                     16u * structReader.Struct_DiscriminantOffset);
             }
 
-            ProcessInterfaceOrStructTail(def, structReader);
-
-            return def;
+            return ProcessInterfaceOrStructTail(def, structReader, state);
         }
 
-        TypeDefinition ProcessParameterList(Schema.Node.Reader reader, Schema.Brand.Reader brandReader, List<Field> list)
+        TypeDefinition ProcessParameterList(Schema.Node.Reader reader, Schema.Brand.Reader brandReader, List<Field> list, Pass2State state)
         {
 //# If a named parameter list was specified in the method
 //# declaration (rather than a single struct parameter type) then a corresponding struct type is
@@ -533,58 +621,38 @@ namespace CapnpC.Model
                 throw new InvalidSchemaException("Expected a struct");
             }
 
+            var def = ProcessTypeDef(reader.Id, state, TypeTag.Struct);
+
             if (reader.ScopeId == 0)
             {
                 // Auto-generated => Named parameter list
-                ProcessFields(reader, null, list);
-                return ProcessStruct(reader, null);
+                foreach (var field in def.Fields) list.Add(field);
+                return def;
             }
             else
             {
                 // Single, anonymous, struct-typed parameter
-                var def = GetOrCreateTypeDef(reader.Id, TypeTag.Struct);
                 var type = Types.FromDefinition(def);
-                ProcessBrand(brandReader, type);
+                ProcessBrand(brandReader, type, state);
                 var anon = new Field() { Type = type };
                 list.Add(anon);
                 return null;
             }
         }
 
-        TypeDefinition ProcessInterface(Schema.Node.Reader ifaceReader, string name)
+        TypeDefinition ProcessInterface(Schema.Node.Reader ifaceReader, TypeDefinition def, Pass2State state)
         {
-            var def = GetOrCreateTypeDef(
-                ifaceReader.Id,
-                TypeTag.Interface);
-
-            def.DeclaringElement = _typeNest.Peek();
-            def.DeclaringElement.NestedTypes.Add(def);
-            def.Name = name;
-
             foreach (var superClassReader in ifaceReader.Interface_Superclasses)
             {
-                var superClass = GetOrCreateTypeDef(
-                    superClassReader.Id,
-                    TypeTag.Interface);
-
+                var superClass = ProcessTypeDef(superClassReader.Id, state, TypeTag.Interface);
                 def.Superclasses.Add(Types.FromDefinition(superClass));
             }
 
-            ProcessInterfaceOrStructTail(def, ifaceReader);
-
-            return def;
+            return ProcessInterfaceOrStructTail(def, ifaceReader, state);
         }
 
-        void ProcessEnum(Schema.Node.Reader enumReader, string name)
+        TypeDefinition ProcessEnum(Schema.Node.Reader enumReader, TypeDefinition def, Pass2State state)
         {
-            var def = GetOrCreateTypeDef(enumReader.Id, TypeTag.Enum);
-
-            def.DeclaringElement = _typeNest.Peek();
-            def.DeclaringElement.NestedTypes.Add(def);
-            def.Name = name;
-
-            _typeNest.Push(def);
-
             foreach (var fieldReader in enumReader.Enumerants)
             {
                 var field = new Enumerant()
@@ -601,46 +669,52 @@ namespace CapnpC.Model
 
                 def.Enumerants.Add(field);
             }
-
-            _typeNest.Pop();
+            return def;
         }
 
-        void ProcessConst(Schema.Node.Reader constReader, string name)
+        Constant ProcessConst(Schema.Node.Reader constReader, Constant @const, Pass2State state)
         {
             var value = ProcessValue(constReader.Const_Value);
-            value.Type = ProcessType(constReader.Const_Type);
-
-            _typeNest.Peek().Constants.Add(value);
+            value.Type = ProcessType(constReader.Const_Type, state);
+            @const.Value = value;
+            return @const;
         }
 
-        void ProcessNode(Schema.Node.Reader node, string name)
+        TypeDefinition ProcessTypeDef(ulong id, Pass2State state, TypeTag tag = default)
         {
-            switch (0)
+            var def = ProcessNode(id, state, tag);
+            var typeDef = def as TypeDefinition;
+            if (def == null)
+                throw new ArgumentException(
+                    $"Expected node {id.StrId()} to be a TypeDefinition but got {def.GetType().Name} instead.",
+                    nameof(id));
+            return typeDef;
+        }
+
+        IDefinition ProcessNode(ulong id, Pass2State state, TypeTag tag = default)
+        {
+            if (!(IdToNode(id, state.isGenerated) is Schema.Node.Reader node)) return null;
+            var kind = node.GetKind();
+            if (tag == TypeTag.Unknown) tag = kind.GetTypeTag();
+            var def = _typeDefMgr.GetExistingDef(id, tag);
+            if (state.processedNodes.Contains(id)) return def;
+            state.processedNodes.Add(id);
+
+            switch (def)
             {
-                case 0 when node.IsAnnotation:
-                    break;
-
-                case 0 when node.IsConst:
-                    ProcessConst(node, name);
-                    break;
-
-                case 0 when node.IsEnum:
-                    ProcessEnum(node, name);
-                    break;
-
-                case 0 when node.IsFile:
-                    throw new InvalidSchemaException("Did not expect file nodes to appear as nested nodes");
-
-                case 0 when node.IsInterface:
-                    ProcessInterface(node, name);
-                    break;
-
-                case 0 when node.IsStruct:
-                    ProcessStruct(node, name);
-                    break;
-
+                case Annotation annotation:
+                    return annotation;
+                case Constant constant:
+                    def.DeclaringElement.Constants.Add(ProcessConst(node, constant, state));
+                    return def;
+                case TypeDefinition typeDef when kind == NodeKind.Enum:
+                    return ProcessEnum(node, typeDef, state);
+                case TypeDefinition typeDef when kind == NodeKind.Interface:
+                    return ProcessInterface(node, typeDef, state);
+                case TypeDefinition typeDef when kind == NodeKind.Struct || kind == NodeKind.Group:
+                    return ProcessStruct(node, typeDef, state);
                 default:
-                    throw new InvalidSchemaException($"Don't know how to process node {node.DisplayName}");
+                    throw new InvalidProgramException($"An unexpected node {node.StrId()} was found during the 2nd schema model building pass.");
             }
         }
 
@@ -650,5 +724,56 @@ namespace CapnpC.Model
             model.Build();
             return model;
         }
+    }
+
+    public enum NodeKind
+    {
+        Unknown,
+        Annotation,
+        Const,
+        Enum,
+        File,
+        Interface,
+        Struct,
+        Group
+    }
+
+    public static class SchemaExtensions
+    {
+        public static string GetName(this Schema.Node.Reader node)
+            => node.DisplayName.Substring((int)node.DisplayNamePrefixLength);
+
+        public static string StrId(this Schema.Node.Reader node)
+            => $"0x{node.Id.ToString("X")}";
+
+        public static string StrId(this ulong nodeId)
+            => $"0x{nodeId.ToString("X")}";
+
+        public static NodeKind GetKind(this Schema.Node.Reader node)
+        {
+            if (node.IsStruct)
+                return node.Struct_IsGroup ? NodeKind.Group : NodeKind.Struct;
+            if (node.IsInterface) return NodeKind.Interface;
+            if (node.IsEnum) return NodeKind.Enum;
+            if (node.IsConst) return NodeKind.Const;
+            if (node.IsAnnotation) return NodeKind.Annotation;
+            if (node.IsFile) return NodeKind.File;
+            return NodeKind.Unknown;
+        }
+
+        internal static TypeTag GetTypeTag(this NodeKind kind)
+        {
+            switch (kind)
+            {
+                case NodeKind.Enum: return TypeTag.Enum;
+                case NodeKind.Interface: return TypeTag.Interface;
+                case NodeKind.Struct: return TypeTag.Struct;
+                case NodeKind.Group: return TypeTag.Group;
+                default: return TypeTag.Unknown;
+            }
+        }
+
+        internal static TypeTag GetTypeTag(this Schema.Node.Reader node)
+            => node.GetKind().GetTypeTag();
     }
 }

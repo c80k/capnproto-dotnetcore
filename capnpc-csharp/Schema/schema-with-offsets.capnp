@@ -1,6 +1,6 @@
-# F:/Downloads/capnproto-c++-win32-0.7.0/capnproto-c++-0.7.0/src/capnp/schema-priv.capnp
+# schema.capnp
 @0xa93fc509624c72d9;
-$import "/F:/Downloads/capnproto-c++-win32-0.7.0/capnproto-c++-0.7.0/src/capnp/c++.capnp".namespace("capnp::schema");
+$import "/capnp/c++.capnp".namespace("capnp::schema");
 struct Node @0xe682ab4cf923a417 {  # 40 bytes, 6 ptrs
   id @0 :UInt64;  # bits[0, 64)
   displayName @1 :Text;  # ptr[0]

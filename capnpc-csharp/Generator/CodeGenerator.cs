@@ -33,6 +33,8 @@
             _interfaceGen = new InterfaceSnippetGen(_names);
         }
 
+        internal GenNames GetNames() => _names;
+
         IEnumerable<MemberDeclarationSyntax> TransformEnum(TypeDefinition def)
         {
             yield return _commonGen.MakeEnum(def);
@@ -102,7 +104,7 @@
                 yield return _interfaceGen.MakePipeliningSupport(def);
             }
 
-            if (def.NestedTypes.Count > 0)
+            if (def.NestedTypes.Any())
             {
                 var ns = ClassDeclaration(
                     _names.MakeTypeName(def, NameUsage.Namespace).ToString())
@@ -143,20 +145,11 @@
             }
         }
 
-        string Transform(GenFile file)
+        internal string Transform(GenFile file)
         {
-            if (file.Namespace != null)
-            {
-                _names.TopNamespace = IdentifierName(MakeCamel(file.Namespace[0]));
+            NameSyntax topNamespace = GenNames.NamespaceName(file.Namespace) ?? _names.TopNamespace;
 
-                foreach (string name in file.Namespace.Skip(1))
-                {
-                    var temp = IdentifierName(MakeCamel(name));
-                    _names.TopNamespace = QualifiedName(_names.TopNamespace, temp);
-                }
-            }
-
-            var ns = NamespaceDeclaration(_names.TopNamespace);
+            var ns = NamespaceDeclaration(topNamespace);
 
             foreach (var def in file.NestedTypes)
             {

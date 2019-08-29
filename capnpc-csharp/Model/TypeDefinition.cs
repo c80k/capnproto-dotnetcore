@@ -2,7 +2,7 @@
 using System.Linq;
 namespace CapnpC.Model
 {
-    class TypeDefinition : AbstractType, IHasNestedDefinitions, IHasGenericParameters
+    class TypeDefinition : AbstractType, IDefinition, IHasNestedDefinitions, IHasGenericParameters
     {
         public class DiscriminationInfo
         {
@@ -16,23 +16,30 @@ namespace CapnpC.Model
             public uint TagOffset { get; }
         }
 
-        public TypeDefinition(TypeTag tag, ulong id)
+        public TypeDefinition(TypeTag tag, ulong id, IHasNestedDefinitions parent)
         {
             Tag = tag;
             Id = id;
+            DeclaringElement = parent;
+            if (tag == TypeTag.Group)
+                ((TypeDefinition)parent).NestedGroups.Add(this);
+            else
+                parent.NestedDefinitions.Add(this);
         }
 
         public ulong Id { get; }
-        public IHasNestedDefinitions DeclaringElement { get; set; }
+        public IHasNestedDefinitions DeclaringElement { get; }
+
         public Method UsingMethod { get; set; }
         public string Name { get; set; }
         public SpecialName SpecialName { get; set; }
         public DiscriminationInfo UnionInfo { get; set; }
         public new List<Field> Fields => base.Fields;
         public List<Enumerant> Enumerants { get; } = new List<Enumerant>();
-        public List<TypeDefinition> NestedTypes { get; } = new List<TypeDefinition>();
+        public ICollection<IDefinition> NestedDefinitions { get; } = new List<IDefinition>();
+        public IEnumerable<TypeDefinition> NestedTypes { get => this.GetNestedTypes(); }
         public List<TypeDefinition> NestedGroups { get; } = new List<TypeDefinition>();
-        public List<Value> Constants { get; } = new List<Value>();
+        public ICollection<Constant> Constants { get; } = new List<Constant>();
         public List<Method> Methods { get; } = new List<Method>();
         public List<Type> Superclasses { get; } = new List<Type>();
         public List<string> GenericParameters { get; } = new List<string>();
@@ -51,6 +58,16 @@ namespace CapnpC.Model
                     yield return def;
                     cur = def.DeclaringElement;
                 }
+            }
+        }
+
+        public GenFile File
+        {
+            get
+            {
+                IHasNestedDefinitions cur = this;
+                while (cur is TypeDefinition def) cur = def.DeclaringElement;
+                return cur as GenFile;
             }
         }
 

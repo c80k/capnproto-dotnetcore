@@ -1,6 +1,9 @@
 ﻿using Capnp;
 using System;
 using System.IO;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleToAttribute("capnpc-csharp.tests")]
 
 namespace CapnpC
 {

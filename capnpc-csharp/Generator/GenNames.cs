@@ -213,29 +213,24 @@ namespace CapnpC.Generator
             }
         }
 
-        NameSyntax GetQName(TypeDefinition def)
+        public static NameSyntax NamespaceName(string[] @namespace)
         {
-            var stack = new Stack<SimpleNameSyntax>();
-
-            stack.Push(MakeGenericTypeName(def, NameUsage.Default));
-
-            while (def.DeclaringElement is TypeDefinition pdef)
+            NameSyntax ident = null;
+            if (@namespace != null)
             {
-                stack.Push(MakeGenericTypeName(pdef, NameUsage.Namespace));
-                def = pdef;
+                ident = IdentifierName(SyntaxHelpers.MakeCamel(@namespace[0]));
+                foreach (string name in @namespace.Skip(1))
+                {
+                    var temp = IdentifierName(SyntaxHelpers.MakeCamel(name));
+                    ident = QualifiedName(ident, temp);
+                }
             }
-
-            var qtype = TopNamespace;
-
-            foreach (var name in stack)
-            {
-                qtype = QualifiedName(qtype, name);
-            }
-
-            return qtype;
+            return ident;
         }
 
-        NameSyntax GetQName(Model.Type type, TypeDefinition scope)
+        NameSyntax GetNamespaceFor(TypeDefinition def) => NamespaceName(def?.File?.Namespace);
+
+        internal NameSyntax GetQName(Model.Type type, TypeDefinition scope)
         {
             // FIXME: With the help of the 'scope' parameter we will be able to generate abbreviated
             // qualified names. Unfortunately the commented approach is too naive. It will fail if
@@ -262,7 +257,10 @@ namespace CapnpC.Generator
                     def = pdef;
                 }
 
-                var qtype = TopNamespace;
+                var qtype = 
+                    GetNamespaceFor(type.Definition)
+                    ?? GetNamespaceFor(scope)
+                    ?? TopNamespace;
 
                 foreach (var name in stack)
                 {
@@ -563,7 +561,8 @@ namespace CapnpC.Generator
             }
 
             var typeNames = new HashSet<Name>(def.NestedTypes.Select(t => MakeTypeName(t)));
-            
+            typeNames.Add(MakeTypeName(def));
+
             foreach (var member in def.Fields)
             {
                 var memberName = new Name(SyntaxHelpers.MakeCamel(member.Name));
