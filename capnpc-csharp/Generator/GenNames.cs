@@ -235,7 +235,7 @@ namespace CapnpC.Generator
             return qtype;
         }
 
-        NameSyntax GetQName(Model.Type type, TypeDefinition scope)
+        internal NameSyntax GetQName(Model.Type type, TypeDefinition scope)
         {
             // FIXME: With the help of the 'scope' parameter we will be able to generate abbreviated
             // qualified names. Unfortunately the commented approach is too naive. It will fail if

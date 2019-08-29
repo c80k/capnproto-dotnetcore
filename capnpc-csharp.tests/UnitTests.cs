@@ -1,6 +1,7 @@
 using capnpc_csharp.Tests.Properties;
 using Capnp;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -45,6 +46,29 @@ namespace CapnpC
         {
             var model = Load(Resources.UnitTest3_capnp);
             // Should not throw
+        }
+
+        [TestMethod]
+        public void Test10ImportedNamespaces()
+        {
+            var model = Load(Resources.UnitTest10_capnp);
+            var codeGen = NewGeneratorFor(model);
+            var genFile = model.FilesToGenerate.First();
+            var outerTypeDef = genFile.NestedTypes.First();
+            var outerType = Model.Types.FromDefinition(outerTypeDef);
+            var innerType = outerTypeDef.Fields[0].Type;
+            var innerTypeDef = innerType.Definition;
+            var names = codeGen.GetNames();
+            var outerNameSyntax = names.GetQName(outerType, outerTypeDef);
+            var innerNameSyntax = names.GetQName(innerType, outerTypeDef);
+            string[] outerNamespace = { "Foo", "Bar", "Baz" };
+            string[] innerNamespace = { "Foo", "Garf", "Snarf" };
+            CollectionAssert.AreEqual(outerNamespace, (outerTypeDef.DeclaringElement as Model.GenFile).Namespace);
+            CollectionAssert.AreEqual(innerNamespace, (innerType.Definition.DeclaringElement as Model.GenFile).Namespace);
+            string outerNSStr = String.Join('.', outerNamespace);
+            string innerNSStr = String.Join('.', innerNamespace);
+            Assert.AreEqual($"{outerNSStr}.Outer", outerNameSyntax.ToString());
+            Assert.AreEqual($"{innerNSStr}.Inner", innerNameSyntax.ToString());
         }
 
         static Generator.CodeGenerator NewGeneratorFor(Model.SchemaModel model)
