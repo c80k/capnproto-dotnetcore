@@ -40,6 +40,13 @@ namespace CapnpC
             // Should not throw
         }
 
+        [TestMethod]
+        public void Test03NonGeneratedNodeSkip()
+        {
+            var model = Load(Resources.UnitTest3_capnp);
+            // Should not throw
+        }
+
         static Generator.CodeGenerator NewGeneratorFor(Model.SchemaModel model)
             => new Generator.CodeGenerator(model, new Generator.GeneratorOptions());
 
