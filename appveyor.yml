@@ -29,6 +29,7 @@ before_build:
   - cmd: dotnet restore ./Capnp.Net.Runtime.Tests/Capnp.Net.Runtime.Tests.Std20.csproj --verbosity m
   - cmd: dotnet restore ./Capnp.Net.Runtime.Tests.Core21/Capnp.Net.Runtime.Tests.Core21.csproj --verbosity m
   - cmd: dotnet restore ./capnpc-csharp/capnpc-csharp.csproj --verbosity m  
+  - cmd: dotnet restore ./capnpc-csharp.tests/capnpc-csharp.tests.csproj --verbosity m  
 build_script:
   - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Debug"
   - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Release"
@@ -53,6 +54,8 @@ test_script:
   - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\netcoreapp2.2\Capnp.Net.Runtime.Tests.Std20.dll
   - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests.Core21\bin\Debug\netcoreapp2.2\Capnp.Net.Runtime.Tests.Core21.dll
   - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests.Core21\bin\Release\netcoreapp2.2\Capnp.Net.Runtime.Tests.Core21.dll
+  - cmd: vstest.console /logger:Appveyor /inIsolation capnpc-csharp.tests\bin\Debug\netcoreapp2.2\capnpc-csharp.tests.dll
+  - cmd: vstest.console /logger:Appveyor /inIsolation capnpc-csharp.tests\bin\Release\netcoreapp2.2\capnpc-csharp.tests.dll
 on_finish :
   # any cleanup in here
 deploy:

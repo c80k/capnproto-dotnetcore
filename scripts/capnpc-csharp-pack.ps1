@@ -1,4 +1,4 @@
-param($version)
+param($version = "1.0.0")
 
 $id = "capnpc-csharp"
 $id_win_x86 = "capnpc-csharp-win-x86"
