@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <Compile Remove="*.cs" />
+    <Compile Include="UnitTests.cs" />
   </ItemGroup>
 
   <ItemGroup>
