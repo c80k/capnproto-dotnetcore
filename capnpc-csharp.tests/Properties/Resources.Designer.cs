@@ -69,5 +69,15 @@ namespace capnpc_csharp.Tests.Properties {
                 return ((byte[])(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] UnitTest2_capnp {
+            get {
+                object obj = ResourceManager.GetObject("UnitTest2_capnp", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

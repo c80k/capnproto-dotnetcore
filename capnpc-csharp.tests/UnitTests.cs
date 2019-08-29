@@ -31,6 +31,15 @@ namespace CapnpC
             Assert.AreNotEqual(structFoo.Name, fieldName);
         }
 
+        [TestMethod]
+        public void Test02ForwardInheritance()
+        {
+            var model = Load(Resources.UnitTest2_capnp);
+            var codeGen = NewGeneratorFor(model);
+            codeGen.Transform(model.FilesToGenerate.First());
+            // Should not throw
+        }
+
         static Generator.CodeGenerator NewGeneratorFor(Model.SchemaModel model)
             => new Generator.CodeGenerator(model, new Generator.GeneratorOptions());
 
