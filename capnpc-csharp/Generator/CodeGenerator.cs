@@ -104,7 +104,7 @@
                 yield return _interfaceGen.MakePipeliningSupport(def);
             }
 
-            if (def.NestedTypes.Count > 0)
+            if (def.NestedTypes.Any())
             {
                 var ns = ClassDeclaration(
                     _names.MakeTypeName(def, NameUsage.Namespace).ToString())

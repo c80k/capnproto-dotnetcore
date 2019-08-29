@@ -28,6 +28,9 @@
         Group,
         Interface,
         Enum,
-        AnyEnum
+        AnyEnum,
+        Const,
+        Annotation,
+        File
     }
 }
