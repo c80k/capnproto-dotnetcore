@@ -132,7 +132,7 @@ namespace CapnpC.Model
                     if (state.parent != null)
                         throw new InvalidSchemaException("Did not expect file nodes to appear as nested nodes");
                     file = new GenFile();
-                    file.Namespace = null; // TODO
+                    file.Namespace = GetNamespaceAnnotation(node);
                     processNestedNodes = true;
                     break;
                 case NodeKind.Enum:
@@ -189,6 +189,18 @@ namespace CapnpC.Model
             return state.parent;
         }
 
+        string[] GetNamespaceAnnotation(Schema.Node.Reader fileNode)
+        {
+            foreach (var annotation in fileNode.Annotations)
+            {
+                if (annotation.Id == 0xb9c6f99ebf805f2c) // Cxx namespace
+                {
+                    return annotation.Value.Text.Split(new string[1] { "::" }, default);
+                }
+            }
+            return null;
+        }
+
         // 2nd pass: Generate types based on definitions
 
         struct Pass2State
@@ -206,7 +218,6 @@ namespace CapnpC.Model
             {
                 var node = IdToNode(file.Id);
                 state.isGenerated = _request.RequestedFiles.Where(req => req.Id == file.Id).Any();
-                ProcessFileAnnotations(node, file.File);
                 ProcessNestedNodes(node.NestedNodes, state);
             }
         }
@@ -216,17 +227,6 @@ namespace CapnpC.Model
             foreach (var nestedNode in nestedNodes)
             {
                 ProcessNode(nestedNode.Id, state);
-            }
-        }
-
-        void ProcessFileAnnotations(Schema.Node.Reader fileNode, GenFile fileElement)
-        {
-            foreach (var annotation in fileNode.Annotations)
-            {
-                if (annotation.Id == 0xb9c6f99ebf805f2c) // Cxx namespace
-                {
-                    fileElement.Namespace = annotation.Value.Text.Split(new string[1] { "::" }, default);
-                }
             }
         }
 

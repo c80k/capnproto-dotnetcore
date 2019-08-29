@@ -147,18 +147,9 @@
 
         internal string Transform(GenFile file)
         {
-            if (file.Namespace != null)
-            {
-                _names.TopNamespace = IdentifierName(MakeCamel(file.Namespace[0]));
+            NameSyntax topNamespace = GenNames.NamespaceName(file.Namespace) ?? _names.TopNamespace;
 
-                foreach (string name in file.Namespace.Skip(1))
-                {
-                    var temp = IdentifierName(MakeCamel(name));
-                    _names.TopNamespace = QualifiedName(_names.TopNamespace, temp);
-                }
-            }
-
-            var ns = NamespaceDeclaration(_names.TopNamespace);
+            var ns = NamespaceDeclaration(topNamespace);
 
             foreach (var def in file.NestedTypes)
             {

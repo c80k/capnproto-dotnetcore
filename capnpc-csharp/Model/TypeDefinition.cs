@@ -54,6 +54,16 @@ namespace CapnpC.Model
             }
         }
 
+        public GenFile File
+        {
+            get
+            {
+                IHasNestedDefinitions cur = this;
+                while (cur is TypeDefinition def) cur = def.DeclaringElement;
+                return cur as GenFile;
+            }
+        }
+
         public IEnumerable<GenericParameter> AllTypeParameters
         {
             get

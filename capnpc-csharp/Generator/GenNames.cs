@@ -213,27 +213,22 @@ namespace CapnpC.Generator
             }
         }
 
-        NameSyntax GetQName(TypeDefinition def)
+        public static NameSyntax NamespaceName(string[] @namespace)
         {
-            var stack = new Stack<SimpleNameSyntax>();
-
-            stack.Push(MakeGenericTypeName(def, NameUsage.Default));
-
-            while (def.DeclaringElement is TypeDefinition pdef)
+            NameSyntax ident = null;
+            if (@namespace != null)
             {
-                stack.Push(MakeGenericTypeName(pdef, NameUsage.Namespace));
-                def = pdef;
+                ident = IdentifierName(SyntaxHelpers.MakeCamel(@namespace[0]));
+                foreach (string name in @namespace.Skip(1))
+                {
+                    var temp = IdentifierName(SyntaxHelpers.MakeCamel(name));
+                    ident = QualifiedName(ident, temp);
+                }
             }
-
-            var qtype = TopNamespace;
-
-            foreach (var name in stack)
-            {
-                qtype = QualifiedName(qtype, name);
-            }
-
-            return qtype;
+            return ident;
         }
+
+        NameSyntax GetNamespaceFor(TypeDefinition def) => NamespaceName(def?.File?.Namespace);
 
         internal NameSyntax GetQName(Model.Type type, TypeDefinition scope)
         {
@@ -262,7 +257,10 @@ namespace CapnpC.Generator
                     def = pdef;
                 }
 
-                var qtype = TopNamespace;
+                var qtype = 
+                    GetNamespaceFor(type.Definition)
+                    ?? GetNamespaceFor(scope)
+                    ?? TopNamespace;
 
                 foreach (var name in stack)
                 {
