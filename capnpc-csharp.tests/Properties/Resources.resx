@@ -121,6 +121,9 @@
   <data name="UnitTest10_capnp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\UnitTest10.capnp.bin;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="UnitTest20_capnp" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UnitTest20.capnp.bin;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="UnitTest3_capnp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\UnitTest3.capnp.bin;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>

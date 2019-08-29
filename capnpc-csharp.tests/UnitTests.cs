@@ -71,6 +71,15 @@ namespace CapnpC
             Assert.AreEqual($"{innerNSStr}.Inner", innerNameSyntax.ToString());
         }
 
+        [TestMethod]
+        public void Test20AnnotationAndConst()
+        {
+            var model = Load(Resources.UnitTest20_capnp);
+            var codeGen = NewGeneratorFor(model);
+            codeGen.Transform(model.FilesToGenerate.First());
+            // Should not throw 
+        }
+
         static Generator.CodeGenerator NewGeneratorFor(Model.SchemaModel model)
             => new Generator.CodeGenerator(model, new Generator.GeneratorOptions());
 
