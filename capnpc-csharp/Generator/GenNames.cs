@@ -563,7 +563,8 @@ namespace CapnpC.Generator
             }
 
             var typeNames = new HashSet<Name>(def.NestedTypes.Select(t => MakeTypeName(t)));
-            
+            typeNames.Add(MakeTypeName(def));
+
             foreach (var member in def.Fields)
             {
                 var memberName = new Name(SyntaxHelpers.MakeCamel(member.Name));
