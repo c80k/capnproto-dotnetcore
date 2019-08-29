@@ -3,3 +3,7 @@
 enum Enumerant {
 	byte @0;
 }
+
+struct Foo {
+	foo @0: UInt8;
+}

@@ -18,6 +18,22 @@ namespace CapnpC
             Assert.AreEqual("@byte", GetTypeDef(0xc8461867c409f5d4, model).Enumerants[0].Literal);
         }
 
+        [TestMethod]
+        public void Test01NestedClash()
+        {
+            var model = Load(Resources.UnitTest1_capnp);
+            var structFoo = GetTypeDef(0x93db6ba5509bac24, model);
+            var codeGen = NewGeneratorFor(model);
+            codeGen.Transform(model.FilesToGenerate.First());
+            var names = codeGen.GetNames();
+            var fieldName = names.GetCodeIdentifier(structFoo.Fields[0]).ToString();
+            Assert.AreEqual("Foo", structFoo.Name);
+            Assert.AreNotEqual(structFoo.Name, fieldName);
+        }
+
+        static Generator.CodeGenerator NewGeneratorFor(Model.SchemaModel model)
+            => new Generator.CodeGenerator(model, new Generator.GeneratorOptions());
+
         static Model.TypeDefinition GetTypeDef(ulong id, Model.SchemaModel model)
         {
             foreach (var defs in model.FilesToGenerate.Select(f => f.NestedTypes))

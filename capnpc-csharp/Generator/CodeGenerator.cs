@@ -33,6 +33,8 @@
             _interfaceGen = new InterfaceSnippetGen(_names);
         }
 
+        internal GenNames GetNames() => _names;
+
         IEnumerable<MemberDeclarationSyntax> TransformEnum(TypeDefinition def)
         {
             yield return _commonGen.MakeEnum(def);
@@ -143,7 +145,7 @@
             }
         }
 
-        string Transform(GenFile file)
+        internal string Transform(GenFile file)
         {
             if (file.Namespace != null)
             {
