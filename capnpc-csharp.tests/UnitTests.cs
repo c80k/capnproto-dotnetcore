@@ -94,6 +94,19 @@ namespace CapnpC
             // Should not throw
         }
 
+        [TestMethod]
+        public void Test40FreeListElementParameters()
+        {
+            var run = LoadAndGenerate(Resources.UnitTest40_capnp, 40);
+            var testType = run.FirstFile.NestedTypes.Where(t => t.Name == "Test").First();
+            var outerField = testType.Fields.First();
+            var outerType = outerField.Type;
+            var innerField = outerType.Fields.First();
+            var innerListType = innerField.Type;
+            var innerElementType = innerListType.ElementType;
+
+        }
+
         struct Run
         {
             public Model.SchemaModel Model;

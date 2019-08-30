@@ -54,6 +54,24 @@ namespace CapnpC.Model
             var requestedFiles = _request.RequestedFiles.ToDictionary(req => req.Id);
             BuildPass1(requestedFiles);
             BuildPass2(requestedFiles);
+
+            var testType = FilesToGenerate.First().NestedTypes.Where(t => t.Name == "Test").First();
+            var outerField = testType.Fields.First();
+            var outerType = outerField.Type;
+            var innerField = outerType.Fields.First();
+            var innerListType = innerField.Type;
+            var innerElementType = innerListType.ElementType;
+
+            var iDefFields = innerElementType.Definition.Fields;
+            var oDefFields = new List<Field>();
+            for (int i = 0; i < iDefFields.Count; i++)
+            {
+                var inField = iDefFields[i];
+                var subField = innerElementType.SubstituteGenerics(inField);
+                oDefFields.Add(subField);
+            }
+
+            var innerElementFields = innerElementType.Fields.ToList();
         }
 
         // First pass: create type definitions for each node.
@@ -537,7 +555,7 @@ namespace CapnpC.Model
                 }
             }
 
-            ProcessNestedNodes(reader.NestedNodes, state, def.File.IsGenerated);
+            //ProcessNestedNodes(reader.NestedNodes, state, def.File.IsGenerated);
 
             ProcessFields(reader, def, def.Fields, state);
 
@@ -592,6 +610,9 @@ namespace CapnpC.Model
 
                 state.currentMethod = null;
             }
+
+            ProcessNestedNodes(reader.NestedNodes, state, def.File.IsGenerated);
+
             return def;
         }
 
@@ -701,6 +722,7 @@ namespace CapnpC.Model
             var kind = node.GetKind();
             if (tag == TypeTag.Unknown) tag = kind.GetTypeTag();
             var def = _typeDefMgr.GetExistingDef(id, tag);
+
             if (state.processedNodes.Contains(id)) return def;
             state.processedNodes.Add(id);
 

@@ -142,4 +142,7 @@
   <data name="UnitTest4_capnp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\UnitTest4.capnp.bin;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="UnitTest40_capnp" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UnitTest40.capnp.bin;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>
