@@ -688,7 +688,7 @@ namespace CapnpC.Model
         {
             var def = ProcessNode(id, state, true, tag);
             var typeDef = def as TypeDefinition;
-            if (def == null)
+            if (typeDef == null)
                 throw new ArgumentException(
                     $"Expected node {id.StrId()} to be a TypeDefinition but got {def.GetType().Name} instead.",
                     nameof(id));
@@ -748,10 +748,10 @@ namespace CapnpC.Model
             => node.DisplayName.Substring((int)node.DisplayNamePrefixLength);
 
         public static string StrId(this Schema.Node.Reader node)
-            => $"0x{node.Id.ToString("X")}";
+            => $"0x{node.Id:X}";
 
         public static string StrId(this ulong nodeId)
-            => $"0x{nodeId.ToString("X")}";
+            => $"0x{nodeId:X}";
 
         public static NodeKind GetKind(this Schema.Node.Reader node)
         {

@@ -46,6 +46,13 @@ namespace CapnpC
         }
 
         [TestMethod]
+        public void Test04MutualDependencies()
+        {
+            LoadAndGenerate(Resources.UnitTest4_capnp, 4);
+            // Should not throw
+        }
+
+        [TestMethod]
         public void Test10ImportedNamespaces()
         {
             var run = LoadAndGenerate(Resources.UnitTest10_capnp, 10);
