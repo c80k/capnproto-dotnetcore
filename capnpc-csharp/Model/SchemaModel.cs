@@ -137,6 +137,7 @@ namespace CapnpC.Model
 
             if (def == null)
             {
+                Trace.Assert(state.parent != null, $"The {node.GetTypeTag().ToString()} node {node.StrId()} was expected to have a parent.");
                 var typeDef = _typeDefMgr.CreateTypeDef(id, node.GetTypeTag(), state.parent);
                 typeDef.Name = name;
                 def = typeDef;

@@ -1,4 +1,5 @@
-﻿
+﻿using System.Diagnostics;
+
 namespace CapnpC.Model
 {
     class Annotation : IDefinition
@@ -11,6 +12,7 @@ namespace CapnpC.Model
 
         public Annotation(ulong id, IHasNestedDefinitions parent)
         {
+            Trace.Assert(parent != null);
             Id = id;
             DeclaringElement = parent;
             parent.NestedDefinitions.Add(this);

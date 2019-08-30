@@ -6,7 +6,7 @@ namespace CapnpC.Model
     {
         public ulong Id { get;  }
         public TypeTag Tag { get => TypeTag.File;  }
-        public IHasNestedDefinitions DeclaringElement { get; }
+        public IHasNestedDefinitions DeclaringElement { get => null; }
 
         public string Name { get; set; }
         public string[] Namespace { get; set; }

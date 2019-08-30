@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 namespace CapnpC.Model
 {
@@ -18,6 +19,7 @@ namespace CapnpC.Model
 
         public TypeDefinition(TypeTag tag, ulong id, IHasNestedDefinitions parent)
         {
+            Trace.Assert(parent != null);
             Tag = tag;
             Id = id;
             DeclaringElement = parent;
