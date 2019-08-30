@@ -8,12 +8,12 @@ namespace CapnpC.Model
     {
         readonly Dictionary<ulong, IDefinition> _id2def = new Dictionary<ulong, IDefinition>();
 
-        public GenFile CreateFile(ulong id)
-            => CreateId<GenFile>(id, () => new GenFile(id));
+        public GenFile CreateFile(ulong id, bool isGenerated)
+            => CreateId<GenFile>(id, () => new GenFile(id, isGenerated));
         public GenFile GetExistingFile(ulong id)
             => GetId<GenFile>(id, TypeTag.File);
 
-        public TypeDefinition CreateTypeDef(ulong id, TypeTag tag, IHasNestedDefinitions decl) 
+        public TypeDefinition CreateTypeDef(ulong id, TypeTag tag, IHasNestedDefinitions decl)
             => CreateId<TypeDefinition>(id, () => new TypeDefinition(tag, id, decl));
         public TypeDefinition GetExistingTypeDef(ulong id, TypeTag tag)
         {

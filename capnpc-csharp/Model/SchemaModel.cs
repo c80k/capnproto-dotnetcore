@@ -61,7 +61,6 @@ namespace CapnpC.Model
         struct Pass1State
         {
             public HashSet<ulong> unprocessedNodes;
-            public bool isGenerated;
             public IHasNestedDefinitions parent;
         }
 
@@ -74,17 +73,11 @@ namespace CapnpC.Model
             foreach (var node in _id2node.Values.Where(n => n.IsFile))
             {
                 GenFile file;
-                state.isGenerated = requestedFiles.TryGetValue(node.Id, out var req);
-                state.parent = null;
-                if (state.isGenerated)
-                {
-                    file = (GenFile)ProcessNodePass1(node.Id, req.Filename, state);
+                bool isGenerated = requestedFiles.TryGetValue(node.Id, out var req);
+                var filename = isGenerated ? req.Filename : node.DisplayName;
+                file = ProcessFilePass1(node.Id, filename, state, isGenerated);
+                if (isGenerated)
                     _generatedFiles.Add(file);
-                }
-                else
-                {
-                    file = (GenFile)ProcessNodePass1(node.Id, node.DisplayName, state);
-                }
             }
             if (state.unprocessedNodes.Count != 0)
             {
@@ -92,9 +85,20 @@ namespace CapnpC.Model
             }
         }
 
+        GenFile ProcessFilePass1(ulong id, string name, Pass1State state, bool isGenerated)
+        {
+            var file = _typeDefMgr.CreateFile(id, isGenerated);
+            var node = IdToNode(id);
+            state.parent = null;
+            file.Namespace = GetNamespaceAnnotation(node);
+            file.Name = name;
+            return ProcessNodePass1(id, name, state) as GenFile;
+        }
+
         IDefinition ProcessNodePass1(ulong id, string name, Pass1State state)
         {
-            if (!(IdToNode(id, state.isGenerated) is Schema.Node.Reader node))
+            bool mustExist = state.parent == null || (state.parent as IDefinition).IsGenerated;
+            if (!(IdToNode(id, mustExist) is Schema.Node.Reader node))
                 return null;
             if (!state.unprocessedNodes.Remove(id))
                 return null;
@@ -112,10 +116,11 @@ namespace CapnpC.Model
                     return _typeDefMgr.CreateConstant(id, state.parent);
                 case NodeKind.File:
                     if (state.parent != null)
-                        throw new InvalidSchemaException("Did not expect file nodes to appear as nested nodes");
-                    var file = _typeDefMgr.CreateFile(id);
+                        throw new InvalidSchemaException($"Did not expect a file node {node.StrId()} to be a nested node.");
+                    var file = _typeDefMgr.GetExistingFile(id);
                     file.Namespace = GetNamespaceAnnotation(node);
                     file.Name = name;
+                    state.parent = file;
                     def = file;
                     processNestedNodes = true;
                     break;
@@ -140,9 +145,9 @@ namespace CapnpC.Model
                 Trace.Assert(state.parent != null, $"The {node.GetTypeTag().ToString()} node {node.StrId()} was expected to have a parent.");
                 var typeDef = _typeDefMgr.CreateTypeDef(id, node.GetTypeTag(), state.parent);
                 typeDef.Name = name;
+                state.parent = typeDef;
                 def = typeDef;
             }
-            state.parent = def as IHasNestedDefinitions;
             
             if (processNestedNodes && node.NestedNodes != null)
                 foreach (var nested in node.NestedNodes)
@@ -187,7 +192,6 @@ namespace CapnpC.Model
         struct Pass2State
         {
             public Method currentMethod;
-            public bool isGenerated;
             public HashSet<ulong> processedNodes;
         }
 
@@ -197,16 +201,15 @@ namespace CapnpC.Model
             foreach (var file in _typeDefMgr.Files)
             {
                 var node = IdToNode(file.Id);
-                state.isGenerated = requestedFiles.ContainsKey(file.Id);
-                ProcessNestedNodes(node.NestedNodes, state);
+                ProcessNestedNodes(node.NestedNodes, state, file.IsGenerated);
             }
         }
 
-        void ProcessNestedNodes(IEnumerable<Schema.Node.NestedNode.Reader> nestedNodes, Pass2State state)
+        void ProcessNestedNodes(IEnumerable<Schema.Node.NestedNode.Reader> nestedNodes, Pass2State state, bool mustExist)
         {
             foreach (var nestedNode in nestedNodes)
             {
-                ProcessNode(nestedNode.Id, state);
+                ProcessNode(nestedNode.Id, state, mustExist);
             }
         }
 
@@ -534,7 +537,7 @@ namespace CapnpC.Model
                 }
             }
 
-            ProcessNestedNodes(reader.NestedNodes, state);
+            ProcessNestedNodes(reader.NestedNodes, state, def.File.IsGenerated);
 
             ProcessFields(reader, def, def.Fields, state);
 
@@ -683,7 +686,7 @@ namespace CapnpC.Model
 
         TypeDefinition ProcessTypeDef(ulong id, Pass2State state, TypeTag tag = default)
         {
-            var def = ProcessNode(id, state, tag);
+            var def = ProcessNode(id, state, true, tag);
             var typeDef = def as TypeDefinition;
             if (def == null)
                 throw new ArgumentException(
@@ -692,9 +695,9 @@ namespace CapnpC.Model
             return typeDef;
         }
 
-        IDefinition ProcessNode(ulong id, Pass2State state, TypeTag tag = default)
+        IDefinition ProcessNode(ulong id, Pass2State state, bool mustExist, TypeTag tag = default)
         {
-            if (!(IdToNode(id, state.isGenerated) is Schema.Node.Reader node)) return null;
+            if (!(IdToNode(id, mustExist) is Schema.Node.Reader node)) return null;
             var kind = node.GetKind();
             if (tag == TypeTag.Unknown) tag = kind.GetTypeTag();
             var def = _typeDefMgr.GetExistingDef(id, tag);
