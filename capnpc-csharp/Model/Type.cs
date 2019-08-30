@@ -67,7 +67,7 @@ namespace CapnpC.Model
                 declaringType = (declaringType as TypeDefinition)?.DeclaringElement as IHasGenericParameters;
             }
 
-            ElementType?.InheritFreeParameters(declaringType);
+            ElementType?.InheritFreeParameters(declaringType); // BUG: this is always null
         }
 
         Type SubstituteGenerics(Type type)
