@@ -72,6 +72,13 @@ namespace CapnpC
         }
 
         [TestMethod]
+        public void Test11ImportedConst()
+        {
+            var model = Load(Resources.UnitTest11_capnp);
+            // Should not throw
+        }
+
+        [TestMethod]
         public void Test20AnnotationAndConst()
         {
             var model = Load(Resources.UnitTest20_capnp);
