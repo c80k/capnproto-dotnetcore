@@ -20,6 +20,7 @@
     <summary>Cap'n Proto C# code generator backend. This is the self-contained variant. It requires Windows x86/x64 
     (as opposed to the capnpc-csharp package, which is CPU-independent but requires a .NET Core runtime)</summary>
     <!--<repository type="Git" />-->
+    <releaseNotes>https://github.com/c80k/capnproto-dotnetcore/releases/tag/v$version$</releaseNotes>
     <dependencies>
         <dependency id="capnproto" version="0.7.0" />
     </dependencies>
@@ -27,8 +28,8 @@
 <files>
     <file src="chocolateyinstall.ps1" target="tools" />
     <file src="chocolateyuninstall.ps1" target="tools" />
-    <file src="..\..\LICENSE" target="tools\LICENSE" />
-    <file src="..\VERIFICATION" target="tools\VERIFICATION" />
+    <file src="..\..\LICENSE" target="tools\LICENSE.txt" />
+    <file src="..\VERIFICATION" target="tools\VERIFICATION.txt" />
     <file src=".\bin\**" target="bin" />
   </files>
 </package>

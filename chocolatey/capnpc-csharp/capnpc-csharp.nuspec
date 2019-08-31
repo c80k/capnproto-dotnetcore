@@ -19,6 +19,7 @@
     <bugTrackerUrl>https://github.com/c80k/capnproto-dotnetcore/issues</bugTrackerUrl>
     <tags>capnp capnpc RPC serialization cerealization</tags>
     <!--<repository type="Git" />-->
+    <releaseNotes>https://github.com/c80k/capnproto-dotnetcore/releases/tag/v$version$</releaseNotes>
     <dependencies>
         <dependency id="capnproto" version="0.7.0" />
         <dependency id="dotnetcore-runtime.install" version="2.1.6" />
@@ -28,8 +29,8 @@
     <file src="chocolateyinstall.ps1" target="tools" />
     <file src="chocolateyuninstall.ps1" target="tools" />
     <file src=".\capnpc-csharp.ps1" target="tools" />
-    <file src="..\..\LICENSE" target="tools\LICENSE" />
-    <file src="..\VERIFICATION" target="tools\VERIFICATION" />
+    <file src="..\..\LICENSE" target="tools\LICENSE.txt" />
+    <file src="..\VERIFICATION" target="tools\VERIFICATION.txt" />
     <file src=".\bin\**" target="bin" />
   </files>
 </package>

@@ -1,3 +1,3 @@
 $ErrorActionPreference = 'Stop'
 
-Uninstall-BinFile capnpc-sharp
+Uninstall-BinFile capnpc-csharp
