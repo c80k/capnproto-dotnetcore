@@ -50,6 +50,16 @@ artifacts:
    type: NuGetPackage
 clone_depth: 1
 test_script:
+  - cmd: cd %APPVEYOR_BUILD_FOLDER%\install-test
+  - cmd: choco install capnpc-csharp --source="'$(appveyor_build_folder)\chocolatey\install;https://chocolatey.org/api/v2'" --force -y
+  - cmd: compile-test
+  - cmd: choco uninstall capnpc-csharp -y
+  - cmd: notinstalled-test
+  - cmd: choco install capnpc-csharp-win-x86 --source="'$(appveyor_build_folder)\chocolatey\install;https://chocolatey.org/api/v2'" --force -y
+  - cmd: compile-test
+  - cmd: choco uninstall capnpc-csharp-win-x86 -y
+  - cmd: notinstalled-test
+  - cmd: cd %APPVEYOR_BUILD_FOLDER%
   - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Debug\netcoreapp2.2\Capnp.Net.Runtime.Tests.Std20.dll
   - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\netcoreapp2.2\Capnp.Net.Runtime.Tests.Std20.dll
   - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests.Core21\bin\Debug\netcoreapp2.2\Capnp.Net.Runtime.Tests.Core21.dll
