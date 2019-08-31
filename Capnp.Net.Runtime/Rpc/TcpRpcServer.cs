@@ -161,6 +161,33 @@ namespace Capnp.Rpc
             }
         }
 
+        void SafeJoin(Thread thread)
+        {
+            for (int retry = 0; retry < 5; ++retry)
+            {
+                try
+                {
+                    if (!thread.Join(500))
+                    {
+                        Logger.LogError($"Unable to join {thread.Name} within timeout");
+                    }
+                    break;
+                }
+                catch (ThreadStateException)
+                {
+                    // In rare cases it happens that despite thread.Start() was called, the thread did not actually start yet.
+                    Logger.LogDebug("Waiting for thread to start in order to join it");
+                    Thread.Sleep(100);
+                }
+                catch (System.Exception exception)
+                {
+                    Logger.LogError($"Unable to join {thread.Name}: {exception.Message}");
+                    break;
+                }
+            }
+        }
+
+
         /// <summary>
         /// Stops accepting incoming attempts and closes all existing connections.
         /// </summary>
@@ -185,41 +212,10 @@ namespace Capnp.Rpc
             {
                 connection.Client.Dispose();
                 connection.Pump.Dispose();
-                if (!connection.PumpRunner.Join(500))
-                {
-                    Logger.LogError("Unable to join frame pumping thread within timeout");
-                }
+                SafeJoin(connection.PumpRunner);
             }
 
-            try
-            {
-                for (int retry = 0; retry < 5; ++retry)
-                {
-                    try
-                    {
-                        if (!_acceptorThread.Join(500))
-                        {
-                            Logger.LogError("Unable to join TCP acceptor thread within timeout");
-                        }
-                        break;
-                    }
-                    catch (ThreadStateException)
-                    {
-                        // In rare cases it happens that despite _acceptorThread.Start() was called, the thread did not actually start yet.
-                        Logger.LogDebug("Waiting for TCP acceptor thread to start in order to join it");
-                        Thread.Sleep(100);
-                    }
-                    catch (System.Exception exception)
-                    {
-                        Logger.LogError($"Unable to join TCP acceptor thread: {exception.Message}");
-                        break;
-                    }
-                }
-            }
-            catch (ThreadStateException)
-            {
-                // If acceptor thread was not yet started this is not a problem. Ignore.
-            }
+            SafeJoin(_acceptorThread);
 
             GC.SuppressFinalize(this);
         }

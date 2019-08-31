@@ -7,8 +7,24 @@ using System.Runtime.CompilerServices;
 
 namespace CapnpC
 {
-    class Program
+    internal class Program
     {
+        internal static void GenerateFromStream(Stream input)
+        {
+            WireFrame segments;
+
+            using (input)
+            {
+                segments = Framing.ReadSegments(input);
+            }
+
+            var dec = DeserializerState.CreateRoot(segments);
+            var reader = Schema.CodeGeneratorRequest.Reader.Create(dec);
+            var model = Model.SchemaModel.Create(reader);
+            var codeGen = new Generator.CodeGenerator(model, new Generator.GeneratorOptions());
+            codeGen.Generate();
+        }
+
         static void Main(string[] args)
         {
             Stream input;
@@ -27,18 +43,7 @@ namespace CapnpC
 
             try
             {
-                WireFrame segments;
-
-                using (input)
-                {
-                    segments = Framing.ReadSegments(input);
-                }
-
-                var dec = DeserializerState.CreateRoot(segments);
-                var reader = Schema.CodeGeneratorRequest.Reader.Create(dec);
-                var model = Model.SchemaModel.Create(reader);
-                var codeGen = new Generator.CodeGenerator(model, new Generator.GeneratorOptions());
-                codeGen.Generate();
+                GenerateFromStream(input);
             }
             catch (Exception exception)
             {
