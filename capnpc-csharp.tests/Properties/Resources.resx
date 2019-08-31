@@ -136,4 +136,10 @@
   <data name="schema_with_offsets_capnp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\schema-with-offsets.capnp.bin;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="UnitTest11_capnp" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UnitTest11.capnp.bin;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="UnitTest4_capnp" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UnitTest4.capnp.bin;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>

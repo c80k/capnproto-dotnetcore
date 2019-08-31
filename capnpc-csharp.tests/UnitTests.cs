@@ -11,6 +11,7 @@ namespace CapnpC
     [TestClass]
     public class UnitTests
     {
+        static readonly Dictionary<int, string> GeneratedCode = new Dictionary<int, string>();
 
         [TestMethod]
         public void Test00Enumerant()
@@ -22,11 +23,9 @@ namespace CapnpC
         [TestMethod]
         public void Test01NestedClash()
         {
-            var model = Load(Resources.UnitTest1_capnp);
-            var structFoo = GetTypeDef(0x93db6ba5509bac24, model);
-            var codeGen = NewGeneratorFor(model);
-            codeGen.Transform(model.FilesToGenerate.First());
-            var names = codeGen.GetNames();
+            var run = LoadAndGenerate(Resources.UnitTest1_capnp, 1);
+            var structFoo = GetTypeDef(0x93db6ba5509bac24, run.Model);
+            var names = run.CodeGen.GetNames();
             var fieldName = names.GetCodeIdentifier(structFoo.Fields[0]).ToString();
             Assert.AreEqual("Foo", structFoo.Name);
             Assert.AreNotEqual(structFoo.Name, fieldName);
@@ -35,30 +34,33 @@ namespace CapnpC
         [TestMethod]
         public void Test02ForwardInheritance()
         {
-            var model = Load(Resources.UnitTest2_capnp);
-            var codeGen = NewGeneratorFor(model);
-            codeGen.Transform(model.FilesToGenerate.First());
+            LoadAndGenerate(Resources.UnitTest2_capnp, 2);
             // Should not throw
         }
 
         [TestMethod]
         public void Test03NonGeneratedNodeSkip()
         {
-            var model = Load(Resources.UnitTest3_capnp);
+            LoadAndGenerate(Resources.UnitTest3_capnp, 3);
+            // Should not throw
+        }
+
+        [TestMethod]
+        public void Test04MutualDependencies()
+        {
+            LoadAndGenerate(Resources.UnitTest4_capnp, 4);
             // Should not throw
         }
 
         [TestMethod]
         public void Test10ImportedNamespaces()
         {
-            var model = Load(Resources.UnitTest10_capnp);
-            var codeGen = NewGeneratorFor(model);
-            var genFile = model.FilesToGenerate.First();
-            var outerTypeDef = genFile.NestedTypes.First();
+            var run = LoadAndGenerate(Resources.UnitTest10_capnp, 10);
+            var outerTypeDef = run.FirstFile.NestedTypes.First();
             var outerType = Model.Types.FromDefinition(outerTypeDef);
             var innerType = outerTypeDef.Fields[0].Type;
             var innerTypeDef = innerType.Definition;
-            var names = codeGen.GetNames();
+            var names = run.CodeGen.GetNames();
             var outerNameSyntax = names.GetQName(outerType, outerTypeDef);
             var innerNameSyntax = names.GetQName(innerType, outerTypeDef);
             string[] outerNamespace = { "Foo", "Bar", "Baz" };
@@ -72,25 +74,48 @@ namespace CapnpC
         }
 
         [TestMethod]
+        public void Test11ImportedConst()
+        {
+            LoadAndGenerate(Resources.UnitTest11_capnp, 11);
+            // Should not throw
+        }
+
+        [TestMethod]
         public void Test20AnnotationAndConst()
         {
-            var model = Load(Resources.UnitTest20_capnp);
-            var codeGen = NewGeneratorFor(model);
-            codeGen.Transform(model.FilesToGenerate.First());
+            LoadAndGenerate(Resources.UnitTest20_capnp, 20);
             // Should not throw 
         }
 
         [TestMethod]
         public void Test30SchemaCapnp()
         {
-            var model = Load(Resources.schema_with_offsets_capnp);
-            var codeGen = NewGeneratorFor(model);
-            codeGen.Transform(model.FilesToGenerate.First());
+            LoadAndGenerate(Resources.schema_with_offsets_capnp);
             // Should not throw
+        }
+
+        struct Run
+        {
+            public Model.SchemaModel Model;
+            public Generator.CodeGenerator CodeGen;
+            public Model.GenFile FirstFile;
+            public string Code;
         }
 
         static Generator.CodeGenerator NewGeneratorFor(Model.SchemaModel model)
             => new Generator.CodeGenerator(model, new Generator.GeneratorOptions());
+
+        Run LoadAndGenerate(byte[] input, int? testNum = null)
+        {
+            var run = new Run();
+            run.Model = Load(input);
+            run.CodeGen = NewGeneratorFor(run.Model);
+            run.FirstFile = run.Model.FilesToGenerate.First();
+            run.Code = run.CodeGen.Transform(run.FirstFile);
+            if (testNum is int num)
+                GeneratedCode[num] = run.Code;
+            return run;
+        }
 
         static Model.TypeDefinition GetTypeDef(ulong id, Model.SchemaModel model)
         {

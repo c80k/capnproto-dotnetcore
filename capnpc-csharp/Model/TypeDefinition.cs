@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 namespace CapnpC.Model
 {
@@ -18,8 +19,10 @@ namespace CapnpC.Model
 
         public TypeDefinition(TypeTag tag, ulong id, IHasNestedDefinitions parent)
         {
+            Trace.Assert(parent != null);
             Tag = tag;
             Id = id;
+            IsGenerated = (parent as IDefinition).IsGenerated;
             DeclaringElement = parent;
             if (tag == TypeTag.Group)
                 ((TypeDefinition)parent).NestedGroups.Add(this);
@@ -28,6 +31,7 @@ namespace CapnpC.Model
         }
 
         public ulong Id { get; }
+        public bool IsGenerated { get; }
         public IHasNestedDefinitions DeclaringElement { get; }
 
         public Method UsingMethod { get; set; }
