@@ -17,5 +17,7 @@ If(!(test-path $installDir))
       New-Item -ItemType Directory -Force -Path $installDir
 }
 
+Copy-Item "$scriptDir\..\LICENSE" -Destination "$chocoDir\LICENSE.txt"
+
 choco pack "$chocoDir\$id\$id.nuspec" --version $version --outputdirectory $installDir
 choco pack "$chocoDir\$id_win_x86\$id_win_x86.nuspec" --version $version --outputdirectory $installDir
