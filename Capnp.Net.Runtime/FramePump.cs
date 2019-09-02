@@ -1,12 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Capnp.FrameTracing;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Capnp
 {
@@ -23,6 +24,7 @@ namespace Capnp
         readonly Stream _stream;
         readonly BinaryWriter _writer;
         readonly object _writeLock = new object();
+        readonly List<IFrameTracer> _tracers = new List<IFrameTracer>();
 
         /// <summary>
         /// Constructs a new instance for given stream.
@@ -47,6 +49,11 @@ namespace Capnp
         {
             if (0 == Interlocked.Exchange(ref _disposing, 1))
             {
+                foreach (var tracer in _tracers)
+                {
+                    tracer.Dispose();
+                }
+
                 _writer?.Dispose();
                 _stream.Dispose();
             }
@@ -84,6 +91,11 @@ namespace Capnp
 
             lock (_writeLock)
             {
+                foreach (var tracer in _tracers)
+                {
+                    tracer.TraceFrame(FrameDirection.Tx, frame);
+                }
+
                 _writer.Write(frame.Segments.Count - 1);
 
                 foreach (var segment in frame.Segments)
@@ -140,6 +152,10 @@ namespace Capnp
                         IsWaitingForData = true;
                         var frame = reader.ReadWireFrame();
                         IsWaitingForData = false;
+                        foreach (var tracer in _tracers)
+                        {
+                            tracer.TraceFrame(FrameDirection.Rx, frame);
+                        }
                         FrameReceived?.Invoke(frame);
                     }
                 }
@@ -168,6 +184,11 @@ namespace Capnp
             {
                 IsWaitingForData = false;
             }
+        }
+
+        public void AttachTracer(IFrameTracer tracer)
+        {
+            _tracers.Add(tracer);
         }
     }
 }

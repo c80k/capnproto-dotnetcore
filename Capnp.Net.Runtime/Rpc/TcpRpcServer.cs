@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Capnp.FrameTracing;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -9,42 +10,21 @@ using System.Threading.Tasks;
 
 namespace Capnp.Rpc
 {
+    public class ConnectionEventArgs: EventArgs
+    {
+        public IConnection Connection { get; }
+
+        public ConnectionEventArgs(IConnection connection)
+        {
+            Connection = connection;
+        }
+    }
+
     /// <summary>
     /// Cap'n Proto RPC TCP server.
     /// </summary>
     public class TcpRpcServer: IDisposable
     {
-        /// <summary>
-        /// Models an incoming connection.
-        /// </summary>
-        public interface IConnection
-        {
-            /// <summary>
-            /// Server-side port
-            /// </summary>
-            int LocalPort { get; }
-
-            /// <summary>
-            /// Receive message counter
-            /// </summary>
-            long RecvCount { get; }
-
-            /// <summary>
-            /// Sent message counter
-            /// </summary>
-            long SendCount { get; }
-
-            /// <summary>
-            /// Whether the RPC engine is currently computing.
-            /// </summary>
-            bool IsComputing { get; }
-
-            /// <summary>
-            /// Whether the connection is idle, waiting for data to receive.
-            /// </summary>
-            bool IsWaitingForData { get; }
-        }
-
         ILogger Logger { get; } = Logging.CreateLogger<TcpRpcServer>();
 
         class OutboundTcpEndpoint : IEndpoint
@@ -71,18 +51,25 @@ namespace Capnp.Rpc
 
         class Connection: IConnection
         {
+            readonly TcpRpcServer _server;
+
             public Connection(TcpRpcServer server, TcpClient client, FramePump pump, OutboundTcpEndpoint outboundEp, RpcEngine.RpcEndpoint inboundEp)
             {
+                _server = server;
                 Client = client;
                 Pump = pump;
                 OutboundEp = outboundEp;
                 InboundEp = inboundEp;
+            }
 
+            public void Start()
+            {
                 PumpRunner = new Thread(o =>
                 {
                     try
                     {
                         Thread.CurrentThread.Name = $"TCP RPC Server Thread {Thread.CurrentThread.ManagedThreadId}";
+                        State = ConnectionState.Active;
 
                         Pump.Run();
                     }
@@ -91,25 +78,46 @@ namespace Capnp.Rpc
                         OutboundEp.Dismiss();
                         InboundEp.Dismiss();
                         Pump.Dispose();
-                        lock (server._reentrancyBlocker)
+                        Client.Dispose();
+                        lock (_server._reentrancyBlocker)
                         {
-                            --server.ConnectionCount;
-                            server._connections.Remove(this);
+                            --_server.ConnectionCount;
+                            _server._connections.Remove(this);
+                            State = ConnectionState.Down;
+                            _server.OnConnectionChanged?.Invoke(_server, new ConnectionEventArgs(this));
                         }
                     }
                 });
             }
 
+            public ConnectionState State { get; set; } = ConnectionState.Initializing;
             public TcpClient Client { get; private set; }
             public FramePump Pump { get; private set; }
             public OutboundTcpEndpoint OutboundEp { get; private set; }
             public RpcEngine.RpcEndpoint InboundEp { get; private set; }
             public Thread PumpRunner { get; private set; }
-            public int LocalPort => ((IPEndPoint)Client.Client.LocalEndPoint).Port;
+            public int? LocalPort => ((IPEndPoint)Client.Client.LocalEndPoint)?.Port;
+            public int? RemotePort => ((IPEndPoint)Client.Client.RemoteEndPoint)?.Port;
             public long RecvCount => InboundEp.RecvCount;
             public long SendCount => InboundEp.SendCount;
             public bool IsComputing => PumpRunner.ThreadState == ThreadState.Running;
             public bool IsWaitingForData => Pump.IsWaitingForData;
+
+            public void AttachTracer(IFrameTracer tracer)
+            {
+                if (tracer == null)
+                    throw new ArgumentNullException(nameof(tracer));
+
+                if (State != ConnectionState.Initializing)
+                    throw new InvalidOperationException("Connection is not in state 'Initializing'");
+
+                Pump.AttachTracer(tracer);
+            }
+
+            public void Close()
+            {
+                Client.Dispose();
+            }
         }
 
         readonly RpcEngine _rpcEngine;
@@ -144,6 +152,9 @@ namespace Capnp.Rpc
                     {
                         ++ConnectionCount;
                         _connections.Add(connection);
+
+                        OnConnectionChanged?.Invoke(this, new ConnectionEventArgs(connection));
+                        connection.Start();
                     }
 
                     connection.PumpRunner.Start();
@@ -193,13 +204,7 @@ namespace Capnp.Rpc
         /// </summary>
         public void Dispose()
         {
-            try
-            {
-                _listener.Stop();
-            }
-            catch (SocketException)
-            {
-            }
+            StopListening();
 
             var connections = new List<Connection>();
 
@@ -218,6 +223,20 @@ namespace Capnp.Rpc
             SafeJoin(_acceptorThread);
 
             GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Stops accepting incoming attempts.
+        /// </summary>
+        public void StopListening()
+        {
+            try
+            {
+                _listener.Stop();
+            }
+            catch (SocketException)
+            {
+            }
         }
 
         /// <summary>
@@ -282,5 +301,10 @@ namespace Capnp.Rpc
                 }
             }
         }
+
+        /// <summary>
+        /// Fires when a new incoming connection was accepted, or when an active connection is closed.
+        /// </summary>
+        public event Action<object, ConnectionEventArgs> OnConnectionChanged;
     }
 }

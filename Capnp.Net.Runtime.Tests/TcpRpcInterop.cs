@@ -1,4 +1,5 @@
-﻿using Capnp.Net.Runtime.Tests.GenImpls;
+﻿using Capnp.FrameTracing;
+using Capnp.Net.Runtime.Tests.GenImpls;
 using Capnp.Rpc;
 using Capnproto_test.Capnp.Test;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -364,13 +365,18 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void TestTailCallClient()
         {
             LaunchCompatTestProcess("server:TailCaller", stdout =>
             {
-                using (var client = new TcpRpcClient("localhost", TcpPort))
+                using (var client = new TcpRpcClient())
                 {
+                    var tracer = new RpcFrameTracer(Console.Out);
+
+                    client.AttachTracer(tracer);
+                    client.Connect("localhost", TcpPort);
+
                     client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestTailCaller>())
@@ -399,11 +405,19 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod, Timeout(10000), Ignore]
+        [TestMethod]
         public void TestTailCallServer()
         {
             using (var server = SetupServer())
             {
+                var tracer = new RpcFrameTracer(Console.Out);
+
+                server.OnConnectionChanged += (s, a) =>
+                {
+                    if (a.Connection.State == ConnectionState.Initializing)
+                        a.Connection.AttachTracer(tracer);
+                };
+
                 var counters = new Counters();
                 server.Main = new TestTailCallerImpl(counters);
 
