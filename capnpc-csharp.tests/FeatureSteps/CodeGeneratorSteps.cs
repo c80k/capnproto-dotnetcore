@@ -1,5 +1,4 @@
-﻿using capnpc_csharp.Tests.Properties;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using System.Reflection;
@@ -17,7 +16,7 @@ namespace capnpc_csharp.Tests
         bool _success;
         Exception _generateException;
 
-        Stream LoadResource(string name)
+        internal static Stream LoadResource(string name)
         {
             var assembly = Assembly.GetExecutingAssembly();
             string[] names = assembly.GetManifestResourceNames();

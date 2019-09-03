@@ -23,7 +23,6 @@
   <ItemGroup>
     <Compile Remove="*.cs" />
     <Compile Remove="Embedded Resources\test.cs" />
-    <Compile Remove="Resources\test.cs" />
     <None Remove="Embedded Resources\null.bin" />
     <None Remove="Embedded Resources\test.capnp" />
     <None Remove="Embedded Resources\test.capnp.bin" />
@@ -38,21 +37,14 @@
     <EmbeddedResource Include="Embedded Resources\null.bin" />
     <EmbeddedResource Include="Embedded Resources\test.capnp.bin" />
     <EmbeddedResource Include="Embedded Resources\test.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Embedded Resources\UnitTest1.capnp.bin" />
+    <EmbeddedResource Include="Embedded Resources\UnitTest2.capnp.bin" />
+    <EmbeddedResource Include="Embedded Resources\UnitTest3.capnp.bin" />
+    <EmbeddedResource Include="Embedded Resources\UnitTest4.capnp.bin" />
+    <EmbeddedResource Include="Embedded Resources\UnitTest10.capnp.bin" />
+    <EmbeddedResource Include="Embedded Resources\UnitTest11.capnp.bin" />
+    <EmbeddedResource Include="Embedded Resources\UnitTest20.capnp.bin" />
+    <EmbeddedResource Include="Embedded Resources\schema-with-offsets.capnp.bin" />
   </ItemGroup>
 
   <ItemGroup>
