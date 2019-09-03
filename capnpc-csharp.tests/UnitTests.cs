@@ -1,15 +1,16 @@
-using capnpc_csharp.Tests;
 using Capnp;
+using Model = CapnpC.Model;
+using Generator = CapnpC.Generator;
+using CodeGeneratorRequest = CapnpC.Schema.CodeGeneratorRequest;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
-namespace CapnpC
+namespace capnpc_csharp.Tests
 {
     [TestClass]
-    public class UnitTests
+    public class CodeGeneratorUnitTests
     {
         static readonly Dictionary<int, string> GeneratedCode = new Dictionary<int, string>();
 
@@ -146,7 +147,7 @@ namespace CapnpC
                 segments = Framing.ReadSegments(input);
             }
             var dec = DeserializerState.CreateRoot(segments);
-            var reader = Schema.CodeGeneratorRequest.Reader.Create(dec);
+            var reader = CodeGeneratorRequest.Reader.Create(dec);
             var model = Model.SchemaModel.Create(reader);
             return model;
         }
