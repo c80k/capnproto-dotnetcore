@@ -1,29 +1,30 @@
-using capnpc_csharp.Tests.Properties;
 using Capnp;
+using Model = CapnpC.Model;
+using Generator = CapnpC.Generator;
+using CodeGeneratorRequest = CapnpC.Schema.CodeGeneratorRequest;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
-namespace CapnpC
+namespace capnpc_csharp.Tests
 {
     [TestClass]
-    public class UnitTests
+    public class CodeGeneratorUnitTests
     {
         static readonly Dictionary<int, string> GeneratedCode = new Dictionary<int, string>();
 
         [TestMethod]
         public void Test00Enumerant()
         {
-            var model = Load(Resources.UnitTest1_capnp);
+            var model = Load("UnitTest1.capnp.bin");
             Assert.AreEqual("@byte", GetTypeDef(0xc8461867c409f5d4, model).Enumerants[0].Literal);
         }
 
         [TestMethod]
         public void Test01NestedClash()
         {
-            var run = LoadAndGenerate(Resources.UnitTest1_capnp, 1);
+            var run = LoadAndGenerate("UnitTest1.capnp.bin", 1);
             var structFoo = GetTypeDef(0x93db6ba5509bac24, run.Model);
             var names = run.CodeGen.GetNames();
             var fieldName = names.GetCodeIdentifier(structFoo.Fields[0]).ToString();
@@ -34,28 +35,28 @@ namespace CapnpC
         [TestMethod]
         public void Test02ForwardInheritance()
         {
-            LoadAndGenerate(Resources.UnitTest2_capnp, 2);
+            LoadAndGenerate("UnitTest2.capnp.bin", 2);
             // Should not throw
         }
 
         [TestMethod]
         public void Test03NonGeneratedNodeSkip()
         {
-            LoadAndGenerate(Resources.UnitTest3_capnp, 3);
+            LoadAndGenerate("UnitTest3.capnp.bin", 3);
             // Should not throw
         }
 
         [TestMethod]
         public void Test04MutualDependencies()
         {
-            LoadAndGenerate(Resources.UnitTest4_capnp, 4);
+            LoadAndGenerate("UnitTest4.capnp.bin", 4);
             // Should not throw
         }
 
         [TestMethod]
         public void Test10ImportedNamespaces()
         {
-            var run = LoadAndGenerate(Resources.UnitTest10_capnp, 10);
+            var run = LoadAndGenerate("UnitTest10.capnp.bin", 10);
             var outerTypeDef = run.FirstFile.NestedTypes.First();
             var outerType = Model.Types.FromDefinition(outerTypeDef);
             var innerType = outerTypeDef.Fields[0].Type;
@@ -76,21 +77,21 @@ namespace CapnpC
         [TestMethod]
         public void Test11ImportedConst()
         {
-            LoadAndGenerate(Resources.UnitTest11_capnp, 11);
+            LoadAndGenerate("UnitTest11.capnp.bin", 11);
             // Should not throw
         }
 
         [TestMethod]
         public void Test20AnnotationAndConst()
         {
-            LoadAndGenerate(Resources.UnitTest20_capnp, 20);
+            LoadAndGenerate("UnitTest20.capnp.bin", 20);
             // Should not throw 
         }
 
         [TestMethod]
         public void Test30SchemaCapnp()
         {
-            LoadAndGenerate(Resources.schema_with_offsets_capnp);
+            LoadAndGenerate("schema-with-offsets.capnp.bin");
             // Should not throw
         }
 
@@ -105,10 +106,10 @@ namespace CapnpC
         static Generator.CodeGenerator NewGeneratorFor(Model.SchemaModel model)
             => new Generator.CodeGenerator(model, new Generator.GeneratorOptions());
 
-        Run LoadAndGenerate(byte[] input, int? testNum = null)
+        Run LoadAndGenerate(string inputName, int? testNum = null)
         {
             var run = new Run();
-            run.Model = Load(input);
+            run.Model = Load(inputName);
             run.CodeGen = NewGeneratorFor(run.Model);
             run.FirstFile = run.Model.FilesToGenerate.First();
             run.Code = run.CodeGen.Transform(run.FirstFile);
@@ -137,16 +138,16 @@ namespace CapnpC
             return null;
         }
 
-        static Model.SchemaModel Load(byte[] data)
+        static Model.SchemaModel Load(string inputName)
         {
             WireFrame segments;
-            var input = new MemoryStream(data);
+            var input = CodeGeneratorSteps.LoadResource(inputName);
             using (input)
             {
                 segments = Framing.ReadSegments(input);
             }
             var dec = DeserializerState.CreateRoot(segments);
-            var reader = Schema.CodeGeneratorRequest.Reader.Create(dec);
+            var reader = CodeGeneratorRequest.Reader.Create(dec);
             var model = Model.SchemaModel.Create(reader);
             return model;
         }
