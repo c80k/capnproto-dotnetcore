@@ -48,7 +48,7 @@ vcpkg install capnproto
 ```
 
 Solution/project structure is as follows:
-- Capnp.Net.sln contains three projects:
+- Capnp.Net.sln contains these projects:
   * Capnp.Net.Runtime is the runtime implementation, a .NET assembly.
   * capnpc-csharp is the generator backend for C# language.
   * Capnp.Net.Runtime.Tests is an MS Unit Testing assembly, containing - you guessed it - the test suite.
