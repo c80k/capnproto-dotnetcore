@@ -70,6 +70,8 @@ namespace Capnp.Rpc
             {
                 if (++_refCount <= 1)
                 {
+                    --_refCount;
+
                     throw new ObjectDisposedException(nameof(ConsumedCapability));
                 }
             }

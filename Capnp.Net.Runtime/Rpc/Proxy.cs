@@ -136,7 +136,24 @@ namespace Capnp.Rpc
         {
             if (!_disposedValue)
             {
-                ConsumedCap?.Release();
+                if (disposing)
+                {
+                    ConsumedCap?.Release();
+                }
+                else
+                {
+                    // When called from the Finalizer, we must not throw.
+                    // But when reference counting goes wrong, ConsumedCapability.Release() will throw an InvalidOperationException.
+                    // The only option here is to suppress that exception.
+                    try
+                    {
+                        ConsumedCap?.Release();
+                    }
+                    catch
+                    {
+                    }
+                }
+
                 _disposedValue = true;
             }
         }
