@@ -1,4 +1,5 @@
-# capnproto-dotnetcore
+# capnproto-dotnetcore [![Build status](https://ci.appveyor.com/api/projects/status/tx4jjl2etiqve2xg/branch/master?svg=true)](https://ci.appveyor.com/project/c80k/capnproto-dotnetcore/branch/master)
+
 A Cap'n Proto implementation for .NET Standard 2.0 (credits to [lostinplace](https://github.com/lostinplace)) and .NET Core 2.1.
 
 ["Cap'n Proto is an insanely fast data interchange format and capability-based RPC system."](https://capnproto.org/) Whilst the original implementation is written in C++ there are several ports to other languages. This is a C# implementation for .NET Core.
@@ -13,9 +14,7 @@ The overall deployment consists of two components:
 
 ### Code generator back end: Windows
 
-Disclaimer: The mid-term goal is to provide the C# code generator backend as Chocolatey package. It turns out that setting up a correct package verification process (which is a requirement for package approval) requires more effort than expected. See [Issue: Not on Chocolatey](https://github.com/c80k/capnproto-dotnetcore/issues/6) for instructions on how to create and install the package locally. Read on to get an impression on how it's supposed to work in the future.
-
-The C# code generator back end will be available as [Chocolatey](https://chocolatey.org/) package. You may choose between two flavors: The portable version requires a .NET Core 2.1 (or higher) runtime or SDK (type `dotnet` at command line prompt to check whether you already have one). This is the recommended variant. To install, type
+The C# code generator back end is available as [Chocolatey](https://chocolatey.org/) package. You may choose between two flavors: The portable version requires a .NET Core 2.1 (or higher) runtime or SDK (type `dotnet` at command line prompt to check whether you already have one). This is the recommended variant. To install, type
 
 ```
 choco install capnpc-csharp
@@ -50,10 +49,11 @@ vcpkg install capnproto
 ```
 
 Solution/project structure is as follows:
-- Capnp.Net.sln contains three projects:
+- Capnp.Net.sln contains these projects:
   * Capnp.Net.Runtime is the runtime implementation, a .NET assembly.
-  * capnpc-csharp is the compiler backend for C# language
-  * Capnp.Net.Runtime.Tests is an MS Unit Testing assembly, containing - you guessed it - the test suite
+  * capnpc-csharp is the generator backend for C# language.
+  * Capnp.Net.Runtime.Tests is an MS Unit Testing assembly, containing - you guessed it - the test suite.
+  * capnpc-csharp.tests contains the generator backend test suite.
 - CapnpCompatTest.sln compiles to a native x86 executable which depends on the original Cap'n Proto C++ implementation. It is (partially) required by the test suite for interoperability testing.
 
 ## Features
