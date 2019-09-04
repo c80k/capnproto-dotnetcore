@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Capnpc.Csharp.Generation</id>
+    <version>1.0.0</version>
+    <title>Capnpc.Csharp.MsBuild.Generation</title>
+    <authors>Christian Köllner and contributors</authors>
+    <owners>Christian Köllner</owners>
+    <description>Package to enable the .capnp -> .cs file generation during build time</description>
+    <summary>Package to enable the .capnp -> .cs file generation during build time</summary>
+    <language>en-US</language>
+    <projectUrl>https://github.com/c80k/capnproto-dotnetcore</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <tags>capnproto csharp msbuild</tags>
+    <copyright>Christian Köllner and contributors</copyright>
+    <dependencies>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="build\**\*" target="build" />
+    <file src="buildMultiTargeting\**\*" target="buildMultiTargeting" />
+    <file src="bin\Release\netstandard2.0\*.dll" target="tasks\netstandard2.0" />
+    <file src="bin\Release\netcoreapp2.1\*.dll" target="tasks\netcoreapp2.1" />
+    <file src="bin\Release\netcoreapp2.1\*.deps.json" target="tasks\netcoreapp2.1" />
+    
+    <file src="..\Licenses\**\*" target="licenses" />
+    <file src="..\LICENSE" target="LICENSE" />
+  </files>
+</package>

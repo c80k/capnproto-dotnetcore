@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Capnp.Net.Runtime.Tests.Cor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "capnpc-csharp.tests", "capnpc-csharp.tests\capnpc-csharp.tests.csproj", "{B77AC567-E232-4072-85C3-8689566BF3D4}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Capnpc.Csharp.MsBuild.Generation", "Capnpc.Csharp.MsBuild.Generation\Capnpc.Csharp.MsBuild.Generation.csproj", "{1EFC1F20-C7BB-4F44-8BF9-DBB123AACCF4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{B77AC567-E232-4072-85C3-8689566BF3D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B77AC567-E232-4072-85C3-8689566BF3D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B77AC567-E232-4072-85C3-8689566BF3D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EFC1F20-C7BB-4F44-8BF9-DBB123AACCF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EFC1F20-C7BB-4F44-8BF9-DBB123AACCF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EFC1F20-C7BB-4F44-8BF9-DBB123AACCF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EFC1F20-C7BB-4F44-8BF9-DBB123AACCF4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
