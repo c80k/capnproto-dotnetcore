@@ -8,7 +8,7 @@
   <ItemGroup>
     <PropertyPageSchema Include="$(CpsExtensionSchemaDirectory)\ProjectItemsSchema.xaml;"/>
 
-    <PropertyPageSchema Include="$(CpsExtensionSchemaDirectory)\FeatureFileType.xaml;">
+    <PropertyPageSchema Include="$(CpsExtensionSchemaDirectory)\CapnpFileType.xaml;">
       <Context>File;BrowseObject</Context>
     </PropertyPageSchema>
   </ItemGroup>

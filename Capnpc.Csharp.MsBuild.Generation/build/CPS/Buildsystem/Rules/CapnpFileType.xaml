@@ -2,10 +2,10 @@
 <!--Copyright, Microsoft Corporation, All rights reserved.-->
     
 <Rule
-    Name="Feature"
-    DisplayName="Feature"
+    Name="Capnp"
+    DisplayName="Cap'n Proto"
     PageTemplate="tool"
-    Description="SpecFlow Feature file" 
+    Description="Cap'n Proto schema file" 
     xmlns="http://schemas.microsoft.com/build/2009/properties">
 
     <Rule.DataSource>

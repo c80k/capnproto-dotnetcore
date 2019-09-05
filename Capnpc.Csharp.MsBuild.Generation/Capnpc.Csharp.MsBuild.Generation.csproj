@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>net471;netcoreapp2.1</TargetFrameworks>
     <SignAssembly>false</SignAssembly>
     <NuspecFile>$(MSBuildThisFileDirectory)Capnpc.Csharp.MsBuild.Generation.nuspec</NuspecFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -68,7 +68,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="build\CPS\Buildsystem\Rules\FeatureFileType.xaml">
+    <None Update="build\CPS\Buildsystem\Rules\CapnpFileType.xaml">
       <Generator>MSBuild:Compile</Generator>
     </None>
     <None Update="build\CPS\Buildsystem\Rules\ProjectItemsSchema.xaml">

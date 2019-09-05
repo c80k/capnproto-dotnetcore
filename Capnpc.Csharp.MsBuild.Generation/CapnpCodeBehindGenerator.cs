@@ -4,12 +4,12 @@ using System.IO;
 
 namespace Capnpc.Csharp.MsBuild.Generation
 {
-    public class FeatureCodeBehindGenerator : IDisposable
+    public class CapnpCodeBehindGenerator : IDisposable
     {
         //private SpecFlowProject _specFlowProject;
         //private ITestGenerator _testGenerator;
 
-        public void InitializeProject(string projectPath, string rootNamespace, IEnumerable<string> generatorPlugins)
+        public void InitializeProject(string projectPath)
         {
             //_specFlowProject = MsBuildProjectReader.LoadSpecFlowProjectFromMsBuild(Path.GetFullPath(projectPath), rootNamespace);
 
@@ -21,14 +21,16 @@ namespace Capnpc.Csharp.MsBuild.Generation
         }
 
 
-        public TestFileGeneratorResult GenerateCodeBehindFile(string featureFile)
+        public TestFileGeneratorResult GenerateCodeBehindFile(string capnpFile)
         {
             //var featureFileInput = new FeatureFileInput(featureFile);
             //var generatedFeatureFileName = Path.GetFileName(_testGenerator.GetTestFullPath(featureFileInput));
 
             //var testGeneratorResult = _testGenerator.GenerateTestFile(featureFileInput, new GenerationSettings());
 
-            return new TestFileGeneratorResult(null, null);
+            return new TestFileGeneratorResult(
+                new TestGeneratorResult() { GeneratedTestCode = "//dummy" }, 
+                capnpFile + ".cs");
         }
 
         public void Dispose()

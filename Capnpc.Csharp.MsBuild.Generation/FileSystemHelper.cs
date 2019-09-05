@@ -69,136 +69,44 @@ namespace Capnpc.Csharp.MsBuild.Generation
 
             // Open the two files.
             using (FileStream fs1 = new FileStream(filePath1, FileMode.Open, FileAccess.Read))
-            using (FileStream fs2 = new FileStream(filePath2, FileMode.Open, FileAccess.Read))
             {
-                // Check the file sizes. If they are not the same, the files 
-                // are not the same.
-                if (fs1.Length != fs2.Length)
+                using (FileStream fs2 = new FileStream(filePath2, FileMode.Open, FileAccess.Read))
                 {
-                    // Return false to indicate files are different
-                    return false;
+                    // Check the file sizes. If they are not the same, the files 
+                    // are not the same.
+                    if (fs1.Length != fs2.Length)
+                    {
+                        // Return false to indicate files are different
+                        return false;
+                    }
+
+                    // Read and compare a byte from each file until either a
+                    // non-matching set of bytes is found or until the end of
+                    // file1 is reached.
+                    do
+                    {
+                        // Read one byte from each file.
+                        file1byte = fs1.ReadByte();
+                        file2byte = fs2.ReadByte();
+                    } while ((file1byte == file2byte) && (file1byte != -1));
                 }
-
-                // Read and compare a byte from each file until either a
-                // non-matching set of bytes is found or until the end of
-                // file1 is reached.
-                do
-                {
-                    // Read one byte from each file.
-                    file1byte = fs1.ReadByte();
-                    file2byte = fs2.ReadByte();
-                } while ((file1byte == file2byte) && (file1byte != -1));
             }
-
             // Return the success of the comparison. "file1byte" is 
             // equal to "file2byte" at this point only if the files are 
             // the same.
             return ((file1byte - file2byte) == 0);
         }
 
-        public static void CopyDirectory(string sourcePath, string destPath, bool cleanDestination = true)
+        // This method accepts two strings the represent two files to 
+        // compare. A return value of true indicates that the contents of the files
+        // are the same. A return value of any other value indicates that the 
+        // files are not the same.
+        public static bool FileCompareContent(string filePath1, string fileContent)
         {
-            if (cleanDestination)
-                EnsureEmptyFolder(destPath);
-            else
-            {
-                if (!Directory.Exists(destPath))
-                {
-                    Directory.CreateDirectory(destPath);
-                }
-            }
+            var currentFileContent = File.ReadAllText(filePath1);
 
-            foreach (string file in Directory.GetFiles(sourcePath))
-            {
-                var fileName = Path.GetFileName(file);
-                Debug.Assert(fileName != null);
-                string dest = Path.Combine(destPath, fileName);
-                File.Copy(file, dest, true);
-                File.SetAttributes(dest, File.GetAttributes(dest) & (~FileAttributes.ReadOnly));
-            }
+            return string.CompareOrdinal(currentFileContent, fileContent) == 0;
 
-            foreach (string folder in Directory.GetDirectories(sourcePath))
-            {
-                var folderName = Path.GetFileName(folder);
-                Debug.Assert(folderName != null);
-                string dest = Path.Combine(destPath, folderName);
-                CopyDirectory(folder, dest);
-            }
-        }
-
-        public static void EnsureEmptyFolder(string folderName)
-        {
-            folderName = Path.GetFullPath(folderName);
-
-            if (!Directory.Exists(folderName))
-            {
-                Directory.CreateDirectory(folderName);
-                return;
-            }
-
-            DeleteFolderContent(folderName);
-        }
-
-        public static void EnsureFolderOfFile(string filePath)
-        {
-            string directory = Path.GetDirectoryName(filePath);
-            if (directory != null && !Directory.Exists(directory))
-                Directory.CreateDirectory(directory);
-        }
-
-
-        private static void Retry(int number, Action action)
-        {
-            try
-            {
-                action();
-            }
-            catch (UnauthorizedAccessException)
-            {
-                var i = number - 1;
-
-                if (i == 0)
-                    throw;
-
-                Retry(i, action);
-            }
-        }
-
-        public static void DeleteFolderContent(string folderName)
-        {
-            foreach (string file in Directory.GetFiles(folderName))
-            {
-                try
-                {
-                    Retry(5, () => File.Delete(file));
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("Unable to delete file: " + file, ex);
-                }
-            }
-
-            foreach (string folder in Directory.GetDirectories(folderName))
-            {
-                try
-                {
-                    Retry(5, () => Directory.Delete(folder, true));
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("Unable to delete folder: " + folder, ex);
-                }
-            }
-        }
-
-        public static void DeleteFolder(string path)
-        {
-            if (!Directory.Exists(path))
-                return;
-
-            DeleteFolderContent(path);
-
-            Retry(5, () => Directory.Delete(path, true));
         }
     }
 }

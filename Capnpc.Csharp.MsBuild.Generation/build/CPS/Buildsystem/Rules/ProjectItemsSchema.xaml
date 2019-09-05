@@ -4,15 +4,15 @@
     xmlns="http://schemas.microsoft.com/build/2009/properties">
 
     <ContentType
-        Name="FeatureFile" 
-        DisplayName="FeatureFileType source file" 
+        Name="CapnpFile" 
+        DisplayName="CapnpFileType source file" 
         ItemType="CapnpFiles">
-        <NameValuePair Name="DependentExtensions" Value=".feature.cs" />
-
+        <NameValuePair Name="DependentExtensions" Value=".capnp.cs" />
     </ContentType>
 
-    <ItemType Name="CapnpFiles" DisplayName="Feature file"/>
+    <ItemType Name="CapnpFiles" DisplayName="Cap'n Proto schema file"/>
 
-    <FileExtension Name=".feature" ContentType="FeatureFile" />
+    <FileExtension Name=".capnp" ContentType="CapnpFile" />
 
 </ProjectSchemaDefinitions>
+    

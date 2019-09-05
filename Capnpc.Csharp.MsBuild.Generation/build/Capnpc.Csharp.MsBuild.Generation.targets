@@ -1,6 +1,6 @@
 ﻿<Project>
 
-  <Import Project="Capnpc.Csharp.MsBuild.Generation.props" Condition="'$(_SpecFlowPropsImported)'==''"/>
+  <Import Project="Capnpc.Csharp.MsBuild.Generation.props" Condition="'$(_CapnpcCsharpPropsImported)'==''"/>
 
   <PropertyGroup Condition="'$(BuildServerMode)' == ''">
     <BuildServerMode Condition="'$(BuildingInsideVisualStudio)'=='true'">false</BuildServerMode>
@@ -49,8 +49,8 @@
 
 
   <Target Name="WarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile" AfterTargets="CoreCompile"
-          Condition="'$(CapnpcCsharp_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile)' == 'true'">
-    <Warning Text="For codebehind file '@(SpecFlowObsoleteCodeBehindFiles)', no feature file was found." File="@(SpecFlowObsoleteCodeBehindFiles)" Condition="'@(SpecFlowObsoleteCodeBehindFiles)' != ''" />
+          Condition="'$(CapnpcCsharp_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingCapnpFile)' == 'true'">
+    <Warning Text="For codebehind file '@(SpecFlowObsoleteCodeBehindFiles)', no capnp file was found." File="@(SpecFlowObsoleteCodeBehindFiles)" Condition="'@(SpecFlowObsoleteCodeBehindFiles)' != ''" />
   </Target>
 
 
@@ -66,26 +66,14 @@
 
     <Message Text="CapnpFiles: @(CapnpFiles)" Importance="high" Condition="'$(VerboseOutput)' == 'true'" />
 
-    <Error
-      Text="CapnpCsharp codebehind generation is not compatible with MSBuild codebehind generation. The custom tool must be removed from the file."
-      File="@(None)"
-      Condition="%(None.Extension) == '.feature' AND %(None.Generator) == 'SpecFlowSingleFileGenerator'"/>
-
-    <!-- <PropertyGroup>
-      <SpecFlowCodeBehindOutputPath Condition="'$(SpecFlowCodeBehindOutputPath)' == ''">Features.Generated</SpecFlowCodeBehindOutputPath>
-    </PropertyGroup> -->
-
-    <GenerateFeatureFileCodeBehindTask
+    <GenerateCapnpFileCodeBehindTask
       ProjectPath="$(MSBuildProjectFullPath)"
-      OutputPath="$(SpecFlowCodeBehindOutputPath)"
-      CapnpFiles="@(CapnpFiles)"
-      RootNamespace="$(RootNamespace)"
-      GeneratorPlugins="@(SpecFlowGeneratorPlugins)" >
+      CapnpFiles="@(CapnpFiles)" >
 
-      <Output TaskParameter="GeneratedFiles" ItemName="CapnpCsharpGeneratedFiles" />
-    </GenerateFeatureFileCodeBehindTask>
+      <Output TaskParameter="GeneratedFiles" ItemName="CapnpcCsharpGeneratedFiles" />
+    </GenerateCapnpFileCodeBehindTask>
 
-    <Message Text="CapnpCsharpGeneratedFiles: %(CapnpCsharpGeneratedFiles.Identity)" Importance="high" Condition="'$(VerboseOutput)' == 'true'" />
+    <Message Text="CapnpcCsharpGeneratedFiles: %(CapnpcCsharpGeneratedFiles.Identity)" Importance="high" Condition="'$(VerboseOutput)' == 'true'" />
 
 
     <!--
@@ -123,7 +111,7 @@
 
   <Target Name="IncludeCodeBehindFilesInProject" DependsOnTargets="UpdateCapnpFilesInProject">
     <ItemGroup Condition="'$(UsingMicrosoftNETSdk)' != 'true'">
-      <Compile Include="@(CapnpCsharpGeneratedFiles)" Exclude="@(Compile)" />
+      <Compile Include="@(CapnpcCsharpGeneratedFiles)" Exclude="@(Compile)" />
     </ItemGroup>
   </Target>
 
@@ -132,12 +120,12 @@
   </Target>
 
   <Target Name="CleanCapnpFilesInProject" Condition="'$(CapnpcCsharp_DeleteCodeBehindFilesOnCleanRebuild)' == 'true'">
-    <!-- remove known codebehind files for existing feature files -->
+    <!-- remove known codebehind files for existing capnp files -->
     <Delete Files="%(CapnpFiles.CodeBehindFile)" ContinueOnError="true" />
 
     <!-- remove obsolete codebehind files, scenarios:
          - after rename operation
-         - after deletion of a feature file
+         - after deletion of a capnp file
          - after pulling latest changes from version control with above changes
      -->
     <Delete Files="@(SpecFlowObsoleteCodeBehindFiles)" ContinueOnError="true" />

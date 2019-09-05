@@ -17,7 +17,7 @@ namespace Capnpc.Csharp.MsBuild.Generation
 
             Errors = generatorResult.Errors;
             IsUpToDate = generatorResult.IsUpToDate;
-            GeneratedTestCode = generatorResult.GeneratedTestCode;
+            GeneratedCode = generatorResult.GeneratedTestCode;
         }
 
         /// <summary>
@@ -31,9 +31,9 @@ namespace Capnpc.Csharp.MsBuild.Generation
         public bool IsUpToDate { get; }
 
         /// <summary>
-        /// The generated test code.
+        /// The generated code.
         /// </summary>
-        public string GeneratedTestCode { get; }
+        public string GeneratedCode { get; }
 
         public bool Success => Errors == null || !Errors.Any();
 

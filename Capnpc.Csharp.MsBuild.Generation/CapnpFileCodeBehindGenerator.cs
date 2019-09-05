@@ -7,11 +7,11 @@ using Microsoft.Build.Utilities;
 
 namespace Capnpc.Csharp.MsBuild.Generation
 {
-    public class FeatureFileCodeBehindGenerator : ICapnpCsharpGenerator
+    public class CapnpFileCodeBehindGenerator : ICapnpcCsharpGenerator
     {
         private readonly FilePathGenerator _filePathGenerator;
         
-        public FeatureFileCodeBehindGenerator(TaskLoggingHelper log)
+        public CapnpFileCodeBehindGenerator(TaskLoggingHelper log)
         {
             Log = log ?? throw new ArgumentNullException(nameof(log));
             _filePathGenerator = new FilePathGenerator();
@@ -21,27 +21,24 @@ namespace Capnpc.Csharp.MsBuild.Generation
 
         public IEnumerable<string> GenerateFilesForProject(
             string projectPath,
-            string rootNamespace,
-            List<string> CapnpFiles,
-            List<string> generatorPlugins,
-            string projectFolder,
-            string outputPath)
+            List<string> capnpFiles,
+            string projectFolder)
         {
-            using (var featureCodeBehindGenerator = new FeatureCodeBehindGenerator())
+            using (var capnpCodeBehindGenerator = new CapnpCodeBehindGenerator())
             {
-                featureCodeBehindGenerator.InitializeProject(projectPath, rootNamespace, generatorPlugins);
+                capnpCodeBehindGenerator.InitializeProject(projectPath);
 
                 var codeBehindWriter = new CodeBehindWriter(null);
 
-                if (CapnpFiles == null)
+                if (capnpFiles == null)
                 {
                     yield break;
                 }
 
-                foreach (var featureFile in CapnpFiles)
+                foreach (var capnpFile in capnpFiles)
                 {
-                    var featureFileItemSpec = featureFile;
-                    var generatorResult = featureCodeBehindGenerator.GenerateCodeBehindFile(featureFileItemSpec);
+                    var capnpFileItemSpec = capnpFile;
+                    var generatorResult = capnpCodeBehindGenerator.GenerateCodeBehindFile(capnpFileItemSpec);
 
                     if (!generatorResult.Success)
                     {
@@ -63,11 +60,10 @@ namespace Capnpc.Csharp.MsBuild.Generation
 
                     var targetFilePath = _filePathGenerator.GenerateFilePath(
                         projectFolder,
-                        outputPath,
-                        featureFile,
+                        capnpFile,
                         generatorResult.Filename);
 
-                    var resultedFile = codeBehindWriter.WriteCodeBehindFile(targetFilePath, featureFile, generatorResult);
+                    var resultedFile = codeBehindWriter.WriteCodeBehindFile(targetFilePath, capnpFile, generatorResult);
 
                     yield return FileSystemHelper.GetRelativePath(resultedFile, projectFolder);
                 }

@@ -13,7 +13,7 @@ namespace Capnpc.Csharp.MsBuild.Generation
 
         public TaskLoggingHelper Log { get; }
 
-        public string WriteCodeBehindFile(string outputPath, string featureFile, TestFileGeneratorResult testFileGeneratorResult) //todo needs unit tests
+        public string WriteCodeBehindFile(string outputPath, string capnpFile, TestFileGeneratorResult testFileGeneratorResult)
         {
             //if (string.IsNullOrEmpty(testFileGeneratorResult.Filename))
             //{
@@ -21,27 +21,27 @@ namespace Capnpc.Csharp.MsBuild.Generation
             //    return null;
             //}
 
-            //string directoryPath = Path.GetDirectoryName(outputPath) ?? throw new InvalidOperationException();
-            //Log?.LogWithNameTag(Log.LogMessage, directoryPath);
+            string directoryPath = Path.GetDirectoryName(outputPath) ?? throw new InvalidOperationException();
+            Log?.LogWithNameTag(Log.LogMessage, directoryPath);
 
-            //Log?.LogWithNameTag(Log.LogMessage, $"Writing data to {outputPath}; path = {directoryPath}; generatedFilename = {testFileGeneratorResult.Filename}");
+            Log?.LogWithNameTag(Log.LogMessage, $"Writing data to {outputPath}; path = {directoryPath}; generatedFilename = {testFileGeneratorResult.Filename}");
 
-            //if (File.Exists(outputPath))
-            //{
-            //    if (!FileSystemHelper.FileCompareContent(outputPath, testFileGeneratorResult.GeneratedTestCode))
-            //    {
-            //        File.WriteAllText(outputPath, testFileGeneratorResult.GeneratedTestCode);
-            //    }
-            //}
-            //else
-            //{
-            //    if (!Directory.Exists(directoryPath))
-            //    {
-            //        Directory.CreateDirectory(directoryPath);
-            //    }
+            if (File.Exists(outputPath))
+            {
+                if (!FileSystemHelper.FileCompareContent(outputPath, testFileGeneratorResult.GeneratedCode))
+                {
+                    File.WriteAllText(outputPath, testFileGeneratorResult.GeneratedCode);
+                }
+            }
+            else
+            {
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
 
-            //    File.WriteAllText(outputPath, testFileGeneratorResult.GeneratedTestCode);
-            //}
+                File.WriteAllText(outputPath, testFileGeneratorResult.GeneratedCode);
+            }
 
             return outputPath;
         }

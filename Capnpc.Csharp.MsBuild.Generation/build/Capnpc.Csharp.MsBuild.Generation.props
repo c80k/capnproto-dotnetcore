@@ -21,7 +21,7 @@
     <VerboseOutput Condition="'$(VerboseOutput)'==''">true</VerboseOutput>
     <CapnpcCsharp_DebugMSBuildTask Condition="'$(CapnpcCsharp_DebugMSBuildTask)' == ''">false</CapnpcCsharp_DebugMSBuildTask>
 
-    <_SpecFlowPropsImported Condition="'$(_SpecFlowPropsImported)'==''">true</_SpecFlowPropsImported>
+    <_CapnpcCsharpPropsImported Condition="'$(_CapnpcCsharpPropsImported)'==''">true</_CapnpcCsharpPropsImported>
   </PropertyGroup>
 
   <!--
@@ -38,14 +38,14 @@
       net.sdk support: feature flag to enable experimental support for net.sdk project system
     -->
     <CapnpcCsharp_EnableDefaultCompileItems Condition="'$(CapnpcCsharp_EnableDefaultCompileItems)'==''">true</CapnpcCsharp_EnableDefaultCompileItems>
-    <CapnpcCsharp_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile Condition="'$(CapnpcCsharp_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile)'==''">$(CapnpcCsharp_EnableDefaultCompileItems)</CapnpcCsharp_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile>
+    <CapnpcCsharp_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingCapnpFile Condition="'$(CapnpcCsharp_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingCapnpFile)'==''">$(CapnpcCsharp_EnableDefaultCompileItems)</CapnpcCsharp_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingCapnpFile>
 
-    <DefaultItemExcludes>$(DefaultItemExcludes);**/*.feature</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);**/*.capnp</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
     <CapnpFiles Include="**\*.capnp" >
-      <CodeBehindFile>%(RelativeDir)%(Filename).capnp(DefaultLanguageSourceExtension)</CodeBehindFile>
+      <CodeBehindFile>%(RelativeDir)%(Filename).capnp.cs</CodeBehindFile>
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
     </CapnpFiles>
 
@@ -54,7 +54,7 @@
          - after deletion of a feature file
          - after pulling latest changes from version control with above changes
      -->
-    <SpecFlowObsoleteCodeBehindFiles Include="**\*.capnp(DefaultLanguageSourceExtension)" Exclude="@(CapnpFiles->'%(CodeBehindFile)')" />
+    <SpecFlowObsoleteCodeBehindFiles Include="**\*.capnp.cs" Exclude="@(CapnpFiles->'%(CodeBehindFile)')" />
 
     <!-- Support for Visual Studio Incremental Build
         https://github.com/techtalk/SpecFlow/issues/1319
@@ -67,7 +67,7 @@
 
 
   <PropertyGroup>
-    <_CapnpcCsharp_TaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' And '$(_CapnpcCsharp_TaskFolder)' == ''">netcoreapp2.0</_CapnpcCsharp_TaskFolder>
+    <_CapnpcCsharp_TaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' And '$(_CapnpcCsharp_TaskFolder)' == ''">netcoreapp2.1</_CapnpcCsharp_TaskFolder>
     <_CapnpcCsharp_TaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' And '$(_CapnpcCsharp_TaskFolder)' == ''">net471</_CapnpcCsharp_TaskFolder>
     <_CapnpcCsharp_TaskAssembly Condition=" '$(_CapnpcCsharp_TaskAssembly)' == '' ">..\tasks\$(_CapnpcCsharp_TaskFolder)\Capnpc.Csharp.MsBuild.Generation.dll</_CapnpcCsharp_TaskAssembly>
   </PropertyGroup>

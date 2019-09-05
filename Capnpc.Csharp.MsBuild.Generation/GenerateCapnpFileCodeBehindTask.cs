@@ -13,22 +13,17 @@ namespace Capnpc.Csharp.MsBuild.Generation
     {
         public GenerateCapnpFileCodeBehindTask()
         {
-            CodeBehindGenerator = new FeatureFileCodeBehindGenerator(Log);
+            CodeBehindGenerator = new CapnpFileCodeBehindGenerator(Log);
         }
 
-        public ICapnpCsharpGenerator CodeBehindGenerator { get; set; }
+        public ICapnpcCsharpGenerator CodeBehindGenerator { get; set; }
 
         [Required]
         public string ProjectPath { get; set; }
 
-        public string RootNamespace { get; set; }
-
         public string ProjectFolder => Path.GetDirectoryName(ProjectPath);
-        public string OutputPath { get; set; }
 
         public ITaskItem[] CapnpFiles { get; set; }
-
-        public ITaskItem[] GeneratorPlugins { get; set; }
 
         [Output]
         public ITaskItem[] GeneratedFiles { get; private set; }
@@ -55,21 +50,16 @@ namespace Capnpc.Csharp.MsBuild.Generation
 
                 AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
-                var generator = CodeBehindGenerator ?? new FeatureFileCodeBehindGenerator(Log);
+                var generator = CodeBehindGenerator ?? new CapnpFileCodeBehindGenerator(Log);
 
                 Log.LogWithNameTag(Log.LogMessage, "Starting GenerateFeatureFileCodeBehind");
-
-                var generatorPlugins = GeneratorPlugins?.Select(gp => gp.ItemSpec).ToList() ?? new List<string>();
 
                 var capnpFiles = CapnpFiles?.Select(i => i.ItemSpec).ToList() ?? new List<string>();
 
                 var generatedFiles = generator.GenerateFilesForProject(
                     ProjectPath,
-                    RootNamespace,
                     capnpFiles,
-                    generatorPlugins,
-                    ProjectFolder,
-                    OutputPath);
+                    ProjectFolder);
 
                 GeneratedFiles = generatedFiles.Select(file => new TaskItem { ItemSpec = file }).ToArray();
 

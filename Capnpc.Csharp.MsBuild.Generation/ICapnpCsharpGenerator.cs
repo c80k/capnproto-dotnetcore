@@ -2,8 +2,8 @@
 
 namespace Capnpc.Csharp.MsBuild.Generation
 {
-    public interface ICapnpCsharpGenerator
+    public interface ICapnpcCsharpGenerator
     {
-        IEnumerable<string> GenerateFilesForProject(string projectPath, string rootNamespace, List<string> CapnpFiles, List<string> generatorPlugins, string projectFolder, string outputPath);
+        IEnumerable<string> GenerateFilesForProject(string projectPath, List<string> capnpFiles, string projectFolder);
     }
 }
