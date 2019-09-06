@@ -25,6 +25,10 @@ namespace Capnpc.Csharp.MsBuild.Generation
 
         public ITaskItem[] CapnpFiles { get; set; }
 
+        public string WorkingDirectory { get; set; }
+
+        public string AdditionalOptions { get; set; }
+
         [Output]
         public ITaskItem[] GeneratedFiles { get; private set; }
 
@@ -59,7 +63,9 @@ namespace Capnpc.Csharp.MsBuild.Generation
                 var generatedFiles = generator.GenerateFilesForProject(
                     ProjectPath,
                     capnpFiles,
-                    ProjectFolder);
+                    ProjectFolder,
+                    WorkingDirectory,
+                    AdditionalOptions);
 
                 GeneratedFiles = generatedFiles.Select(file => new TaskItem { ItemSpec = file }).ToArray();
 

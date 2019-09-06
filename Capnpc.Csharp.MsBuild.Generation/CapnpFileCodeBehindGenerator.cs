@@ -21,8 +21,10 @@ namespace Capnpc.Csharp.MsBuild.Generation
 
         public IEnumerable<string> GenerateFilesForProject(
             string projectPath,
-            List<string> capnpFiles,
-            string projectFolder)
+            List<string> capnpFiles,            
+            string projectFolder,
+            string workingDirectory, 
+            string additionalOptions)
         {
             using (var capnpCodeBehindGenerator = new CapnpCodeBehindGenerator())
             {
