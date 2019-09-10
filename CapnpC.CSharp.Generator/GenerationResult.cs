@@ -40,5 +40,15 @@ namespace CapnpC.CSharp.Generator
         /// true iff generation was successful
         /// </summary>
         public bool IsSuccess => GeneratedFiles != null;
+
+        /// <summary>
+        /// Messages read from standard error. Valid for both failure and success (capnp might spit out some warnings).
+        /// </summary>
+        public IReadOnlyList<CapnpMessage> Messages { get; internal set; }
+
+        /// <summary>
+        /// Error classification (if any error)
+        /// </summary>
+        public CapnpProcessFailure ErrorCategory { get; internal set; }
     }
 }

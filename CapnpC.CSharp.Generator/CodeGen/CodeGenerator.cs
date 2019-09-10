@@ -11,7 +11,7 @@
     using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
     using static SyntaxHelpers;
 
-    class CodeGenerator
+    internal class CodeGenerator
     {
         readonly SchemaModel _model;
         readonly GenNames _names;

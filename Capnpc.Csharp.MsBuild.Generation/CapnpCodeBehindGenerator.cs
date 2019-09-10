@@ -1,41 +1,85 @@
-﻿using System;
+﻿using CapnpC.CSharp.Generator;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Capnpc.Csharp.MsBuild.Generation
+namespace CapnpC.CSharp.MsBuild.Generation
 {
     public class CapnpCodeBehindGenerator : IDisposable
     {
-        //private SpecFlowProject _specFlowProject;
-        //private ITestGenerator _testGenerator;
 
         public void InitializeProject(string projectPath)
         {
-            //_specFlowProject = MsBuildProjectReader.LoadSpecFlowProjectFromMsBuild(Path.GetFullPath(projectPath), rootNamespace);
-
-            //var projectSettings = _specFlowProject.ProjectSettings;
-
-            //var testGeneratorFactory = new TestGeneratorFactory();
-
-            //_testGenerator = testGeneratorFactory.CreateGenerator(projectSettings, generatorPlugins);
         }
 
 
-        public TestFileGeneratorResult GenerateCodeBehindFile(string capnpFile)
+        public CsFileGeneratorResult GenerateCodeBehindFile(string capnpFile)
         {
-            //var featureFileInput = new FeatureFileInput(featureFile);
-            //var generatedFeatureFileName = Path.GetFileName(_testGenerator.GetTestFullPath(featureFileInput));
+            // Works around a weird capnp.exe behavior: When the input file is empty, it will spit out an exception dump
+            // instead of a parse error. But the parse error is nice because it contains a generated ID. We want the parse error!
+            // Workaround: Generate a temporary file that contains a single line break (such that it is not empty...)
+            try
+            {
+                if (File.Exists(capnpFile) && new FileInfo(capnpFile).Length == 0)
+                {
+                    string tempFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".capnp");
 
-            //var testGeneratorResult = _testGenerator.GenerateTestFile(featureFileInput, new GenerationSettings());
+                    File.WriteAllText(tempFile, Environment.NewLine);
+                    try
+                    {
+                        return GenerateCodeBehindFile(tempFile);
+                    }
+                    finally
+                    {
+                        File.Delete(tempFile);
+                    }
+                }
+            }
+            catch
+            {
+            }
 
-            return new TestFileGeneratorResult(
-                new TestGeneratorResult() { GeneratedTestCode = "//dummy" }, 
-                capnpFile + ".cs");
+            var result = CapnpCompilation.InvokeCapnpAndGenerate(new string[] { capnpFile });
+
+            if (result.IsSuccess)
+            {
+                if (result.GeneratedFiles.Count == 1)
+                {
+                    return new CsFileGeneratorResult(
+                        result.GeneratedFiles[0],
+                        capnpFile + ".cs",
+                        result.Messages);
+                }
+                else
+                {
+                    return new CsFileGeneratorResult(
+                        "Code generation produced more than one file. This is not supported.",
+                        result.Messages);
+                }
+            }
+            else
+            {
+                switch (result.ErrorCategory)
+                {
+                    case CapnpProcessFailure.NotFound:
+                        return new CsFileGeneratorResult("Unable to find capnp.exe - please install capnproto on your system first.");
+
+                    case CapnpProcessFailure.BadInput:
+                        return new CsFileGeneratorResult("Invalid schema", result.Messages);
+
+                    case CapnpProcessFailure.BadOutput:
+                        return new CsFileGeneratorResult(
+                            "Internal error: capnp.exe produced a binary code generation request which was not understood by the backend",
+                            result.Messages);
+
+                    default:
+                        throw new NotSupportedException("Invalid error category");
+                }
+            }
         }
 
         public void Dispose()
         {
-            //_testGenerator?.Dispose();
         }
     }
 }

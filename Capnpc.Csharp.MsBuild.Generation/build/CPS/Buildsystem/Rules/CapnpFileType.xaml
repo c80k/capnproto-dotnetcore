@@ -29,7 +29,7 @@
     <StringProperty Name="Link" Visible="false" />
     <StringProperty Name="Generator" Visible="true" DisplayName="Custom Tool"/>
 
-    <StringProperty Name="WorkingDirectory" DisplayName="Working Directory" ReadOnly="false" Category="Misc">
+    <!--<StringProperty Name="WorkingDirectory" DisplayName="Working Directory" ReadOnly="false" Category="Misc">
         <StringProperty.DataSource>
             <DataSource Persistence="ProjectFile" ItemType="WorkingDirectory" PersistedName="WorkingDirectory" />
         </StringProperty.DataSource>
@@ -39,5 +39,5 @@
         <StringProperty.DataSource>
             <DataSource Persistence="ProjectFile" ItemType="AdditionalOptions" PersistedName="AdditionalOptions" />
         </StringProperty.DataSource>
-    </StringProperty>
+    </StringProperty>-->
 </Rule>

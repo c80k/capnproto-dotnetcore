@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Build.Utilities;
 
-namespace Capnpc.Csharp.MsBuild.Generation
+namespace CapnpC.CSharp.MsBuild.Generation
 {
     public static class LogExtensions
     {
@@ -15,7 +15,7 @@ namespace Capnpc.Csharp.MsBuild.Generation
             string message,
             params object[] messageArgs)
         {
-            string fullMessage = $"[SpecFlow] {message}";
+            string fullMessage = $"[Cap'n Proto] {message}";
             loggingMethod?.Invoke(fullMessage, messageArgs);
         }
     }

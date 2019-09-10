@@ -1,30 +1,14 @@
 ﻿using Capnp;
+using CapnpC.CSharp.Generator;
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
-
-[assembly: InternalsVisibleToAttribute("capnpc-csharp.tests")]
+using System.Security;
 
 namespace CapnpC
 {
     internal class Program
     {
-        internal static void GenerateFromStream(Stream input)
-        {
-            WireFrame segments;
-
-            using (input)
-            {
-                segments = Framing.ReadSegments(input);
-            }
-
-            var dec = DeserializerState.CreateRoot(segments);
-            var reader = Schema.CodeGeneratorRequest.Reader.Create(dec);
-            var model = Model.SchemaModel.Create(reader);
-            var codeGen = new Generator.CodeGenerator(model, new Generator.GeneratorOptions());
-            codeGen.Generate();
-        }
-
         static void Main(string[] args)
         {
             Stream input;
@@ -41,13 +25,36 @@ namespace CapnpC
                 input = Console.OpenStandardInput();
             }
 
-            try
+            var result = CapnpCompilation.GenerateFromStream(input);
+
+            if (result.IsSuccess)
             {
-                GenerateFromStream(input);
+                foreach (var generatedFile in result.GeneratedFiles)
+                {
+                    if (generatedFile.IsSuccess)
+                    {
+                        string outputFile = generatedFile.CapnpFilePath + ".cs";
+
+                        try
+                        {
+                            File.WriteAllText(outputFile, generatedFile.GeneratedContent);
+                        }
+                        catch (Exception exception)
+                        {
+                            Console.Error.WriteLine(exception.Message);
+                            Environment.ExitCode = -1;
+                        }
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine($"Error generating {generatedFile.CapnpFilePath}: {generatedFile.Exception.Message}");
+                        Environment.ExitCode = -1;
+                    }
+                }
             }
-            catch (Exception exception)
+            else
             {
-                Console.Error.WriteLine(exception.Message);
+                Console.Error.WriteLine(result.Exception.Message);
                 Environment.ExitCode = -1;
             }
         }

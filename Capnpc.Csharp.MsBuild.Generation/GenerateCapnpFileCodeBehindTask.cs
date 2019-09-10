@@ -7,7 +7,7 @@ using System.Resources;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
-namespace Capnpc.Csharp.MsBuild.Generation
+namespace CapnpC.CSharp.MsBuild.Generation
 {
     public class GenerateCapnpFileCodeBehindTask : Task
     {

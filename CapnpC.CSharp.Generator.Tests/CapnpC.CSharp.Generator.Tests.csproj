@@ -1,0 +1,67 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <RootNamespace>CapnpC.CSharp.Generator.Tests</RootNamespace>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="1.4.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.4.0" />
+    <PackageReference Include="SpecFlow" Version="3.0.225" />
+    <PackageReference Include="SpecFlow.MsTest" Version="3.0.225" />
+    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.0.225" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="*.cs" />
+    <Compile Remove="Embedded Resources\test.cs" />
+    <None Remove="Embedded Resources\Empty.capnp" />
+    <None Remove="Embedded Resources\Empty1.capnp" />
+    <None Remove="Embedded Resources\invalid.capnp" />
+    <None Remove="Embedded Resources\null.bin" />
+    <None Remove="Embedded Resources\test.capnp" />
+    <None Remove="Embedded Resources\test.capnp.bin" />
+    <None Remove="Embedded Resources\UnitTest1.capnp" />
+    <Compile Include="CapnpMessageUnitTests.cs" />
+    <Compile Include="CodeGeneratorUnitTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Embedded Resources\test.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Embedded Resources\Empty.capnp" />
+    <EmbeddedResource Include="Embedded Resources\Empty1.capnp" />
+    <EmbeddedResource Include="Embedded Resources\invalid.capnp" />
+    <EmbeddedResource Include="Embedded Resources\null.bin" />
+    <EmbeddedResource Include="Embedded Resources\test.capnp.bin" />
+    <EmbeddedResource Include="Embedded Resources\test.cs" />
+    <EmbeddedResource Include="Embedded Resources\UnitTest1.capnp" />
+    <EmbeddedResource Include="Embedded Resources\UnitTest1.capnp.bin" />
+    <EmbeddedResource Include="Embedded Resources\UnitTest2.capnp.bin" />
+    <EmbeddedResource Include="Embedded Resources\UnitTest3.capnp.bin" />
+    <EmbeddedResource Include="Embedded Resources\UnitTest4.capnp.bin" />
+    <EmbeddedResource Include="Embedded Resources\UnitTest10.capnp.bin" />
+    <EmbeddedResource Include="Embedded Resources\UnitTest11.capnp.bin" />
+    <EmbeddedResource Include="Embedded Resources\UnitTest20.capnp.bin" />
+    <EmbeddedResource Include="Embedded Resources\schema-with-offsets.capnp.bin" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CapnpC.CSharp.Generator\CapnpC.CSharp.Generator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowFeatureFiles Update="CodeGenerator.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>CodeGenerator.feature.cs</LastGenOutput>
+      <Generator Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'"></Generator>
+    </SpecFlowFeatureFiles>
+  </ItemGroup>
+  
+</Project>

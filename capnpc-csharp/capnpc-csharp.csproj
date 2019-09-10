@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Capnp.Net.Runtime\Capnp.Net.Runtime.csproj" />
+    <ProjectReference Include="..\CapnpC.CSharp.Generator\CapnpC.CSharp.Generator.csproj" />
   </ItemGroup>
 
 </Project>

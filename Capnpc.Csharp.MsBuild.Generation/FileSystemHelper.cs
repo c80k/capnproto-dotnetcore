@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 
-namespace Capnpc.Csharp.MsBuild.Generation
+namespace CapnpC.CSharp.MsBuild.Generation
 {
     public static class FileSystemHelper
     {

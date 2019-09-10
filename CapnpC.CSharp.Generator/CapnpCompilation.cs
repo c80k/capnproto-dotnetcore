@@ -1,7 +1,12 @@
 ﻿using Capnp;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
+
+[assembly: InternalsVisibleTo("CapnpC.CSharp.Generator.Tests")]
 
 namespace CapnpC.CSharp.Generator
 {
@@ -23,13 +28,7 @@ namespace CapnpC.CSharp.Generator
 
             try
             {
-                WireFrame segments;
-
-                using (input)
-                {
-                    segments = Framing.ReadSegments(input);
-                }
-
+                var segments = Framing.ReadSegments(input);
                 var dec = DeserializerState.CreateRoot(segments);
                 var reader = Schema.CodeGeneratorRequest.Reader.Create(dec);
                 var model = Model.SchemaModel.Create(reader);
@@ -42,8 +41,66 @@ namespace CapnpC.CSharp.Generator
             }
         }
 
-        public static GenerationResult InvokeCapnpcAndGenerate()
+        /// <summary>
+        /// Invokes "capnp.exe -o-" with given additional arguments and redirects the output to the C# generator backend.
+        /// </summary>
+        /// <param name="arguments">additional command line arguments</param>
+        /// <returns>generation result</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="arguments"/>is null</exception>
+        public static GenerationResult InvokeCapnpAndGenerate(IEnumerable<string> arguments)
         {
+            if (arguments == null)
+                throw new ArgumentNullException(nameof(arguments));
+
+            using (var compiler = new Process())
+            {
+                var argList = new List<string>();
+                argList.Add("compile");
+                argList.Add($"-o-");
+                argList.AddRange(arguments);
+
+                compiler.StartInfo.FileName = "capnp.exe";
+                compiler.StartInfo.Arguments = string.Join(" ", argList);
+                compiler.StartInfo.UseShellExecute = false;
+                compiler.StartInfo.RedirectStandardOutput = true;
+                compiler.StartInfo.RedirectStandardError = true;
+
+                try
+                {
+                    compiler.Start();
+                }
+                catch (Exception exception)
+                {
+                    return new GenerationResult(exception)
+                    {
+                        ErrorCategory = CapnpProcessFailure.NotFound
+                    };
+                }
+
+                var result = GenerateFromStream(compiler.StandardOutput.BaseStream);
+
+                var messageList = new List<CapnpMessage>();
+
+                while (!compiler.StandardError.EndOfStream)
+                {
+                    messageList.Add(new CapnpMessage(compiler.StandardError.ReadLine()));
+                }
+
+                result.Messages = messageList;
+
+                if (!result.IsSuccess)
+                {
+                    compiler.WaitForExit();
+                    int exitCode = compiler.ExitCode;
+
+                    if (exitCode == 0)
+                        result.ErrorCategory = CapnpProcessFailure.BadOutput;
+                    else
+                        result.ErrorCategory = CapnpProcessFailure.BadInput;
+                }
+
+                return result;
+            }
         }
     }
 }

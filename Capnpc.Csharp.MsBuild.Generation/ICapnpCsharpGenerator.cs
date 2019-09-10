@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Capnpc.Csharp.MsBuild.Generation
+namespace CapnpC.CSharp.MsBuild.Generation
 {
     public interface ICapnpcCsharpGenerator
     {

@@ -54,7 +54,7 @@
          - after deletion of a feature file
          - after pulling latest changes from version control with above changes
      -->
-    <SpecFlowObsoleteCodeBehindFiles Include="**\*.capnp.cs" Exclude="@(CapnpFiles->'%(CodeBehindFile)')" />
+    <CapnpCsharpObsoleteCodeBehindFiles Include="**\*.capnp.cs" Exclude="@(CapnpFiles->'%(CodeBehindFile)')" />
 
     <!-- Support for Visual Studio Incremental Build
         https://github.com/techtalk/SpecFlow/issues/1319
@@ -69,9 +69,9 @@
   <PropertyGroup>
     <_CapnpcCsharp_TaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' And '$(_CapnpcCsharp_TaskFolder)' == ''">netcoreapp2.1</_CapnpcCsharp_TaskFolder>
     <_CapnpcCsharp_TaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' And '$(_CapnpcCsharp_TaskFolder)' == ''">net471</_CapnpcCsharp_TaskFolder>
-    <_CapnpcCsharp_TaskAssembly Condition=" '$(_CapnpcCsharp_TaskAssembly)' == '' ">..\tasks\$(_CapnpcCsharp_TaskFolder)\Capnpc.Csharp.MsBuild.Generation.dll</_CapnpcCsharp_TaskAssembly>
+    <_CapnpcCsharp_TaskAssembly Condition=" '$(_CapnpcCsharp_TaskAssembly)' == '' ">..\tasks\$(_CapnpcCsharp_TaskFolder)\CapnpC.CSharp.MsBuild.Generation.dll</_CapnpcCsharp_TaskAssembly>
   </PropertyGroup>
 
-  <Import Project="Capnpc.Csharp.MsBuild.Generation.tasks"/>
+  <Import Project="CapnpC.CSharp.MsBuild.Generation.tasks"/>
 
 </Project>

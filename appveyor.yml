@@ -29,7 +29,7 @@ before_build:
   - cmd: dotnet restore ./Capnp.Net.Runtime.Tests/Capnp.Net.Runtime.Tests.Std20.csproj --verbosity m
   - cmd: dotnet restore ./Capnp.Net.Runtime.Tests.Core21/Capnp.Net.Runtime.Tests.Core21.csproj --verbosity m
   - cmd: dotnet restore ./capnpc-csharp/capnpc-csharp.csproj --verbosity m  
-  - cmd: dotnet restore ./capnpc-csharp.tests/capnpc-csharp.tests.csproj --verbosity m  
+  - cmd: dotnet restore ./CapnpC.CSharp.Generator.Tests/CapnpC.CSharp.Generator.Tests.csproj --verbosity m  
 build_script:
   - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Debug"
   - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Release"
@@ -50,11 +50,12 @@ artifacts:
    type: NuGetPackage
 clone_depth: 1
 test_script:
-  - cmd: vstest.console /logger:Appveyor /inIsolation capnpc-csharp.tests\bin\Release\netcoreapp2.2\capnpc-csharp.tests.dll
+  - cmd: vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp2.2\CapnpC.CSharp.Generator.Tests.dll
   - cmd: cd %APPVEYOR_BUILD_FOLDER%\chocolatey\install
   - cmd: choco install capnpc-csharp --source=".;https://chocolatey.org/api/v2" --force -y
   - cmd: cd %APPVEYOR_BUILD_FOLDER%\install-test
   - cmd: compile-test
+  - cmd: vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp2.2\CapnpC.CSharp.Generator.Tests.dll
   - cmd: choco uninstall capnpc-csharp -y
   - cmd: notinstalled-test
   - cmd: cd %APPVEYOR_BUILD_FOLDER%\chocolatey\install

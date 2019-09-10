@@ -2,7 +2,7 @@
 using System.IO;
 using Microsoft.Build.Utilities;
 
-namespace Capnpc.Csharp.MsBuild.Generation
+namespace CapnpC.CSharp.MsBuild.Generation
 {
     public class CodeBehindWriter
     {
@@ -13,14 +13,8 @@ namespace Capnpc.Csharp.MsBuild.Generation
 
         public TaskLoggingHelper Log { get; }
 
-        public string WriteCodeBehindFile(string outputPath, string capnpFile, TestFileGeneratorResult testFileGeneratorResult)
+        public string WriteCodeBehindFile(string outputPath, CsFileGeneratorResult testFileGeneratorResult)
         {
-            //if (string.IsNullOrEmpty(testFileGeneratorResult.Filename))
-            //{
-            //    Log?.LogWithNameTag(Log.LogError, $"{featureFile} has no generated filename");
-            //    return null;
-            //}
-
             string directoryPath = Path.GetDirectoryName(outputPath) ?? throw new InvalidOperationException();
             Log?.LogWithNameTag(Log.LogMessage, directoryPath);
 
@@ -35,11 +29,6 @@ namespace Capnpc.Csharp.MsBuild.Generation
             }
             else
             {
-                if (!Directory.Exists(directoryPath))
-                {
-                    Directory.CreateDirectory(directoryPath);
-                }
-
                 File.WriteAllText(outputPath, testFileGeneratorResult.GeneratedCode);
             }
 

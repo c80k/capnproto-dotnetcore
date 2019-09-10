@@ -1,6 +1,6 @@
 ﻿<Project>
 
-  <Import Project="Capnpc.Csharp.MsBuild.Generation.props" Condition="'$(_CapnpcCsharpPropsImported)'==''"/>
+  <Import Project="CapnpC.CSharp.MsBuild.Generation.props" Condition="'$(_CapnpcCsharpPropsImported)'==''"/>
 
   <PropertyGroup Condition="'$(BuildServerMode)' == ''">
     <BuildServerMode Condition="'$(BuildingInsideVisualStudio)'=='true'">false</BuildServerMode>
@@ -48,9 +48,9 @@
   </ItemGroup>
 
 
-  <Target Name="WarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile" AfterTargets="CoreCompile"
+  <Target Name="WarnForCapnpCsharpCodeBehindFilesWithoutCorrespondingCapnpFile" AfterTargets="CoreCompile"
           Condition="'$(CapnpcCsharp_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingCapnpFile)' == 'true'">
-    <Warning Text="For codebehind file '@(SpecFlowObsoleteCodeBehindFiles)', no capnp file was found." File="@(SpecFlowObsoleteCodeBehindFiles)" Condition="'@(SpecFlowObsoleteCodeBehindFiles)' != ''" />
+    <Warning Text="For codebehind file '@(CapnpCsharpObsoleteCodeBehindFiles)', no capnp file was found." File="@(CapnpCsharpObsoleteCodeBehindFiles)" Condition="'@(CapnpCsharpObsoleteCodeBehindFiles)' != ''" />
   </Target>
 
 
@@ -100,7 +100,7 @@
                Condition="'%(Compile.Identity)' == '@(CapnpFiles->'%(CodeBehindFile)')'" />
 
       <!-- remove files which got obsolete, typically after rename operation, or getting changes from source control -->
-      <Compile Remove="@(SpecFlowObsoleteCodeBehindFiles)" />
+      <Compile Remove="@(CapnpCsharpObsoleteCodeBehindFiles)" />
     </ItemGroup>
 
   </Target>
@@ -128,6 +128,6 @@
          - after deletion of a capnp file
          - after pulling latest changes from version control with above changes
      -->
-    <Delete Files="@(SpecFlowObsoleteCodeBehindFiles)" ContinueOnError="true" />
+    <Delete Files="@(CapnpCsharpObsoleteCodeBehindFiles)" ContinueOnError="true" />
   </Target>
 </Project>
