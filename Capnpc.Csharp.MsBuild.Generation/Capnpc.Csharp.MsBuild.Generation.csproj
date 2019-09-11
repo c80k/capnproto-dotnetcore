@@ -14,7 +14,7 @@
     <Version>1.0.0</Version>
 
     <NuspecFile>$(MSBuildThisFileDirectory)CapnpC.CSharp.MsBuild.Generation.nuspec</NuspecFile>
-    <NuspecProperties>version=$(Version)</NuspecProperties>
+    <NuspecProperties>version=$(Version);configuration=$(Configuration)</NuspecProperties>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
