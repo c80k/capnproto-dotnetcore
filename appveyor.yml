@@ -32,6 +32,7 @@ before_build:
   - cmd: dotnet restore ./CapnpC.CSharp.Generator.Tests/CapnpC.CSharp.Generator.Tests.csproj --verbosity m  
   - cmd: dotnet restore ./CapnpC.CSharp.MsBuild.Generation/CapnpC.CSharp.MsBuild.Generation.csproj --verbosity m  
   - cmd: dotnet restore ./CapnpC.CSharp.MsBuild.Generation.Tests/CapnpC.CSharp.MsBuild.Generation.Tests.csproj --verbosity m  
+  - cmd: dotnet restore ./capnpc-csharp/capnpc-csharp.csproj --verbosity m  
 build_script:
   - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Debug"
   - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Release"
