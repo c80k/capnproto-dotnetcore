@@ -1,8 +1,8 @@
 version: '1.0.{build}'
 image: Visual Studio 2019
-branches:
-  only:
-  - master
+# branches:
+#  only:
+# - master
 cache:
   - c:\Tools\vcpkg\installed
 init:
@@ -28,8 +28,10 @@ before_build:
   - cmd: dotnet restore ./Capnp.Net.Runtime.Core21/Capnp.Net.Runtime.Core21.csproj --verbosity m
   - cmd: dotnet restore ./Capnp.Net.Runtime.Tests/Capnp.Net.Runtime.Tests.Std20.csproj --verbosity m
   - cmd: dotnet restore ./Capnp.Net.Runtime.Tests.Core21/Capnp.Net.Runtime.Tests.Core21.csproj --verbosity m
-  - cmd: dotnet restore ./capnpc-csharp/capnpc-csharp.csproj --verbosity m  
+  - cmd: dotnet restore ./CapnpC.CSharp.Generator/CapnpC.CSharp.Generator.csproj --verbosity m  
   - cmd: dotnet restore ./CapnpC.CSharp.Generator.Tests/CapnpC.CSharp.Generator.Tests.csproj --verbosity m  
+  - cmd: dotnet restore ./CapnpC.CSharp.MsBuild.Generation/CapnpC.CSharp.MsBuild.Generation.csproj --verbosity m  
+  - cmd: dotnet restore ./CapnpC.CSharp.MsBuild.Generation.Tests/CapnpC.CSharp.MsBuild.Generation.Tests.csproj --verbosity m  
 build_script:
   - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Debug"
   - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Release"
@@ -41,6 +43,9 @@ after_build:
 artifacts:
  - path: Capnp.Net.Runtime\bin\Release\Capnp.Net.Runtime.$(appveyor_build_version).nupkg
    name: Capnp.Net.Runtime
+   type: NuGetPackage
+ - path: CapnpC.CSharp.MsBuild.Generation\bin\Release\CapnpC.CSharp.MsBuild.Generation.$(appveyor_build_version).nupkg
+   name: CapnpC.CSharp.MsBuild.Generation
    type: NuGetPackage
  - path: chocolatey\install\capnpc-csharp-win-x86.$(appveyor_build_version).nupkg
    name: capnpc-csharp-win-x86
@@ -65,6 +70,7 @@ test_script:
   - cmd: choco uninstall capnpc-csharp-win-x86 -y
   - cmd: notinstalled-test
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
+  - cmd: vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.MsBuild.Generation.Tests\bin\Release\netcoreapp2.2\CapnpC.CSharp.MsBuild.Generation.Tests.dll
   - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Debug\netcoreapp2.2\Capnp.Net.Runtime.Tests.Std20.dll
   - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\netcoreapp2.2\Capnp.Net.Runtime.Tests.Std20.dll
   - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests.Core21\bin\Debug\netcoreapp2.2\Capnp.Net.Runtime.Tests.Core21.dll
