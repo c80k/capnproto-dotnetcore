@@ -61,6 +61,7 @@ test_script:
   - cmd: choco install capnpc-csharp --source=".;https://chocolatey.org/api/v2" --force -y
   - cmd: cd %APPVEYOR_BUILD_FOLDER%\install-test
   - cmd: compile-test
+  - cmd: cd %APPVEYOR_BUILD_FOLDER%
   - cmd: vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp2.2\CapnpC.CSharp.Generator.Tests.dll
   - cmd: choco uninstall capnpc-csharp -y
   - cmd: notinstalled-test
