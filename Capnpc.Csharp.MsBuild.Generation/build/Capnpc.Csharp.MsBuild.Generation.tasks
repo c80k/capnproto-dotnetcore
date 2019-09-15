@@ -1,3 +1,0 @@
-﻿<Project>
-  <UsingTask TaskName="CapnpC.CSharp.MsBuild.Generation.GenerateCapnpFileCodeBehindTask" AssemblyFile="$(_CapnpcCsharp_TaskAssembly)" />
-</Project>
