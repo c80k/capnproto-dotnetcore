@@ -13,8 +13,10 @@ namespace CapnpC.CSharp.MsBuild.Generation
         }
 
 
-        public CsFileGeneratorResult GenerateCodeBehindFile(string capnpFile)
+        public CsFileGeneratorResult GenerateCodeBehindFile(CapnpGenJob job)
         {
+            string capnpFile = job.CapnpPath;
+
             // Works around a weird capnp.exe behavior: When the input file is empty, it will spit out an exception dump
             // instead of a parse error. But the parse error is nice because it contains a generated ID. We want the parse error!
             // Workaround: Generate a temporary file that contains a single line break (such that it is not empty...)
@@ -27,7 +29,15 @@ namespace CapnpC.CSharp.MsBuild.Generation
                     File.WriteAllText(tempFile, Environment.NewLine);
                     try
                     {
-                        return GenerateCodeBehindFile(tempFile);
+                        var jobCopy = new CapnpGenJob()
+                        {
+                            CapnpPath = tempFile,
+                            WorkingDirectory = job.WorkingDirectory
+                        };
+
+                        jobCopy.AdditionalArguments.AddRange(job.AdditionalArguments);
+
+                        return GenerateCodeBehindFile(jobCopy);
                     }
                     finally
                     {
@@ -39,7 +49,11 @@ namespace CapnpC.CSharp.MsBuild.Generation
             {
             }
 
-            var result = CapnpCompilation.InvokeCapnpAndGenerate(new string[] { capnpFile });
+            var args = new List<string>();
+            args.AddRange(job.AdditionalArguments);
+            args.Add(capnpFile);
+
+            var result = CapnpCompilation.InvokeCapnpAndGenerate(args, job.WorkingDirectory);
 
             if (result.IsSuccess)
             {

@@ -25,12 +25,42 @@ namespace CapnpC.CSharp.MsBuild.Generation
 
         public ITaskItem[] CapnpFiles { get; set; }
 
-        public string WorkingDirectory { get; set; }
-
-        public string AdditionalOptions { get; set; }
-
         [Output]
         public ITaskItem[] GeneratedFiles { get; private set; }
+
+        static CapnpGenJob ToGenJob(ITaskItem item)
+        {
+            var job = new CapnpGenJob()
+            {
+                CapnpPath = item.GetMetadata("FullPath"),
+                WorkingDirectory = item.GetMetadata("WorkingDirectory")
+            };
+
+            string importPaths = item.GetMetadata("ImportPaths");
+
+            if (!string.IsNullOrWhiteSpace(importPaths))
+            {
+                job.AdditionalArguments.AddRange(importPaths.Split(new char[] { ';' }, 
+                    StringSplitOptions.RemoveEmptyEntries).Select(p => $"-I\"{p.TrimEnd('\\')}\""));
+            }
+
+            string sourcePrefix = item.GetMetadata("SourcePrefix");
+
+            if (!string.IsNullOrWhiteSpace(sourcePrefix))
+            {
+                job.AdditionalArguments.Add(sourcePrefix);
+            }
+
+
+            string verbose = item.GetMetadata("Verbose");
+
+            if ("true".Equals(verbose, StringComparison.OrdinalIgnoreCase))
+            {
+                job.AdditionalArguments.Add("--verbose");
+            }
+
+            return job;
+        }
 
         public override bool Execute()
         {
@@ -56,16 +86,14 @@ namespace CapnpC.CSharp.MsBuild.Generation
 
                 var generator = CodeBehindGenerator ?? new CapnpFileCodeBehindGenerator(Log);
 
-                Log.LogWithNameTag(Log.LogMessage, "Starting GenerateFeatureFileCodeBehind");
+                Log.LogWithNameTag(Log.LogMessage, "Starting GenerateCapnpFileCodeBehind");
 
-                var capnpFiles = CapnpFiles?.Select(i => i.ItemSpec).ToList() ?? new List<string>();
+                var capnpFiles = CapnpFiles?.Select(ToGenJob).ToList() ?? new List<CapnpGenJob>();
 
                 var generatedFiles = generator.GenerateFilesForProject(
                     ProjectPath,
                     capnpFiles,
-                    ProjectFolder,
-                    WorkingDirectory,
-                    AdditionalOptions);
+                    ProjectFolder);
 
                 GeneratedFiles = generatedFiles.Select(file => new TaskItem { ItemSpec = file }).ToArray();
 

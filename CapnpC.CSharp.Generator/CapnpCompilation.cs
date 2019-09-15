@@ -45,9 +45,10 @@ namespace CapnpC.CSharp.Generator
         /// Invokes "capnp.exe -o-" with given additional arguments and redirects the output to the C# generator backend.
         /// </summary>
         /// <param name="arguments">additional command line arguments</param>
+        /// <param name="workingDirectory">optional working directory</param>
         /// <returns>generation result</returns>
         /// <exception cref="ArgumentNullException"><paramref name="arguments"/>is null</exception>
-        public static GenerationResult InvokeCapnpAndGenerate(IEnumerable<string> arguments)
+        public static GenerationResult InvokeCapnpAndGenerate(IEnumerable<string> arguments, string workingDirectory = null)
         {
             if (arguments == null)
                 throw new ArgumentNullException(nameof(arguments));
@@ -64,6 +65,10 @@ namespace CapnpC.CSharp.Generator
                 compiler.StartInfo.UseShellExecute = false;
                 compiler.StartInfo.RedirectStandardOutput = true;
                 compiler.StartInfo.RedirectStandardError = true;
+                if (!string.IsNullOrWhiteSpace(workingDirectory))
+                {
+                    compiler.StartInfo.WorkingDirectory = workingDirectory;
+                }
 
                 try
                 {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 namespace CapnpC.CSharp.MsBuild.Generation
@@ -18,10 +19,8 @@ namespace CapnpC.CSharp.MsBuild.Generation
 
         public IEnumerable<string> GenerateFilesForProject(
             string projectPath,
-            List<string> capnpFiles,            
-            string projectFolder,
-            string workingDirectory, 
-            string additionalOptions)
+            List<CapnpGenJob> capnpFiles,
+            string projectFolder)
         {
             using (var capnpCodeBehindGenerator = new CapnpCodeBehindGenerator())
             {
@@ -34,9 +33,14 @@ namespace CapnpC.CSharp.MsBuild.Generation
                     yield break;
                 }
 
-                foreach (var capnpFile in capnpFiles)
+                foreach (var genJob in capnpFiles)
                 {
-                    var generatorResult = capnpCodeBehindGenerator.GenerateCodeBehindFile(capnpFile);
+                    Log.LogMessage(MessageImportance.Normal, "Generate {0}, working dir = {1}, options = {2}", 
+                        genJob.CapnpPath,
+                        genJob.WorkingDirectory,
+                        string.Join(" ", genJob.AdditionalArguments));
+
+                    var generatorResult = capnpCodeBehindGenerator.GenerateCodeBehindFile(genJob);
 
                     if (!generatorResult.Success)
                     {
@@ -55,7 +59,7 @@ namespace CapnpC.CSharp.MsBuild.Generation
                                         subcategory: null,
                                         errorCode: null,
                                         helpKeyword: null,
-                                        file: capnpFile,
+                                        file: genJob.CapnpPath,
                                         lineNumber: message.Line,
                                         columnNumber: message.Column,
                                         endLineNumber: message.Line,

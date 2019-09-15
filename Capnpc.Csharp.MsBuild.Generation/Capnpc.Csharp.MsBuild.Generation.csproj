@@ -11,19 +11,22 @@
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    <Version>1.0.0</Version>
-
+    <Version>1.0-local$([System.DateTime]::UtcNow.ToString(yyMMddHHmm))</Version>
+    
     <NuspecFile>$(MSBuildThisFileDirectory)CapnpC.CSharp.MsBuild.Generation.nuspec</NuspecFile>
     <NuspecProperties>version=$(Version);configuration=$(Configuration)</NuspecProperties>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageOutputPath>..\bin\$(Configuration)</PackageOutputPath>
+    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Composition" />
     <PackageReference Include="Microsoft.VisualStudio.ProjectSystem" />
     <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.SDK" />
     <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.SDK.Tools" />
     <PackageReference Include="Microsoft.VisualStudio.Threading" />
+    <PackageReference Include="Microsoft.Xaml" />
     <PackageReference Include="System.Collections.Immutable" />
   </ItemGroup>
 
@@ -41,7 +44,8 @@
     <PackageReference Update="Microsoft.VisualStudio.ProjectSystem" Version="15.8.243" />
     <PackageReference Update="Microsoft.VisualStudio.ProjectSystem.SDK" Version="15.8.243" />
     <PackageReference Update="Microsoft.VisualStudio.ProjectSystem.SDK.Tools" Version="15.8.243" />
-    <PackageReference Update="Microsoft.VisualStudio.Threading" Version="15.8.132" />
+    <PackageReference Update="Microsoft.VisualStudio.Threading" Version="16.3.52" />
+    <PackageReference Update="Microsoft.Xaml" Version="4.0.0.1" />
     <PackageReference Update="System.Collections.Immutable" Version="1.5.0" />
   </ItemGroup>
 
@@ -102,5 +106,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="rmdir /s /q $(SolutionDir)MsBuildGenerationTest\obj" />
+  </Target>
 
 </Project>

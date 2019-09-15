@@ -332,3 +332,8 @@ ASALocalRun/
 .mfractor/
 .vscode/tasks.json
 .vscode/launch.json
+
+# Capnp code behind
+.capnp.cs
+/globalPackages
+*.cs

@@ -42,10 +42,10 @@ build_script:
 after_build:
   # For once the build has completed
 artifacts:
- - path: Capnp.Net.Runtime\bin\Release\Capnp.Net.Runtime.$(appveyor_build_version).nupkg
+ - path: bin\Release\Capnp.Net.Runtime.$(appveyor_build_version).nupkg
    name: Capnp.Net.Runtime
    type: NuGetPackage
- - path: CapnpC.CSharp.MsBuild.Generation\bin\Release\CapnpC.CSharp.MsBuild.Generation.$(appveyor_build_version).nupkg
+ - path: bin\Release\CapnpC.CSharp.MsBuild.Generation.$(appveyor_build_version).nupkg
    name: CapnpC.CSharp.MsBuild.Generation
    type: NuGetPackage
  - path: chocolatey\install\capnpc-csharp-win-x86.$(appveyor_build_version).nupkg

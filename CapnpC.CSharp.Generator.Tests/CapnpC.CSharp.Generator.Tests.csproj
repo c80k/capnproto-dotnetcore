@@ -5,6 +5,8 @@
     <RootNamespace>CapnpC.CSharp.Generator.Tests</RootNamespace>
 
     <IsPackable>false</IsPackable>
+
+    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -61,6 +63,7 @@
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>CodeGenerator.feature.cs</LastGenOutput>
       <Generator Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'"></Generator>
+      <Generator Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|AnyCPU'"></Generator>
     </SpecFlowFeatureFiles>
   </ItemGroup>
   

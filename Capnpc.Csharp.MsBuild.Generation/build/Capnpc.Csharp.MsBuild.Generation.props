@@ -47,6 +47,7 @@
     <CapnpFiles Include="**\*.capnp" >
       <CodeBehindFile>%(RelativeDir)%(Filename).capnp.cs</CodeBehindFile>
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <WorkingDirectory>$(ProjectDir)</WorkingDirectory>
     </CapnpFiles>
 
     <!-- obsolete codebehind files, scenarios:

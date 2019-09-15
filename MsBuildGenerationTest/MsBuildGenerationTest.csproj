@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <CapnpFiles Remove="capnp\persistent.capnp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Capnp.Net.Runtime" Version="1.0-local*" />
+    <PackageReference Include="CapnpC.CSharp.MsBuild.Generation" Version="1.0-local*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <CapnpFiles Update="capnp\c++.capnp">
+      <WorkingDirectory>$(ProjectDir)</WorkingDirectory>
+      <Verbose Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">true</Verbose>
+    </CapnpFiles>
+    <CapnpFiles Update="capnp\compat\json-test.capnp">
+      <WorkingDirectory>$(ProjectDir)</WorkingDirectory>
+      <ImportPaths>$(ProjectDir);%(ImportPaths)</ImportPaths>
+    </CapnpFiles>
+    <CapnpFiles Update="capnp\compat\json.capnp">
+      <WorkingDirectory>$(ProjectDir)</WorkingDirectory>
+      <ImportPaths>$(ProjectDir);%(ImportPaths)</ImportPaths>
+    </CapnpFiles>
+    <CapnpFiles Update="capnp\rpc-twoparty.capnp">
+      <WorkingDirectory>$(ProjectDir)</WorkingDirectory>
+      <ImportPaths>$(ProjectDir);%(ImportPaths)</ImportPaths>
+    </CapnpFiles>
+    <CapnpFiles Update="capnp\rpc.capnp">
+      <WorkingDirectory>$(ProjectDir)</WorkingDirectory>
+      <ImportPaths>$(ProjectDir);%(ImportPaths)</ImportPaths>
+    </CapnpFiles>
+    <CapnpFiles Update="capnp\schema.capnp">
+      <WorkingDirectory>$(ProjectDir)</WorkingDirectory>
+      <ImportPaths>$(ProjectDir);%(ImportPaths)</ImportPaths>
+    </CapnpFiles>
+    <CapnpFiles Update="capnp\test-import.capnp">
+      <WorkingDirectory>$(ProjectDir)</WorkingDirectory>
+      <ImportPaths>$(ProjectDir);%(ImportPaths)</ImportPaths>
+    </CapnpFiles>
+    <CapnpFiles Update="capnp\test-import2.capnp">
+      <WorkingDirectory>$(ProjectDir)</WorkingDirectory>
+      <ImportPaths>$(ProjectDir);%(ImportPaths)</ImportPaths>
+    </CapnpFiles>
+    <CapnpFiles Update="capnp\test.capnp">
+      <WorkingDirectory>$(ProjectDir)</WorkingDirectory>
+      <ImportPaths>$(ProjectDir);%(ImportPaths)</ImportPaths>
+    </CapnpFiles>
+  </ItemGroup>
+
+</Project>

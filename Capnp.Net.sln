@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapnpC.CSharp.MsBuild.Gener
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapnpC.CSharp.Generator", "CapnpC.CSharp.Generator\CapnpC.CSharp.Generator.csproj", "{C3A3BB49-356E-4762-A190-76D877BE18F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CapnpC.CSharp.MsBuild.Generation.Tests", "CapnpC.CSharp.MsBuild.Generation.Tests\CapnpC.CSharp.MsBuild.Generation.Tests.csproj", "{EF05AD68-DE31-448E-B88D-4144F928ED5D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapnpC.CSharp.MsBuild.Generation.Tests", "CapnpC.CSharp.MsBuild.Generation.Tests\CapnpC.CSharp.MsBuild.Generation.Tests.csproj", "{EF05AD68-DE31-448E-B88D-4144F928ED5D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
