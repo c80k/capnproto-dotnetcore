@@ -26,7 +26,6 @@
     <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.SDK" />
     <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.SDK.Tools" />
     <PackageReference Include="Microsoft.VisualStudio.Threading" />
-    <PackageReference Include="Microsoft.Xaml" />
     <PackageReference Include="System.Collections.Immutable" />
   </ItemGroup>
 

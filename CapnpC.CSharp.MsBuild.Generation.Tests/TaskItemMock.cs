@@ -23,7 +23,12 @@ namespace CapnpC.CSharp.MsBuild.Generation.Tests
 
         public string GetMetadata(string metadataName)
         {
-            return null;
+            if (metadataName == "FullPath")
+            {
+                return ItemSpec;
+            }
+
+            return string.Empty;
         }
 
         public void RemoveMetadata(string metadataName)
