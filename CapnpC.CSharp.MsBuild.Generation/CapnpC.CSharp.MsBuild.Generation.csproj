@@ -1,0 +1,114 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net471;netcoreapp2.1</TargetFrameworks>
+    <SignAssembly>false</SignAssembly>
+    
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.0-local$([System.DateTime]::UtcNow.ToString(yyMMddHHmm))</Version>
+    
+    <NuspecFile>$(MSBuildThisFileDirectory)CapnpC.CSharp.MsBuild.Generation.nuspec</NuspecFile>
+    <NuspecProperties>version=$(Version);configuration=$(Configuration)</NuspecProperties>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageOutputPath>..\bin\$(Configuration)</PackageOutputPath>
+    <Configurations>Debug;Release</Configurations>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Composition" />
+    <PackageReference Include="Microsoft.VisualStudio.ProjectSystem" />
+    <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.SDK" />
+    <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.SDK.Tools" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading" />
+    <PackageReference Include="Microsoft.Xaml" />
+    <PackageReference Include="System.Collections.Immutable" />
+  </ItemGroup>
+
+  <ItemDefinitionGroup>
+    <PackageReference>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+  </ItemDefinitionGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Framework" Version="15.8.166" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.8.166" />
+    <PackageReference Update="@(PackageReference)" PrivateAssets="All" />
+    <PackageReference Update="Microsoft.VisualStudio.Composition" Version="15.8.98" />
+    <PackageReference Update="Microsoft.VisualStudio.ProjectSystem" Version="15.8.243" />
+    <PackageReference Update="Microsoft.VisualStudio.ProjectSystem.SDK" Version="15.8.243" />
+    <PackageReference Update="Microsoft.VisualStudio.ProjectSystem.SDK.Tools" Version="15.8.243" />
+    <PackageReference Update="Microsoft.VisualStudio.Threading" Version="16.3.52" />
+    <PackageReference Update="Microsoft.Xaml" Version="4.0.0.1" />
+    <PackageReference Update="System.Collections.Immutable" Version="1.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="FrameworkDependent\**\*.cs" />
+    <Compile Include="FrameworkDependent\*.cs" />
+    <None Include="FrameworkDependent\**\*.cs" />
+    <Compile Include="FrameworkDependent\FullFramework\**\*.cs" Condition="'$(TargetFramework)' == '$(CapnpcCsharp_FullFramework_Tools_TFM)'" />
+    <Compile Include="FrameworkDependent\DotNetCore\**\*.cs" Condition="'$(TargetFramework)' == '$(CapnpcCsharp_Core_Tools_TFM)'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="FrameworkDependent\DotNetCore\" />
+    <Folder Include="FrameworkDependent\FullFramework\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CapnpC.CSharp.Generator\CapnpC.CSharp.Generator.csproj">
+      <Private>true</Private>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.Build">
+      <HintPath>Microsoft.Build</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Build.Framework">
+      <HintPath>Microsoft.Build.Framework</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Build.Utilities.Core">
+      <HintPath>Microsoft.Build.Utilities.Core</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="buildMultiTargeting\CapnpC.CSharp.MsBuild.Generation.props">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="build\CapnpC.CSharp.MsBuild.Generation.props">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="build\CapnpC.CSharp.MsBuild.Generation.targets">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="build\CapnpC.CSharp.MsBuild.Generation.tasks">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="build\CPS\Buildsystem\CpsExtension.DesignTime.targets">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="build\CPS\Buildsystem\Rules\CapnpFileType.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="build\CPS\Buildsystem\Rules\ProjectItemsSchema.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="rmdir /s /q $(SolutionDir)MsBuildGenerationTest\obj" />
+  </Target>
+
+</Project>
