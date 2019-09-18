@@ -93,5 +93,20 @@ namespace CapnpC.Generator
             LiteralExpression(
                 SyntaxKind.NumericLiteralExpression,
                 Literal($"0x{id:x}UL", id));
+
+        public static FieldDeclarationSyntax MakeTypeIdConst(ulong id, GenNames names) =>
+            FieldDeclaration(
+                VariableDeclaration(
+                    IdentifierName("UInt64"))
+                .WithVariables(
+                    SingletonSeparatedList<VariableDeclaratorSyntax>(
+                        VariableDeclarator(names.TypeIdField.Identifier)
+                        .WithInitializer(
+                            EqualsValueClause(HexLiteral(id))))))
+                .WithModifiers(
+                    TokenList(
+                        new[]{
+                            Token(SyntaxKind.PublicKeyword),
+                            Token(SyntaxKind.ConstKeyword)}));
     }
 }
