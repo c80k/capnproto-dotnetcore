@@ -71,6 +71,8 @@
                     .AddConstraintClauses(MakeTypeParameterConstraints(def).ToArray());
             }
 
+            topDecl = topDecl.AddMembers(CommonSnippetGen.MakeTypeIdConst(def.Id, _names));
+
             if (def.UnionInfo != null)
             {
                 topDecl = topDecl.AddMembers(_commonGen.MakeUnionSelectorEnum(def));
