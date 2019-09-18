@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Capnproto_test.Capnp.Test
 {
+    [TypeId(0x9c8e9318b29d9cd3UL)]
     public enum TestEnum : ushort
     {
         foo,
@@ -4995,6 +4996,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
+        [TypeId(0xb651d2fba42056d4UL)]
         public enum NestedEnum : ushort
         {
             foo,
@@ -5077,6 +5079,7 @@ namespace Capnproto_test.Capnp.Test
                 }
             }
 
+            [TypeId(0xcfa0d546993a3df3UL)]
             public enum NestedEnum : ushort
             {
                 baz,
@@ -15757,6 +15760,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
+        [TypeId(0xef428f2f67c4d439UL)]
         public enum Tag : ushort
         {
             testInterface,
@@ -16289,6 +16293,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
+        [TypeId(0xf610d1deb4c9e84aUL)]
         public enum BadlyNamedEnum : ushort
         {
             foo,
@@ -16370,6 +16375,7 @@ namespace Capnproto_test.Capnp.Test
                 }
             }
 
+            [TypeId(0xf6cb3f9c7a4322e0UL)]
             public enum DeeplyNestedEnum : ushort
             {
                 quux,

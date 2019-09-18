@@ -52,6 +52,7 @@ namespace CapnpC.Generator
         public EnumDeclarationSyntax MakeEnum(TypeDefinition def)
         {
             var decl = EnumDeclaration(def.Name)
+                .WithAttributeLists(MakeTypeIdAttributeLists(def.Id))
                 .AddModifiers(Public)
                 .AddBaseListTypes(SimpleBaseType(Type<ushort>()));
 
