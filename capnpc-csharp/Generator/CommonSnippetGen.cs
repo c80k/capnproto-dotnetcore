@@ -89,5 +89,9 @@ namespace CapnpC.Generator
             }
         }
 
+        static LiteralExpressionSyntax HexLiteral(ulong id) =>
+            LiteralExpression(
+                SyntaxKind.NumericLiteralExpression,
+                Literal($"0x{id:x}UL", id));
     }
 }
