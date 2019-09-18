@@ -8463,7 +8463,7 @@ namespace Capnproto_test.Capnp.Test
                     }
                 }
 
-                [Proxy(typeof(DeepNestInterfaceProxy<>)), Skeleton(typeof(DeepNestInterfaceSkeleton<>))]
+                [TypeId(0x8839ed86c9794287UL), Proxy(typeof(DeepNestInterfaceProxy<>)), Skeleton(typeof(DeepNestInterfaceSkeleton<>))]
                 public interface IDeepNestInterface<TQuux> : IDisposable
                 {
                     Task Call(CancellationToken cancellationToken_ = default);
@@ -8595,7 +8595,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [Proxy(typeof(InterfaceProxy<>)), Skeleton(typeof(InterfaceSkeleton<>))]
+        [TypeId(0xc9e749e8dd54da5cUL), Proxy(typeof(InterfaceProxy<>)), Skeleton(typeof(InterfaceSkeleton<>))]
         public interface IInterface<TQux> : IDisposable
         {
             Task<(TQux, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>)> Call(Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<string> arg_, CancellationToken cancellationToken_ = default);
@@ -8974,7 +8974,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [Proxy(typeof(TestImplicitMethodParamsProxy)), Skeleton(typeof(TestImplicitMethodParamsSkeleton))]
+    [TypeId(0x8b9717a3f8d85a9aUL), Proxy(typeof(TestImplicitMethodParamsProxy)), Skeleton(typeof(TestImplicitMethodParamsSkeleton))]
     public interface ITestImplicitMethodParams : IDisposable
     {
         Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT foo, TU bar, CancellationToken cancellationToken_ = default)
@@ -9101,7 +9101,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [Proxy(typeof(TestImplicitMethodParamsInGenericProxy<>)), Skeleton(typeof(TestImplicitMethodParamsInGenericSkeleton<>))]
+    [TypeId(0xdf9ccdeb81a704c9UL), Proxy(typeof(TestImplicitMethodParamsInGenericProxy<>)), Skeleton(typeof(TestImplicitMethodParamsInGenericSkeleton<>))]
     public interface ITestImplicitMethodParamsInGeneric<TV> : IDisposable
     {
         Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT foo, TU bar, CancellationToken cancellationToken_ = default)
@@ -10010,7 +10010,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [Proxy(typeof(TestInterfaceProxy)), Skeleton(typeof(TestInterfaceSkeleton))]
+    [TypeId(0x88eb12a0e0af92b2UL), Proxy(typeof(TestInterfaceProxy)), Skeleton(typeof(TestInterfaceSkeleton))]
     public interface ITestInterface : IDisposable
     {
         Task<string> Foo(uint i, bool j, CancellationToken cancellationToken_ = default);
@@ -10425,7 +10425,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [Proxy(typeof(TestExtendsProxy)), Skeleton(typeof(TestExtendsSkeleton))]
+    [TypeId(0xe4e9bac98670b748UL), Proxy(typeof(TestExtendsProxy)), Skeleton(typeof(TestExtendsSkeleton))]
     public interface ITestExtends : Capnproto_test.Capnp.Test.ITestInterface
     {
         Task Qux(CancellationToken cancellationToken_ = default);
@@ -10718,7 +10718,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [Proxy(typeof(TestExtends2Proxy)), Skeleton(typeof(TestExtends2Skeleton))]
+    [TypeId(0x98d7e0ef61488783UL), Proxy(typeof(TestExtends2Proxy)), Skeleton(typeof(TestExtends2Skeleton))]
     public interface ITestExtends2 : Capnproto_test.Capnp.Test.ITestExtends
     {
     }
@@ -10800,7 +10800,7 @@ namespace Capnproto_test.Capnp.Test
         public override ulong InterfaceId => 11013518732491786115UL;
     }
 
-    [Proxy(typeof(TestPipelineProxy)), Skeleton(typeof(TestPipelineSkeleton))]
+    [TypeId(0xa5a404caa61d4cd0UL), Proxy(typeof(TestPipelineProxy)), Skeleton(typeof(TestPipelineSkeleton))]
     public interface ITestPipeline : IDisposable
     {
         Task<(string, Capnproto_test.Capnp.Test.TestPipeline.Box)> GetCap(uint n, Capnproto_test.Capnp.Test.ITestInterface inCap, CancellationToken cancellationToken_ = default);
@@ -11470,7 +11470,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [Proxy(typeof(TestCallOrderProxy)), Skeleton(typeof(TestCallOrderSkeleton))]
+    [TypeId(0xa0e77035bdff0051UL), Proxy(typeof(TestCallOrderProxy)), Skeleton(typeof(TestCallOrderSkeleton))]
     public interface ITestCallOrder : IDisposable
     {
         Task<uint> GetCallSequence(uint expected, CancellationToken cancellationToken_ = default);
@@ -11636,7 +11636,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [Proxy(typeof(TestTailCalleeProxy)), Skeleton(typeof(TestTailCalleeSkeleton))]
+    [TypeId(0xddd699207eb8e23bUL), Proxy(typeof(TestTailCalleeProxy)), Skeleton(typeof(TestTailCalleeSkeleton))]
     public interface ITestTailCallee : IDisposable
     {
         Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int i, string t, CancellationToken cancellationToken_ = default);
@@ -11859,7 +11859,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [Proxy(typeof(TestTailCallerProxy)), Skeleton(typeof(TestTailCallerSkeleton))]
+    [TypeId(0x870bf40110ce3035UL), Proxy(typeof(TestTailCallerProxy)), Skeleton(typeof(TestTailCallerSkeleton))]
     public interface ITestTailCaller : IDisposable
     {
         Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int i, Capnproto_test.Capnp.Test.ITestTailCallee callee, CancellationToken cancellationToken_ = default);
@@ -11987,7 +11987,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [Proxy(typeof(TestHandleProxy)), Skeleton(typeof(TestHandleSkeleton))]
+    [TypeId(0xa38e5efe41e53a15UL), Proxy(typeof(TestHandleProxy)), Skeleton(typeof(TestHandleSkeleton))]
     public interface ITestHandle : IDisposable
     {
     }
@@ -12006,7 +12006,7 @@ namespace Capnproto_test.Capnp.Test
         public override ulong InterfaceId => 11785461720995412501UL;
     }
 
-    [Proxy(typeof(TestMoreStuffProxy)), Skeleton(typeof(TestMoreStuffSkeleton))]
+    [TypeId(0xddc70bf9784133cfUL), Proxy(typeof(TestMoreStuffProxy)), Skeleton(typeof(TestMoreStuffSkeleton))]
     public interface ITestMoreStuff : Capnproto_test.Capnp.Test.ITestCallOrder
     {
         Task<string> CallFoo(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default);
@@ -13902,7 +13902,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [Proxy(typeof(TestMembraneProxy)), Skeleton(typeof(TestMembraneSkeleton))]
+    [TypeId(0xc07d8dcd80a69c0cUL), Proxy(typeof(TestMembraneProxy)), Skeleton(typeof(TestMembraneSkeleton))]
     public interface ITestMembrane : IDisposable
     {
         Task<Capnproto_test.Capnp.Test.TestMembrane.IThing> MakeThing(CancellationToken cancellationToken_ = default);
@@ -14058,7 +14058,7 @@ namespace Capnproto_test.Capnp.Test
 
     public static class TestMembrane
     {
-        [Proxy(typeof(ThingProxy)), Skeleton(typeof(ThingSkeleton))]
+        [TypeId(0x9352e4e41f173917UL), Proxy(typeof(ThingProxy)), Skeleton(typeof(ThingSkeleton))]
         public interface IThing : IDisposable
         {
             Task<Capnproto_test.Capnp.Test.TestMembrane.Result> PassThrough(CancellationToken cancellationToken_ = default);
@@ -14952,7 +14952,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [Proxy(typeof(TestKeywordMethodsProxy)), Skeleton(typeof(TestKeywordMethodsSkeleton))]
+    [TypeId(0x9ae342d394247cfcUL), Proxy(typeof(TestKeywordMethodsProxy)), Skeleton(typeof(TestKeywordMethodsSkeleton))]
     public interface ITestKeywordMethods : IDisposable
     {
         Task Delete(CancellationToken cancellationToken_ = default);
@@ -15408,7 +15408,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [Proxy(typeof(TestAuthenticatedBootstrapProxy<>)), Skeleton(typeof(TestAuthenticatedBootstrapSkeleton<>))]
+    [TypeId(0xea72cc77253798cdUL), Proxy(typeof(TestAuthenticatedBootstrapProxy<>)), Skeleton(typeof(TestAuthenticatedBootstrapSkeleton<>))]
     public interface ITestAuthenticatedBootstrap<TVatId> : IDisposable
     {
         Task<TVatId> GetCallerId(CancellationToken cancellationToken_ = default);
@@ -16379,7 +16379,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [Proxy(typeof(TestNameAnnotationInterfaceProxy)), Skeleton(typeof(TestNameAnnotationInterfaceSkeleton))]
+    [TypeId(0xd112a69d31ed918bUL), Proxy(typeof(TestNameAnnotationInterfaceProxy)), Skeleton(typeof(TestNameAnnotationInterfaceSkeleton))]
     public interface ITestNameAnnotationInterface : IDisposable
     {
         Task BadlyNamedMethod(byte badlyNamedParam, CancellationToken cancellationToken_ = default);
