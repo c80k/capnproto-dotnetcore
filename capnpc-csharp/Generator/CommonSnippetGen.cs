@@ -108,5 +108,19 @@ namespace CapnpC.Generator
                         new[]{
                             Token(SyntaxKind.PublicKeyword),
                             Token(SyntaxKind.ConstKeyword)}));
+
+        public static AttributeSyntax MakeTypeIdAttribute(ulong id) =>
+            Attribute(
+                IdentifierName("TypeId"))
+            .WithArgumentList(
+                AttributeArgumentList(
+                    SingletonSeparatedList<AttributeArgumentSyntax>(
+                        AttributeArgument(HexLiteral(id)))));
+
+        public static SyntaxList<AttributeListSyntax> MakeTypeIdAttributeLists(ulong id) =>
+            SingletonList<AttributeListSyntax>(
+                AttributeList(
+                    SingletonSeparatedList<AttributeSyntax>(
+                        CommonSnippetGen.MakeTypeIdAttribute(id))));
     }
 }
