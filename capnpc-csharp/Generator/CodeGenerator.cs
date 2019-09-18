@@ -72,6 +72,7 @@
             }
 
             topDecl = topDecl.AddMembers(CommonSnippetGen.MakeTypeIdConst(def.Id, _names));
+            topDecl = topDecl.WithAttributeLists(CommonSnippetGen.MakeTypeIdAttributeLists(def.Id));
 
             if (def.UnionInfo != null)
             {
