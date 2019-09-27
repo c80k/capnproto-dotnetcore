@@ -23,7 +23,7 @@ namespace Capnp
         /// <exception cref="IOException">An I/O error occurs.</exception>
         /// <exception cref="InvalidDataException">Encountered invalid framing data, too many or too large segments</exception>
         /// <exception cref="OutOfMemoryException">Too many or too large segments, probably due to invalid framing data.</exception>
-        public static WireFrame ReadSegments(Stream stream, bool isPacked)
+        public static WireFrame ReadSegments(Stream stream, bool isPacked = false)
         {
             if (isPacked)
             {
