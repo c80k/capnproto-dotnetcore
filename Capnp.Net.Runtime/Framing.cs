@@ -23,8 +23,17 @@ namespace Capnp
         /// <exception cref="IOException">An I/O error occurs.</exception>
         /// <exception cref="InvalidDataException">Encountered invalid framing data, too many or too large segments</exception>
         /// <exception cref="OutOfMemoryException">Too many or too large segments, probably due to invalid framing data.</exception>
-        public static WireFrame ReadSegments(Stream stream)
+        public static WireFrame ReadSegments(Stream stream, bool isPacked)
         {
+            if (isPacked)
+            {
+                using (var reader = new BinaryReader(stream, Encoding.Default, true))
+                {
+                    stream = reader.Unpack();
+                    stream.Position = 0;
+                }
+            }
+
             using (var reader = new BinaryReader(stream, Encoding.Default, true))
             {
                 return reader.ReadWireFrame();
@@ -79,7 +88,80 @@ namespace Capnp
 
             return new WireFrame(buffers);
         }
-        
+
+        private static MemoryStream Unpack(this BinaryReader reader)
+        {
+            MemoryStream memStream = new MemoryStream();
+
+            RecursiveUnpackByteArray(reader, memStream);
+
+            return memStream;
+        }
+
+        /// <summary>
+        /// Unwraps the packed message into a unpacked memorystream
+        /// </summary>
+        /// <param name="reader">The packed binaryreader</param>
+        /// <param name="unpackedBytes">The unpacked memorystream</param>
+        private static void RecursiveUnpackByteArray(BinaryReader reader, MemoryStream unpackedBytes)
+        {
+            const byte cEmptyByte = 0x00;
+            const byte cBit = 0x01;
+            const byte cFullByte = 0xFF;
+
+            if (reader.BaseStream.Position == reader.BaseStream.Length)
+            {
+                return;
+            }
+
+            byte tag = reader.ReadByte();
+            if (tag == cEmptyByte)
+            {
+                if (reader.BaseStream.Position < reader.BaseStream.Length)
+                {
+                    int repeatNullByteCount = reader.ReadByte();
+                    if (repeatNullByteCount == cEmptyByte)
+                    {
+                        return;
+                    }
+
+                    repeatNullByteCount = (repeatNullByteCount + 1) * 8 ;
+                    unpackedBytes.Write(new byte[repeatNullByteCount], 0, repeatNullByteCount);
+                }
+            }
+            else
+            {
+                for (byte tagIndex = 0; tagIndex < 8; tagIndex++)
+                {
+                    if (((tag >> tagIndex) & cBit) == cBit)
+                    {
+                        if (reader.BaseStream.Position != reader.BaseStream.Length)
+                        {
+                            unpackedBytes.WriteByte(reader.ReadByte());
+                        }
+                    }
+                    else
+                    {
+                        unpackedBytes.WriteByte(cEmptyByte);
+                    }
+                }
+                if (tag == cFullByte)
+                {
+                    if (reader.BaseStream.Position + 2 <= reader.BaseStream.Length)
+                    {
+                        int repeatableCount = reader.ReadByte();
+                        byte repeatableByte = reader.ReadByte();
+                        for (int i = 0; i < repeatableCount * 8; i++)
+                        {
+                            unpackedBytes.WriteByte(repeatableByte);
+                        }
+                    }
+                }
+            }
+
+            RecursiveUnpackByteArray(reader, unpackedBytes);
+        }
+
         static void FillBuffersFromFrames(Memory<ulong>[] buffers, uint segmentCount, BinaryReader reader)
         {
             for (uint i = 0; i < segmentCount; i++)
