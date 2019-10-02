@@ -334,5 +334,5 @@ ASALocalRun/
 .vscode/launch.json
 
 # Capnp code behind
-.capnp.cs
+*.capnp.cs
 /globalPackages
