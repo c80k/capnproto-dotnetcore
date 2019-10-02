@@ -97,6 +97,7 @@ namespace CapnpC.Generator
                 .AddAttributeLists(
                     AttributeList()
                         .AddAttributes(
+                            CommonSnippetGen.MakeTypeIdAttribute(type.Id),
                             Attribute(IdentifierName("Proxy"))
                                 .AddArgumentListArguments(
                                     AttributeArgument(

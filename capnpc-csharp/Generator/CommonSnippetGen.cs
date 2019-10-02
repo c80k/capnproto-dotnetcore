@@ -52,6 +52,7 @@ namespace CapnpC.Generator
         public EnumDeclarationSyntax MakeEnum(TypeDefinition def)
         {
             var decl = EnumDeclaration(def.Name)
+                .WithAttributeLists(MakeTypeIdAttributeLists(def.Id))
                 .AddModifiers(Public)
                 .AddBaseListTypes(SimpleBaseType(Type<ushort>()));
 
@@ -89,5 +90,38 @@ namespace CapnpC.Generator
             }
         }
 
+        static LiteralExpressionSyntax HexLiteral(ulong id) =>
+            LiteralExpression(
+                SyntaxKind.NumericLiteralExpression,
+                Literal($"0x{id:x}UL", id));
+
+        public static FieldDeclarationSyntax MakeTypeIdConst(ulong id, GenNames names) =>
+            FieldDeclaration(
+                VariableDeclaration(
+                    IdentifierName("UInt64"))
+                .WithVariables(
+                    SingletonSeparatedList<VariableDeclaratorSyntax>(
+                        VariableDeclarator(names.TypeIdField.Identifier)
+                        .WithInitializer(
+                            EqualsValueClause(HexLiteral(id))))))
+                .WithModifiers(
+                    TokenList(
+                        new[]{
+                            Token(SyntaxKind.PublicKeyword),
+                            Token(SyntaxKind.ConstKeyword)}));
+
+        public static AttributeSyntax MakeTypeIdAttribute(ulong id) =>
+            Attribute(
+                IdentifierName("TypeId"))
+            .WithArgumentList(
+                AttributeArgumentList(
+                    SingletonSeparatedList<AttributeArgumentSyntax>(
+                        AttributeArgument(HexLiteral(id)))));
+
+        public static SyntaxList<AttributeListSyntax> MakeTypeIdAttributeLists(ulong id) =>
+            SingletonList<AttributeListSyntax>(
+                AttributeList(
+                    SingletonSeparatedList<AttributeSyntax>(
+                        CommonSnippetGen.MakeTypeIdAttribute(id))));
     }
 }
