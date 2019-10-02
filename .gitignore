@@ -336,4 +336,3 @@ ASALocalRun/
 # Capnp code behind
 .capnp.cs
 /globalPackages
-*.cs
