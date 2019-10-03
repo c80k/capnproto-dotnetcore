@@ -75,7 +75,7 @@ test_script:
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
   - cmd: vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.MsBuild.Generation.Tests\bin\Release\netcoreapp2.2\CapnpC.CSharp.MsBuild.Generation.Tests.dll
   - cmd: dotnet restore ./MsBuildGenerationTest/MsBuildGenerationTest.csproj --verbosity m  
-  - cmd: msbuild ./MsBuildGenerationTest/MsBuildGenerationTest.sln /p:Configuration="Debug"
+  - cmd: msbuild ./MsBuildGenerationTest/MsBuildGenerationTest.sln /p:Configuration="Debug" /p:PackageReferenceVersion="{version}"
   - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Debug\netcoreapp2.2\Capnp.Net.Runtime.Tests.Std20.dll
   - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\netcoreapp2.2\Capnp.Net.Runtime.Tests.Std20.dll
   - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests.Core21\bin\Debug\netcoreapp2.2\Capnp.Net.Runtime.Tests.Core21.dll

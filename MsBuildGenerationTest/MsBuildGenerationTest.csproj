@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <Version>1.0-local</Version>
     <Configurations>Debug;Release</Configurations>
+    <PackageReferenceVersion Condition="'$(PackageReferenceVersion)'==''">$(Version)*</PackageReferenceVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Capnp.Net.Runtime" Version="$(Version)*" />
-    <PackageReference Include="CapnpC.CSharp.MsBuild.Generation" Version="$(Version)*" />
+    <PackageReference Include="Capnp.Net.Runtime" Version="$(PackageReferenceVersion)" />
+    <PackageReference Include="CapnpC.CSharp.MsBuild.Generation" Version="1.0.0-local1910031632" />
   </ItemGroup>
 
   <ItemGroup>
