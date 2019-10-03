@@ -206,7 +206,8 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
             if (def.GenericParameters.Count > 0)
             {
-                return GenericName(name.Identifier).AddTypeArgumentListArguments();
+                var args = Enumerable.Repeat(OmittedTypeArgument(), def.GenericParameters.Count);
+                return GenericName(name.Identifier).AddTypeArgumentListArguments(args.ToArray());
             }
             else
             {

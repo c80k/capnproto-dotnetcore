@@ -56,7 +56,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 {
                     foreach (var arg in method.Params)
                     {
-                        list.Add(Parameter(Identifier(arg.Name))
+                        list.Add(Parameter(Identifier(IdentifierRenamer.ToNonKeyword(arg.Name)))
                             .WithType(_names.MakeTypeSyntax(arg.Type, method.DeclaringInterface, TypeUsage.DomainClass)));
                     }
                 }
@@ -108,7 +108,9 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
             if (type.GenericParameters.Count > 0)
             {
-                ifaceDecl = ifaceDecl.AddTypeParameterListParameters(MakeTypeParameters(type).ToArray());
+                ifaceDecl = ifaceDecl
+                    .AddTypeParameterListParameters(MakeTypeParameters(type).ToArray())
+                    .AddConstraintClauses(MakeTypeParameterConstraints(type).ToArray());
             }
 
             if (type.Superclasses.Count == 0)
@@ -185,7 +187,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 yield return AssignmentExpression(
                     SyntaxKind.SimpleAssignmentExpression,
                     _names.GetCodeIdentifier(methodParam).IdentifierName,
-                    IdentifierName(methodParam.Name));
+                    IdentifierName(IdentifierRenamer.ToNonKeyword(methodParam.Name)));
             }
         }
 
@@ -461,7 +463,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 yield return AssignmentExpression(
                     SyntaxKind.SimpleAssignmentExpression,
                     _names.GetCodeIdentifier(arg).IdentifierName,
-                    IdentifierName(arg.Name));
+                    IdentifierName(IdentifierRenamer.ToNonKeyword(arg.Name)));
             }
         }
 

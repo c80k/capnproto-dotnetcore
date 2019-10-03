@@ -70,7 +70,29 @@ namespace CapnpC.CSharp.Generator.Tests
         public void ThenTheGeneratedOutputMustMatchTheReference()
         {
             Assert.IsTrue(_result.IsSuccess, $"Tool invocation failed: {_result.Exception?.Message}");
-            Assert.AreEqual(_referenceOutputContent, _result.GeneratedFiles.Single().GeneratedContent);
+            string generated = _result.GeneratedFiles.Single().GeneratedContent;
+            bool equals = _referenceOutputContent.Equals(generated);
+            if (!equals)
+            {
+                string path = Path.ChangeExtension(Path.GetTempFileName(), ".capnp.cs");
+                File.WriteAllText(path, generated);
+
+                string[] refLines = _referenceOutputContent.Split(Environment.NewLine);
+                string[] actLines = generated.Split(Environment.NewLine);
+                int mismatchLine = 0;
+
+                for (int i = 0; i < Math.Min(refLines.Length, actLines.Length); i++)
+                {
+                    if (!refLines[i].Equals(actLines[i]))
+                    {
+                        mismatchLine = i + 1;
+                        break;
+                    }
+                }
+
+                Assert.Fail(
+                    $"Reference output does not match. Expected: <{_referenceOutputContent.Substring(0, 100)}...>, actual: <{generated.Substring(0, 100)}...>, see {path}, first mismatch line: {mismatchLine}");
+            }
         }
 
         [Then(@"the invocation must fail")]

@@ -8467,7 +8467,7 @@ namespace Capnproto_test.Capnp.Test
                 }
 
                 [TypeId(0x8839ed86c9794287UL), Proxy(typeof(DeepNestInterfaceProxy<>)), Skeleton(typeof(DeepNestInterfaceSkeleton<>))]
-                public interface IDeepNestInterface<TQuux> : IDisposable
+                public interface IDeepNestInterface<TQuux> : IDisposable where TQuux : class
                 {
                     Task Call(CancellationToken cancellationToken_ = default);
                 }
@@ -8599,7 +8599,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xc9e749e8dd54da5cUL), Proxy(typeof(InterfaceProxy<>)), Skeleton(typeof(InterfaceSkeleton<>))]
-        public interface IInterface<TQux> : IDisposable
+        public interface IInterface<TQux> : IDisposable where TQux : class
         {
             Task<(TQux, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>)> Call(Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<string> arg_, CancellationToken cancellationToken_ = default);
         }
@@ -9105,7 +9105,7 @@ namespace Capnproto_test.Capnp.Test
     }
 
     [TypeId(0xdf9ccdeb81a704c9UL), Proxy(typeof(TestImplicitMethodParamsInGenericProxy<>)), Skeleton(typeof(TestImplicitMethodParamsInGenericSkeleton<>))]
-    public interface ITestImplicitMethodParamsInGeneric<TV> : IDisposable
+    public interface ITestImplicitMethodParamsInGeneric<TV> : IDisposable where TV : class
     {
         Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT foo, TU bar, CancellationToken cancellationToken_ = default)
             where TT : class where TU : class;
@@ -15412,7 +15412,7 @@ namespace Capnproto_test.Capnp.Test
     }
 
     [TypeId(0xea72cc77253798cdUL), Proxy(typeof(TestAuthenticatedBootstrapProxy<>)), Skeleton(typeof(TestAuthenticatedBootstrapSkeleton<>))]
-    public interface ITestAuthenticatedBootstrap<TVatId> : IDisposable
+    public interface ITestAuthenticatedBootstrap<TVatId> : IDisposable where TVatId : class
     {
         Task<TVatId> GetCallerId(CancellationToken cancellationToken_ = default);
     }

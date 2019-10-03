@@ -9,10 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <CapnpFiles Remove="capnp\persistent.capnp" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Capnp.Net.Runtime" Version="$(PackageReferenceVersion)" />
     <PackageReference Include="CapnpC.CSharp.MsBuild.Generation" Version="$(PackageReferenceVersion)" />
   </ItemGroup>
@@ -28,6 +24,9 @@
     </CapnpFiles>
     <CapnpFiles Update="capnp\compat\json.capnp">
       <WorkingDirectory>$(ProjectDir)</WorkingDirectory>
+      <ImportPaths>$(ProjectDir);%(ImportPaths)</ImportPaths>
+    </CapnpFiles>
+    <CapnpFiles Update="capnp\persistent.capnp">
       <ImportPaths>$(ProjectDir);%(ImportPaths)</ImportPaths>
     </CapnpFiles>
     <CapnpFiles Update="capnp\rpc-twoparty.capnp">
