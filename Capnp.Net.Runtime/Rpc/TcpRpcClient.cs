@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Capnp.FrameTracing;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,7 +16,7 @@ namespace Capnp.Rpc
     /// TCP-based RPC implementation which will establish a connection to a TCP server implementing 
     /// the Cap'n Proto RPC protocol.
     /// </summary>
-    public class TcpRpcClient: IDisposable
+    public class TcpRpcClient: IConnection, IDisposable
     {
         ILogger Logger { get; } = Logging.CreateLogger<TcpRpcClient>();
 
@@ -47,11 +48,13 @@ namespace Capnp.Rpc
         OutboundTcpEndpoint _outboundEndpoint;
         FramePump _pump;
         Thread _pumpThread;
+        Action _attachTracerAction;
 
         /// <summary>
-        /// Gets a Task which completes when TCP is connected.
+        /// Gets a Task which completes when TCP is connected. Will be
+        /// null until connection is actually requested (either by calling Connect or using appropriate constructor).
         /// </summary>
-        public Task WhenConnected { get; }
+        public Task WhenConnected { get; private set; }
 
         async Task ConnectAsync(string host, int port)
         {
@@ -74,11 +77,13 @@ namespace Capnp.Rpc
             }
         }
 
-        async Task Connect(string host, int port)
+        async Task ConnectAndRunAsync(string host, int port)
         {
             await ConnectAsync(host, port);
 
+            State = ConnectionState.Active;
             _pump = new FramePump(_client.GetStream());
+            _attachTracerAction?.Invoke();
             _outboundEndpoint = new OutboundTcpEndpoint(this, _pump);
             _inboundEndpoint = _rpcEngine.AddEndpoint(_outboundEndpoint);
             _pumpThread = new Thread(() =>
@@ -91,6 +96,7 @@ namespace Capnp.Rpc
                 }
                 finally
                 {
+                    State = ConnectionState.Down;
                     _outboundEndpoint.Dismiss();
                     _inboundEndpoint.Dismiss();
                     _pump.Dispose();
@@ -109,13 +115,36 @@ namespace Capnp.Rpc
         /// <exception cref="ArgumentNullException"><paramref name="host"/> is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="port"/> is not between System.Net.IPEndPoint.MinPort and System.Net.IPEndPoint.MaxPort.</exception>
         /// <exception cref="System.Net.Sockets.SocketException">An error occurred when accessing the socket.</exception>
-        public TcpRpcClient(string host, int port)
+        public TcpRpcClient(string host, int port): this()
+        {
+            Connect(host, port);
+        }
+
+        /// <summary>
+        /// Constructs an instance but does not yet attempt to connect.
+        /// </summary>
+        public TcpRpcClient()
         {
             _rpcEngine = new RpcEngine();
             _client = new TcpClient();
             _client.ExclusiveAddressUse = false;
+        }
 
-            WhenConnected = Connect(host, port);
+        /// <summary>
+        /// Attempts to connect it to given host.
+        /// </summary>
+        /// <param name="host">The DNS name of the remote RPC host</param>
+        /// <param name="port">The port number of the remote RPC host</param>
+        /// <exception cref="ArgumentNullException"><paramref name="host"/> is null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="port"/> is not between System.Net.IPEndPoint.MinPort and System.Net.IPEndPoint.MaxPort.</exception>
+        /// <exception cref="System.Net.Sockets.SocketException">An error occurred when accessing the socket.</exception>
+        /// <exception cref="InvalidOperationException">Connection was already requested</exception>
+        public void Connect(string host, int port)
+        {
+            if (WhenConnected != null)
+                throw new InvalidOperationException("Connection was already requested");
+
+            WhenConnected = ConnectAndRunAsync(host, port);
         }
 
         /// <summary>
@@ -168,6 +197,41 @@ namespace Capnp.Rpc
         }
 
         /// <summary>
+        /// Attaches a tracer to this connection. Only allowed in state 'Initializing'. To avoid race conditions, 
+        /// this method should only be used  in conjunction with the parameterless constructor (no auto-connect).
+        /// Call this method *before* calling Connect.
+        /// </summary>
+        /// <param name="tracer">Tracer to attach</param>
+        /// <exception cref="ArgumentNullException"><paramref name="tracer"/> is null</exception>
+        /// <exception cref="InvalidOperationException">Connection is not in state 'Initializing'</exception>
+        public void AttachTracer(IFrameTracer tracer)
+        {
+            if (tracer == null)
+                throw new ArgumentNullException(nameof(tracer));
+
+            if (State != ConnectionState.Initializing)
+                throw new InvalidOperationException("Connection is not in state 'Initializing'");
+
+            _attachTracerAction += () =>
+            {
+                _pump.AttachTracer(tracer);
+            };
+        }
+
+        /// <summary>
+        /// Prematurely closes this connection. Note that there is usually no need to close a connection manually.
+        /// </summary>
+        void IConnection.Close()
+        {
+            _client.Dispose();
+        }
+
+        /// <summary>
+        /// Returns the state of this connection.
+        /// </summary>
+        public ConnectionState State { get; private set; } = ConnectionState.Initializing;
+
+        /// <summary>
         /// Gets the number of RPC protocol messages sent by this client so far.
         /// </summary>
         public long SendCount => _inboundEndpoint.SendCount;
@@ -182,6 +246,12 @@ namespace Capnp.Rpc
         /// or null if the connection is not yet established.
         /// </summary>
         public int? RemotePort => ((IPEndPoint)_client.Client?.RemoteEndPoint)?.Port;
+
+        /// <summary>
+        /// Gets the local port number which this client using, 
+        /// or null if the connection is not yet established.
+        /// </summary>
+        public int? LocalPort => ((IPEndPoint)_client.Client?.LocalEndPoint)?.Port;
 
         /// <summary>
         /// Whether the I/O thread is currently running
