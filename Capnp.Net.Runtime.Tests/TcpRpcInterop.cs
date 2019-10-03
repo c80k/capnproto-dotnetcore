@@ -405,9 +405,11 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
+        // For details on why this test is ignored, see https://github.com/capnproto/capnproto/issues/876
         public void TestTailCallServer()
         {
+
             using (var server = SetupServer())
             {
                 var tracer = new RpcFrameTracer(Console.Out);
