@@ -74,8 +74,8 @@ test_script:
   - cmd: notinstalled-test
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
   - cmd: vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.MsBuild.Generation.Tests\bin\Release\netcoreapp2.2\CapnpC.CSharp.MsBuild.Generation.Tests.dll
-  - cmd: msbuild -t:restore ./MsBuildGenerationTest/MsBuildGenerationTest.csproj /p:Configuration="Debug" /p:PackageReferenceVersion='{version}'
-  - cmd: msbuild ./MsBuildGenerationTest/MsBuildGenerationTest.sln /p:Configuration="Debug" /p:PackageReferenceVersion='{version}'
+  - cmd: msbuild -t:restore ./MsBuildGenerationTest/MsBuildGenerationTest.csproj /p:Configuration="Debug" /p:PackageReferenceVersion="$(appveyor_build_version)"
+  - cmd: msbuild ./MsBuildGenerationTest/MsBuildGenerationTest.sln /p:Configuration="Debug" /p:PackageReferenceVersion="$(appveyor_build_version)"
   - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Debug\netcoreapp2.2\Capnp.Net.Runtime.Tests.Std20.dll
   - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\netcoreapp2.2\Capnp.Net.Runtime.Tests.Std20.dll
   - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests.Core21\bin\Debug\netcoreapp2.2\Capnp.Net.Runtime.Tests.Core21.dll
