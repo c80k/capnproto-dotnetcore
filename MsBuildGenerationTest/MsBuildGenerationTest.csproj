@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="Capnp.Net.Runtime" Version="$(PackageReferenceVersion)" />
-    <PackageReference Include="CapnpC.CSharp.MsBuild.Generation" Version="1.0.0-local1910031632" />
+    <PackageReference Include="CapnpC.CSharp.MsBuild.Generation" Version="$(PackageReferenceVersion)" />
   </ItemGroup>
 
   <ItemGroup>
