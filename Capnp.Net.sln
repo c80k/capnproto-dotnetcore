@@ -11,7 +11,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Capnp.Net.Runtime.Tests.Std
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Capnp.Net.Runtime.Tests.Core21", "Capnp.Net.Runtime.Tests.Core21\Capnp.Net.Runtime.Tests.Core21.csproj", "{58E8FFC8-D207-4B0F-842A-58ED9D3D9EEF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "capnpc-csharp.tests", "capnpc-csharp.tests\capnpc-csharp.tests.csproj", "{B77AC567-E232-4072-85C3-8689566BF3D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapnpC.CSharp.Generator.Tests", "CapnpC.CSharp.Generator.Tests\CapnpC.CSharp.Generator.Tests.csproj", "{B77AC567-E232-4072-85C3-8689566BF3D4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapnpC.CSharp.MsBuild.Generation", "CapnpC.CSharp.MsBuild.Generation\CapnpC.CSharp.MsBuild.Generation.csproj", "{1EFC1F20-C7BB-4F44-8BF9-DBB123AACCF4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapnpC.CSharp.Generator", "CapnpC.CSharp.Generator\CapnpC.CSharp.Generator.csproj", "{C3A3BB49-356E-4762-A190-76D877BE18F7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapnpC.CSharp.MsBuild.Generation.Tests", "CapnpC.CSharp.MsBuild.Generation.Tests\CapnpC.CSharp.MsBuild.Generation.Tests.csproj", "{EF05AD68-DE31-448E-B88D-4144F928ED5D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +45,18 @@ Global
 		{B77AC567-E232-4072-85C3-8689566BF3D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B77AC567-E232-4072-85C3-8689566BF3D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B77AC567-E232-4072-85C3-8689566BF3D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EFC1F20-C7BB-4F44-8BF9-DBB123AACCF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EFC1F20-C7BB-4F44-8BF9-DBB123AACCF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EFC1F20-C7BB-4F44-8BF9-DBB123AACCF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EFC1F20-C7BB-4F44-8BF9-DBB123AACCF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3A3BB49-356E-4762-A190-76D877BE18F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3A3BB49-356E-4762-A190-76D877BE18F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3A3BB49-356E-4762-A190-76D877BE18F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3A3BB49-356E-4762-A190-76D877BE18F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF05AD68-DE31-448E-B88D-4144F928ED5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF05AD68-DE31-448E-B88D-4144F928ED5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF05AD68-DE31-448E-B88D-4144F928ED5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF05AD68-DE31-448E-B88D-4144F928ED5D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

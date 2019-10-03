@@ -53,7 +53,7 @@ Solution/project structure is as follows:
   * Capnp.Net.Runtime is the runtime implementation, a .NET assembly.
   * capnpc-csharp is the generator backend for C# language.
   * Capnp.Net.Runtime.Tests is an MS Unit Testing assembly, containing - you guessed it - the test suite.
-  * capnpc-csharp.tests contains the generator backend test suite.
+  * CapnpC.CSharp.Generator.Tests contains the generator backend test suite.
 - CapnpCompatTest.sln compiles to a native x86 executable which depends on the original Cap'n Proto C++ implementation. It is (partially) required by the test suite for interoperability testing.
 
 ## Features
