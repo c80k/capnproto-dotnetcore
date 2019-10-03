@@ -62,6 +62,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
         public string MemberAccessPathNameFormat { get; }
         public Name TaskParameter { get; }
         public Name EagerMethod { get; }
+        public Name TypeIdField { get; }
 
         public GenNames(GeneratorOptions options)
         {
@@ -97,6 +98,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
             MemberAccessPathNameFormat = options.MemberAccessPathNameFormat;
             TaskParameter = new Name(options.TaskParameterName);
             EagerMethod = new Name(options.EagerMethodName);
+            TypeIdField = new Name(options.TypeIdFieldName);
         }
 
         public Name MakeTypeName(TypeDefinition def, NameUsage usage = NameUsage.Default)

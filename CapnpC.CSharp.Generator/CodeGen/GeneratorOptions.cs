@@ -34,5 +34,6 @@
         public string MemberAccessPathNameFormat { get; set; } = "Path_{0}_{1}";
         public string TaskParameterName { get; set; } = "task";
         public string EagerMethodName { get; set; } = "Eager";
+        public string TypeIdFieldName { get; set; } = "TypeId";
     }
 }
