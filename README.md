@@ -49,12 +49,17 @@ vcpkg install capnproto
 ```
 
 Solution/project structure is as follows:
-- Capnp.Net.sln contains these projects:
-  * Capnp.Net.Runtime is the runtime implementation, a .NET assembly.
-  * capnpc-csharp is the generator backend for C# language.
-  * Capnp.Net.Runtime.Tests is an MS Unit Testing assembly, containing - you guessed it - the test suite.
-  * CapnpC.CSharp.Generator.Tests contains the generator backend test suite.
-- CapnpCompatTest.sln compiles to a native x86 executable which depends on the original Cap'n Proto C++ implementation. It is (partially) required by the test suite for interoperability testing.
+- `Capnp.Net.sln` contains these projects:
+  * `Capnp.Net.Runtime` is the runtime implementation, a multi-target (.NET Standard 2.0 + .NET Core 2.1) assembly.
+  * `CapnpC.CSharp.Generator` contains the generator backend logic for C# language. It is also a multi-target (.NET Standard 2.0 + .NET Core 2.1) assembly.
+  * `capnpc-csharp` is the command line-based generator backend (a .NET Core 2.1 application).
+  * `CapnpC.CSharp.MsBuild.Generation` provides the MSBuild integration for the generator backend.
+  * `Capnp.Net.Runtime.Tests.Core21` is an MS Unit Testing assembly, containing - you guessed it - the test suite. It depends on the .NET Core 2.1 flavor runtime assembly.
+  * `Capnp.Net.Runtime.Tests.Std20` depends (you guessed it, again) on .NET Standard 2.0 flavor. Note that the code base involves conditional compilation, such that there are indeed some code differences for .NET Standard and .NET Core flavor.
+  * `CapnpC.CSharp.Generator.Tests` contains the generator backend test suite.
+  * `CapnpC.CSharp.MsBuild.Generation.Tests` contains tests for `CapnpC.CSharp.MsBuild.Generation`.
+- `CapnpCompatTest.sln` compiles to a native x86 executable which depends on the original Cap'n Proto C++ implementation. It is (partially) required by the test suite for interoperability testing.
+- `MsBuildGenerationTest\MsBuildGenerationTest.sln` is a test solution/project for MSBuild integration.
 
 ## Features
 
