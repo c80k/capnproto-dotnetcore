@@ -50,6 +50,7 @@ namespace Capnp.Net.Runtime.Tests
             string arguments = $"{whichTest} 127.0.0.1:{TcpPort}";
             var startInfo = new ProcessStartInfo(path, arguments)
             {
+                UseShellExecute = false,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
                 RedirectStandardInput = true
