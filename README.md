@@ -86,7 +86,7 @@ The following Cap'n Proto features are currently implemented:
 - Compiler backend generates reader/writer classes, interfaces, proxies, skeletons (as you know it from the C++ implementation), and additionally so-called "domain classes" for all struct types. A domain class is like a "plain old C# class" for representing a schema-defined struct, but it is decoupled from any underlying message. It provides serialize/deserialize methods for assembling/disassembling the actual message. This provides more convenience, but comes at the price of non-zero serialization overhead (not "infinitely" faster anymore).
 
 These features are not yet implemented:
-- Level N RPC with N >= 2
+- Level N RPC with N ≥ 2
 - Packing
 - Compression
 - Canonicalization
