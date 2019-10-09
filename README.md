@@ -57,7 +57,7 @@ Install-Package Capnp.Net.Runtime
 
 ## Getting started: Developers
 
-For building from scratch you will need Visual Studio >= 2019 (e.g. Community Edition) with suitable workloads for C# / .NET Core (currently .NET Core 2.1) development. For the test suite, you will also need the C++ native workload, [vcpkg](https://github.com/microsoft/vcpkg) and Cap'n Proto release 0.7.0:
+For building from scratch you will need Visual Studio ≥ 2019 (e.g. Community Edition) with suitable workloads for C# / .NET Core (currently .NET Core 2.1) development. For the test suite, you will also need the C++ native workload, [vcpkg](https://github.com/microsoft/vcpkg) and Cap'n Proto release 0.7.0:
 
 ```
 vcpkg install capnproto
