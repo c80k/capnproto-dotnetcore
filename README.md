@@ -79,7 +79,7 @@ Solution/project structure is as follows:
 ## Features
 
 The following Cap'n Proto features are currently implemented:
-- Serialization/deserialization of all kinds ofdata (structs, groups, unions, lists, capabilities, data, text, enums, even primitives)
+- Serialization/deserialization of all kinds of data (structs, groups, unions, lists, capabilities, data, text, enums, even primitives)
 - Generics
 - Level 1 RPC, including promise pipelining, embargos, and automatic tail calls
 - Security (pointer validation, protection against amplification and stack overflow DoS attacks)
