@@ -12,7 +12,22 @@ The overall deployment consists of two components:
 - The C# code generator back end is required for generating `.cs` serialization classes from `.capnp` schema files. It is designed to be used in conjunction with the Cap'n Proto tool set which is maintained at the original site. The tool set is required at compile time.
 - The `Capnp.Net.Runtime` assembly is to be included as a reference into your particular application (or assembly).
 
-### Code generator back end: Windows
+### Code generator back end: Visual Studio / MSBuild integration
+
+This is probably the most convenient option for Visual Studio development: The MSBuild integration package recognizes `.capnp` files in your VS project and generates their code-behind during build.
+
+A prerequisite is that the Cap'n Proto tool suite is installed (`capnp.exe` must be on your `PATH`). The simplest way to achieve this:
+```
+choco install capnproto
+```
+
+Then, for the VS project which hosts your `.capnp` schema definitions:
+
+```
+Install-Package CapnpC.CSharp.MsBuild.Generation
+```
+
+### Code generator back end: Windows command line
 
 The C# code generator back end is available as [Chocolatey](https://chocolatey.org/) package. You may choose between two flavors: The portable version requires a .NET Core 2.1 (or higher) runtime or SDK (type `dotnet` at command line prompt to check whether you already have one). This is the recommended variant. To install, type
 
