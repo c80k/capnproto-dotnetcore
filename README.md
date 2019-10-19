@@ -12,7 +12,22 @@ The overall deployment consists of two components:
 - The C# code generator back end is required for generating `.cs` serialization classes from `.capnp` schema files. It is designed to be used in conjunction with the Cap'n Proto tool set which is maintained at the original site. The tool set is required at compile time.
 - The `Capnp.Net.Runtime` assembly is to be included as a reference into your particular application (or assembly).
 
-### Code generator back end: Windows
+### Code generator back end: Visual Studio / MSBuild integration
+
+This is probably the most convenient option for Visual Studio development: The MSBuild integration package recognizes `.capnp` files in your VS project and generates their code-behind during build.
+
+A prerequisite is that the Cap'n Proto tool suite is installed (`capnp.exe` must be on your `PATH`). The simplest way to achieve this:
+```
+choco install capnproto
+```
+
+Then, for the VS project which hosts your `.capnp` schema definitions:
+
+```
+Install-Package CapnpC.CSharp.MsBuild.Generation
+```
+
+### Code generator back end: Windows command line
 
 The C# code generator back end is available as [Chocolatey](https://chocolatey.org/) package. You may choose between two flavors: The portable version requires a .NET Core 2.1 (or higher) runtime or SDK (type `dotnet` at command line prompt to check whether you already have one). This is the recommended variant. To install, type
 
@@ -42,7 +57,7 @@ Install-Package Capnp.Net.Runtime
 
 ## Getting started: Developers
 
-For building from scratch you will need Visual Studio >= 2019 (e.g. Community Edition) with suitable workloads for C# / .NET Core (currently .NET Core 2.1) development. For the test suite, you will also need the C++ native workload, [vcpkg](https://github.com/microsoft/vcpkg) and Cap'n Proto release 0.7.0:
+For building from scratch you will need Visual Studio ≥ 2019 (e.g. Community Edition) with suitable workloads for C# / .NET Core (currently .NET Core 2.1) development. For the test suite, you will also need the C++ native workload, [vcpkg](https://github.com/microsoft/vcpkg) and Cap'n Proto release 0.7.0:
 
 ```
 vcpkg install capnproto
@@ -64,14 +79,14 @@ Solution/project structure is as follows:
 ## Features
 
 The following Cap'n Proto features are currently implemented:
-- Serialization/deserialization of all kinds ofdata (structs, groups, unions, lists, capabilities, data, text, enums, even primitives)
+- Serialization/deserialization of all kinds of data (structs, groups, unions, lists, capabilities, data, text, enums, even primitives)
 - Generics
 - Level 1 RPC, including promise pipelining, embargos, and automatic tail calls
 - Security (pointer validation, protection against amplification and stack overflow DoS attacks)
 - Compiler backend generates reader/writer classes, interfaces, proxies, skeletons (as you know it from the C++ implementation), and additionally so-called "domain classes" for all struct types. A domain class is like a "plain old C# class" for representing a schema-defined struct, but it is decoupled from any underlying message. It provides serialize/deserialize methods for assembling/disassembling the actual message. This provides more convenience, but comes at the price of non-zero serialization overhead (not "infinitely" faster anymore).
 
 These features are not yet implemented:
-- Level N RPC with N >= 2
+- Level N RPC with N ≥ 2
 - Packing
 - Compression
 - Canonicalization
