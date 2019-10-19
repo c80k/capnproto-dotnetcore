@@ -39,7 +39,7 @@ namespace CapnpC.CSharp.Generator.Model
         public string Name { get; set; }
         public SpecialName SpecialName { get; set; }
         public DiscriminationInfo UnionInfo { get; set; }
-        public new List<Field> Fields => base.Fields;
+        public List<Field> Fields { get; } = new List<Field>();
         public List<Enumerant> Enumerants { get; } = new List<Enumerant>();
         public ICollection<IDefinition> NestedDefinitions { get; } = new List<IDefinition>();
         public IEnumerable<TypeDefinition> NestedTypes { get => this.GetNestedTypes(); }

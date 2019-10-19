@@ -120,5 +120,28 @@ namespace Capnp.Net.Runtime.Tests
                 }
             }
         }
+
+        [TestMethod]
+        public void InheritFromGenericInterface()
+        {
+            using (var server = SetupServer())
+            {
+                var counters = new Counters();
+                server.Main = new B2Impl();
+
+                using (var client = SetupClient())
+                {
+                    client.WhenConnected.Wait();
+
+                    using (var main = client.GetMain<CapnpGen.IB2>())
+                    {
+                        Assert.IsTrue(main.MethodA("42").Wait(MediumNonDbgTimeout));
+                        var b = main.MethodB(123);
+                        Assert.IsTrue(b.Wait(MediumNonDbgTimeout));
+                        Assert.AreEqual("42", b.Result);
+                    }
+                }
+            }
+        }
     }
 }

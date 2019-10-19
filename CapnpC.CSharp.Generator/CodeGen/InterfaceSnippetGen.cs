@@ -283,7 +283,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
             var allMethods =
                 from c in Types.FromDefinition(type).AllImplementedClasses
-                from m in c.Definition.Methods
+                from m in c.Methods
                 select m;
 
             foreach (var method in allMethods)

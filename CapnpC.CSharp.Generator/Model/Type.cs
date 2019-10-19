@@ -83,7 +83,7 @@ namespace CapnpC.CSharp.Generator.Model
                 }
                 else
                 {
-                    return Types.AnyPointer;
+                    return type;
                 }
             }
 
@@ -117,7 +117,25 @@ namespace CapnpC.CSharp.Generator.Model
             return result;
         }
 
-        public new IReadOnlyList<Field> Fields => Definition.Fields.LazyListSelect(SubstituteGenerics);
+        Method SubstituteGenerics(Method method)
+        {
+            var result = method.Clone();
+            result.ParamsStruct = SubstituteGenerics(result.ParamsStruct);
+            result.ResultStruct = SubstituteGenerics(result.ResultStruct);
+            foreach (var field in result.Params)
+            {
+                field.Type = SubstituteGenerics(field.Type);
+            }
+            foreach (var field in result.Results)
+            {
+                field.Type = SubstituteGenerics(field.Type);
+            }
+            return result;
+        }
+
+        public IReadOnlyList<Field> Fields => Definition.Fields.LazyListSelect(SubstituteGenerics);
+
+        public IReadOnlyList<Method> Methods => Definition.Methods.LazyListSelect(SubstituteGenerics);
 
         public Type DeclaringType
         {

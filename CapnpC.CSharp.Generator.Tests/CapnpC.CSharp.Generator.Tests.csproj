@@ -10,7 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.3.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.3.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+    <PackageReference Include="Mono.Cecil" Version="0.11.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.4.0" />
     <PackageReference Include="MSTest.TestFramework" Version="1.4.0" />
     <PackageReference Include="SpecFlow" Version="3.0.225" />
@@ -24,6 +27,7 @@
     <None Remove="Embedded Resources\Empty.capnp" />
     <None Remove="Embedded Resources\Empty1.capnp" />
     <None Remove="Embedded Resources\invalid.capnp" />
+    <None Remove="Embedded Resources\Issue19.capnp.bin" />
     <None Remove="Embedded Resources\null.bin" />
     <None Remove="Embedded Resources\test.capnp" />
     <None Remove="Embedded Resources\test.capnp.bin" />
@@ -37,6 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Embedded Resources\Issue19.capnp.bin" />
     <EmbeddedResource Include="Embedded Resources\Empty.capnp" />
     <EmbeddedResource Include="Embedded Resources\Empty1.capnp" />
     <EmbeddedResource Include="Embedded Resources\invalid.capnp" />

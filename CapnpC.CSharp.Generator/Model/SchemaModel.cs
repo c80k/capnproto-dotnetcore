@@ -648,8 +648,9 @@ namespace CapnpC.CSharp.Generator.Model
         {
             foreach (var superClassReader in ifaceReader.Interface_Superclasses)
             {
-                var superClass = ProcessTypeDef(superClassReader.Id, state, TypeTag.Interface);
-                def.Superclasses.Add(Types.FromDefinition(superClass));
+                var superClass = Types.FromDefinition(ProcessTypeDef(superClassReader.Id, state, TypeTag.Interface));
+                ProcessBrand(superClassReader.Brand, superClass, state);
+                def.Superclasses.Add(superClass);
             }
 
             return ProcessInterfaceOrStructTail(def, ifaceReader, state);

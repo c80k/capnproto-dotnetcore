@@ -102,6 +102,13 @@ namespace CapnpC.CSharp.Generator.Tests
             Assert.IsNotNull(_result.Exception, "Expected an exception");
         }
 
+        [Then(@"the invocation must succeed and the generated code must compile")]
+        public void ThenTheInvocationMustSucceedAndTheGeneratedCodeMustCompile()
+        {
+            Assert.IsTrue(_result.IsSuccess, "Tool invocation was not successful");
+            Assert.IsTrue(Util.InlineAssemblyCompiler.TryCompileCapnp(_result.GeneratedFiles[0].GeneratedContent), "Compilation was not successful");
+        }
+
         [Given(@"capnp\.exe is installed on my system")]
         public void GivenCapnp_ExeIsInstalledOnMySystem()
         {

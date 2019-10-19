@@ -119,21 +119,20 @@ namespace Capnp.Rpc
                 try
                 {
                     var attrs = (from iface in _.GetInterfaces()
-                                 from attr in iface.GetCustomAttributes(typeof(SkeletonAttribute), true)
-                                 select (SkeletonAttribute)attr).ToArray();
+                                 let generics = iface.GetGenericArguments()
+                                 from attr in iface.GetCustomAttributes(typeof(SkeletonAttribute), false)
+                                 select (Attr: (SkeletonAttribute)attr, Generics: generics)).ToArray();
 
                     if (attrs.Length == 0)
                         throw new InvalidCapabilityInterfaceException("No 'Skeleton' attribute defined, don't know how to create the skeleton");
 
-                    Type[] genericArguments = type.GetGenericArguments();
-
                     if (attrs.Length == 1)
                     {
-                        return CreateMonoSkeletonFactory(attrs[0], genericArguments);
+                        return CreateMonoSkeletonFactory(attrs[0].Attr, attrs[0].Generics);
                     }
                     else
                     {
-                        var monoFactories = attrs.Select(a => CreateMonoSkeletonFactory(a, genericArguments)).ToArray();
+                        var monoFactories = attrs.Select(a => CreateMonoSkeletonFactory(a.Attr, a.Generics)).ToArray();
                         return new PolySkeletonFactory(monoFactories);
                     }
                 }
@@ -174,7 +173,7 @@ namespace Capnp.Rpc
                 try
                 {
                     var attrs = type
-                        .GetCustomAttributes(typeof(ProxyAttribute), true)
+                        .GetCustomAttributes(typeof(ProxyAttribute), false)
                         .Cast<ProxyAttribute>()
                         .ToArray();
 

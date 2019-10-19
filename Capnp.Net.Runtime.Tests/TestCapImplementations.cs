@@ -753,4 +753,27 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
         }
     }
     #endregion TestHandle
+
+    #region B2
+
+    class B2Impl : CapnpGen.IB2
+    {
+        string _s;
+
+        public void Dispose()
+        {
+        }
+
+        public Task MethodA(string param1, CancellationToken cancellationToken_ = default)
+        {
+            _s = param1;
+            return Task.CompletedTask;
+        }
+
+        public Task<string> MethodB(long param1, CancellationToken cancellationToken_ = default)
+        {
+            return Task.FromResult(_s);
+        }
+    }
+    #endregion B2
 }

@@ -46,3 +46,12 @@ Scenario: Multiple errors
 	Then the invocation must fail
 	And the reason must be bad input
 	And the error output must contain multiple messages
+
+Scenario Outline: Valid generator output
+	Given I have a binary code generator request <bin>
+	When I invoke capnpc-csharp
+	Then the invocation must succeed and the generated code must compile
+
+Examples:
+    | bin                 |
+    | Issue19.capnp.bin   |

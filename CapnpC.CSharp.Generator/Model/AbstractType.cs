@@ -5,7 +5,6 @@ namespace CapnpC.CSharp.Generator.Model
     abstract class AbstractType
     {
         public TypeTag Tag { get; set; }
-        protected List<Field> Fields { get; } = new List<Field>();
 
         public uint? FixedBitWidth
         {

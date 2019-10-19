@@ -9,6 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <CapnpCsharpObsoleteCodeBehindFiles Remove="capnp\bergm.capnp.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="capnp\bergm.capnp.bin" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Capnp.Net.Runtime" Version="$(PackageReferenceVersion)" />
     <PackageReference Include="CapnpC.CSharp.MsBuild.Generation" Version="$(PackageReferenceVersion)" />
   </ItemGroup>
@@ -53,6 +61,12 @@
       <WorkingDirectory>$(ProjectDir)</WorkingDirectory>
       <ImportPaths>$(ProjectDir);%(ImportPaths)</ImportPaths>
     </CapnpFiles>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="issue19.capnp.cs">
+      <DependentUpon>Issue19.capnp</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>

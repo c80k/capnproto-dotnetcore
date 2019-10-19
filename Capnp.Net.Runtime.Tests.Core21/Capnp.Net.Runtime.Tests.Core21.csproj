@@ -14,6 +14,7 @@
     <Compile Include="..\Capnp.Net.Runtime.Tests\DynamicSerializerStateTests.cs" Link="DynamicSerializerStateTests.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\FramePumpTests.cs" Link="FramePumpTests.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\General.cs" Link="General.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\Issue19.cs" Link="Issue19.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\JobUtil.cs" Link="JobUtil.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\MessageBuilderTests.cs" Link="MessageBuilderTests.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\ProvidedCapabilityMock.cs" Link="ProvidedCapabilityMock.cs" />
