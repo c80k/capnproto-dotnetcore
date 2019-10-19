@@ -1,6 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using CapnpGen;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Capnp.Net.Runtime.Tests
 {
@@ -922,6 +924,38 @@ namespace Capnp.Net.Runtime.Tests
                     }
                 }
             }
+        }
+
+        [TestMethod]
+        public void Issue20()
+        {
+            RpcRequest<ArithmeticOperationRequest> rpcRequest = new RpcRequest<ArithmeticOperationRequest>();
+            rpcRequest.Method = "AddTwoNumbers";
+
+            ArithmeticOperationRequest request = new ArithmeticOperationRequest();
+
+            request.NumA = 5;
+            request.NumB = 8;
+
+            rpcRequest.Request = request;
+
+            var msg = MessageBuilder.Create();
+            var root = msg.BuildRoot<RpcRequest<ArithmeticOperationRequest>.WRITER>();
+            rpcRequest.serialize(root);
+
+            var mems = new MemoryStream();
+            var pump = new FramePump(mems);
+            pump.Send(msg.Frame);
+            mems.Seek(0, SeekOrigin.Begin);
+
+            var frame = Framing.ReadSegments(mems);
+            var deserializer = DeserializerState.CreateRoot(frame);
+            var mainRequest = new RpcRequest<ArithmeticOperationRequest>.READER(deserializer);
+            var innerRequest = new ArithmeticOperationRequest.READER(mainRequest.Request);
+
+            Console.WriteLine("Method Name: " + mainRequest.Method);
+            Console.WriteLine("NumA: " + innerRequest.NumA.ToString());
+            Console.WriteLine("NumB: " + innerRequest.NumB.ToString());
         }
     }
 }

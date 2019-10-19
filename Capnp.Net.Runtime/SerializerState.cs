@@ -92,41 +92,44 @@ namespace Capnp
 
             ts = new TS();
 
-            InvalidOperationException InvalidWrap() =>
-                new InvalidOperationException("Incompatible cast");
-
-            switch (ts.Kind)
+            if (Kind != ObjectKind.Nil)
             {
-                case ObjectKind.Struct:
-                case ObjectKind.ListOfStructs:
-                    if (ts.Kind != Kind ||
-                        ts.StructDataCount != StructDataCount ||
-                        ts.StructPtrCount != StructPtrCount)
-                        throw InvalidWrap();
-                    break;
+                InvalidOperationException InvalidWrap() =>
+                    new InvalidOperationException("Incompatible cast");
 
-                case ObjectKind.Nil:
-                    break;
+                switch (ts.Kind)
+                {
+                    case ObjectKind.Struct:
+                    case ObjectKind.ListOfStructs:
+                        if (ts.Kind != Kind ||
+                            ts.StructDataCount != StructDataCount ||
+                            ts.StructPtrCount != StructPtrCount)
+                            throw InvalidWrap();
+                        break;
 
-                default:
-                    if (ts.Kind != Kind)
-                        throw InvalidWrap();
-                    break;
+                    case ObjectKind.Nil:
+                        break;
+
+                    default:
+                        if (ts.Kind != Kind)
+                            throw InvalidWrap();
+                        break;
+                }
+
+                ts.SegmentIndex = SegmentIndex;
+                ts.Offset = Offset;
+                ts.ListElementCount = ListElementCount;
+                ts.StructDataCount = StructDataCount;
+                ts.StructPtrCount = StructPtrCount;
+                ts.Kind = Kind;
+                ts.CapabilityIndex = CapabilityIndex;
+                ts._linkedStates = _linkedStates;
             }
 
             if (Owner != null)
                 ts.Bind(Owner, OwnerSlot);
             else
                 ts.Bind(MsgBuilder);
-
-            ts.SegmentIndex = SegmentIndex;
-            ts.Offset = Offset;
-            ts.ListElementCount = ListElementCount;
-            ts.StructDataCount = StructDataCount;
-            ts.StructPtrCount = StructPtrCount;
-            ts.Kind = Kind;
-            ts.CapabilityIndex = CapabilityIndex;
-            ts._linkedStates = _linkedStates;
 
             return ts;
         }
