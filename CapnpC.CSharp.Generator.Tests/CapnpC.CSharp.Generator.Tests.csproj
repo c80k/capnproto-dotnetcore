@@ -28,6 +28,7 @@
     <None Remove="Embedded Resources\Empty1.capnp" />
     <None Remove="Embedded Resources\invalid.capnp" />
     <None Remove="Embedded Resources\Issue19.capnp.bin" />
+    <None Remove="Embedded Resources\Issue21.capnp.bin" />
     <None Remove="Embedded Resources\null.bin" />
     <None Remove="Embedded Resources\test.capnp" />
     <None Remove="Embedded Resources\test.capnp.bin" />
@@ -45,6 +46,7 @@
     <EmbeddedResource Include="Embedded Resources\Empty.capnp" />
     <EmbeddedResource Include="Embedded Resources\Empty1.capnp" />
     <EmbeddedResource Include="Embedded Resources\invalid.capnp" />
+    <EmbeddedResource Include="Embedded Resources\Issue21.capnp.bin" />
     <EmbeddedResource Include="Embedded Resources\null.bin" />
     <EmbeddedResource Include="Embedded Resources\test.capnp.bin" />
     <EmbeddedResource Include="Embedded Resources\test.cs" />

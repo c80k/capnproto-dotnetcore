@@ -101,11 +101,6 @@
             yield return _interfaceGen.MakeProxy(def);
             yield return _interfaceGen.MakeSkeleton(def);
 
-            if (_interfaceGen.RequiresPipeliningSupport(def))
-            {
-                yield return _interfaceGen.MakePipeliningSupport(def);
-            }
-
             if (def.NestedTypes.Any())
             {
                 var ns = ClassDeclaration(
@@ -147,6 +142,46 @@
             }
         }
 
+        ClassDeclarationSyntax TransformPipeliningSupport(IHasNestedDefinitions def)
+        {
+            var classDecl = default(ClassDeclarationSyntax);
+
+            var q = new Queue<TypeDefinition>();
+
+            foreach (var inner in def.NestedDefinitions.OfType<TypeDefinition>())
+            {
+                q.Enqueue(inner);
+            }
+
+            while (q.Count > 0)
+            {
+                var cur = q.Dequeue();
+
+                if (cur.Tag == TypeTag.Interface && _interfaceGen.RequiresPipeliningSupport(cur))
+                {
+                    var members = _interfaceGen.MakePipeliningSupport(cur).ToArray();
+
+                    if (members.Length > 0)
+                    {
+                        if (classDecl == null)
+                        {
+                            classDecl = ClassDeclaration(_names.PipeliningExtensionsClassName.Identifier)
+                                        .AddModifiers(Public, Static, Partial);
+                        }
+
+                        classDecl = classDecl.AddMembers(members);
+                    }
+                }
+
+                foreach (var inner in cur.NestedDefinitions.OfType<TypeDefinition>())
+                {
+                    q.Enqueue(inner);
+                }
+            }
+
+            return classDecl;
+        }
+
         internal string Transform(GenFile file)
         {
             NameSyntax topNamespace = GenNames.NamespaceName(file.Namespace) ?? _names.TopNamespace;
@@ -156,6 +191,13 @@
             foreach (var def in file.NestedTypes)
             {
                 ns = ns.AddMembers(Transform(def).ToArray());
+            }
+
+            var psc = TransformPipeliningSupport(file);
+
+            if (psc != null)
+            {
+                ns = ns.AddMembers(psc);
             }
 
             var cu = CompilationUnit().AddUsings(

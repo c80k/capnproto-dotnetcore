@@ -269,6 +269,18 @@ this.ScenarioInitialize(scenarioInfo);
 this.ValidGeneratorOutput("Issue19.capnp.bin", ((string[])(null)));
 #line hidden
         }
+        
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Valid generator output: Issue21.capnp.bin")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Issue21.capnp.bin")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "Issue21.capnp.bin")]
+        public virtual void ValidGeneratorOutput_Issue21_Capnp_Bin()
+        {
+#line 50
+this.ValidGeneratorOutput("Issue21.capnp.bin", ((string[])(null)));
+#line hidden
+        }
     }
 }
 #pragma warning restore

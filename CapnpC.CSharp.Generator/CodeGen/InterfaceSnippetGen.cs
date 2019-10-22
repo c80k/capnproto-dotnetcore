@@ -760,11 +760,8 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         readonly HashSet<(string, string)> _existingExtensionMethods = new HashSet<(string, string)>();
 
-        public MemberDeclarationSyntax MakePipeliningSupport(TypeDefinition type)
+        public IEnumerable<MemberDeclarationSyntax> MakePipeliningSupport(TypeDefinition type)
         {
-            var classDecl = ClassDeclaration(_names.PipeliningExtensionsClassName.Identifier)
-                .AddModifiers(Public, Static, Partial);
-
             foreach (var method in type.Methods)
             {
                 foreach (var path in ExpandPipeliningPaths(method))
@@ -836,11 +833,10 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                                     Argument(
                                                         accessPath.IdentifierName)))))));
 
-                    classDecl = classDecl.AddMembers(pathDecl, methodDecl);
+                    yield return pathDecl;
+                    yield return methodDecl;
                 }
             }
-
-            return classDecl;
         }
     }
 }

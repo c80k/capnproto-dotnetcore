@@ -10900,21 +10900,6 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    public static partial class PipeliningSupportExtensions
-    {
-        static readonly MemberAccessPath Path_getCap_OutBox_Cap = new MemberAccessPath(1U, 0U);
-        public static Capnproto_test.Capnp.Test.ITestInterface OutBox_Cap(this Task<(string, Capnproto_test.Capnp.Test.TestPipeline.Box)> task)
-        {
-            return (Capnproto_test.Capnp.Test.ITestInterface)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestInterface>(Impatient.GetAnswer(task).Access(Path_getCap_OutBox_Cap));
-        }
-
-        static readonly MemberAccessPath Path_getAnyCap_OutBox_Cap = new MemberAccessPath(1U, 0U);
-        public static BareProxy OutBox_Cap(this Task<(string, Capnproto_test.Capnp.Test.TestPipeline.AnyBox)> task)
-        {
-            return (BareProxy)CapabilityReflection.CreateProxy<BareProxy>(Impatient.GetAnswer(task).Access(Path_getAnyCap_OutBox_Cap));
-        }
-    }
-
     public static class TestPipeline
     {
         [TypeId(0xb0b29e51db0e26b1UL)]
@@ -11685,15 +11670,6 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    public static partial class PipeliningSupportExtensions
-    {
-        static readonly MemberAccessPath Path_foo_C = new MemberAccessPath(1U);
-        public static Capnproto_test.Capnp.Test.ITestCallOrder C(this Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> task)
-        {
-            return (Capnproto_test.Capnp.Test.ITestCallOrder)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestCallOrder>(Impatient.GetAnswer(task).Access(Path_foo_C));
-        }
-    }
-
     public static class TestTailCallee
     {
         [TypeId(0xa9ed2e5a9fd53d19UL)]
@@ -11906,10 +11882,6 @@ namespace Capnproto_test.Capnp.Test
 
             );
         }
-    }
-
-    public static partial class PipeliningSupportExtensions
-    {
     }
 
     public static class TestTailCaller
@@ -12369,33 +12341,6 @@ namespace Capnproto_test.Capnp.Test
             await Impl.MethodWithNullDefault(in_.A, in_.B, cancellationToken_);
             var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_methodWithNullDefault.WRITER>();
             return s_;
-        }
-    }
-
-    public static partial class PipeliningSupportExtensions
-    {
-        static readonly MemberAccessPath Path_neverReturn_Eager = new MemberAccessPath(0U);
-        public static Capnproto_test.Capnp.Test.ITestInterface Eager(this Task<Capnproto_test.Capnp.Test.ITestInterface> task)
-        {
-            return (Capnproto_test.Capnp.Test.ITestInterface)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestInterface>(Impatient.GetAnswer(task).Access(Path_neverReturn_Eager));
-        }
-
-        static readonly MemberAccessPath Path_echo_Eager = new MemberAccessPath(0U);
-        public static Capnproto_test.Capnp.Test.ITestCallOrder Eager(this Task<Capnproto_test.Capnp.Test.ITestCallOrder> task)
-        {
-            return (Capnproto_test.Capnp.Test.ITestCallOrder)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestCallOrder>(Impatient.GetAnswer(task).Access(Path_echo_Eager));
-        }
-
-        static readonly MemberAccessPath Path_getHandle_Eager = new MemberAccessPath(0U);
-        public static Capnproto_test.Capnp.Test.ITestHandle Eager(this Task<Capnproto_test.Capnp.Test.ITestHandle> task)
-        {
-            return (Capnproto_test.Capnp.Test.ITestHandle)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestHandle>(Impatient.GetAnswer(task).Access(Path_getHandle_Eager));
-        }
-
-        static readonly MemberAccessPath Path_getNull_Eager = new MemberAccessPath(0U);
-        public static Capnproto_test.Capnp.Test.ITestMoreStuff Eager(this Task<Capnproto_test.Capnp.Test.ITestMoreStuff> task)
-        {
-            return (Capnproto_test.Capnp.Test.ITestMoreStuff)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestMoreStuff>(Impatient.GetAnswer(task).Access(Path_getNull_Eager));
         }
     }
 
@@ -14047,15 +13992,6 @@ namespace Capnproto_test.Capnp.Test
             await Impl.WaitForever(cancellationToken_);
             var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Result_waitForever.WRITER>();
             return s_;
-        }
-    }
-
-    public static partial class PipeliningSupportExtensions
-    {
-        static readonly MemberAccessPath Path_makeThing_Eager = new MemberAccessPath(0U);
-        public static Capnproto_test.Capnp.Test.TestMembrane.IThing Eager(this Task<Capnproto_test.Capnp.Test.TestMembrane.IThing> task)
-        {
-            return (Capnproto_test.Capnp.Test.TestMembrane.IThing)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.TestMembrane.IThing>(Impatient.GetAnswer(task).Access(Path_makeThing_Eager));
         }
     }
 
@@ -16527,6 +16463,57 @@ namespace Capnproto_test.Capnp.Test
                     this.SetStruct(0, 0);
                 }
             }
+        }
+    }
+
+    public static partial class PipeliningSupportExtensions
+    {
+        static readonly MemberAccessPath Path_getCap_OutBox_Cap = new MemberAccessPath(1U, 0U);
+        public static Capnproto_test.Capnp.Test.ITestInterface OutBox_Cap(this Task<(string, Capnproto_test.Capnp.Test.TestPipeline.Box)> task)
+        {
+            return (Capnproto_test.Capnp.Test.ITestInterface)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestInterface>(Impatient.GetAnswer(task).Access(Path_getCap_OutBox_Cap));
+        }
+
+        static readonly MemberAccessPath Path_getAnyCap_OutBox_Cap = new MemberAccessPath(1U, 0U);
+        public static BareProxy OutBox_Cap(this Task<(string, Capnproto_test.Capnp.Test.TestPipeline.AnyBox)> task)
+        {
+            return (BareProxy)CapabilityReflection.CreateProxy<BareProxy>(Impatient.GetAnswer(task).Access(Path_getAnyCap_OutBox_Cap));
+        }
+
+        static readonly MemberAccessPath Path_foo_C = new MemberAccessPath(1U);
+        public static Capnproto_test.Capnp.Test.ITestCallOrder C(this Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> task)
+        {
+            return (Capnproto_test.Capnp.Test.ITestCallOrder)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestCallOrder>(Impatient.GetAnswer(task).Access(Path_foo_C));
+        }
+
+        static readonly MemberAccessPath Path_neverReturn_Eager = new MemberAccessPath(0U);
+        public static Capnproto_test.Capnp.Test.ITestInterface Eager(this Task<Capnproto_test.Capnp.Test.ITestInterface> task)
+        {
+            return (Capnproto_test.Capnp.Test.ITestInterface)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestInterface>(Impatient.GetAnswer(task).Access(Path_neverReturn_Eager));
+        }
+
+        static readonly MemberAccessPath Path_echo_Eager = new MemberAccessPath(0U);
+        public static Capnproto_test.Capnp.Test.ITestCallOrder Eager(this Task<Capnproto_test.Capnp.Test.ITestCallOrder> task)
+        {
+            return (Capnproto_test.Capnp.Test.ITestCallOrder)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestCallOrder>(Impatient.GetAnswer(task).Access(Path_echo_Eager));
+        }
+
+        static readonly MemberAccessPath Path_getHandle_Eager = new MemberAccessPath(0U);
+        public static Capnproto_test.Capnp.Test.ITestHandle Eager(this Task<Capnproto_test.Capnp.Test.ITestHandle> task)
+        {
+            return (Capnproto_test.Capnp.Test.ITestHandle)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestHandle>(Impatient.GetAnswer(task).Access(Path_getHandle_Eager));
+        }
+
+        static readonly MemberAccessPath Path_getNull_Eager = new MemberAccessPath(0U);
+        public static Capnproto_test.Capnp.Test.ITestMoreStuff Eager(this Task<Capnproto_test.Capnp.Test.ITestMoreStuff> task)
+        {
+            return (Capnproto_test.Capnp.Test.ITestMoreStuff)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestMoreStuff>(Impatient.GetAnswer(task).Access(Path_getNull_Eager));
+        }
+
+        static readonly MemberAccessPath Path_makeThing_Eager = new MemberAccessPath(0U);
+        public static Capnproto_test.Capnp.Test.TestMembrane.IThing Eager(this Task<Capnproto_test.Capnp.Test.TestMembrane.IThing> task)
+        {
+            return (Capnproto_test.Capnp.Test.TestMembrane.IThing)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.TestMembrane.IThing>(Impatient.GetAnswer(task).Access(Path_makeThing_Eager));
         }
     }
 }

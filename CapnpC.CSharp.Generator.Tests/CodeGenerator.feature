@@ -55,3 +55,4 @@ Scenario Outline: Valid generator output
 Examples:
     | bin                 |
     | Issue19.capnp.bin   |
+	| Issue21.capnp.bin   |
