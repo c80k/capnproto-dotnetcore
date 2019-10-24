@@ -145,11 +145,11 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         break;
 
                     case NameUsage.Proxy:
-                        name = def.Name + "Proxy";
+                        name = def.Name + "_Proxy";
                         break;
 
                     case NameUsage.Skeleton:
-                        name = def.Name + "Skeleton";
+                        name = def.Name + "_Skeleton";
                         break;
 
                     default:
