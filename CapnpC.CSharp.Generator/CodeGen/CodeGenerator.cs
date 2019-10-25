@@ -142,13 +142,13 @@
             }
         }
 
-        ClassDeclarationSyntax TransformPipeliningSupport(IHasNestedDefinitions def)
+        ClassDeclarationSyntax TransformForPipeliningSupport(GenFile file)
         {
             var classDecl = default(ClassDeclarationSyntax);
 
             var q = new Queue<TypeDefinition>();
 
-            foreach (var inner in def.NestedDefinitions.OfType<TypeDefinition>())
+            foreach (var inner in file.NestedTypes)
             {
                 q.Enqueue(inner);
             }
@@ -165,7 +165,7 @@
                     {
                         if (classDecl == null)
                         {
-                            classDecl = ClassDeclaration(_names.PipeliningExtensionsClassName.Identifier)
+                            classDecl = ClassDeclaration(_names.MakePipeliningSupportExtensionClassName(file).Identifier)
                                         .AddModifiers(Public, Static, Partial);
                         }
 
@@ -173,7 +173,7 @@
                     }
                 }
 
-                foreach (var inner in cur.NestedDefinitions.OfType<TypeDefinition>())
+                foreach (var inner in cur.NestedTypes)
                 {
                     q.Enqueue(inner);
                 }
@@ -193,7 +193,7 @@
                 ns = ns.AddMembers(Transform(def).ToArray());
             }
 
-            var psc = TransformPipeliningSupport(file);
+            var psc = TransformForPipeliningSupport(file);
 
             if (psc != null)
             {

@@ -8602,13 +8602,13 @@ namespace Capnproto_test.Capnp.Test
                     }
                 }
 
-                [TypeId(0x8839ed86c9794287UL), Proxy(typeof(DeepNestInterfaceProxy<>)), Skeleton(typeof(DeepNestInterfaceSkeleton<>))]
+                [TypeId(0x8839ed86c9794287UL), Proxy(typeof(DeepNestInterface_Proxy<>)), Skeleton(typeof(DeepNestInterface_Skeleton<>))]
                 public interface IDeepNestInterface<TQuux> : IDisposable where TQuux : class
                 {
                     Task Call(CancellationToken cancellationToken_ = default);
                 }
 
-                public class DeepNestInterfaceProxy<TQuux> : Proxy, IDeepNestInterface<TQuux> where TQuux : class
+                public class DeepNestInterface_Proxy<TQuux> : Proxy, IDeepNestInterface<TQuux> where TQuux : class
                 {
                     public async Task Call(CancellationToken cancellationToken_ = default)
                     {
@@ -8622,9 +8622,9 @@ namespace Capnproto_test.Capnp.Test
                     }
                 }
 
-                public class DeepNestInterfaceSkeleton<TQuux> : Skeleton<IDeepNestInterface<TQuux>> where TQuux : class
+                public class DeepNestInterface_Skeleton<TQuux> : Skeleton<IDeepNestInterface<TQuux>> where TQuux : class
                 {
-                    public DeepNestInterfaceSkeleton()
+                    public DeepNestInterface_Skeleton()
                     {
                         SetMethodTable(Call);
                     }
@@ -8734,13 +8734,13 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xc9e749e8dd54da5cUL), Proxy(typeof(InterfaceProxy<>)), Skeleton(typeof(InterfaceSkeleton<>))]
+        [TypeId(0xc9e749e8dd54da5cUL), Proxy(typeof(Interface_Proxy<>)), Skeleton(typeof(Interface_Skeleton<>))]
         public interface IInterface<TQux> : IDisposable where TQux : class
         {
             Task<(TQux, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>)> Call(Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<string> arg_, CancellationToken cancellationToken_ = default);
         }
 
-        public class InterfaceProxy<TQux> : Proxy, IInterface<TQux> where TQux : class
+        public class Interface_Proxy<TQux> : Proxy, IInterface<TQux> where TQux : class
         {
             public Task<(TQux, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>)> Call(Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<string> arg_, CancellationToken cancellationToken_ = default)
             {
@@ -8756,9 +8756,9 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        public class InterfaceSkeleton<TQux> : Skeleton<IInterface<TQux>> where TQux : class
+        public class Interface_Skeleton<TQux> : Skeleton<IInterface<TQux>> where TQux : class
         {
-            public InterfaceSkeleton()
+            public Interface_Skeleton()
             {
                 SetMethodTable(Call);
             }
@@ -9113,14 +9113,14 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x8b9717a3f8d85a9aUL), Proxy(typeof(TestImplicitMethodParamsProxy)), Skeleton(typeof(TestImplicitMethodParamsSkeleton))]
+    [TypeId(0x8b9717a3f8d85a9aUL), Proxy(typeof(TestImplicitMethodParams_Proxy)), Skeleton(typeof(TestImplicitMethodParams_Skeleton))]
     public interface ITestImplicitMethodParams : IDisposable
     {
         Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT foo, TU bar, CancellationToken cancellationToken_ = default)
             where TT : class where TU : class;
     }
 
-    public class TestImplicitMethodParamsProxy : Proxy, ITestImplicitMethodParams
+    public class TestImplicitMethodParams_Proxy : Proxy, ITestImplicitMethodParams
     {
         public Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT foo, TU bar, CancellationToken cancellationToken_ = default)
             where TT : class where TU : class
@@ -9139,9 +9139,9 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    public class TestImplicitMethodParamsSkeleton : Skeleton<ITestImplicitMethodParams>
+    public class TestImplicitMethodParams_Skeleton : Skeleton<ITestImplicitMethodParams>
     {
-        public TestImplicitMethodParamsSkeleton()
+        public TestImplicitMethodParams_Skeleton()
         {
             SetMethodTable(Call<AnyPointer, AnyPointer>);
         }
@@ -9240,14 +9240,14 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xdf9ccdeb81a704c9UL), Proxy(typeof(TestImplicitMethodParamsInGenericProxy<>)), Skeleton(typeof(TestImplicitMethodParamsInGenericSkeleton<>))]
+    [TypeId(0xdf9ccdeb81a704c9UL), Proxy(typeof(TestImplicitMethodParamsInGeneric_Proxy<>)), Skeleton(typeof(TestImplicitMethodParamsInGeneric_Skeleton<>))]
     public interface ITestImplicitMethodParamsInGeneric<TV> : IDisposable where TV : class
     {
         Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT foo, TU bar, CancellationToken cancellationToken_ = default)
             where TT : class where TU : class;
     }
 
-    public class TestImplicitMethodParamsInGenericProxy<TV> : Proxy, ITestImplicitMethodParamsInGeneric<TV> where TV : class
+    public class TestImplicitMethodParamsInGeneric_Proxy<TV> : Proxy, ITestImplicitMethodParamsInGeneric<TV> where TV : class
     {
         public Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT foo, TU bar, CancellationToken cancellationToken_ = default)
             where TT : class where TU : class
@@ -9266,9 +9266,9 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    public class TestImplicitMethodParamsInGenericSkeleton<TV> : Skeleton<ITestImplicitMethodParamsInGeneric<TV>> where TV : class
+    public class TestImplicitMethodParamsInGeneric_Skeleton<TV> : Skeleton<ITestImplicitMethodParamsInGeneric<TV>> where TV : class
     {
-        public TestImplicitMethodParamsInGenericSkeleton()
+        public TestImplicitMethodParamsInGeneric_Skeleton()
         {
             SetMethodTable(Call<AnyPointer, AnyPointer>);
         }
@@ -10797,7 +10797,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x88eb12a0e0af92b2UL), Proxy(typeof(TestInterfaceProxy)), Skeleton(typeof(TestInterfaceSkeleton))]
+    [TypeId(0x88eb12a0e0af92b2UL), Proxy(typeof(TestInterface_Proxy)), Skeleton(typeof(TestInterface_Skeleton))]
     public interface ITestInterface : IDisposable
     {
         Task<string> Foo(uint i, bool j, CancellationToken cancellationToken_ = default);
@@ -10805,7 +10805,7 @@ namespace Capnproto_test.Capnp.Test
         Task Baz(Capnproto_test.Capnp.Test.TestAllTypes s, CancellationToken cancellationToken_ = default);
     }
 
-    public class TestInterfaceProxy : Proxy, ITestInterface
+    public class TestInterface_Proxy : Proxy, ITestInterface
     {
         public async Task<string> Foo(uint i, bool j, CancellationToken cancellationToken_ = default)
         {
@@ -10841,9 +10841,9 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    public class TestInterfaceSkeleton : Skeleton<ITestInterface>
+    public class TestInterface_Skeleton : Skeleton<ITestInterface>
     {
-        public TestInterfaceSkeleton()
+        public TestInterface_Skeleton()
         {
             SetMethodTable(Foo, Bar, Baz);
         }
@@ -11212,7 +11212,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xe4e9bac98670b748UL), Proxy(typeof(TestExtendsProxy)), Skeleton(typeof(TestExtendsSkeleton))]
+    [TypeId(0xe4e9bac98670b748UL), Proxy(typeof(TestExtends_Proxy)), Skeleton(typeof(TestExtends_Skeleton))]
     public interface ITestExtends : Capnproto_test.Capnp.Test.ITestInterface
     {
         Task Qux(CancellationToken cancellationToken_ = default);
@@ -11220,7 +11220,7 @@ namespace Capnproto_test.Capnp.Test
         Task<Capnproto_test.Capnp.Test.TestAllTypes> Grault(CancellationToken cancellationToken_ = default);
     }
 
-    public class TestExtendsProxy : Proxy, ITestExtends
+    public class TestExtends_Proxy : Proxy, ITestExtends
     {
         public async Task Qux(CancellationToken cancellationToken_ = default)
         {
@@ -11287,9 +11287,9 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    public class TestExtendsSkeleton : Skeleton<ITestExtends>
+    public class TestExtends_Skeleton : Skeleton<ITestExtends>
     {
-        public TestExtendsSkeleton()
+        public TestExtends_Skeleton()
         {
             SetMethodTable(Qux, Corge, Grault);
         }
@@ -11505,12 +11505,12 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x98d7e0ef61488783UL), Proxy(typeof(TestExtends2Proxy)), Skeleton(typeof(TestExtends2Skeleton))]
+    [TypeId(0x98d7e0ef61488783UL), Proxy(typeof(TestExtends2_Proxy)), Skeleton(typeof(TestExtends2_Skeleton))]
     public interface ITestExtends2 : Capnproto_test.Capnp.Test.ITestExtends
     {
     }
 
-    public class TestExtends2Proxy : Proxy, ITestExtends2
+    public class TestExtends2_Proxy : Proxy, ITestExtends2
     {
         public async Task Qux(CancellationToken cancellationToken_ = default)
         {
@@ -11577,9 +11577,9 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    public class TestExtends2Skeleton : Skeleton<ITestExtends2>
+    public class TestExtends2_Skeleton : Skeleton<ITestExtends2>
     {
-        public TestExtends2Skeleton()
+        public TestExtends2_Skeleton()
         {
             SetMethodTable();
         }
@@ -11587,7 +11587,7 @@ namespace Capnproto_test.Capnp.Test
         public override ulong InterfaceId => 11013518732491786115UL;
     }
 
-    [TypeId(0xa5a404caa61d4cd0UL), Proxy(typeof(TestPipelineProxy)), Skeleton(typeof(TestPipelineSkeleton))]
+    [TypeId(0xa5a404caa61d4cd0UL), Proxy(typeof(TestPipeline_Proxy)), Skeleton(typeof(TestPipeline_Skeleton))]
     public interface ITestPipeline : IDisposable
     {
         Task<(string, Capnproto_test.Capnp.Test.TestPipeline.Box)> GetCap(uint n, Capnproto_test.Capnp.Test.ITestInterface inCap, CancellationToken cancellationToken_ = default);
@@ -11595,7 +11595,7 @@ namespace Capnproto_test.Capnp.Test
         Task<(string, Capnproto_test.Capnp.Test.TestPipeline.AnyBox)> GetAnyCap(uint n, BareProxy inCap, CancellationToken cancellationToken_ = default);
     }
 
-    public class TestPipelineProxy : Proxy, ITestPipeline
+    public class TestPipeline_Proxy : Proxy, ITestPipeline
     {
         public Task<(string, Capnproto_test.Capnp.Test.TestPipeline.Box)> GetCap(uint n, Capnproto_test.Capnp.Test.ITestInterface inCap, CancellationToken cancellationToken_ = default)
         {
@@ -11639,9 +11639,9 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    public class TestPipelineSkeleton : Skeleton<ITestPipeline>
+    public class TestPipeline_Skeleton : Skeleton<ITestPipeline>
     {
-        public TestPipelineSkeleton()
+        public TestPipeline_Skeleton()
         {
             SetMethodTable(GetCap, TestPointers, GetAnyCap);
         }
@@ -12242,13 +12242,13 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xa0e77035bdff0051UL), Proxy(typeof(TestCallOrderProxy)), Skeleton(typeof(TestCallOrderSkeleton))]
+    [TypeId(0xa0e77035bdff0051UL), Proxy(typeof(TestCallOrder_Proxy)), Skeleton(typeof(TestCallOrder_Skeleton))]
     public interface ITestCallOrder : IDisposable
     {
         Task<uint> GetCallSequence(uint expected, CancellationToken cancellationToken_ = default);
     }
 
-    public class TestCallOrderProxy : Proxy, ITestCallOrder
+    public class TestCallOrder_Proxy : Proxy, ITestCallOrder
     {
         public async Task<uint> GetCallSequence(uint expected, CancellationToken cancellationToken_ = default)
         {
@@ -12262,9 +12262,9 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    public class TestCallOrderSkeleton : Skeleton<ITestCallOrder>
+    public class TestCallOrder_Skeleton : Skeleton<ITestCallOrder>
     {
-        public TestCallOrderSkeleton()
+        public TestCallOrder_Skeleton()
         {
             SetMethodTable(GetCallSequence);
         }
@@ -12408,13 +12408,13 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xddd699207eb8e23bUL), Proxy(typeof(TestTailCalleeProxy)), Skeleton(typeof(TestTailCalleeSkeleton))]
+    [TypeId(0xddd699207eb8e23bUL), Proxy(typeof(TestTailCallee_Proxy)), Skeleton(typeof(TestTailCallee_Skeleton))]
     public interface ITestTailCallee : IDisposable
     {
         Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int i, string t, CancellationToken cancellationToken_ = default);
     }
 
-    public class TestTailCalleeProxy : Proxy, ITestTailCallee
+    public class TestTailCallee_Proxy : Proxy, ITestTailCallee
     {
         public Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int i, string t, CancellationToken cancellationToken_ = default)
         {
@@ -12432,9 +12432,9 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    public class TestTailCalleeSkeleton : Skeleton<ITestTailCallee>
+    public class TestTailCallee_Skeleton : Skeleton<ITestTailCallee>
     {
-        public TestTailCalleeSkeleton()
+        public TestTailCallee_Skeleton()
         {
             SetMethodTable(Foo);
         }
@@ -12622,13 +12622,13 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x870bf40110ce3035UL), Proxy(typeof(TestTailCallerProxy)), Skeleton(typeof(TestTailCallerSkeleton))]
+    [TypeId(0x870bf40110ce3035UL), Proxy(typeof(TestTailCaller_Proxy)), Skeleton(typeof(TestTailCaller_Skeleton))]
     public interface ITestTailCaller : IDisposable
     {
         Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int i, Capnproto_test.Capnp.Test.ITestTailCallee callee, CancellationToken cancellationToken_ = default);
     }
 
-    public class TestTailCallerProxy : Proxy, ITestTailCaller
+    public class TestTailCaller_Proxy : Proxy, ITestTailCaller
     {
         public Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int i, Capnproto_test.Capnp.Test.ITestTailCallee callee, CancellationToken cancellationToken_ = default)
         {
@@ -12646,9 +12646,9 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    public class TestTailCallerSkeleton : Skeleton<ITestTailCaller>
+    public class TestTailCaller_Skeleton : Skeleton<ITestTailCaller>
     {
-        public TestTailCallerSkeleton()
+        public TestTailCaller_Skeleton()
         {
             SetMethodTable(Foo);
         }
@@ -12746,18 +12746,18 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xa38e5efe41e53a15UL), Proxy(typeof(TestHandleProxy)), Skeleton(typeof(TestHandleSkeleton))]
+    [TypeId(0xa38e5efe41e53a15UL), Proxy(typeof(TestHandle_Proxy)), Skeleton(typeof(TestHandle_Skeleton))]
     public interface ITestHandle : IDisposable
     {
     }
 
-    public class TestHandleProxy : Proxy, ITestHandle
+    public class TestHandle_Proxy : Proxy, ITestHandle
     {
     }
 
-    public class TestHandleSkeleton : Skeleton<ITestHandle>
+    public class TestHandle_Skeleton : Skeleton<ITestHandle>
     {
-        public TestHandleSkeleton()
+        public TestHandle_Skeleton()
         {
             SetMethodTable();
         }
@@ -12765,7 +12765,7 @@ namespace Capnproto_test.Capnp.Test
         public override ulong InterfaceId => 11785461720995412501UL;
     }
 
-    [TypeId(0xddc70bf9784133cfUL), Proxy(typeof(TestMoreStuffProxy)), Skeleton(typeof(TestMoreStuffSkeleton))]
+    [TypeId(0xddc70bf9784133cfUL), Proxy(typeof(TestMoreStuff_Proxy)), Skeleton(typeof(TestMoreStuff_Skeleton))]
     public interface ITestMoreStuff : Capnproto_test.Capnp.Test.ITestCallOrder
     {
         Task<string> CallFoo(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default);
@@ -12783,7 +12783,7 @@ namespace Capnproto_test.Capnp.Test
         Task MethodWithNullDefault(string a, Capnproto_test.Capnp.Test.ITestInterface b, CancellationToken cancellationToken_ = default);
     }
 
-    public class TestMoreStuffProxy : Proxy, ITestMoreStuff
+    public class TestMoreStuff_Proxy : Proxy, ITestMoreStuff
     {
         public async Task<string> CallFoo(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default)
         {
@@ -12960,9 +12960,9 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    public class TestMoreStuffSkeleton : Skeleton<ITestMoreStuff>
+    public class TestMoreStuff_Skeleton : Skeleton<ITestMoreStuff>
     {
-        public TestMoreStuffSkeleton()
+        public TestMoreStuff_Skeleton()
         {
             SetMethodTable(CallFoo, CallFooWhenResolved, NeverReturn, Hold, CallHeld, GetHeld, Echo, ExpectCancel, MethodWithDefaults, GetHandle, GetNull, GetEnormousString, MethodWithNullDefault);
         }
@@ -14634,7 +14634,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xc07d8dcd80a69c0cUL), Proxy(typeof(TestMembraneProxy)), Skeleton(typeof(TestMembraneSkeleton))]
+    [TypeId(0xc07d8dcd80a69c0cUL), Proxy(typeof(TestMembrane_Proxy)), Skeleton(typeof(TestMembrane_Skeleton))]
     public interface ITestMembrane : IDisposable
     {
         Task<Capnproto_test.Capnp.Test.TestMembrane.IThing> MakeThing(CancellationToken cancellationToken_ = default);
@@ -14644,7 +14644,7 @@ namespace Capnproto_test.Capnp.Test
         Task WaitForever(CancellationToken cancellationToken_ = default);
     }
 
-    public class TestMembraneProxy : Proxy, ITestMembrane
+    public class TestMembrane_Proxy : Proxy, ITestMembrane
     {
         public Task<Capnproto_test.Capnp.Test.TestMembrane.IThing> MakeThing(CancellationToken cancellationToken_ = default)
         {
@@ -14710,9 +14710,9 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    public class TestMembraneSkeleton : Skeleton<ITestMembrane>
+    public class TestMembrane_Skeleton : Skeleton<ITestMembrane>
     {
-        public TestMembraneSkeleton()
+        public TestMembrane_Skeleton()
         {
             SetMethodTable(MakeThing, CallPassThrough, CallIntercept, Loopback, WaitForever);
         }
@@ -14781,14 +14781,14 @@ namespace Capnproto_test.Capnp.Test
 
     public static class TestMembrane
     {
-        [TypeId(0x9352e4e41f173917UL), Proxy(typeof(ThingProxy)), Skeleton(typeof(ThingSkeleton))]
+        [TypeId(0x9352e4e41f173917UL), Proxy(typeof(Thing_Proxy)), Skeleton(typeof(Thing_Skeleton))]
         public interface IThing : IDisposable
         {
             Task<Capnproto_test.Capnp.Test.TestMembrane.Result> PassThrough(CancellationToken cancellationToken_ = default);
             Task<Capnproto_test.Capnp.Test.TestMembrane.Result> Intercept(CancellationToken cancellationToken_ = default);
         }
 
-        public class ThingProxy : Proxy, IThing
+        public class Thing_Proxy : Proxy, IThing
         {
             public async Task<Capnproto_test.Capnp.Test.TestMembrane.Result> PassThrough(CancellationToken cancellationToken_ = default)
             {
@@ -14813,9 +14813,9 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        public class ThingSkeleton : Skeleton<IThing>
+        public class Thing_Skeleton : Skeleton<IThing>
         {
-            public ThingSkeleton()
+            public Thing_Skeleton()
             {
                 SetMethodTable(PassThrough, Intercept);
             }
@@ -15675,7 +15675,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x9ae342d394247cfcUL), Proxy(typeof(TestKeywordMethodsProxy)), Skeleton(typeof(TestKeywordMethodsSkeleton))]
+    [TypeId(0x9ae342d394247cfcUL), Proxy(typeof(TestKeywordMethods_Proxy)), Skeleton(typeof(TestKeywordMethods_Skeleton))]
     public interface ITestKeywordMethods : IDisposable
     {
         Task Delete(CancellationToken cancellationToken_ = default);
@@ -15684,7 +15684,7 @@ namespace Capnproto_test.Capnp.Test
         Task Return(CancellationToken cancellationToken_ = default);
     }
 
-    public class TestKeywordMethodsProxy : Proxy, ITestKeywordMethods
+    public class TestKeywordMethods_Proxy : Proxy, ITestKeywordMethods
     {
         public async Task Delete(CancellationToken cancellationToken_ = default)
         {
@@ -15731,9 +15731,9 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    public class TestKeywordMethodsSkeleton : Skeleton<ITestKeywordMethods>
+    public class TestKeywordMethods_Skeleton : Skeleton<ITestKeywordMethods>
     {
-        public TestKeywordMethodsSkeleton()
+        public TestKeywordMethods_Skeleton()
         {
             SetMethodTable(Delete, Class, Void, Return);
         }
@@ -16131,13 +16131,13 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xea72cc77253798cdUL), Proxy(typeof(TestAuthenticatedBootstrapProxy<>)), Skeleton(typeof(TestAuthenticatedBootstrapSkeleton<>))]
+    [TypeId(0xea72cc77253798cdUL), Proxy(typeof(TestAuthenticatedBootstrap_Proxy<>)), Skeleton(typeof(TestAuthenticatedBootstrap_Skeleton<>))]
     public interface ITestAuthenticatedBootstrap<TVatId> : IDisposable where TVatId : class
     {
         Task<TVatId> GetCallerId(CancellationToken cancellationToken_ = default);
     }
 
-    public class TestAuthenticatedBootstrapProxy<TVatId> : Proxy, ITestAuthenticatedBootstrap<TVatId> where TVatId : class
+    public class TestAuthenticatedBootstrap_Proxy<TVatId> : Proxy, ITestAuthenticatedBootstrap<TVatId> where TVatId : class
     {
         public Task<TVatId> GetCallerId(CancellationToken cancellationToken_ = default)
         {
@@ -16155,9 +16155,9 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    public class TestAuthenticatedBootstrapSkeleton<TVatId> : Skeleton<ITestAuthenticatedBootstrap<TVatId>> where TVatId : class
+    public class TestAuthenticatedBootstrap_Skeleton<TVatId> : Skeleton<ITestAuthenticatedBootstrap<TVatId>> where TVatId : class
     {
-        public TestAuthenticatedBootstrapSkeleton()
+        public TestAuthenticatedBootstrap_Skeleton()
         {
             SetMethodTable(GetCallerId);
         }
@@ -17105,13 +17105,13 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xd112a69d31ed918bUL), Proxy(typeof(TestNameAnnotationInterfaceProxy)), Skeleton(typeof(TestNameAnnotationInterfaceSkeleton))]
+    [TypeId(0xd112a69d31ed918bUL), Proxy(typeof(TestNameAnnotationInterface_Proxy)), Skeleton(typeof(TestNameAnnotationInterface_Skeleton))]
     public interface ITestNameAnnotationInterface : IDisposable
     {
         Task BadlyNamedMethod(byte badlyNamedParam, CancellationToken cancellationToken_ = default);
     }
 
-    public class TestNameAnnotationInterfaceProxy : Proxy, ITestNameAnnotationInterface
+    public class TestNameAnnotationInterface_Proxy : Proxy, ITestNameAnnotationInterface
     {
         public async Task BadlyNamedMethod(byte badlyNamedParam, CancellationToken cancellationToken_ = default)
         {
@@ -17125,9 +17125,9 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    public class TestNameAnnotationInterfaceSkeleton : Skeleton<ITestNameAnnotationInterface>
+    public class TestNameAnnotationInterface_Skeleton : Skeleton<ITestNameAnnotationInterface>
     {
-        public TestNameAnnotationInterfaceSkeleton()
+        public TestNameAnnotationInterface_Skeleton()
         {
             SetMethodTable(BadlyNamedMethod);
         }
@@ -17250,54 +17250,24 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    public static partial class PipeliningSupportExtensions
+    public static partial class PipeliningSupportExtensions_test
     {
-        static readonly MemberAccessPath Path_getCap_OutBox_Cap = new MemberAccessPath(1U, 0U);
+        static readonly MemberAccessPath Path_capnproto_test_capnp_test_TestPipeline_getCap_OutBox_Cap = new MemberAccessPath(1U, 0U);
         public static Capnproto_test.Capnp.Test.ITestInterface OutBox_Cap(this Task<(string, Capnproto_test.Capnp.Test.TestPipeline.Box)> task)
         {
-            return (Capnproto_test.Capnp.Test.ITestInterface)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestInterface>(Impatient.GetAnswer(task).Access(Path_getCap_OutBox_Cap));
+            return (Capnproto_test.Capnp.Test.ITestInterface)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestInterface>(Impatient.GetAnswer(task).Access(Path_capnproto_test_capnp_test_TestPipeline_getCap_OutBox_Cap));
         }
 
-        static readonly MemberAccessPath Path_getAnyCap_OutBox_Cap = new MemberAccessPath(1U, 0U);
+        static readonly MemberAccessPath Path_capnproto_test_capnp_test_TestPipeline_getAnyCap_OutBox_Cap = new MemberAccessPath(1U, 0U);
         public static BareProxy OutBox_Cap(this Task<(string, Capnproto_test.Capnp.Test.TestPipeline.AnyBox)> task)
         {
-            return (BareProxy)CapabilityReflection.CreateProxy<BareProxy>(Impatient.GetAnswer(task).Access(Path_getAnyCap_OutBox_Cap));
+            return (BareProxy)CapabilityReflection.CreateProxy<BareProxy>(Impatient.GetAnswer(task).Access(Path_capnproto_test_capnp_test_TestPipeline_getAnyCap_OutBox_Cap));
         }
 
-        static readonly MemberAccessPath Path_foo_C = new MemberAccessPath(1U);
+        static readonly MemberAccessPath Path_capnproto_test_capnp_test_TestTailCallee_foo_C = new MemberAccessPath(1U);
         public static Capnproto_test.Capnp.Test.ITestCallOrder C(this Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> task)
         {
-            return (Capnproto_test.Capnp.Test.ITestCallOrder)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestCallOrder>(Impatient.GetAnswer(task).Access(Path_foo_C));
-        }
-
-        static readonly MemberAccessPath Path_neverReturn_Eager = new MemberAccessPath(0U);
-        public static Capnproto_test.Capnp.Test.ITestInterface Eager(this Task<Capnproto_test.Capnp.Test.ITestInterface> task)
-        {
-            return (Capnproto_test.Capnp.Test.ITestInterface)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestInterface>(Impatient.GetAnswer(task).Access(Path_neverReturn_Eager));
-        }
-
-        static readonly MemberAccessPath Path_echo_Eager = new MemberAccessPath(0U);
-        public static Capnproto_test.Capnp.Test.ITestCallOrder Eager(this Task<Capnproto_test.Capnp.Test.ITestCallOrder> task)
-        {
-            return (Capnproto_test.Capnp.Test.ITestCallOrder)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestCallOrder>(Impatient.GetAnswer(task).Access(Path_echo_Eager));
-        }
-
-        static readonly MemberAccessPath Path_getHandle_Eager = new MemberAccessPath(0U);
-        public static Capnproto_test.Capnp.Test.ITestHandle Eager(this Task<Capnproto_test.Capnp.Test.ITestHandle> task)
-        {
-            return (Capnproto_test.Capnp.Test.ITestHandle)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestHandle>(Impatient.GetAnswer(task).Access(Path_getHandle_Eager));
-        }
-
-        static readonly MemberAccessPath Path_getNull_Eager = new MemberAccessPath(0U);
-        public static Capnproto_test.Capnp.Test.ITestMoreStuff Eager(this Task<Capnproto_test.Capnp.Test.ITestMoreStuff> task)
-        {
-            return (Capnproto_test.Capnp.Test.ITestMoreStuff)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestMoreStuff>(Impatient.GetAnswer(task).Access(Path_getNull_Eager));
-        }
-
-        static readonly MemberAccessPath Path_makeThing_Eager = new MemberAccessPath(0U);
-        public static Capnproto_test.Capnp.Test.TestMembrane.IThing Eager(this Task<Capnproto_test.Capnp.Test.TestMembrane.IThing> task)
-        {
-            return (Capnproto_test.Capnp.Test.TestMembrane.IThing)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.TestMembrane.IThing>(Impatient.GetAnswer(task).Access(Path_makeThing_Eager));
+            return (Capnproto_test.Capnp.Test.ITestCallOrder)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestCallOrder>(Impatient.GetAnswer(task).Access(Path_capnproto_test_capnp_test_TestTailCallee_foo_C));
         }
     }
 }

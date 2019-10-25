@@ -30,8 +30,10 @@
         public string PropertyNamedLikeTypeRenameFormat { get; set; } = "The{0}";
         public string InstLocalName { get; set; } = "inst";
         public string GenericTypeParameterFormat { get; set; } = "T{0}";
-        public string PipeliningExtensionsClassName { get; set; } = "PipeliningSupportExtensions";
-        public string MemberAccessPathNameFormat { get; set; } = "Path_{0}_{1}";
+        public string PipeliningExtensionsClassFormat { get; set; } = "PipeliningSupportExtensions_{0}";
+        public string ProxyClassFormat { get; set; } = "{0}_Proxy";
+        public string SkeletonClassFormat { get; set; } = "{0}_Skeleton";
+        public string MemberAccessPathNameFormat { get; set; } = "Path_{0}_{1}_{2}_{3}";
         public string TaskParameterName { get; set; } = "task";
         public string EagerMethodName { get; set; } = "Eager";
         public string TypeIdFieldName { get; set; } = "typeId";

@@ -56,3 +56,4 @@ Examples:
     | bin                 |
     | Issue19.capnp.bin   |
 	| Issue21.capnp.bin   |
+	| Issue22.capnp.bin   |

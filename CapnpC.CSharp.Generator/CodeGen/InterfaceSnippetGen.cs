@@ -766,6 +766,12 @@ namespace CapnpC.CSharp.Generator.CodeGen
             {
                 foreach (var path in ExpandPipeliningPaths(method))
                 {
+                    if (path.Count == 1 && path[0].Offset == 0)
+                    {
+                        // The "trivial path" is already covered by the "Eager" extension method.
+                        continue;
+                    }
+
                     var accessPath = _names.MakeMemberAccessPathFieldName(method, path);
                     var methodName = _names.MakePipeliningSupportExtensionMethodName(path);
                     var capType = path[path.Count - 1].Type;

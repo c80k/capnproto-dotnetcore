@@ -241,7 +241,7 @@ namespace Capnp.Net.Runtime.Tests
                 using (var main = client.GetMain<ITestMoreStuff>())
                 {
                     var tcs = new TaskCompletionSource<ITestInterface>();
-                    var eager = tcs.Task.PseudoEager();
+                    var eager = tcs.Task.Eager(true);
 
                     var request = main.CallFoo(eager, default);
                     var request2 = main.CallFooWhenResolved(eager, default);
@@ -528,7 +528,7 @@ namespace Capnp.Net.Runtime.Tests
 
                     var earlyCall = main.GetCallSequence(0, default);
 
-                    var echo = main.Echo(cap.Task.PseudoEager(), default);
+                    var echo = main.Echo(cap.Task.Eager(true), default);
 
                     var pipeline = echo.Eager();
 
@@ -620,7 +620,7 @@ namespace Capnp.Net.Runtime.Tests
 
                     var tcs = new TaskCompletionSource<ITestInterface>();
 
-                    var req = main.Hold(tcs.Task.PseudoEager(), default);
+                    var req = main.Hold(tcs.Task.Eager(true), default);
                     Assert.IsTrue(req.Wait(MediumNonDbgTimeout));
 
                     var req2 = main.CallHeld(default);

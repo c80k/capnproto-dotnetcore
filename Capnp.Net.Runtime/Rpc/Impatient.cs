@@ -123,6 +123,7 @@ namespace Capnp.Rpc
         /// <exception cref="ArgumentNullException"><paramref name="task"/> is null.</exception>
         /// <exception cref="InvalidCapabilityInterfaceException"><typeparamref name="TInterface"/> did not
         /// quality as capability interface.</exception>
+        [Obsolete("Call Eager<TInterface>(task, true) instead")]
         public static TInterface PseudoEager<TInterface>(this Task<TInterface> task,
             [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
             [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
@@ -131,6 +132,48 @@ namespace Capnp.Rpc
         {
             var lazyCap = new LazyCapability(AwaitProxy(task));
             return CapabilityReflection.CreateProxy<TInterface>(lazyCap, memberName, sourceFilePath, sourceLineNumber) as TInterface;
+        }
+
+        static readonly MemberAccessPath Path_OneAndOnly = new MemberAccessPath(0U);
+
+        /// <summary>
+        /// Returns a promise-pipelined Proxy for a remote method invocation Task.
+        /// </summary>
+        /// <typeparam name="TInterface">Capability interface type</typeparam>
+        /// <param name="task">Task returning an interface</param>
+        /// <param name="allowNoPipeliningFallback">If this flag is 'false', the <paramref name="task"/> MUST have been returned from a remote
+        /// method invocation on a generated Proxy interface. Since this is the prerequisite for promise pipelining to work, the method throws an
+        /// exception if the requirement is not met (i.e. the passed some Task instance was constructed "somewhere else"). Setting this flag to 'true'
+        /// prevents such an exception. The method falls back to a local "lazy" proxy for the given Task. It is fully usable, but does not perform
+        /// any promise pipelining (as specified for Cap'n Proto).</param>
+        /// <returns>A proxy for the given future.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="task"/> is null.</exception>
+        /// <exception cref="InvalidCapabilityInterfaceException"><typeparamref name="TInterface"/> did not qualify as capability interface.</exception>
+        /// <exception cref="ArgumentException">The task was not returned from a remote method invocation. Promise pipelining won't work.
+        /// Setting <paramref name="allowNoPipeliningFallback"/>> to 'true' prevents this exception. 
+        /// OR: Mismatch between generic type arguments (if capability interface is generic).</exception>
+        /// <exception cref="InvalidOperationException">Mismatch between generic type arguments (if capability interface is generic).</exception>
+        /// <exception cref="System.Reflection.TargetInvocationException">Problem with instatiating the Proxy (constructor threw exception).</exception>
+        /// <exception cref="MemberAccessException">Caller does not have permission to invoke the Proxy constructor.</exception>
+        /// <exception cref="TypeLoadException">Problem with building the Proxy type, or problem with loading some dependent class.</exception>
+        public static TInterface Eager<TInterface>(this Task<TInterface> task, bool allowNoPipeliningFallback = false)
+            where TInterface : class
+        {
+            var answer = TryGetAnswer(task);
+            if (answer == null)
+            {
+                if (!allowNoPipeliningFallback)
+                {
+                    throw new ArgumentException("The task was not returned from a remote method invocation. See documentation for details.");
+                }
+
+                var lazyCap = new LazyCapability(AwaitProxy(task));
+                return CapabilityReflection.CreateProxy<TInterface>(lazyCap) as TInterface;
+            }
+            else
+            {
+                return CapabilityReflection.CreateProxy<TInterface>(answer.Access(Path_OneAndOnly)) as TInterface;
+            }
         }
 
         internal static IRpcEndpoint AskingEndpoint

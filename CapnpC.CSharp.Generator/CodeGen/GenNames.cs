@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -58,12 +59,13 @@ namespace CapnpC.CSharp.Generator.CodeGen
         public string ResultStructFormat { get; }
         public string PropertyNamedLikeTypeRenameFormat { get; }
         public string GenericTypeParameterFormat { get; }
-        public Name PipeliningExtensionsClassName { get; }
         public string MemberAccessPathNameFormat { get; }
         public Name TaskParameter { get; }
         public Name EagerMethod { get; }
         public Name TypeIdField { get; }
-
+        public string PipeliningExtensionsClassFormat { get; }
+        public string ProxyClassFormat { get; }
+        public string SkeletonClassFormat { get; }
         public GenNames(GeneratorOptions options)
         {
             TopNamespace = new Name(options.TopNamespaceName).IdentifierName;
@@ -94,11 +96,13 @@ namespace CapnpC.CSharp.Generator.CodeGen
             ResultStructFormat = options.ResultStructFormat;
             PropertyNamedLikeTypeRenameFormat = options.PropertyNamedLikeTypeRenameFormat;
             GenericTypeParameterFormat = options.GenericTypeParameterFormat;
-            PipeliningExtensionsClassName = new Name(options.PipeliningExtensionsClassName);
             MemberAccessPathNameFormat = options.MemberAccessPathNameFormat;
             TaskParameter = new Name(options.TaskParameterName);
             EagerMethod = new Name(options.EagerMethodName);
             TypeIdField = new Name(options.TypeIdFieldName);
+            PipeliningExtensionsClassFormat = options.PipeliningExtensionsClassFormat;
+            ProxyClassFormat = options.ProxyClassFormat;
+            SkeletonClassFormat = options.SkeletonClassFormat;
         }
 
         public Name MakeTypeName(TypeDefinition def, NameUsage usage = NameUsage.Default)
@@ -145,11 +149,11 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         break;
 
                     case NameUsage.Proxy:
-                        name = def.Name + "Proxy";
+                        name = string.Format(ProxyClassFormat, def.Name);
                         break;
 
                     case NameUsage.Skeleton:
-                        name = def.Name + "Skeleton";
+                        name = string.Format(SkeletonClassFormat, def.Name);
                         break;
 
                     default:
@@ -593,9 +597,43 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 return new Name(string.Join("_", path.Select(f => GetCodeIdentifier(f).ToString())));
         }
 
+        public Name MakePipeliningSupportExtensionClassName(GenFile file)
+        {
+            return new Name(string.Format(PipeliningExtensionsClassFormat, Path.GetFileNameWithoutExtension(file.Name).Replace(".", "_")));
+        }
+
         public Name MakeMemberAccessPathFieldName(Method method, IReadOnlyList<Field> path)
         {
+            var nameList = new Stack<string>();
+            var cur = method.DeclaringInterface.DeclaringElement;
+            do
+            {
+                switch (cur)
+                {
+                    case TypeDefinition def:
+                        nameList.Push(def.Name);
+                        cur = def.DeclaringElement;
+                        break;
+
+                    case GenFile file:
+                        if (file.Namespace != null)
+                        {
+                            foreach (string id in file.Namespace.Reverse())
+                            {
+                                nameList.Push(id);
+                            }
+                        }
+                        cur = null;
+                        break;
+
+                    default:
+                        throw new NotImplementedException("Unexpected element in definition hierarchy of method. Not a type, not a file.");
+                }
+            } while (cur != null);
+
             return new Name(string.Format(MemberAccessPathNameFormat,
+                string.Join("_", nameList),
+                method.DeclaringInterface.Name,
                 method.Name,
                 MakePipeliningSupportExtensionMethodName(path)));
         }
