@@ -143,5 +143,34 @@ namespace Capnp.Net.Runtime.Tests
                 }
             }
         }
+
+        [TestMethod]
+        public void Issue25()
+        {
+            using (var server = SetupServer())
+            {
+                server.Main = new Issue25BImpl();
+
+                using (var client = SetupClient())
+                {
+                    client.WhenConnected.Wait();
+
+                    using (var main = client.GetMain<CapnpGen.IIssue25B>())
+                    {
+                        var capholderAPT = main.GetAinCapHolderAnyPointer();
+                        Assert.IsTrue(capholderAPT.Wait(MediumNonDbgTimeout));
+                        var capholderAP = capholderAPT.Result;
+                        var capAPT = capholderAP.Cap();
+                        Assert.IsTrue(capAPT.Wait(MediumNonDbgTimeout));
+                        using (var a = ((BareProxy)capAPT.Result).Cast<CapnpGen.IIssue25A>(true))
+                        {
+                            var r = a.MethodA();
+                            Assert.IsTrue(r.Wait(MediumNonDbgTimeout));
+                            Assert.AreEqual(123L, r.Result);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

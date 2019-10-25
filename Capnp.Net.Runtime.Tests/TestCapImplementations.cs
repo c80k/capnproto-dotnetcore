@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Capnproto_test.Capnp.Test;
+using CapnpGen;
 
 namespace Capnp.Net.Runtime.Tests.GenImpls
 {
@@ -500,7 +501,7 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
             return ("bar", new TestPipeline.Box() { Cap = new TestExtendsImpl(_counters) });
         }
 
-        public Task TestPointers(ITestInterface cap, AnyPointer obj, IReadOnlyList<ITestInterface> list, CancellationToken cancellationToken_)
+        public Task TestPointers(ITestInterface cap, object obj, IReadOnlyList<ITestInterface> list, CancellationToken cancellationToken_)
         {
             throw new NotImplementedException();
         }
@@ -776,4 +777,83 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
         }
     }
     #endregion B2
+
+    #region Issue25
+
+    class Issue25AImpl : CapnpGen.IIssue25A
+    {
+        public void Dispose()
+        {
+        }
+
+        public Task<long> MethodA(CancellationToken cancellationToken_ = default)
+        {
+            return Task.FromResult(123L);
+        }
+    }
+
+    class CapHolderImpl<T> : CapnpGen.ICapHolder<T>
+        where T: class
+    {
+        T _cap;
+
+        public CapHolderImpl(T cap)
+        {
+            _cap = cap;
+        }
+
+        public Task<T> Cap(CancellationToken cancellationToken_ = default)
+        {
+            return Task.FromResult(_cap);
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+
+    class CapHolderAImpl : CapnpGen.ICapHolderA
+    {
+        IIssue25A _a;
+
+        public CapHolderAImpl(IIssue25A a)
+        {
+            _a = a;
+        }
+
+        public Task<IIssue25A> Cap(CancellationToken cancellationToken_ = default)
+        {
+            return Task.FromResult(_a);
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+
+    class Issue25BImpl : CapnpGen.IIssue25B
+    {
+        Issue25AImpl _a = new Issue25AImpl();
+
+        public void Dispose()
+        {
+        }
+
+        public Task<ICapHolder<object>> GetAinCapHolderAnyPointer(CancellationToken cancellationToken_ = default)
+        {
+            return Task.FromResult<ICapHolder<object>>(new CapHolderImpl<object>(_a));
+        }
+
+        public Task<ICapHolder<IIssue25A>> GetAinCapHolderGenericA(CancellationToken cancellationToken_ = default)
+        {
+            return Task.FromResult<ICapHolder<IIssue25A>>(new CapHolderImpl<CapnpGen.IIssue25A>(_a));
+        }
+
+        public Task<ICapHolderA> GetAinCapHolderNonGenericA(CancellationToken cancellationToken_ = default)
+        {
+            return Task.FromResult<ICapHolderA>(new CapHolderAImpl(_a));
+        }
+    }
+
+    #endregion
 }

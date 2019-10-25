@@ -99,6 +99,7 @@ namespace Capnp.Rpc
         static CapabilityReflection()
         {
             _proxyMap.Add(typeof(BareProxy), new ProxyFactory<BareProxy>());
+            _proxyMap.Add(typeof(object), new ProxyFactory<BareProxy>());
         }
 
         static SkeletonFactory CreateMonoSkeletonFactory(SkeletonAttribute attr, Type[] genericArguments)
@@ -185,7 +186,7 @@ namespace Capnp.Rpc
                         Type proxyClass = attrs[0].ProxyClass;
                         Type[] genericArguments = type.GetGenericArguments();
                         if (genericArguments.Length > 0)
-                            proxyClass = proxyClass.MakeGenericType(proxyClass);
+                            proxyClass = proxyClass.MakeGenericType(genericArguments);
 
                         return (ProxyFactory)Activator.CreateInstance(
                             typeof(ProxyFactory<>)

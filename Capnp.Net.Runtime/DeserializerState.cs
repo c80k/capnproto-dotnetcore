@@ -355,7 +355,9 @@ namespace Capnp
                         continue;
 
                     case PointerKind.Other:
+                        var tmp = Caps;
                         this = default;
+                        Caps = tmp;
                         Kind = ObjectKind.Capability;
                         BytesTraversedOrData = pointer.CapabilityIndex;
                         return;

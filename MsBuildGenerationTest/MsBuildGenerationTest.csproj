@@ -17,6 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <CapnpFiles Include="Issue25.capnp" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Capnp.Net.Runtime" Version="$(PackageReferenceVersion)" />
     <PackageReference Include="CapnpC.CSharp.MsBuild.Generation" Version="$(PackageReferenceVersion)" />
   </ItemGroup>

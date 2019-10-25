@@ -1223,7 +1223,7 @@ namespace Capnproto_test.Capnp.Test
         void ICapnpSerializable.Deserialize(DeserializerState arg_)
         {
             var reader = READER.create(arg_);
-            AnyPointerField = CapnpSerializable.Create<AnyPointer>(reader.AnyPointerField);
+            AnyPointerField = CapnpSerializable.Create<object>(reader.AnyPointerField);
             applyDefaults();
         }
 
@@ -1241,7 +1241,7 @@ namespace Capnproto_test.Capnp.Test
         {
         }
 
-        public AnyPointer AnyPointerField
+        public object AnyPointerField
         {
             get;
             set;
@@ -1283,7 +1283,7 @@ namespace Capnproto_test.Capnp.Test
         void ICapnpSerializable.Deserialize(DeserializerState arg_)
         {
             var reader = READER.create(arg_);
-            AnyStructField = CapnpSerializable.Create<AnyPointer>(reader.AnyStructField);
+            AnyStructField = CapnpSerializable.Create<object>(reader.AnyStructField);
             AnyListField = reader.AnyListField.ToReadOnlyList(_ => (object)_);
             CapabilityField = reader.CapabilityField;
             applyDefaults();
@@ -1305,7 +1305,7 @@ namespace Capnproto_test.Capnp.Test
         {
         }
 
-        public AnyPointer AnyStructField
+        public object AnyStructField
         {
             get;
             set;
@@ -8866,7 +8866,7 @@ namespace Capnproto_test.Capnp.Test
                 var reader = READER.create(arg_);
                 Foo = CapnpSerializable.Create<TFoo>(reader.Foo);
                 Inner = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner>(reader.Inner);
-                Inner2 = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<AnyPointer>>(reader.Inner2);
+                Inner2 = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<object>>(reader.Inner2);
                 Inner2Bind = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<string>>(reader.Inner2Bind);
                 Inner2Text = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<string>>(reader.Inner2Text);
                 RevFoo = CapnpSerializable.Create<TBar>(reader.RevFoo);
@@ -8904,7 +8904,7 @@ namespace Capnproto_test.Capnp.Test
                 set;
             }
 
-            public Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<AnyPointer> Inner2
+            public Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<object> Inner2
             {
                 get;
                 set;
@@ -8941,7 +8941,7 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public DeserializerState Foo => ctx.StructReadPointer(0);
                 public Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner.READER Inner => ctx.ReadStruct(1, Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner.READER.create);
-                public Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<AnyPointer>.READER Inner2 => ctx.ReadStruct(2, Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<AnyPointer>.READER.create);
+                public Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<object>.READER Inner2 => ctx.ReadStruct(2, Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<object>.READER.create);
                 public Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<string>.READER Inner2Bind => ctx.ReadStruct(3, Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<string>.READER.create);
                 public Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<string>.READER Inner2Text => ctx.ReadStruct(4, Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<string>.READER.create);
                 public DeserializerState RevFoo => ctx.StructReadPointer(5);
@@ -8966,9 +8966,9 @@ namespace Capnproto_test.Capnp.Test
                     set => Link(1, value);
                 }
 
-                public Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<AnyPointer>.WRITER Inner2
+                public Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<object>.WRITER Inner2
                 {
-                    get => BuildPointer<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<AnyPointer>.WRITER>(2);
+                    get => BuildPointer<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<object>.WRITER>(2);
                     set => Link(2, value);
                 }
 
@@ -9513,8 +9513,8 @@ namespace Capnproto_test.Capnp.Test
             Basic = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>>(reader.Basic);
             Inner = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner>(reader.Inner);
             Inner2 = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<string>>(reader.Inner2);
-            Unspecified = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<AnyPointer, AnyPointer>>(reader.Unspecified);
-            UnspecifiedInner = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<AnyPointer, AnyPointer>.Inner2<string>>(reader.UnspecifiedInner);
+            Unspecified = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<object, object>>(reader.Unspecified);
+            UnspecifiedInner = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<object, object>.Inner2<string>>(reader.UnspecifiedInner);
             Default = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, string>>(reader.Default);
             DefaultInner = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, string>.Inner>(reader.DefaultInner);
             DefaultUser = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestUseGenerics>(reader.DefaultUser);
@@ -9523,7 +9523,7 @@ namespace Capnproto_test.Capnp.Test
             DefaultWrapper2 = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenericsWrapper2>(reader.DefaultWrapper2);
             AliasFoo = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestAllTypes>(reader.AliasFoo);
             AliasInner = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner>(reader.AliasInner);
-            AliasInner2 = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<AnyPointer>>(reader.AliasInner2);
+            AliasInner2 = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<object>>(reader.AliasInner2);
             AliasInner2Bind = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<IReadOnlyList<uint>>>(reader.AliasInner2Bind);
             AliasInner2Text = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<string>>(reader.AliasInner2Text);
             AliasRev = reader.AliasRev;
@@ -9739,9 +9739,9 @@ namespace Capnproto_test.Capnp.Test
                 { },
                 Inner2 = new Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<string>()
                 { },
-                Unspecified = new Capnproto_test.Capnp.Test.TestGenerics<AnyPointer, AnyPointer>()
+                Unspecified = new Capnproto_test.Capnp.Test.TestGenerics<object, object>()
                 { },
-                UnspecifiedInner = new Capnproto_test.Capnp.Test.TestGenerics<AnyPointer, AnyPointer>.Inner2<string>()
+                UnspecifiedInner = new Capnproto_test.Capnp.Test.TestGenerics<object, object>.Inner2<string>()
                 { },
                 Default = new Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, string>()
                 { },
@@ -9759,7 +9759,7 @@ namespace Capnproto_test.Capnp.Test
                 { },
                 AliasInner = new Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner()
                 { },
-                AliasInner2 = new Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<AnyPointer>()
+                AliasInner2 = new Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<object>()
                 { },
                 AliasInner2Bind = new Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<IReadOnlyList<uint>>()
                 { },
@@ -9951,7 +9951,7 @@ namespace Capnproto_test.Capnp.Test
                 Bar = new Capnproto_test.Capnp.Test.TestAnyPointer()
                 { }
             };
-            AliasInner2 = AliasInner2 ?? new Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<AnyPointer>()
+            AliasInner2 = AliasInner2 ?? new Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<object>()
             {
                 Bar = new Capnproto_test.Capnp.Test.TestAnyPointer()
                 { },
@@ -10176,7 +10176,7 @@ namespace Capnproto_test.Capnp.Test
                     },
                     Bar = new uint[] { }
                 },
-                Inner2 = new Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, IReadOnlyList<uint>>.Inner2<AnyPointer>()
+                Inner2 = new Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, IReadOnlyList<uint>>.Inner2<object>()
                 {
                     Bar = new uint[] { },
                     InnerBound = new Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, IReadOnlyList<uint>>.Inner()
@@ -10338,13 +10338,13 @@ namespace Capnproto_test.Capnp.Test
             set;
         }
 
-        public Capnproto_test.Capnp.Test.TestGenerics<AnyPointer, AnyPointer> Unspecified
+        public Capnproto_test.Capnp.Test.TestGenerics<object, object> Unspecified
         {
             get;
             set;
         }
 
-        public Capnproto_test.Capnp.Test.TestGenerics<AnyPointer, AnyPointer>.Inner2<string> UnspecifiedInner
+        public Capnproto_test.Capnp.Test.TestGenerics<object, object>.Inner2<string> UnspecifiedInner
         {
             get;
             set;
@@ -10398,7 +10398,7 @@ namespace Capnproto_test.Capnp.Test
             set;
         }
 
-        public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<AnyPointer> AliasInner2
+        public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<object> AliasInner2
         {
             get;
             set;
@@ -10454,8 +10454,8 @@ namespace Capnproto_test.Capnp.Test
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.READER Basic => ctx.ReadStruct(0, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.READER.create);
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner.READER Inner => ctx.ReadStruct(1, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner.READER.create);
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<string>.READER Inner2 => ctx.ReadStruct(2, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<string>.READER.create);
-            public Capnproto_test.Capnp.Test.TestGenerics<AnyPointer, AnyPointer>.READER Unspecified => ctx.ReadStruct(3, Capnproto_test.Capnp.Test.TestGenerics<AnyPointer, AnyPointer>.READER.create);
-            public Capnproto_test.Capnp.Test.TestGenerics<AnyPointer, AnyPointer>.Inner2<string>.READER UnspecifiedInner => ctx.ReadStruct(4, Capnproto_test.Capnp.Test.TestGenerics<AnyPointer, AnyPointer>.Inner2<string>.READER.create);
+            public Capnproto_test.Capnp.Test.TestGenerics<object, object>.READER Unspecified => ctx.ReadStruct(3, Capnproto_test.Capnp.Test.TestGenerics<object, object>.READER.create);
+            public Capnproto_test.Capnp.Test.TestGenerics<object, object>.Inner2<string>.READER UnspecifiedInner => ctx.ReadStruct(4, Capnproto_test.Capnp.Test.TestGenerics<object, object>.Inner2<string>.READER.create);
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, string>.READER Default => ctx.ReadStruct(5, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, string>.READER.create);
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, string>.Inner.READER DefaultInner => ctx.ReadStruct(6, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, string>.Inner.READER.create);
             public Capnproto_test.Capnp.Test.TestUseGenerics.READER DefaultUser => ctx.ReadStruct(7, Capnproto_test.Capnp.Test.TestUseGenerics.READER.create);
@@ -10464,7 +10464,7 @@ namespace Capnproto_test.Capnp.Test
             public Capnproto_test.Capnp.Test.TestGenericsWrapper2.READER DefaultWrapper2 => ctx.ReadStruct(10, Capnproto_test.Capnp.Test.TestGenericsWrapper2.READER.create);
             public Capnproto_test.Capnp.Test.TestAllTypes.READER AliasFoo => ctx.ReadStruct(11, Capnproto_test.Capnp.Test.TestAllTypes.READER.create);
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner.READER AliasInner => ctx.ReadStruct(12, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner.READER.create);
-            public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<AnyPointer>.READER AliasInner2 => ctx.ReadStruct(13, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<AnyPointer>.READER.create);
+            public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<object>.READER AliasInner2 => ctx.ReadStruct(13, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<object>.READER.create);
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<IReadOnlyList<uint>>.READER AliasInner2Bind => ctx.ReadStruct(14, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<IReadOnlyList<uint>>.READER.create);
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<string>.READER AliasInner2Text => ctx.ReadStruct(15, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<string>.READER.create);
             public string AliasRev => ctx.ReadText(16, "text");
@@ -10498,15 +10498,15 @@ namespace Capnproto_test.Capnp.Test
                 set => Link(2, value);
             }
 
-            public Capnproto_test.Capnp.Test.TestGenerics<AnyPointer, AnyPointer>.WRITER Unspecified
+            public Capnproto_test.Capnp.Test.TestGenerics<object, object>.WRITER Unspecified
             {
-                get => BuildPointer<Capnproto_test.Capnp.Test.TestGenerics<AnyPointer, AnyPointer>.WRITER>(3);
+                get => BuildPointer<Capnproto_test.Capnp.Test.TestGenerics<object, object>.WRITER>(3);
                 set => Link(3, value);
             }
 
-            public Capnproto_test.Capnp.Test.TestGenerics<AnyPointer, AnyPointer>.Inner2<string>.WRITER UnspecifiedInner
+            public Capnproto_test.Capnp.Test.TestGenerics<object, object>.Inner2<string>.WRITER UnspecifiedInner
             {
-                get => BuildPointer<Capnproto_test.Capnp.Test.TestGenerics<AnyPointer, AnyPointer>.Inner2<string>.WRITER>(4);
+                get => BuildPointer<Capnproto_test.Capnp.Test.TestGenerics<object, object>.Inner2<string>.WRITER>(4);
                 set => Link(4, value);
             }
 
@@ -10558,9 +10558,9 @@ namespace Capnproto_test.Capnp.Test
                 set => Link(12, value);
             }
 
-            public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<AnyPointer>.WRITER AliasInner2
+            public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<object>.WRITER AliasInner2
             {
-                get => BuildPointer<Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<AnyPointer>.WRITER>(13);
+                get => BuildPointer<Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<object>.WRITER>(13);
                 set => Link(13, value);
             }
 
@@ -10699,9 +10699,9 @@ namespace Capnproto_test.Capnp.Test
         void ICapnpSerializable.Deserialize(DeserializerState arg_)
         {
             var reader = READER.create(arg_);
-            AnyKindAsStruct = CapnpSerializable.Create<AnyPointer>(reader.AnyKindAsStruct);
-            AnyStructAsStruct = CapnpSerializable.Create<AnyPointer>(reader.AnyStructAsStruct);
-            AnyKindAsList = CapnpSerializable.Create<AnyPointer>(reader.AnyKindAsList);
+            AnyKindAsStruct = CapnpSerializable.Create<object>(reader.AnyKindAsStruct);
+            AnyStructAsStruct = CapnpSerializable.Create<object>(reader.AnyStructAsStruct);
+            AnyKindAsList = CapnpSerializable.Create<object>(reader.AnyKindAsList);
             AnyListAsList = reader.AnyListAsList.ToReadOnlyList(_ => (object)_);
             applyDefaults();
         }
@@ -10723,19 +10723,19 @@ namespace Capnproto_test.Capnp.Test
         {
         }
 
-        public AnyPointer AnyKindAsStruct
+        public object AnyKindAsStruct
         {
             get;
             set;
         }
 
-        public AnyPointer AnyStructAsStruct
+        public object AnyStructAsStruct
         {
             get;
             set;
         }
 
-        public AnyPointer AnyKindAsList
+        public object AnyKindAsList
         {
             get;
             set;
@@ -11591,7 +11591,7 @@ namespace Capnproto_test.Capnp.Test
     public interface ITestPipeline : IDisposable
     {
         Task<(string, Capnproto_test.Capnp.Test.TestPipeline.Box)> GetCap(uint n, Capnproto_test.Capnp.Test.ITestInterface inCap, CancellationToken cancellationToken_ = default);
-        Task TestPointers(Capnproto_test.Capnp.Test.ITestInterface cap, AnyPointer obj, IReadOnlyList<Capnproto_test.Capnp.Test.ITestInterface> list, CancellationToken cancellationToken_ = default);
+        Task TestPointers(Capnproto_test.Capnp.Test.ITestInterface cap, object obj, IReadOnlyList<Capnproto_test.Capnp.Test.ITestInterface> list, CancellationToken cancellationToken_ = default);
         Task<(string, Capnproto_test.Capnp.Test.TestPipeline.AnyBox)> GetAnyCap(uint n, BareProxy inCap, CancellationToken cancellationToken_ = default);
     }
 
@@ -11612,7 +11612,7 @@ namespace Capnproto_test.Capnp.Test
             );
         }
 
-        public async Task TestPointers(Capnproto_test.Capnp.Test.ITestInterface cap, AnyPointer obj, IReadOnlyList<Capnproto_test.Capnp.Test.ITestInterface> list, CancellationToken cancellationToken_ = default)
+        public async Task TestPointers(Capnproto_test.Capnp.Test.ITestInterface cap, object obj, IReadOnlyList<Capnproto_test.Capnp.Test.ITestInterface> list, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestPipeline.Params_testPointers.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestPipeline.Params_testPointers()
@@ -11964,7 +11964,7 @@ namespace Capnproto_test.Capnp.Test
             {
                 var reader = READER.create(arg_);
                 Cap = reader.Cap;
-                Obj = CapnpSerializable.Create<AnyPointer>(reader.Obj);
+                Obj = CapnpSerializable.Create<object>(reader.Obj);
                 List = reader.List;
                 applyDefaults();
             }
@@ -11991,7 +11991,7 @@ namespace Capnproto_test.Capnp.Test
                 set;
             }
 
-            public AnyPointer Obj
+            public object Obj
             {
                 get;
                 set;
@@ -16294,7 +16294,7 @@ namespace Capnproto_test.Capnp.Test
         {
             var reader = READER.create(arg_);
             HostId = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestSturdyRefHostId>(reader.HostId);
-            ObjectId = CapnpSerializable.Create<AnyPointer>(reader.ObjectId);
+            ObjectId = CapnpSerializable.Create<object>(reader.ObjectId);
             applyDefaults();
         }
 
@@ -16319,7 +16319,7 @@ namespace Capnproto_test.Capnp.Test
             set;
         }
 
-        public AnyPointer ObjectId
+        public object ObjectId
         {
             get;
             set;

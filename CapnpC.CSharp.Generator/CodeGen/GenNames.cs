@@ -406,7 +406,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                             }
                             else
                             {
-                                return SyntaxHelpers.Type<Capnp.AnyPointer>();
+                                return SyntaxHelpers.Type<object>();
                             }
 
                         default:
