@@ -4,11 +4,23 @@ using System.Runtime.CompilerServices;
 
 namespace Capnp.Rpc.Interception
 {
+    /// <summary>
+    /// This static class provides extension methods for intercepting and unintercepting capabilities.
+    /// </summary>
     public static class Interceptor
     {
         static readonly ConditionalWeakTable<ConsumedCapability, CensorCapability> _interceptMap =
             new ConditionalWeakTable<ConsumedCapability, CensorCapability>();
-        
+
+        /// <summary>
+        /// Attach this policy to given capability.
+        /// </summary>
+        /// <typeparam name="TCap">Capability interface type</typeparam>
+        /// <param name="policy">Policy to attach</param>
+        /// <param name="cap">Capability to censor</param>
+        /// <returns>Censored capability instance</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="policy"/> is null or 
+        /// <paramref name="cap"/> is null</exception>
         public static TCap Attach<TCap>(this IInterceptionPolicy policy, TCap cap)
             where TCap: class
         {
@@ -46,6 +58,15 @@ namespace Capnp.Rpc.Interception
             }
         }
 
+        /// <summary>
+        /// Detach this policy from given (censored) capability.
+        /// </summary>
+        /// <typeparam name="TCap">Capability interface type</typeparam>
+        /// <param name="policy">Policy to detach</param>
+        /// <param name="cap">Capability to clean</param>
+        /// <returns>Clean capability instance (at least, without this interception policy)</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="policy"/> is null or 
+        /// <paramref name="cap"/> is null</exception>
         public static TCap Detach<TCap>(this IInterceptionPolicy policy, TCap cap)
             where TCap: class
         {

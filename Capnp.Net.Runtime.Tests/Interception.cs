@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
@@ -217,7 +218,7 @@ namespace Capnp.Net.Runtime.Tests
         }
 
         [TestMethod]
-        public void InterceptClientSideCancelCall()
+        public void InterceptClientSideCancelReturn()
         {
             var policy = new MyPolicy("a");
 
@@ -235,13 +236,49 @@ namespace Capnp.Net.Runtime.Tests
                     var request1 = main.Foo(321, false, default);
                     Assert.IsTrue(policy.Calls.TryReceive(out var cc));
                     Assert.IsFalse(request1.IsCompleted);
+                    Assert.IsFalse(cc.CancelFromAlice.IsCancellationRequested);
 
-                    cc.IsCanceled = true;
+                    cc.ReturnCanceled = true;
 
                     cc.ReturnToAlice();
 
                     Assert.IsTrue(request1.IsCompleted);
                     Assert.IsTrue(request1.IsCanceled);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void InterceptClientSideOverrideCanceledCall()
+        {
+            var policy = new MyPolicy("a");
+
+            (var server, var client) = SetupClientServerPair();
+
+            using (server)
+            using (client)
+            {
+                client.WhenConnected.Wait();
+
+                var counters = new Counters();
+                server.Main = new TestInterfaceImpl(counters);
+                using (var main = policy.Attach(client.GetMain<ITestInterface>()))
+                {
+                    var request1 = main.Foo(321, false, new CancellationToken(true));
+                    Assert.IsTrue(policy.Calls.TryReceive(out var cc));
+                    Assert.IsFalse(request1.IsCompleted);
+                    Assert.IsTrue(cc.CancelFromAlice.IsCancellationRequested);
+
+                    cc.ForwardToBob();
+                    Assert.IsTrue(policy.Returns.ReceiveAsync().Wait(MediumNonDbgTimeout));
+                    Assert.IsTrue(cc.ReturnCanceled);
+                    cc.ReturnCanceled = false;
+                    cc.Exception = "Cancelled";
+
+                    cc.ReturnToAlice();
+
+                    Assert.IsTrue(request1.IsCompleted);
+                    Assert.IsTrue(request1.IsFaulted);
                 }
             }
         }
