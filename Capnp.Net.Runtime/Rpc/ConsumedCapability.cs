@@ -10,7 +10,7 @@ namespace Capnp.Rpc
     /// </summary>
     public abstract class ConsumedCapability
     {
-        internal abstract IPromisedAnswer DoCall(ulong interfaceId, ushort methodId, DynamicSerializerState args, bool tailCall);
+        internal abstract IPromisedAnswer DoCall(ulong interfaceId, ushort methodId, DynamicSerializerState args);
 
         /// <summary>
         /// Request the RPC engine to release this capability from its import table, 

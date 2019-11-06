@@ -66,13 +66,15 @@ namespace Capnp.Rpc
         /// <param name="interfaceId">Interface ID to call</param>
         /// <param name="methodId">Method ID to call</param>
         /// <param name="args">Method arguments ("param struct")</param>
-        /// <param name="tailCall">Whether it is a tail call</param>
+        /// <param name="obsoleteAndIgnored">This flag is ignored. It is there to preserve compatibility with the
+        /// code generator and will be removed in future versions.</param>
         /// <param name="cancellationToken">For cancelling an ongoing method call</param>
         /// <returns>An answer promise</returns>
         /// <exception cref="ObjectDisposedException">This instance was disposed, or transport-layer stream was disposed.</exception>
         /// <exception cref="InvalidOperationException">Capability is broken.</exception>
         /// <exception cref="System.IO.IOException">An I/O error occurs.</exception>
-        protected internal IPromisedAnswer Call(ulong interfaceId, ushort methodId, DynamicSerializerState args, bool tailCall, CancellationToken cancellationToken = default)
+        protected internal IPromisedAnswer Call(ulong interfaceId, ushort methodId, DynamicSerializerState args, 
+            bool obsoleteAndIgnored, CancellationToken cancellationToken = default)
         {
             if (_disposedValue)
                 throw new ObjectDisposedException(nameof(Proxy));
@@ -80,7 +82,7 @@ namespace Capnp.Rpc
             if (ConsumedCap == null)
                 throw new InvalidOperationException("Cannot call null capability");
 
-            var answer = ConsumedCap.DoCall(interfaceId, methodId, args, tailCall);
+            var answer = ConsumedCap.DoCall(interfaceId, methodId, args);
 
             if (cancellationToken.CanBeCanceled)
             {

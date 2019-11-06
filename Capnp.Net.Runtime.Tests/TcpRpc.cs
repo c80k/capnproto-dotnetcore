@@ -141,7 +141,7 @@ namespace Capnp.Net.Runtime.Tests
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
-                using (var answer = main.Call(0x1234567812345678, 0x3333, args, false))
+                using (var answer = main.Call(0x1234567812345678, 0x3333, args))
                 {
                     Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
                     (var interfaceId, var methodId, var inargs, var ct) = mock.WhenCalled.Result;
@@ -182,7 +182,7 @@ namespace Capnp.Net.Runtime.Tests
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
-                using (var answer = main.Call(0x1234567812345678, 0x3333, args, false))
+                using (var answer = main.Call(0x1234567812345678, 0x3333, args))
                 {
                     Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
                     (var interfaceId, var methodId, var inargs, var ct) = mock.WhenCalled.Result;
@@ -223,7 +223,7 @@ namespace Capnp.Net.Runtime.Tests
                     args.SetStruct(1, 0);
                     args.WriteData(0, 123456);
                     CancellationToken ctx;
-                    using (var answer = main.Call(0x1234567812345678, 0x3333, args, false))
+                    using (var answer = main.Call(0x1234567812345678, 0x3333, args))
                     {
                         Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
                         (var interfaceId, var methodId, var inargs, var ct) = mock.WhenCalled.Result;
@@ -267,7 +267,7 @@ namespace Capnp.Net.Runtime.Tests
                     args.WriteData(0, 123456);
                     CancellationToken ctx;
                     IPromisedAnswer answer;
-                    using (answer = main.Call(0x1234567812345678, 0x3333, args, false))
+                    using (answer = main.Call(0x1234567812345678, 0x3333, args))
                     {
                         Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
                         (var interfaceId, var methodId, var inargs, var ct) = mock.WhenCalled.Result;
@@ -324,7 +324,7 @@ namespace Capnp.Net.Runtime.Tests
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
-                using (var answer = main.Call(0x1234567812345678, 0x3333, args, false))
+                using (var answer = main.Call(0x1234567812345678, 0x3333, args))
                 {
                     Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
                     (var interfaceId, var methodId, var inargs, var ct) = mock.WhenCalled.Result;
@@ -361,7 +361,7 @@ namespace Capnp.Net.Runtime.Tests
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
-                using (var answer = main.Call(0x1234567812345678, 0x3333, args, true))
+                using (var answer = main.Call(0x1234567812345678, 0x3333, args))
                 {
                     Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
 
@@ -372,7 +372,7 @@ namespace Capnp.Net.Runtime.Tests
                     args2.SetStruct(1, 0);
                     args2.WriteData(0, 654321);
 
-                    using (var answer2 = pipelined.Call(0x8765432187654321, 0x4444, args2, false))
+                    using (var answer2 = pipelined.Call(0x8765432187654321, 0x4444, args2))
                     {
                         (var interfaceId, var methodId, var inargs, var ct) = mock.WhenCalled.Result;
                         Assert.AreEqual<ulong>(0x1234567812345678, interfaceId);
@@ -434,7 +434,7 @@ namespace Capnp.Net.Runtime.Tests
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
-                using (var answer = main.Call(0x1234567812345678, 0x3333, args, true))
+                using (var answer = main.Call(0x1234567812345678, 0x3333, args))
                 {
                     Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
 
@@ -464,7 +464,7 @@ namespace Capnp.Net.Runtime.Tests
                         args2.SetStruct(1, 0);
                         args2.WriteData(0, 654321);
 
-                        using (var answer2 = pipelined.Call(0x8765432187654321, 0x4444, args2, false))
+                        using (var answer2 = pipelined.Call(0x8765432187654321, 0x4444, args2))
                         {
                             Assert.IsTrue(answer.WhenReturned.Wait(MediumTimeout));
                             Assert.IsTrue(mock2.WhenCalled.Wait(MediumTimeout));
@@ -510,7 +510,7 @@ namespace Capnp.Net.Runtime.Tests
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
-                using (var answer = main.Call(0x1234567812345678, 0x3333, args, true))
+                using (var answer = main.Call(0x1234567812345678, 0x3333, args))
                 {
                     Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
 
@@ -524,8 +524,8 @@ namespace Capnp.Net.Runtime.Tests
                     args3.SetStruct(1, 0);
                     args3.WriteData(0, 222222);
 
-                    using (var answer2 = pipelined.Call(0x1111111111111111, 0x1111, args2, false))
-                    using (var answer3 = pipelined.Call(0x2222222222222222, 0x2222, args3, false))
+                    using (var answer2 = pipelined.Call(0x1111111111111111, 0x1111, args2))
+                    using (var answer3 = pipelined.Call(0x2222222222222222, 0x2222, args3))
                     {
                         (var interfaceId, var methodId, var inargs, var ct) = mock.WhenCalled.Result;
 
@@ -555,8 +555,8 @@ namespace Capnp.Net.Runtime.Tests
                         args5.SetStruct(1, 0);
                         args5.WriteData(0, 444444);
 
-                        using (var answer4 = pipelined.Call(0x3333333333333333, 0x3333, args4, false))
-                        using (var answer5 = pipelined.Call(0x4444444444444444, 0x4444, args5, false))
+                        using (var answer4 = pipelined.Call(0x3333333333333333, 0x3333, args4))
+                        using (var answer5 = pipelined.Call(0x4444444444444444, 0x4444, args5))
                         {
                             var call2 = mock2.WhenCalled;
                             var call3 = mock2.WhenCalled;
@@ -628,7 +628,7 @@ namespace Capnp.Net.Runtime.Tests
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
                 BareProxy pipelined;
-                using (var answer = main.Call(0x1234567812345678, 0x3333, args, true))
+                using (var answer = main.Call(0x1234567812345678, 0x3333, args))
                 {
                     Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
 
@@ -643,7 +643,7 @@ namespace Capnp.Net.Runtime.Tests
 
                 try
                 {
-                    pipelined.Call(0x8765432187654321, 0x4444, args2, false);
+                    pipelined.Call(0x8765432187654321, 0x4444, args2);
                     Assert.Fail("Expected an exception here");
                 }
                 catch (ObjectDisposedException)
@@ -675,7 +675,7 @@ namespace Capnp.Net.Runtime.Tests
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
                 IPromisedAnswer answer2;
-                using (var answer = main.Call(0x1234567812345678, 0x3333, args, true))
+                using (var answer = main.Call(0x1234567812345678, 0x3333, args))
                 {
                     Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
 
@@ -685,7 +685,7 @@ namespace Capnp.Net.Runtime.Tests
                     args2.SetStruct(1, 0);
                     args2.WriteData(0, 654321);
 
-                    answer2 = pipelined.Call(0x8765432187654321, 0x4444, args2, false);
+                    answer2 = pipelined.Call(0x8765432187654321, 0x4444, args2);
                 }
 
                 using (answer2)

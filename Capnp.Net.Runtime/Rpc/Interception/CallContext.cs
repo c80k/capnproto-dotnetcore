@@ -289,7 +289,7 @@ namespace Capnp.Rpc.Interception
                 throw new InvalidOperationException("Bob is null");
             }
             
-            var answer = BobProxy.Call(InterfaceId, MethodId, InArgs.Rewrap<DynamicSerializerState>(), false, CancelToBob);
+            var answer = BobProxy.Call(InterfaceId, MethodId, InArgs.Rewrap<DynamicSerializerState>(), default, CancelToBob);
 
             State = InterceptionState.ForwardedToBob;
 

@@ -29,7 +29,7 @@ namespace Capnp.Rpc
 
         protected abstract void GetMessageTarget(MessageTarget.WRITER wr);
 
-        protected IPromisedAnswer CallOnResolution(ulong interfaceId, ushort methodId, DynamicSerializerState args, bool pipeline)
+        protected IPromisedAnswer CallOnResolution(ulong interfaceId, ushort methodId, DynamicSerializerState args)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace Capnp.Rpc
 #if DebugEmbargos
                 Logger.LogDebug("Direct call");
 #endif
-                        return ResolvedCap.Call(interfaceId, methodId, args, pipeline);
+                        return ResolvedCap.Call(interfaceId, methodId, args, default);
                     }
                     else
                     {
@@ -90,7 +90,7 @@ namespace Capnp.Rpc
 
                             cancellationTokenSource.Token.ThrowIfCancellationRequested();
 
-                            return ResolvedCap.Call(interfaceId, methodId, args, pipeline);
+                            return ResolvedCap.Call(interfaceId, methodId, args, default);
 
                         }, TaskContinuationOptions.ExecuteSynchronously);
 

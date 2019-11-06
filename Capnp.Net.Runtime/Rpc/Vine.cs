@@ -32,7 +32,7 @@ namespace Capnp.Rpc
             ulong interfaceId, ushort methodId, DeserializerState args, 
             CancellationToken cancellationToken = default)
         {
-            var promisedAnswer = Proxy.Call(interfaceId, methodId, (DynamicSerializerState)args, false);
+            var promisedAnswer = Proxy.Call(interfaceId, methodId, (DynamicSerializerState)args, default);
 
             if (promisedAnswer is PendingQuestion pendingQuestion && pendingQuestion.RpcEndpoint == Impatient.AskingEndpoint)
             {

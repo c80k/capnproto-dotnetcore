@@ -19,7 +19,7 @@
             InterceptedCapability.Release();
         }
 
-        internal override IPromisedAnswer DoCall(ulong interfaceId, ushort methodId, DynamicSerializerState args, bool tailCall)
+        internal override IPromisedAnswer DoCall(ulong interfaceId, ushort methodId, DynamicSerializerState args)
         {
             var cc = new CallContext(this, interfaceId, methodId, args);
             Policy.OnCallFromAlice(cc);
