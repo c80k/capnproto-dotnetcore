@@ -38,40 +38,6 @@ namespace Capnp.Rpc
             }
         }
 
-        //public Task<SerializerState> WhenReady => ChainedAwaitWhenReady();
-
-        //public void Pipeline(PromisedAnswer.READER rd, Action<Proxy> action, Action<System.Exception> error)
-        //{
-        //    lock (_reentrancyBlocker)
-        //    {
-        //        if (_chainedTask == null)
-        //        {
-        //            _chainedTask = InitialAwaitWhenReady();
-        //        }
-
-        //        _chainedTask = _chainedTask.ContinueWith(t =>
-        //        {
-        //            bool rethrow = true;
-
-        //            try
-        //            {
-        //                t.Wait();
-        //                rethrow = false;
-        //                EvaluateProxyAndCallContinuation(rd, action);
-        //            }
-        //            catch (AggregateException aggregateException)
-        //            {
-        //                var innerException = aggregateException.InnerException;
-
-        //                error(innerException);
-
-        //                if (rethrow) throw innerException;
-        //            }
-        //        },
-        //            TaskContinuationOptions.ExecuteSynchronously);
-        //    }
-        //}
-
         async Task AwaitChainedTask(Task chainedTask, Func<Task<AnswerOrCounterquestion>, Task> func)
         {
             try

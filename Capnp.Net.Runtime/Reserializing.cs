@@ -25,6 +25,12 @@ namespace Capnp
             if (to == null)
                 throw new ArgumentNullException(nameof(to));
 
+            if (from.Caps != null && to.Caps != null)
+            {
+                to.Caps.Clear();
+                to.Caps.AddRange(from.Caps);
+            }
+
             var ds = to.Rewrap<DynamicSerializerState>();
 
             IReadOnlyList<DeserializerState> items;

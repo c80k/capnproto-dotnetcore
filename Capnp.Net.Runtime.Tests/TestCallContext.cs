@@ -4,9 +4,9 @@ using Capnp.Rpc;
 
 namespace Capnp.Net.Runtime.Tests
 {
-    class CallContext
+    class TestCallContext
     {
-        public CallContext(ulong interfaceId, ushort methodId, DeserializerState args, CancellationToken ct)
+        public TestCallContext(ulong interfaceId, ushort methodId, DeserializerState args, CancellationToken ct)
         {
             InterfaceId = interfaceId;
             MethodId = methodId;

@@ -9,11 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Capnp.Net.Runtime.Tests\CallContext.cs" Link="CallContext.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\DeserializationTests.cs" Link="DeserializationTests.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\DynamicSerializerStateTests.cs" Link="DynamicSerializerStateTests.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\FramePumpTests.cs" Link="FramePumpTests.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\General.cs" Link="General.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\Interception.cs" Link="Interception.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\Issue19.cs" Link="Issue19.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\Issue20.cs" Link="Issue20.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\Issue25.cs" Link="Issue25.cs" />
@@ -30,6 +30,7 @@
     <Compile Include="..\Capnp.Net.Runtime.Tests\TcpRpcStress.cs" Link="TcpRpcStress.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\test.cs" Link="test.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\TestBase.cs" Link="TestBase.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\TestCallContext.cs" Link="TestCallContext.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\TestCapImplementations.cs" Link="TestCapImplementations.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\TestInterfaces.cs" Link="TestInterfaces.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\WirePointerTests.cs" Link="WirePointerTests.cs" />
