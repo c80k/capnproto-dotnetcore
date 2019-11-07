@@ -99,7 +99,7 @@ namespace Capnp.Rpc
             _access.Serialize(wr.PromisedAnswer);
         }
 
-        internal override IPromisedAnswer DoCall(ulong interfaceId, ushort methodId, DynamicSerializerState args, bool pipeline)
+        internal override IPromisedAnswer DoCall(ulong interfaceId, ushort methodId, DynamicSerializerState args)
         {
             lock (_question.ReentrancyBlocker)
             {
@@ -111,7 +111,7 @@ namespace Capnp.Rpc
                         throw new RpcException("Answer did not resolve to expected capability");
                     }
 
-                    return CallOnResolution(interfaceId, methodId, args, pipeline);
+                    return CallOnResolution(interfaceId, methodId, args);
                 }
                 else
                 {
@@ -130,7 +130,7 @@ namespace Capnp.Rpc
 
                     _question.DisallowFinish();
                     ++_pendingCallsOnPromise;
-                    var promisedAnswer = base.DoCall(interfaceId, methodId, args, pipeline);
+                    var promisedAnswer = base.DoCall(interfaceId, methodId, args);
                     ReAllowFinishWhenDone(promisedAnswer.WhenReturned);
 
                     async void DecrementPendingCallsOnPromiseWhenReturned()

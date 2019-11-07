@@ -1311,7 +1311,7 @@ namespace Capnp.Rpc
                 }
             }
 
-            public IReadOnlyList<ConsumedCapability> ImportCapTable(Payload.READER payload)
+            public IList<ConsumedCapability> ImportCapTable(Payload.READER payload)
             {
                 var list = new List<ConsumedCapability>();
 

@@ -169,13 +169,13 @@ namespace Capnp.Rpc
             wr.ImportedCap = _remoteId;
         }
 
-        internal override IPromisedAnswer DoCall(ulong interfaceId, ushort methodId, DynamicSerializerState args, bool pipeline)
+        internal override IPromisedAnswer DoCall(ulong interfaceId, ushort methodId, DynamicSerializerState args)
         {
             lock (_reentrancyBlocker)
             {
                 if (_resolvedCap.Task.IsCompleted)
                 {
-                    return CallOnResolution(interfaceId, methodId, args, pipeline);
+                    return CallOnResolution(interfaceId, methodId, args);
                 }
                 else
                 {
@@ -184,7 +184,7 @@ namespace Capnp.Rpc
                 }
             }
 
-            var promisedAnswer = base.DoCall(interfaceId, methodId, args, pipeline);
+            var promisedAnswer = base.DoCall(interfaceId, methodId, args);
             TrackCall(promisedAnswer.WhenReturned);
             return promisedAnswer;
         }

@@ -42,7 +42,7 @@ namespace Capnp.Rpc
             ProvidedCap.Relinquish();
         }
 
-        internal override IPromisedAnswer DoCall(ulong interfaceId, ushort methodId, DynamicSerializerState args, bool pipeline)
+        internal override IPromisedAnswer DoCall(ulong interfaceId, ushort methodId, DynamicSerializerState args)
         {
             var cts = new CancellationTokenSource();
             var call = ProvidedCap.Invoke(interfaceId, methodId, args, cts.Token);

@@ -45,9 +45,9 @@
         /// <param name="args">Method arguments</param>
         /// <param name="tailCall">Whether it is a tail call</param>
         /// <returns>Answer promise</returns>
-        public IPromisedAnswer Call(ulong interfaceId, ushort methodId, DynamicSerializerState args, bool tailCall)
+        public IPromisedAnswer Call(ulong interfaceId, ushort methodId, DynamicSerializerState args)
         {
-            return base.Call(interfaceId, methodId, args, tailCall);
+            return base.Call(interfaceId, methodId, args, default);
         }
     }
 }

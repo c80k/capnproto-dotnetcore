@@ -15,7 +15,7 @@ namespace Capnp.Rpc
             _ep = ep;
         }
 
-        internal override IPromisedAnswer DoCall(ulong interfaceId, ushort methodId, DynamicSerializerState args, bool tailCall)
+        internal override IPromisedAnswer DoCall(ulong interfaceId, ushort methodId, DynamicSerializerState args)
         {
             var call = SetupMessage(args, interfaceId, methodId);
             Debug.Assert(call.Target.which != MessageTarget.WHICH.undefined);

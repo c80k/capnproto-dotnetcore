@@ -39,6 +39,9 @@ namespace Capnp.Rpc
         internal static Skeleton GetOrCreateSkeleton<T>(T impl, bool addRef)
             where T: class
         {
+            if (impl == null)
+                throw new ArgumentNullException(nameof(impl));
+
             if (impl is Skeleton skel)
                 return skel;
 

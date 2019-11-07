@@ -81,9 +81,7 @@ namespace Capnp.Rpc
 
         public Task<Proxy> WhenResolved { get; }
 
-        async Task<DeserializerState> CallImpl(ulong interfaceId, ushort methodId,
-            DynamicSerializerState args, bool pipeline,
-            CancellationToken cancellationToken)
+        async Task<DeserializerState> CallImpl(ulong interfaceId, ushort methodId, DynamicSerializerState args, CancellationToken cancellationToken)
         {
             var cap = await WhenResolved;
 
@@ -92,7 +90,7 @@ namespace Capnp.Rpc
             if (cap == null)
                 throw new RpcException("Broken capability");
 
-            var call = cap.Call(interfaceId, methodId, args, pipeline);
+            var call = cap.Call(interfaceId, methodId, args, default);
             var whenReturned = call.WhenReturned;
 
             using (var registration = cancellationToken.Register(call.Dispose))
@@ -101,10 +99,10 @@ namespace Capnp.Rpc
             }
         }
 
-        internal override IPromisedAnswer DoCall(ulong interfaceId, ushort methodId, DynamicSerializerState args, bool pipeline)
+        internal override IPromisedAnswer DoCall(ulong interfaceId, ushort methodId, DynamicSerializerState args)
         {
             var cts = new CancellationTokenSource();
-            return new LocalAnswer(cts, CallImpl(interfaceId, methodId, args, pipeline, cts.Token));
+            return new LocalAnswer(cts, CallImpl(interfaceId, methodId, args, cts.Token));
         }
     }
 }
