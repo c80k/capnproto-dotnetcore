@@ -107,7 +107,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="rmdir /s /q $(SolutionDir)MsBuildGenerationTest\obj" />
+    <RemoveDir Directories="$(SolutionDir)\MsBuildGenerationTest\obj" />
   </Target>
 
 </Project>

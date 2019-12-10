@@ -210,7 +210,7 @@
 
             cu = cu.AddMembers(ns);
 
-            return cu.NormalizeWhitespace().ToFullString();
+            return cu.NormalizeWhitespace("    ", Environment.NewLine).ToFullString();
         }
 
         public IReadOnlyList<FileGenerationResult> Generate()

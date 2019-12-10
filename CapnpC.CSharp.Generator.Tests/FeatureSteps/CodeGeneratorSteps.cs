@@ -27,16 +27,27 @@ namespace CapnpC.CSharp.Generator.Tests
             return assembly.GetManifestResourceStream(urn);
         }
 
-        internal static bool IsCapnpExeInstalled()
+        internal static bool IsCapnpInstalled()
         {
-            using (var process = Process.Start("where", "capnp.exe"))
+            try
             {
-                if (process == null)
-                    Assert.Fail("Unable to start 'where'");
+                var startInfo = new ProcessStartInfo(CapnpCompilation.CapnpCompilerFilename, "--version");
+                startInfo.UseShellExecute = false;
+                startInfo.RedirectStandardOutput = true;
+                startInfo.RedirectStandardError = true;
 
-                process.WaitForExit();
+                using (var process = Process.Start(startInfo))
+                {
+                    Assert.IsNotNull(process, $"Unable to start '{CapnpCompilation.CapnpCompilerFilename}'");
 
-                return process.ExitCode == 0;
+                    process.WaitForExit();
+
+                    return process.ExitCode == 0;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
 
@@ -112,9 +123,9 @@ namespace CapnpC.CSharp.Generator.Tests
         [Given(@"capnp\.exe is installed on my system")]
         public void GivenCapnp_ExeIsInstalledOnMySystem()
         {
-            if (!IsCapnpExeInstalled())
+            if (!IsCapnpInstalled())
             {
-                Assert.Inconclusive("capnp.exe not found. Precondition of this test is not met.");
+                Assert.Inconclusive("Capnp compiler not found. Precondition of this test is not met.");
             }
         }
 
@@ -151,9 +162,9 @@ namespace CapnpC.CSharp.Generator.Tests
         [Given(@"capnp\.exe is not installed on my system")]
         public void GivenCapnp_ExeIsNotInstalledOnMySystem()
         {
-            if (IsCapnpExeInstalled())
+            if (IsCapnpInstalled())
             {
-                Assert.Inconclusive("capnp.exe found. Precondition of this test is not met.");
+                Assert.Inconclusive("Capnp compiler found. Precondition of this test is not met.");
             }
         }
 

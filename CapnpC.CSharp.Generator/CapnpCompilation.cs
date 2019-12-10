@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 [assembly: InternalsVisibleTo("CapnpC.CSharp.Generator.Tests")]
@@ -15,6 +16,14 @@ namespace CapnpC.CSharp.Generator
     /// </summary>
     public static class CapnpCompilation
     {
+        /// <summary>
+        /// Returns the basename of the capnp executable
+        /// </summary>
+        public static string CapnpCompilerFilename
+        {
+            get => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "capnp.exe" : "capnp";
+        }
+
         /// <summary>
         /// Generates C# code from given input stream
         /// </summary>
@@ -60,7 +69,7 @@ namespace CapnpC.CSharp.Generator
                 argList.Add($"-o-");
                 argList.AddRange(arguments);
 
-                compiler.StartInfo.FileName = "capnp.exe";
+                compiler.StartInfo.FileName = CapnpCompilerFilename;
                 compiler.StartInfo.Arguments = string.Join(" ", argList);
                 compiler.StartInfo.UseShellExecute = false;
                 compiler.StartInfo.RedirectStandardOutput = true;
