@@ -42,6 +42,16 @@ namespace CapnpC.CSharp.Generator.Tests.Util
             {
                 var emitResult = compilation.Emit(stream);
 
+                foreach (var diag in emitResult.Diagnostics)
+                    Console.WriteLine($"{diag}");
+
+                if (!emitResult.Success)
+                {
+                    string path = Path.ChangeExtension(Path.GetTempFileName(), ".capnp.cs");
+                    File.WriteAllText(path, code);
+                    Console.WriteLine($"[See {path} for generated code]");
+                }
+
                 return emitResult.Success;
             }
         }
