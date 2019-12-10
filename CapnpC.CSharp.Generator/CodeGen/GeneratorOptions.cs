@@ -12,10 +12,10 @@
         public string ContextParameterName { get; set; } = "ctx";
         public string GroupReaderContextArgName { get; set; } = "ctx";
         public string GroupWriterContextArgName { get; set; } = "ctx";
-        public string UnionDisciminatorEnumName { get; set; } = "WHICH";
+        public string UnionDiscriminatorEnumName { get; set; } = "WHICH";
         public string UnionDiscriminatorPropName { get; set; } = "which";
         public string UnionDiscriminatorFieldName { get; set; } = "_which";
-        public string UnionDisciminatorUndefinedName { get; set; } = "undefined";
+        public string UnionDiscriminatorUndefinedName { get; set; } = "undefined";
         public string UnionContentFieldName { get; set; } = "_content";
         public string SerializeMethodName { get; set; } = "serialize";
         public string ApplyDefaultsMethodName { get; set; } = "applyDefaults";
