@@ -551,11 +551,26 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         IEnumerable<StatementSyntax> MakeSkeletonMethodBody(Method method)
         {
+            SimpleNameSyntax methodName;
+
+            if (method.GenericParameters.Count == 0)
+            {
+                methodName = _names.GetCodeIdentifier(method).IdentifierName;
+            }
+            else
+            {
+                methodName = GenericName(_names.GetCodeIdentifier(method).Identifier)
+                    .AddTypeArgumentListArguments(
+                        method.GenericParameters.Select(
+                            p => _names.GetGenericTypeParameter(p).IdentifierName)
+                        .ToArray());
+            }
+
             var call = InvocationExpression(
                 MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
                     IdentifierName(SkeletonWorder.ImplName),
-                    _names.GetCodeIdentifier(method).IdentifierName));
+                    methodName));
 
             if (method.Params.Count > 0)
             {

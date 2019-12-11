@@ -9015,7 +9015,7 @@ namespace Capnproto_test.Capnp.Test
             where TT : class where TU : class
         {
             var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestImplicitMethodParams.Params_call<TT, TU>>(d_);
-            return Impatient.MaybeTailCall(Impl.Call(in_.Foo, in_.Bar, cancellationToken_), r_ =>
+            return Impatient.MaybeTailCall(Impl.Call<TT, TU>(in_.Foo, in_.Bar, cancellationToken_), r_ =>
             {
                 var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>.WRITER>();
                 r_.serialize(s_);
@@ -9142,7 +9142,7 @@ namespace Capnproto_test.Capnp.Test
             where TT : class where TU : class
         {
             var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestImplicitMethodParamsInGeneric<TV>.Params_call<TT, TU>>(d_);
-            return Impatient.MaybeTailCall(Impl.Call(in_.Foo, in_.Bar, cancellationToken_), r_ =>
+            return Impatient.MaybeTailCall(Impl.Call<TT, TU>(in_.Foo, in_.Bar, cancellationToken_), r_ =>
             {
                 var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>.WRITER>();
                 r_.serialize(s_);

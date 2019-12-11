@@ -43,7 +43,6 @@
         /// <param name="interfaceId">Target interface ID</param>
         /// <param name="methodId">Target method ID</param>
         /// <param name="args">Method arguments</param>
-        /// <param name="tailCall">Whether it is a tail call</param>
         /// <returns>Answer promise</returns>
         public IPromisedAnswer Call(ulong interfaceId, ushort methodId, DynamicSerializerState args)
         {

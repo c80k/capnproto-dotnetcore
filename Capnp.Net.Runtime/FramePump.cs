@@ -186,6 +186,10 @@ namespace Capnp
             }
         }
 
+        /// <summary>
+        /// Attaches an observer for tracing RPC traffic
+        /// </summary>
+        /// <param name="tracer">observer implementation</param>
         public void AttachTracer(IFrameTracer tracer)
         {
             _tracers.Add(tracer);

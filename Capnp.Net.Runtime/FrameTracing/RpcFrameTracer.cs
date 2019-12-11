@@ -8,6 +8,9 @@ using System.Threading;
 
 namespace Capnp.FrameTracing
 {
+    /// <summary>
+    /// Default implementation of an RPC observer
+    /// </summary>
     public class RpcFrameTracer : IFrameTracer
     {
         const string Header = "Ticks      | Thread     | Dir | Message";
@@ -16,12 +19,19 @@ namespace Capnp.FrameTracing
         readonly Stopwatch _timer = new Stopwatch();
         readonly TextWriter _traceWriter;
 
+        /// <summary>
+        /// Constructs an instance
+        /// </summary>
+        /// <param name="traceWriter">textual logging target</param>
         public RpcFrameTracer(TextWriter traceWriter)
         {
             _traceWriter = traceWriter ?? throw new ArgumentNullException(nameof(traceWriter));
             _traceWriter.WriteLine(Header);
         }
 
+        /// <summary>
+        /// Dispose pattern implementation
+        /// </summary>
         public void Dispose()
         {
             _traceWriter.WriteLine("<end of trace>");
@@ -91,6 +101,11 @@ namespace Capnp.FrameTracing
             }
         }
 
+        /// <summary>
+        /// Processes a sent or received RPC frame
+        /// </summary>
+        /// <param name="dir">frame direction</param>
+        /// <param name="frame">actual frame</param>
         public void TraceFrame(FrameDirection dir, WireFrame frame)
         {
             if (!_timer.IsRunning)
