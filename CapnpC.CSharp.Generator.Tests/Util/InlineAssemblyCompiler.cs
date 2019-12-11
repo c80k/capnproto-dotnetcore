@@ -22,7 +22,12 @@ namespace CapnpC.CSharp.Generator.Tests.Util
 
             string capnpRuntimePath = Path.GetFullPath(Path.Combine(
                 Assembly.GetExecutingAssembly().Location,
-                @"..\..\..\..\..\Capnp.Net.Runtime\bin\Debug\netcoreapp2.1\Capnp.Net.Runtime.dll"));
+                "..", "..", "..", "..", "..",
+                "Capnp.Net.Runtime",
+                "bin",
+                "Debug",
+                "netcoreapp2.1",
+                "Capnp.Net.Runtime.dll"));
 
             var capnpRuntimeMetadataRef = MetadataReference.CreateFromFile(capnpRuntimePath);
 
