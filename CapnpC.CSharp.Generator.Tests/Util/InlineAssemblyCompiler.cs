@@ -12,19 +12,20 @@ namespace CapnpC.CSharp.Generator.Tests.Util
     {
         public static bool TryCompileCapnp(string code)
         {
+            return TryCompileCapnp(new[] {code});
+        }
+
+        public static bool TryCompileCapnp(string[] code)
+        {
             var options = new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary, 
                 optimizationLevel: OptimizationLevel.Debug);
-
-            SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(code);
 
             string assemblyRoot = Path.GetDirectoryName(typeof(object).Assembly.Location);
 
             string capnpRuntimePath = Path.GetFullPath(Path.Combine(
                 Assembly.GetExecutingAssembly().Location,
                 @"..\..\..\..\..\Capnp.Net.Runtime\bin\Debug\netcoreapp2.1\Capnp.Net.Runtime.dll"));
-
-            var capnpRuntimeMetadataRef = MetadataReference.CreateFromFile(capnpRuntimePath);
 
             var compilation = CSharpCompilation.Create(
                 "CompilationTestAssembly",
@@ -35,8 +36,8 @@ namespace CapnpC.CSharp.Generator.Tests.Util
                     MetadataReference.CreateFromFile(Path.Combine(assemblyRoot, "System.Core.dll")),
                     MetadataReference.CreateFromFile(Path.Combine(assemblyRoot, "System.Runtime.dll")),
                     MetadataReference.CreateFromFile(Path.Combine(assemblyRoot, "System.Private.CoreLib.dll")),
-                    capnpRuntimeMetadataRef }, 
-                syntaxTrees: new SyntaxTree[] { syntaxTree });
+                    MetadataReference.CreateFromFile(capnpRuntimePath) },
+                syntaxTrees: Array.ConvertAll(code, new Converter<string, SyntaxTree>(c => CSharpSyntaxTree.ParseText(c))));
 
             using (var stream = new MemoryStream())
             {
@@ -47,9 +48,12 @@ namespace CapnpC.CSharp.Generator.Tests.Util
 
                 if (!emitResult.Success)
                 {
-                    string path = Path.ChangeExtension(Path.GetTempFileName(), ".capnp.cs");
-                    File.WriteAllText(path, code);
-                    Console.WriteLine($"[See {path} for generated code]");
+                    foreach (var c in code)
+                    {
+                        string path = Path.ChangeExtension(Path.GetTempFileName(), ".capnp.cs");
+                        File.WriteAllText(path, c);
+                        Console.WriteLine($"[See {path} for generated code]");
+                    }
                 }
 
                 return emitResult.Success;

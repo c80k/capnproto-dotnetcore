@@ -22,9 +22,9 @@ namespace CapnpC.CSharp.Generator.Tests
         [TestMethod]
         public void Test01NestedClash()
         {
-            var run = LoadAndGenerate("UnitTest1.capnp.bin");
-            var structFoo = GetTypeDef(0x93db6ba5509bac24, run.Model);
-            var names = run.CodeGen.GetNames();
+            var (model, codegen) = LoadAndGenerate("UnitTest1.capnp.bin");
+            var structFoo = GetTypeDef(0x93db6ba5509bac24, model);
+            var names = codegen.GetNames();
             var fieldName = names.GetCodeIdentifier(structFoo.Fields[0]).ToString();
             Assert.AreEqual("Foo", structFoo.Name);
             Assert.AreNotEqual(structFoo.Name, fieldName);
@@ -51,12 +51,12 @@ namespace CapnpC.CSharp.Generator.Tests
         [TestMethod]
         public void Test10ImportedNamespaces()
         {
-            var run = LoadAndGenerate("UnitTest10.capnp.bin");
-            var outerTypeDef = run.FirstFile.NestedTypes.First();
+            var (model, codegen) = LoadAndGenerate("UnitTest10.capnp.bin");
+            var outerTypeDef = GetGeneratedFile("UnitTest10.capnp", model).NestedTypes.First();
             var outerType = Model.Types.FromDefinition(outerTypeDef);
             var innerType = outerTypeDef.Fields[0].Type;
             var innerTypeDef = innerType.Definition;
-            var names = run.CodeGen.GetNames();
+            var names = codegen.GetNames();
             var outerNameSyntax = names.GetQName(outerType, outerTypeDef);
             var innerNameSyntax = names.GetQName(innerType, outerTypeDef);
             string[] outerNamespace = { "Foo", "Bar", "Baz" };
@@ -93,26 +93,22 @@ namespace CapnpC.CSharp.Generator.Tests
             LoadAndGenerate("schema-with-offsets.capnp.bin");
         }
 
-        struct Run
+        static (Model.SchemaModel, CodeGen.CodeGenerator) LoadAndGenerate(string inputName)
         {
-            public Model.SchemaModel Model;
-            public CodeGen.CodeGenerator CodeGen;
-            public Model.GenFile FirstFile;
-            public string Code;
+            var model = Load(inputName);
+            var codegen = new CodeGen.CodeGenerator(model, new CodeGen.GeneratorOptions());
+
+            var code = model.FilesToGenerate.Select(f => codegen.Transform(f)).ToArray();
+            Assert.IsTrue(Util.InlineAssemblyCompiler.TryCompileCapnp(code), "Compilation was not successful");
+
+            return (model, codegen);
         }
 
-        static CodeGen.CodeGenerator NewGeneratorFor(Model.SchemaModel model)
-            => new CodeGen.CodeGenerator(model, new CodeGen.GeneratorOptions());
-
-        Run LoadAndGenerate(string inputName)
+        static Model.GenFile GetGeneratedFile(string name, Model.SchemaModel model)
         {
-            var run = new Run();
-            run.Model = Load(inputName);
-            run.CodeGen = NewGeneratorFor(run.Model);
-            run.FirstFile = run.Model.FilesToGenerate.First();
-            run.Code = run.CodeGen.Transform(run.FirstFile);
-            Assert.IsTrue(Util.InlineAssemblyCompiler.TryCompileCapnp(run.Code), "Compilation was not successful");
-            return run;
+            var file = model.FilesToGenerate.SingleOrDefault(f => f.Name.EndsWith(name));
+            Assert.IsNotNull(file, $"Could not find '{name}' in generated files");
+            return file;
         }
 
         static Model.TypeDefinition GetTypeDef(ulong id, Model.SchemaModel model)
