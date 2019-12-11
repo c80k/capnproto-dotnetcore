@@ -78,9 +78,9 @@ namespace CapnpC.CSharp.Generator.CodeGen
             ContextParameter = new Name(options.ContextParameterName);
             GroupReaderContextArg = new Name(options.GroupReaderContextArgName);
             GroupWriterContextArg = new Name(options.GroupWriterContextArgName);
-            UnionDiscriminatorEnum = new Name(options.UnionDisciminatorEnumName);
+            UnionDiscriminatorEnum = new Name(options.UnionDiscriminatorEnumName);
             UnionDiscriminatorProp = new Name(options.UnionDiscriminatorPropName);
-            UnionDiscriminatorUndefined = new Name(options.UnionDisciminatorUndefinedName);
+            UnionDiscriminatorUndefined = new Name(options.UnionDiscriminatorUndefinedName);
             UnionDiscriminatorField = new Name(options.UnionDiscriminatorFieldName);
             UnionContentField = new Name(options.UnionContentFieldName);
             SerializeMethod = new Name(options.SerializeMethodName);
