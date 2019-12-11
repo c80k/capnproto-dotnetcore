@@ -343,10 +343,9 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         return LiteralExpression(SyntaxKind.FalseLiteralExpression);
 
                     case TypeTag.Enum:
-                        return MemberAccessExpression(
-                            SyntaxKind.SimpleMemberAccessExpression,
+                        return CastExpression(
                             _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.NotRelevant),
-                            _names.UnionDiscriminatorUndefined.IdentifierName);
+                            LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0)));
 
                     case TypeTag.F32:
                         return LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0.0f));
