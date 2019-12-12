@@ -4,16 +4,24 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Capnp.Rpc
 {
+    /// <summary>
+    /// Carries information on RPC connection state changes.
+    /// </summary>
     public class ConnectionEventArgs: EventArgs
     {
+        /// <summary>
+        /// Affected connection
+        /// </summary>
         public IConnection Connection { get; }
 
+        /// <summary>
+        /// Constructs an instance
+        /// </summary>
+        /// <param name="connection">RPC connection object</param>
         public ConnectionEventArgs(IConnection connection)
         {
             Connection = connection;

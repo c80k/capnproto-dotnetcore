@@ -281,7 +281,6 @@ namespace Capnp.Rpc.Interception
         /// <summary>
         /// Forwards this intercepted call to the target capability ("Bob").
         /// </summary>
-        /// <param name="cancellationToken">Optional cancellation token, requesting Bob to cancel the call</param>
         public void ForwardToBob()
         {
             if (Bob == null)
