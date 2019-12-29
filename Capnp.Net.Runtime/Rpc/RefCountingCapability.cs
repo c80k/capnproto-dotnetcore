@@ -72,7 +72,7 @@ namespace Capnp.Rpc
                 {
                     --_refCount;
 
-                    throw new ObjectDisposedException(nameof(ConsumedCapability));
+                    throw new ObjectDisposedException(ToString(), "Attempted to add reference to capability which was already released");
                 }
             }
         }
@@ -106,7 +106,7 @@ namespace Capnp.Rpc
             {
                 if (_refCount <= 0)
                 {
-                    throw new ObjectDisposedException(nameof(ConsumedCapability), "Validation failed, capability is already disposed");
+                    throw new ObjectDisposedException(ToString(), "Validation failed, capability is already disposed");
                 }
             }
         }

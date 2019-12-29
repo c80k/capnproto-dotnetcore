@@ -482,7 +482,7 @@ namespace Capnp.Net.Runtime.Tests
                                 bool flag = call0.Wait(MediumNonDbgTimeout);
                                 Assert.IsTrue(flag);
                             }
-                            catch (RpcException exception) when (exception.Message == "Cannot access a disposed object.")
+                            catch (AggregateException exception) when (exception.InnerException is RpcException rpcException && rpcException.Message == "Cannot access a disposed object.")
                             {
                                 Logger.Log(LogLevel.Information, $"Oops, object disposed. Counter = {cap.Count}, tx count = {client.SendCount}, rx count = {client.RecvCount}");
                                 throw;
