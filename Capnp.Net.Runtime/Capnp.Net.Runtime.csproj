@@ -18,7 +18,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>capnp "Cap'n Proto" RPC serialization cerealization</PackageTags>
-    <Version>1.2-local$([System.DateTime]::UtcNow.ToString(yyMMddHHmm))</Version>
+    <Version>1.3-local$([System.DateTime]::UtcNow.ToString(yyMMddHHmm))</Version>
     <Configurations>Debug;Release</Configurations>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
