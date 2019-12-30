@@ -10,8 +10,11 @@
     <!--<license type="expression">MIT</license>-->
     <licenseUrl>https://github.com/c80k/capnproto-dotnetcore/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/c80k/capnproto-dotnetcore</projectUrl>
-    <title>capnpc-csharp (Install)</title>
-    <description>Cap'n Proto C# code generator backend, portable .NET Core 2.1</description>
+    <title>[Deprecated] capnpc-csharp (Install)</title>
+    <description>Cap'n Proto C# code generator backend, portable .NET Core 2.1
+    This package is deprecated now. It was converted to a .NET Core CLI tool which is now hosted here: https://www.nuget.org/packages/capnpc-csharp
+    To install, type: dotnet tool install -g capnpc-csharp
+    </description>
     <summary>Cap'n Proto C# code generator backend. This is the portable variant which depends on .NET Core 2.1 (as opposed to capnpc-csharp-win-x86)</summary>
     <copyright>Christian Köllner and contributors</copyright>
     <projectSourceUrl>https://github.com/c80k/capnproto-dotnetcore</projectSourceUrl>
@@ -20,17 +23,7 @@
     <tags>capnp capnpc RPC serialization cerealization</tags>
     <!--<repository type="Git" />-->
     <releaseNotes>https://github.com/c80k/capnproto-dotnetcore/releases/tag/v$version$</releaseNotes>
-    <dependencies>
-        <dependency id="capnproto" version="0.7.0" />
-        <dependency id="dotnetcore-runtime.install" version="2.1.6" />
-    </dependencies>
+    <dependencies/>
   </metadata>
-<files>
-    <file src="chocolateyinstall.ps1" target="tools" />
-    <file src="chocolateyuninstall.ps1" target="tools" />
-    <file src=".\capnpc-csharp.ps1" target="tools" />
-    <file src="..\LICENSE.txt" target="tools" />
-    <file src="..\VERIFICATION.txt" target="tools" />
-    <file src=".\bin\**" target="bin" />
-  </files>
+<files/>
 </package>

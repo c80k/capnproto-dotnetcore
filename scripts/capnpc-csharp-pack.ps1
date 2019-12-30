@@ -10,7 +10,7 @@ $installDir = "$chocoDir\install"
 
 dotnet build -c Release "$scriptDir\..\Capnp.Net.sln"
 dotnet publish -c Release -r win-x86 --self-contained -o "$chocoDir\$id_win_x86\bin" "$csprojDir\$csprojFile"
-dotnet publish -c Release -o "$chocoDir\$id\bin" "$csprojDir\$csprojFile"
+# dotnet publish -c Release -o "$chocoDir\$id\bin" "$csprojDir\$csprojFile"
 
 If(!(test-path $installDir))
 {
@@ -21,3 +21,4 @@ Copy-Item "$scriptDir\..\LICENSE" -Destination "$chocoDir\LICENSE.txt"
 
 choco pack "$chocoDir\$id\$id.nuspec" --version $version --outputdirectory $installDir
 choco pack "$chocoDir\$id_win_x86\$id_win_x86.nuspec" --version $version --outputdirectory $installDir
+Rename-Item -Path "$installDir\$id.nupkg" -NewName "$installDir\$id-deprecated.nupkg"

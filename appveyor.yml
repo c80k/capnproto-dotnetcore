@@ -1,4 +1,4 @@
-version: '1.3.{build}'
+version: '1.3.0-alpha'
 image: Visual Studio 2019
 # branches:
 #  only:
@@ -51,22 +51,25 @@ artifacts:
  - path: chocolatey\install\capnpc-csharp-win-x86.$(appveyor_build_version).nupkg
    name: capnpc-csharp-win-x86
    type: NuGetPackage
-# - path: chocolatey\install\capnpc-csharp.$(appveyor_build_version).nupkg
-#   name: capnpc-csharp
-#   type: NuGetPackage
+ - path: chocolatey\install\capnpc-csharp.$(appveyor_build_version)-deprecated.nupkg
+   name: capnpc-csharp-deprecated
+   type: NuGetPackage
  - path: capnpc-csharp\nupkg\capnpc-csharp.$(appveyor_build_version).nupkg
    name: capnpc-csharp
    type: NuGetPackage
 clone_depth: 1
 test_script:
   - cmd: vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp2.1\CapnpC.CSharp.Generator.Tests.dll
-  - cmd: cd %APPVEYOR_BUILD_FOLDER%\chocolatey\install
-  - cmd: choco install capnpc-csharp --source=".;https://chocolatey.org/api/v2" --force -y
+#  - cmd: cd %APPVEYOR_BUILD_FOLDER%\chocolatey\install
+#  - cmd: choco install capnpc-csharp --source=".;https://chocolatey.org/api/v2" --force -y
+  - cmd: cd %APPVEYOR_BUILD_FOLDER%\capnpc-csharp
+  - cmd: dotnet tool install --global --add-source ./nupkg capnpc-csharp
   - cmd: cd %APPVEYOR_BUILD_FOLDER%\install-test
   - cmd: compile-test
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
   - cmd: vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp2.1\CapnpC.CSharp.Generator.Tests.dll
-  - cmd: choco uninstall capnpc-csharp -y
+#  - cmd: choco uninstall capnpc-csharp -y
+  - cmd: dotnet tool install --global capnpc-csharp
   - cmd: cd %APPVEYOR_BUILD_FOLDER%\install-test
   - cmd: notinstalled-test
   - cmd: cd %APPVEYOR_BUILD_FOLDER%\chocolatey\install
