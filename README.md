@@ -43,6 +43,9 @@ choco install capnpc-csharp-win-x86
 
 Both versions will also download and install the [Cap'n Proto tool set Chocolatey package](https://www.chocolatey.org/packages/capnproto). Note that the author does not maintain this package and has no influence on its contents.
 
+*Announcement: There is currently an experimental branch for packaging the code generator back end as .NET Core CLI tool. If this approach turns out to be viable, it will probably be superior to the Chocolatey deployment. In that case, the CLI tool capnpc-csharp will be deployed on NuGet.org and the former Chocolatey package will be deprecated. capnpc-csharp-win-x86 will probably be kept (and also maintained).*
+
+
 ### Code generator back end: Other OSes
 
 Currently, you are on yourself. Compile the `capnpc-csharp` VS project and install the resulting .NET application manually on your system. This should not be that complicated, see also the [Wiki](https://github.com/c80k/capnproto-dotnetcore/wiki). It would be great to support other package managers, especially [APT](https://wiki.debian.org/Apt). Consider contributing? Author would be happy!
