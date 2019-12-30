@@ -51,7 +51,10 @@ artifacts:
  - path: chocolatey\install\capnpc-csharp-win-x86.$(appveyor_build_version).nupkg
    name: capnpc-csharp-win-x86
    type: NuGetPackage
- - path: chocolatey\install\capnpc-csharp.$(appveyor_build_version).nupkg
+# - path: chocolatey\install\capnpc-csharp.$(appveyor_build_version).nupkg
+#   name: capnpc-csharp
+#   type: NuGetPackage
+ - path: capnpc-csharp\nupkg\capnpc-csharp.$(appveyor_build_version).nupkg
    name: capnpc-csharp
    type: NuGetPackage
 clone_depth: 1

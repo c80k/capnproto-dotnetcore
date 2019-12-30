@@ -5,7 +5,10 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <RootNamespace>CapnpC</RootNamespace>
     <LangVersion>7.1</LangVersion>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>capnpc-csharp</ToolCommandName>
+    <PackageOutputPath>./nupkg/capnpc-csharp</PackageOutputPath>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Authors>Christian Köllner and contributors</Authors>
     <Description>Cap'n Proto C# code generator backend</Description>
