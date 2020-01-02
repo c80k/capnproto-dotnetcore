@@ -2,6 +2,7 @@ image: Visual Studio 2019
 # branches:
 #  only:
 # - master
+version: {build}
 cache:
   - c:\Tools\vcpkg\installed
 install:
@@ -14,7 +15,7 @@ init:
   # Good practise, because Windows line endings are different from Unix/Linux ones
   - cmd: git config --global core.autocrlf true
 before_build:
-  - cmd: nbgv cloud
+#  - cmd: nbgv cloud
   - cmd: dotnet --version
   - cmd: msbuild -ver
   - cmd: dotnet restore ./Capnp.Net.Runtime/Capnp.Net.Runtime.csproj --verbosity m
