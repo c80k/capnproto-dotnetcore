@@ -50,19 +50,19 @@ build_script:
 after_build:
   # For once the build has completed
 artifacts:
- - path: bin\Release\Capnp.Net.Runtime.$(semver).nupkg
+ - path: bin\Release\Capnp.Net.Runtime.*.nupkg
    name: Capnp.Net.Runtime
    type: NuGetPackage
- - path: bin\Release\CapnpC.CSharp.MsBuild.Generation.$(semver).nupkg
+ - path: bin\Release\CapnpC.CSharp.MsBuild.Generation.*.nupkg
    name: CapnpC.CSharp.MsBuild.Generation
    type: NuGetPackage
- - path: chocolatey\install\capnpc-csharp-win-x86.$(semver).nupkg
+ - path: chocolatey\install\capnpc-csharp-win-x86.*.nupkg
    name: capnpc-csharp-win-x86
    type: NuGetPackage
- - path: chocolatey\install\capnpc-csharp.$(semver)-deprecated.nupkg
+ - path: chocolatey\install\capnpc-csharp.*-deprecated.nupkg
    name: capnpc-csharp-deprecated
    type: NuGetPackage
- - path: capnpc-csharp\nupkg\capnpc-csharp.$(semver).nupkg
+ - path: capnpc-csharp\nupkg\capnpc-csharp.*.nupkg
    name: capnpc-csharp
    type: NuGetPackage
 clone_depth: 1
