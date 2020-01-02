@@ -8,7 +8,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>capnpc-csharp</ToolCommandName>
-    <PackageOutputPath>./nupkg/capnpc-csharp</PackageOutputPath>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Authors>Christian Köllner and contributors</Authors>
     <Description>Cap'n Proto C# code generator backend</Description>
