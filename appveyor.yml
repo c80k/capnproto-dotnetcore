@@ -12,9 +12,9 @@ install:
   - dotnet tool install -g . nbgv
 init:
   # Good practise, because Windows line endings are different from Unix/Linux ones
-  - cmd: nbgv cloud
   - cmd: git config --global core.autocrlf true
 before_build:
+  - cmd: nbgv cloud
   - cmd: dotnet --version
   - cmd: msbuild -ver
   - cmd: dotnet restore ./Capnp.Net.Runtime/Capnp.Net.Runtime.csproj --verbosity m
