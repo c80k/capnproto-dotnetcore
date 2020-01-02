@@ -17,6 +17,8 @@
     <RepositoryType>Git</RepositoryType>
     <PackageTags>capnp capnpc RPC serialization cerealization</PackageTags>
     <Version>1.3.0</Version>
+    <FileVersion>1.3.0.0</FileVersion>
+    <AssemblyVersion>1.3.0.0</AssemblyVersion>
     <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
