@@ -2,7 +2,7 @@ image: Visual Studio 2019
 # branches:
 #  only:
 # - master
-version: {build}
+version: '{build}'
 cache:
   - c:\Tools\vcpkg\installed
 install:
