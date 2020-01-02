@@ -2,13 +2,7 @@ environment:
   major: 1
   minor: 3
   patch: 0
-init:
-  - cmd: set semver='%major%.%minor%.%patch%'
-  - cmd: set fullsemver='%semver%+{build}'
-  - cmd: set msasmver='%major%.%minor%.{build}.%patch%'
-  # Good practise, because Windows line endings are different from Unix/Linux ones
-  - cmd: git config --global core.autocrlf true
-version: '$(fullsemver)'
+version: '$(major).$(minor).$(patch)+{build}'
 image: Visual Studio 2019
 # branches:
 #  only:
@@ -20,6 +14,11 @@ install:
   - vcpkg integrate install
   - vcpkg install capnproto
   - cd %APPVEYOR_BUILD_FOLDER%
+init:
+  - cmd: set semver='%major%.%minor%.%patch%'
+  - cmd: set msasmver='%major%.%minor%.{build}.%patch%'
+  # Good practise, because Windows line endings are different from Unix/Linux ones
+  - cmd: git config --global core.autocrlf true
 dotnet_csproj:
   patch: true
   file: '**\*.csproj;**\*.props;**\*.fsproj;**\*.xml'
@@ -27,7 +26,7 @@ dotnet_csproj:
   package_version: '$(semver)'
   assembly_version: '$(msasmver)'
   file_version: '$(msasmver)'
-  informational_version: '$(fullsemver)'
+  informational_version: '{version}'
 before_build:
   - cmd: dotnet --version
   - cmd: msbuild -ver
