@@ -17,6 +17,8 @@ install:
 init:
   - cmd: set semver=%major%.%minor%.%patch%
   - cmd: set msasmver=%major%.%minor%.%build%.%patch%
+  - cmd: echo %semver%
+  - cmd: echo %msasmver%
   # Good practise, because Windows line endings are different from Unix/Linux ones
   - cmd: git config --global core.autocrlf true
 dotnet_csproj:
