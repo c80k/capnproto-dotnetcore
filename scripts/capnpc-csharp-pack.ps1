@@ -1,5 +1,5 @@
-param($version = "1.0.0")
-
+$jversion = nbgv get-version -f json | ConvertFrom-Json
+$version = $($jversion.NuGetPackageVersion)
 $id = "capnpc-csharp"
 $id_win_x86 = "capnpc-csharp-win-x86"
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
