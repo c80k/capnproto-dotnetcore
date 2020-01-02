@@ -2,9 +2,10 @@ environment:
   major: 1
   minor: 3
   patch: 0
-  semver: '$(major).$(minor).$(patch)'
-  fullsemver: '$(semver)+{build}'
-  msasmver: '$(major).$(minor).{build}.$(patch)'
+init:
+  - cmd: set semver='%major%.%minor%.%patch%'
+  - cmd: set fullsemver='%semver%+{build}'
+  - cmd: set msasmver='%major%.%minor%.{build}.%patch%'
 version: '$(fullsemver)'
 image: Visual Studio 2019
 # branches:
