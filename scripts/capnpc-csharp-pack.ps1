@@ -21,4 +21,4 @@ Copy-Item "$scriptDir\..\LICENSE" -Destination "$chocoDir\LICENSE.txt"
 
 choco pack "$chocoDir\$id\$id.nuspec" --version $version --outputdirectory $installDir
 choco pack "$chocoDir\$id_win_x86\$id_win_x86.nuspec" --version $version --outputdirectory $installDir
-Rename-Item -Path "$installDir\$id.$version.nupkg" -NewName "$installDir\$id.$version-deprecated.nupkg"
+Rename-Item -Path "$installDir\$id.$version.nupkg" -NewName "$id.$version-deprecated.nupkg"
