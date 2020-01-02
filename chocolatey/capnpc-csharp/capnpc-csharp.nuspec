@@ -23,7 +23,9 @@
     <tags>capnp capnpc RPC serialization cerealization</tags>
     <!--<repository type="Git" />-->
     <releaseNotes>https://github.com/c80k/capnproto-dotnetcore/releases/tag/v$version$</releaseNotes>
-    <dependencies/>
+    <dependencies>
+        <dependency id="capnproto" version="0.7.0" />
+    </dependencies>
   </metadata>
 <files/>
 </package>
