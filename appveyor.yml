@@ -51,7 +51,6 @@ artifacts:
  - path: capnpc-csharp\nupkg\*.nupkg
    name: capnpc-csharp
    type: NuGetPackage
-clone_depth: 1
 test_script:
   - cmd: vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp2.1\CapnpC.CSharp.Generator.Tests.dll
 #  - cmd: cd %APPVEYOR_BUILD_FOLDER%\chocolatey\install
