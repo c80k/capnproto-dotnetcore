@@ -8,7 +8,7 @@ $csprojDir = "$scriptDir\..\capnpc-csharp"
 $csprojFile = "capnpc-csharp.csproj"
 $installDir = "$chocoDir\install"
 
-dotnet build -c Release "$scriptDir\..\Capnp.Net.sln"
+dotnet build -c Release "$scriptDir\..\Capnp.Net.sln" /p:PublicRelease=true
 dotnet publish -c Release -r win-x86 --self-contained -o "$chocoDir\$id_win_x86\bin" "$csprojDir\$csprojFile"
 # dotnet publish -c Release -o "$chocoDir\$id\bin" "$csprojDir\$csprojFile"
 

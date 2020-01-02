@@ -1,8 +1,3 @@
-environment:
-  major: 1
-  minor: 3
-  patch: 0
-version: '$(major).$(minor).$(patch)+{build}'
 image: Visual Studio 2019
 # branches:
 #  only:
@@ -14,21 +9,11 @@ install:
   - vcpkg integrate install
   - vcpkg install capnproto
   - cd %APPVEYOR_BUILD_FOLDER%
+  - dotnet tool install -g . nbgv
 init:
-  - cmd: set semver=%major%.%minor%.%patch%
-  - cmd: set msasmver=%major%.%minor%.%APPVEYOR_BUILD_NUMBER%.%patch%
-  - cmd: echo %semver%
-  - cmd: echo %msasmver%
   # Good practise, because Windows line endings are different from Unix/Linux ones
+  - cmd: nbgv cloud
   - cmd: git config --global core.autocrlf true
-dotnet_csproj:
-  patch: true
-  file: '**\*.csproj;**\*.props;**\*.fsproj;**\*.xml'
-  version: '$(semver)'
-  package_version: '$(semver)'
-  assembly_version: '$(msasmver)'
-  file_version: '$(msasmver)'
-  informational_version: '{version}'
 before_build:
   - cmd: dotnet --version
   - cmd: msbuild -ver
@@ -43,10 +28,10 @@ before_build:
   - cmd: dotnet restore ./capnpc-csharp/capnpc-csharp.csproj --verbosity m  
 build_script:
   - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Debug"
-  - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Release"
+  - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Release" /p:PublicRelease=true
   - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Debug"
   - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Release"
-  - ps: scripts\capnpc-csharp-pack.ps1 $env:semver
+  - ps: scripts\capnpc-csharp-pack.ps1
 after_build:
   # For once the build has completed
 artifacts:
