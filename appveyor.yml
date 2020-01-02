@@ -9,7 +9,7 @@ install:
   - vcpkg integrate install
   - vcpkg install capnproto
   - cd %APPVEYOR_BUILD_FOLDER%
-  - dotnet tool install -g . nbgv
+  - dotnet tool install -g nbgv
 init:
   # Good practise, because Windows line endings are different from Unix/Linux ones
   - cmd: git config --global core.autocrlf true
