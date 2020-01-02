@@ -1,6 +1,11 @@
 environment:
-  semver: "1.3.0"
-version: '$(semver)+{build}'
+  major: 1
+  minor: 3
+  patch: 0
+  semver: '$(major).$(minor).$(patch)'
+  fullsemver: '$(semver)+{build}'
+  msasmver: '$(major).$(minor).{build}.$(patch)'
+version: '$(fullsemver)'
 image: Visual Studio 2019
 # branches:
 #  only:
@@ -18,11 +23,11 @@ install:
 dotnet_csproj:
   patch: true
   file: '**\*.csproj;**\*.props;**\*.fsproj;**\*.xml'
-  version: '{version}'
-  package_version: '{semver}'
-  assembly_version: '{version}'
-  file_version: '{version}'
-  informational_version: '{semver}'
+  version: '$(semver)'
+  package_version: '$(semver)'
+  assembly_version: '$(msasmver)'
+  file_version: '$(msasmver)'
+  informational_version: '$(fullsemver)'
 before_build:
   - cmd: dotnet --version
   - cmd: msbuild -ver
