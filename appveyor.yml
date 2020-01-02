@@ -6,6 +6,8 @@ init:
   - cmd: set semver='%major%.%minor%.%patch%'
   - cmd: set fullsemver='%semver%+{build}'
   - cmd: set msasmver='%major%.%minor%.{build}.%patch%'
+  # Good practise, because Windows line endings are different from Unix/Linux ones
+  - cmd: git config --global core.autocrlf true
 version: '$(fullsemver)'
 image: Visual Studio 2019
 # branches:
@@ -13,9 +15,6 @@ image: Visual Studio 2019
 # - master
 cache:
   - c:\Tools\vcpkg\installed
-init:
-  # Good practise, because Windows line endings are different from Unix/Linux ones
-  - cmd: git config --global core.autocrlf true
 install:
   - cd c:\tools\vcpkg
   - vcpkg integrate install
