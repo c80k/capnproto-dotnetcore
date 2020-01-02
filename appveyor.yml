@@ -2,7 +2,7 @@ environment:
   major: 1
   minor: 3
   patch: 0
-  build: {build}
+  build: '{build}'
 version: '$(major).$(minor).$(patch)+{build}'
 image: Visual Studio 2019
 # branches:
