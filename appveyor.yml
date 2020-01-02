@@ -62,7 +62,7 @@ artifacts:
  - path: chocolatey\install\capnpc-csharp.*-deprecated.nupkg
    name: capnpc-csharp-deprecated
    type: NuGetPackage
- - path: capnpc-csharp\nupkg\capnpc-csharp.*.nupkg
+ - path: capnpc-csharp\nupkg\*.nupkg
    name: capnpc-csharp
    type: NuGetPackage
 clone_depth: 1
