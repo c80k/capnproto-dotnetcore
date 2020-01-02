@@ -9,9 +9,8 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    
+
     <NuspecFile>$(MSBuildThisFileDirectory)CapnpC.CSharp.MsBuild.Generation.nuspec</NuspecFile>
-    <NuspecProperties>version=$(Version);configuration=$(Configuration)</NuspecProperties>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageOutputPath>..\bin\$(Configuration)</PackageOutputPath>
     <Configurations>Debug;Release</Configurations>
