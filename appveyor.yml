@@ -2,7 +2,6 @@ environment:
   major: 1
   minor: 3
   patch: 0
-  build: '{build}'
 version: '$(major).$(minor).$(patch)+{build}'
 image: Visual Studio 2019
 # branches:
@@ -17,7 +16,7 @@ install:
   - cd %APPVEYOR_BUILD_FOLDER%
 init:
   - cmd: set semver=%major%.%minor%.%patch%
-  - cmd: set msasmver=%major%.%minor%.%build%.%patch%
+  - cmd: set msasmver=%major%.%minor%.%APPVEYOR_BUILD_NUMBER%.%patch%
   - cmd: echo %semver%
   - cmd: echo %msasmver%
   # Good practise, because Windows line endings are different from Unix/Linux ones
