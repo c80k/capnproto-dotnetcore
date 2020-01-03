@@ -67,7 +67,7 @@ test_script:
       cd %APPVEYOR_BUILD_FOLDER%\install-test
       notinstalled-test
       cd %APPVEYOR_BUILD_FOLDER%\chocolatey\install
-      choco install capnpc-csharp-win-x86 --source=".;https://chocolatey.org/api/v2" --force -y
+      choco install capnpc-csharp-win-x86 --source=".;https://chocolatey.org/api/v2" --force -y --version %VERSION% --pre
       cd %APPVEYOR_BUILD_FOLDER%\install-test
       compile-test
       choco uninstall capnpc-csharp-win-x86 -y
