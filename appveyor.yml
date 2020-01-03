@@ -57,7 +57,10 @@ test_script:
 #  - cmd: choco install capnpc-csharp --source=".;https://chocolatey.org/api/v2" --force -y
   - cmd: choco install capnproto --source="https://chocolatey.org/api/v2" --force -y
   - cmd: cd %APPVEYOR_BUILD_FOLDER%\capnpc-csharp
-  - cmd: dotnet tool install --global --add-source ./nupkg capnpc-csharp
+  - powershell: |
+      $jversion = nbgv get-version -f json | ConvertFrom-Json
+      $version = $($jversion.NuGetPackageVersion)
+      dotnet tool install --global --add-source ./nupkg capnpc-csharp --version $(version)
   - cmd: cd %APPVEYOR_BUILD_FOLDER%\install-test
   - cmd: compile-test
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
