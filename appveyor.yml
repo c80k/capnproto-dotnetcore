@@ -29,7 +29,7 @@ before_build:
   - cmd: dotnet restore ./capnpc-csharp/capnpc-csharp.csproj --verbosity m  
 build_script:
   - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Debug"
-  - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Release" /p:PublicRelease=true
+  - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Release"
   - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Debug"
   - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Release"
   - ps: scripts\capnpc-csharp-pack.ps1
