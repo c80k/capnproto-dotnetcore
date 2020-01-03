@@ -52,36 +52,34 @@ artifacts:
    name: capnpc-csharp
    type: NuGetPackage
 test_script:
-  - cmd: vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp2.1\CapnpC.CSharp.Generator.Tests.dll
-#  - cmd: cd %APPVEYOR_BUILD_FOLDER%\chocolatey\install
-#  - cmd: choco install capnpc-csharp --source=".;https://chocolatey.org/api/v2" --force -y
-  - cmd: choco install capnproto --source="https://chocolatey.org/api/v2" --force -y
-  - cmd: cd %APPVEYOR_BUILD_FOLDER%\capnpc-csharp
-  - cmd: echo|set /p="dotnet tool install --global --add-source ./nupkg capnpc-csharp --version " > install.bat & exit 0
-  - cmd: nbgv get-version -v NuGetPackageVersion >> install.bat
-  - cmd: install.bat
-  - cmd: cd %APPVEYOR_BUILD_FOLDER%\install-test
-  - cmd: compile-test
-  - cmd: cd %APPVEYOR_BUILD_FOLDER%
-  - cmd: vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp2.1\CapnpC.CSharp.Generator.Tests.dll
-#  - cmd: choco uninstall capnpc-csharp -y
-  - cmd: dotnet tool uninstall --global capnpc-csharp
-  - cmd: cd %APPVEYOR_BUILD_FOLDER%\install-test
-  - cmd: notinstalled-test
-  - cmd: cd %APPVEYOR_BUILD_FOLDER%\chocolatey\install
-  - cmd: choco install capnpc-csharp-win-x86 --source=".;https://chocolatey.org/api/v2" --force -y
-  - cmd: cd %APPVEYOR_BUILD_FOLDER%\install-test
-  - cmd: compile-test
-  - cmd: choco uninstall capnpc-csharp-win-x86 -y
-  - cmd: notinstalled-test
-  - cmd: cd %APPVEYOR_BUILD_FOLDER%
-  - cmd: vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.MsBuild.Generation.Tests\bin\Release\netcoreapp2.1\CapnpC.CSharp.MsBuild.Generation.Tests.dll
-  - cmd: msbuild -t:restore ./MsBuildGenerationTest/MsBuildGenerationTest.csproj /p:Configuration="Debug" /p:PackageReferenceVersion="%APPVEYOR_BUILD_VERSION%"
-  - cmd: msbuild ./MsBuildGenerationTest/MsBuildGenerationTest.sln /p:Configuration="Debug" /p:PackageReferenceVersion="%APPVEYOR_BUILD_VERSION%"
-  - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Debug\net471\Capnp.Net.Runtime.Tests.Std20.dll
-  - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\net471\Capnp.Net.Runtime.Tests.Std20.dll
-  - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests.Core21\bin\Debug\netcoreapp2.1\Capnp.Net.Runtime.Tests.Core21.dll
-  - cmd: vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests.Core21\bin\Release\netcoreapp2.1\Capnp.Net.Runtime.Tests.Core21.dll
+  - cmd: |
+      nbgv get-version -v NuGetPackageVersion >> version.txt
+      set /P VERSION=< version.txt
+      vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp2.1\CapnpC.CSharp.Generator.Tests.dll
+      choco install capnproto --source="https://chocolatey.org/api/v2" --force -y
+      cd %APPVEYOR_BUILD_FOLDER%\capnpc-csharp
+      dotnet tool install --global --add-source ./nupkg capnpc-csharp --version %VERSION%
+      cd %APPVEYOR_BUILD_FOLDER%\install-test
+      compile-test
+      cd %APPVEYOR_BUILD_FOLDER%
+      vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp2.1\CapnpC.CSharp.Generator.Tests.dll
+      dotnet tool uninstall --global capnpc-csharp
+      cd %APPVEYOR_BUILD_FOLDER%\install-test
+      notinstalled-test
+      cd %APPVEYOR_BUILD_FOLDER%\chocolatey\install
+      choco install capnpc-csharp-win-x86 --source=".;https://chocolatey.org/api/v2" --force -y
+      cd %APPVEYOR_BUILD_FOLDER%\install-test
+      compile-test
+      choco uninstall capnpc-csharp-win-x86 -y
+      notinstalled-test
+      cd %APPVEYOR_BUILD_FOLDER%
+      vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.MsBuild.Generation.Tests\bin\Release\netcoreapp2.1\CapnpC.CSharp.MsBuild.Generation.Tests.dll
+      msbuild -t:restore ./MsBuildGenerationTest/MsBuildGenerationTest.csproj /p:Configuration="Debug" /p:PackageReferenceVersion="%VERSION%"
+      msbuild ./MsBuildGenerationTest/MsBuildGenerationTest.sln /p:Configuration="Debug" /p:PackageReferenceVersion="%VERSION%"
+      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Debug\net471\Capnp.Net.Runtime.Tests.Std20.dll
+      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\net471\Capnp.Net.Runtime.Tests.Std20.dll
+      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests.Core21\bin\Debug\netcoreapp2.1\Capnp.Net.Runtime.Tests.Core21.dll
+      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests.Core21\bin\Release\netcoreapp2.1\Capnp.Net.Runtime.Tests.Core21.dll
 on_finish :
   # any cleanup in here
 deploy:
