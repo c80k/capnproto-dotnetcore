@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+#nullable enable
 namespace Capnp.Rpc.Interception
 {
 
@@ -34,7 +35,7 @@ namespace Capnp.Rpc.Interception
                 return new Proxy(Access(access));
             }
 
-            public ConsumedCapability Access(MemberAccessPath access)
+            public ConsumedCapability? Access(MemberAccessPath access)
             {
                 if (_futureResult.Task.IsCompleted)
                 {
@@ -44,7 +45,7 @@ namespace Capnp.Rpc.Interception
                     }
                     catch (AggregateException exception)
                     {
-                        throw exception.InnerException;
+                        throw exception.InnerException!;
                     }
                 }
                 else
@@ -107,7 +108,7 @@ namespace Capnp.Rpc.Interception
         /// <summary>
         /// Input arguments
         /// </summary>
-        public SerializerState InArgs { get; set; }
+        public SerializerState? InArgs { get; set; }
 
         /// <summary>
         /// Output arguments ("return value")
@@ -117,7 +118,7 @@ namespace Capnp.Rpc.Interception
         /// <summary>
         /// Exception text, or null if there is no exception
         /// </summary>
-        public string Exception { get; set; }
+        public string? Exception { get; set; }
 
         /// <summary>
         /// Whether the call should return in canceled state to Alice (the original caller).
@@ -156,7 +157,7 @@ namespace Capnp.Rpc.Interception
         /// <item><description>null</description></item>
         /// </list>
         /// </summary>
-        public object Bob 
+        public object? Bob 
         {
             get => _bob;
             set
@@ -196,11 +197,11 @@ namespace Capnp.Rpc.Interception
             }
         }
 
-        internal Proxy BobProxy { get; private set; }
+        internal Proxy? BobProxy { get; private set; }
 
         readonly CensorCapability _censorCapability;
         PromisedAnswer _promisedAnswer;
-        object _bob;
+        object? _bob;
 
         internal IPromisedAnswer Answer => _promisedAnswer;
 
@@ -224,8 +225,13 @@ namespace Capnp.Rpc.Interception
             {
                 for (int i = 0; i < state.Caps.Count; i++)
                 {
-                    state.Caps[i] = policy.Attach(state.Caps[i]);
-                    state.Caps[i].AddRef();
+                    var cap = state.Caps[i];
+                    if (cap != null)
+                    {
+                        cap = policy.Attach(cap);
+                        state.Caps[i] = cap;
+                        cap.AddRef();
+                    }
                 }
             }
         }
@@ -236,8 +242,13 @@ namespace Capnp.Rpc.Interception
             {
                 for (int i = 0; i < state.Caps.Count; i++)
                 {
-                    state.Caps[i] = policy.Detach(state.Caps[i]);
-                    state.Caps[i].AddRef();
+                    var cap = state.Caps[i];
+                    if (cap != null)
+                    {
+                        cap = policy.Detach(cap);
+                        state.Caps[i] = cap;
+                        cap.AddRef();
+                    }
                 }
             }
         }
@@ -246,8 +257,12 @@ namespace Capnp.Rpc.Interception
         /// Intercepts all capabilies inside the input arguments
         /// </summary>
         /// <param name="policyOverride">Policy to use, or null to further use present policy</param>
-        public void InterceptInCaps(IInterceptionPolicy policyOverride = null)
+        /// <exception cref="InvalidOperationException">InArgs not set</exception>
+        public void InterceptInCaps(IInterceptionPolicy? policyOverride = null)
         {
+            if (InArgs == null)
+                throw new InvalidOperationException("InArgs not set");
+
             InterceptCaps(InArgs, policyOverride ?? _censorCapability.Policy);
         }
 
@@ -255,7 +270,7 @@ namespace Capnp.Rpc.Interception
         /// Intercepts all capabilies inside the output arguments
         /// </summary>
         /// <param name="policyOverride">Policy to use, or null to further use present policy</param>
-        public void InterceptOutCaps(IInterceptionPolicy policyOverride = null)
+        public void InterceptOutCaps(IInterceptionPolicy? policyOverride = null)
         {
             InterceptCaps(OutArgs, policyOverride ?? _censorCapability.Policy);
         }
@@ -264,8 +279,12 @@ namespace Capnp.Rpc.Interception
         /// Unintercepts all capabilies inside the input arguments
         /// </summary>
         /// <param name="policyOverride">Policy to remove, or null to remove present policy</param>
-        public void UninterceptInCaps(IInterceptionPolicy policyOverride = null)
+        /// <exception cref="InvalidOperationException">InArgs not set</exception>
+        public void UninterceptInCaps(IInterceptionPolicy? policyOverride = null)
         {
+            if (InArgs == null)
+                throw new InvalidOperationException("InArgs not set");
+
             UninterceptCaps(InArgs, policyOverride ?? _censorCapability.Policy);
         }
 
@@ -273,7 +292,7 @@ namespace Capnp.Rpc.Interception
         /// Unintercepts all capabilies inside the output arguments
         /// </summary>
         /// <param name="policyOverride">Policy to remove, or null to remove present policy</param>
-        public void UninterceptOutCaps(IInterceptionPolicy policyOverride = null)
+        public void UninterceptOutCaps(IInterceptionPolicy? policyOverride = null)
         {
             UninterceptCaps(OutArgs, policyOverride ?? _censorCapability.Policy);
         }
@@ -281,14 +300,16 @@ namespace Capnp.Rpc.Interception
         /// <summary>
         /// Forwards this intercepted call to the target capability ("Bob").
         /// </summary>
+        /// <exception cref="InvalidOperationException">Bob/InArgs not set</exception>
         public void ForwardToBob()
         {
             if (Bob == null)
-            {
                 throw new InvalidOperationException("Bob is null");
-            }
-            
-            var answer = BobProxy.Call(InterfaceId, MethodId, InArgs.Rewrap<DynamicSerializerState>(), default, CancelToBob);
+
+            if (InArgs == null)
+                throw new InvalidOperationException("InArgs not set");
+
+            var answer = BobProxy!.Call(InterfaceId, MethodId, InArgs.Rewrap<DynamicSerializerState>(), default, CancelToBob);
 
             State = InterceptionState.ForwardedToBob;
 
@@ -336,3 +357,4 @@ namespace Capnp.Rpc.Interception
         }
     }
 }
+#nullable restore

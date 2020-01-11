@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
+#nullable enable
 namespace Capnp.Rpc.Interception
 {
     /// <summary>
@@ -45,16 +46,16 @@ namespace Capnp.Rpc.Interception
             switch (cap)
             {
                 case Proxy proxy:
-                    return CapabilityReflection.CreateProxy<TCap>(Attach(policy, proxy.ConsumedCap)) as TCap;
+                    return (CapabilityReflection.CreateProxy<TCap>(Attach(policy, proxy.ConsumedCap!)) as TCap)!;
 
                 case ConsumedCapability ccap:
-                    return new CensorCapability(ccap, policy) as TCap;
+                    return (new CensorCapability(ccap, policy) as TCap)!;
 
                 default:
-                    return Attach(policy, 
-                        CapabilityReflection.CreateProxy<TCap>(
+                    return (Attach(policy, 
+                        (CapabilityReflection.CreateProxy<TCap>(
                             LocalCapability.Create(
-                                Skeleton.GetOrCreateSkeleton(cap, false))) as TCap);
+                                Skeleton.GetOrCreateSkeleton(cap, false))) as TCap)!));
             }
         }
 
@@ -79,11 +80,11 @@ namespace Capnp.Rpc.Interception
             switch (cap)
             {
                 case Proxy proxy:
-                    return CapabilityReflection.CreateProxy<TCap>(Detach(policy, proxy.ConsumedCap)) as TCap;
+                    return (CapabilityReflection.CreateProxy<TCap>(Detach(policy, proxy.ConsumedCap!)) as TCap)!;
 
                 case CensorCapability ccap:
                     {
-                        var cur = ccap;
+                        CensorCapability? cur = ccap;
                         var stk = new Stack<IInterceptionPolicy>();
 
                         do
@@ -96,7 +97,7 @@ namespace Capnp.Rpc.Interception
                                 {
                                     cur2 = p.Attach(cur2);
                                 }
-                                return cur2 as TCap;
+                                return (cur2 as TCap)!;
                             }
 
                             stk.Push(cur.Policy);
@@ -104,7 +105,7 @@ namespace Capnp.Rpc.Interception
                         }
                         while (cur != null);
 
-                        return ccap as TCap;
+                        return (ccap as TCap)!;
                     }
 
                 default:
@@ -113,3 +114,4 @@ namespace Capnp.Rpc.Interception
         }
     }
 }
+#nullable restore

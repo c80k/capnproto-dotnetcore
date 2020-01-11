@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 
+#nullable enable
 namespace Capnp.Rpc
 {
     /// <summary>
@@ -52,3 +53,4 @@ namespace Capnp.Rpc
         }
     }
 }
+#nullable restore

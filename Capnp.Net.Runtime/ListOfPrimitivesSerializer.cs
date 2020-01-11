@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
+#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -94,3 +95,4 @@ namespace Capnp
         IEnumerator IEnumerable.GetEnumerator() => Data.ToArray().GetEnumerator();
     }
 }
+#nullable restore

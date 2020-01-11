@@ -1,4 +1,5 @@
-﻿namespace Capnp.Rpc.Interception
+﻿#nullable enable
+namespace Capnp.Rpc.Interception
 {
     class CensorCapability : RefCountingCapability
     {
@@ -32,7 +33,7 @@
             writer.SenderHosted = endpoint.AllocateExport(MyVine, out bool _);
         }
 
-        internal override void Freeze(out IRpcEndpoint boundEndpoint)
+        internal override void Freeze(out IRpcEndpoint? boundEndpoint)
         {
             boundEndpoint = null;
         }
@@ -42,3 +43,4 @@
         }
     }
 }
+#nullable restore

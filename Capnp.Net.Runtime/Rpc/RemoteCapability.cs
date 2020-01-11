@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
+#nullable enable
 namespace Capnp.Rpc
 {
 
@@ -24,6 +25,9 @@ namespace Capnp.Rpc
 
         protected virtual Call.WRITER SetupMessage(DynamicSerializerState args, ulong interfaceId, ushort methodId)
         {
+            if (args.MsgBuilder == null)
+                throw new ArgumentException("Unbound serializer state", nameof(args));
+
             var callMsg = args.MsgBuilder.BuildRoot<Message.WRITER>();
 
             callMsg.which = Message.WHICH.Call;
@@ -38,3 +42,4 @@ namespace Capnp.Rpc
         }
     }
 }
+#nullable restore

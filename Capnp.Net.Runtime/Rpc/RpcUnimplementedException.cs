@@ -1,6 +1,8 @@
-﻿namespace Capnp.Rpc
+﻿#nullable enable
+namespace Capnp.Rpc
 {
     class RpcUnimplementedException : System.Exception
     {
     }
 }
+#nullable restore

@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+#nullable enable
 namespace Capnp.Rpc
 {
     /// <summary>
@@ -44,17 +45,17 @@ namespace Capnp.Rpc
 
         readonly RpcEngine _rpcEngine;
         readonly TcpClient _client;
-        RpcEngine.RpcEndpoint _inboundEndpoint;
-        OutboundTcpEndpoint _outboundEndpoint;
-        FramePump _pump;
-        Thread _pumpThread;
-        Action _attachTracerAction;
+        RpcEngine.RpcEndpoint? _inboundEndpoint;
+        OutboundTcpEndpoint? _outboundEndpoint;
+        FramePump? _pump;
+        Thread? _pumpThread;
+        Action? _attachTracerAction;
 
         /// <summary>
         /// Gets a Task which completes when TCP is connected. Will be
         /// null until connection is actually requested (either by calling Connect or using appropriate constructor).
         /// </summary>
-        public Task WhenConnected { get; private set; }
+        public Task? WhenConnected { get; private set; }
 
         async Task ConnectAsync(string host, int port)
         {
@@ -152,8 +153,14 @@ namespace Capnp.Rpc
         /// </summary>
         /// <typeparam name="TProxy">Bootstrap capability interface</typeparam>
         /// <returns>A proxy for the bootstrap capability</returns>
+        /// <exception cref="InvalidOperationException">Not connected</exception>
         public TProxy GetMain<TProxy>() where TProxy: class
         {
+            if (WhenConnected == null)
+            {
+                throw new InvalidOperationException("Not connecting");
+            }
+
             if (!WhenConnected.IsCompleted)
             {
                 throw new InvalidOperationException("Connection not yet established");
@@ -164,9 +171,7 @@ namespace Capnp.Rpc
                 throw new InvalidOperationException("Connection not successfully established");
             }
 
-            Debug.Assert(_inboundEndpoint != null);
-
-            return CapabilityReflection.CreateProxy<TProxy>(_inboundEndpoint.QueryMain()) as TProxy;
+            return (CapabilityReflection.CreateProxy<TProxy>(_inboundEndpoint!.QueryMain()) as TProxy)!;
         }
 
         /// <summary>
@@ -178,7 +183,7 @@ namespace Capnp.Rpc
 
             try
             {
-                if (!WhenConnected.Wait(500))
+                if (WhenConnected != null && !WhenConnected.Wait(500))
                 {
                     Logger.LogError("Unable to join connection task within timeout");
                 }
@@ -214,7 +219,7 @@ namespace Capnp.Rpc
 
             _attachTracerAction += () =>
             {
-                _pump.AttachTracer(tracer);
+                _pump?.AttachTracer(tracer);
             };
         }
 
@@ -234,33 +239,34 @@ namespace Capnp.Rpc
         /// <summary>
         /// Gets the number of RPC protocol messages sent by this client so far.
         /// </summary>
-        public long SendCount => _inboundEndpoint.SendCount;
+        public long SendCount => _inboundEndpoint?.SendCount ?? 0;
 
         /// <summary>
         /// Gets the number of RPC protocol messages received by this client so far.
         /// </summary>
-        public long RecvCount => _inboundEndpoint.RecvCount;
+        public long RecvCount => _inboundEndpoint?.RecvCount ?? 0;
 
         /// <summary>
         /// Gets the remote port number which this client is connected to, 
         /// or null if the connection is not yet established.
         /// </summary>
-        public int? RemotePort => ((IPEndPoint)_client.Client?.RemoteEndPoint)?.Port;
+        public int? RemotePort => ((IPEndPoint)_client.Client.RemoteEndPoint)?.Port;
 
         /// <summary>
         /// Gets the local port number which this client using, 
         /// or null if the connection is not yet established.
         /// </summary>
-        public int? LocalPort => ((IPEndPoint)_client.Client?.LocalEndPoint)?.Port;
+        public int? LocalPort => ((IPEndPoint)_client.Client.LocalEndPoint)?.Port;
 
         /// <summary>
         /// Whether the I/O thread is currently running
         /// </summary>
-        public bool IsComputing => _pumpThread.ThreadState == System.Threading.ThreadState.Running;
+        public bool IsComputing => _pumpThread?.ThreadState == System.Threading.ThreadState.Running;
 
         /// <summary>
         /// Whether the I/O thread is waiting for data to receive
         /// </summary>
-        public bool IsWaitingForData => _pump.IsWaitingForData;
+        public bool IsWaitingForData => _pump?.IsWaitingForData ?? false;
     }
 }
+#nullable restore

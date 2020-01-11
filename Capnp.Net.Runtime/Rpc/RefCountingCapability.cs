@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
+#nullable enable
 namespace Capnp.Rpc
 {
     abstract class RefCountingCapability: ConsumedCapability
@@ -112,3 +113,4 @@ namespace Capnp.Rpc
         }
     }
 }
+#nullable restore

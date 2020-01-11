@@ -4,8 +4,9 @@ using System.Threading.Tasks;
 
 namespace Capnp
 {
-  internal static class UtilityExtensions
-  {
+#nullable enable
+    internal static class UtilityExtensions
+    {
         /// <summary>
         /// This method exists until NET Standard 2.1 is released
         /// </summary>
@@ -23,7 +24,7 @@ namespace Capnp
             return true;
         }
 #else
-        public static bool ReplacementTryAdd<K, V>(this Dictionary<K, V> thisDict, K key, V value) => thisDict.TryAdd(key, value);
+        public static bool ReplacementTryAdd<K, V>(this Dictionary<K, V> thisDict, K key, V value) where K: struct => thisDict.TryAdd(key, value);
 #endif
 
         /// <summary>
@@ -40,14 +41,16 @@ namespace Capnp
         {
             if (!thisDict.ContainsKey(key))
             {
-                value = default;
+                value = default!; // OK here since .NET Standard 2.0 does not support (non-)nullability anyway.
                 return false;
             }
             value = thisDict[key];
             return thisDict.Remove(key);
         }
 #else
+#pragma warning disable CS8714
         public static bool ReplacementTryRemove<K, V>(this Dictionary<K, V> thisDict, K key, out V value) => thisDict.Remove(key, out value);
+#pragma warning restore CS8714
 #endif
 
         /// <summary>
@@ -77,3 +80,4 @@ namespace Capnp
 #endif
     }
 }
+#nullable restore

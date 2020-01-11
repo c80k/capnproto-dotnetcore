@@ -1,5 +1,6 @@
 ﻿using System;
 
+#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -25,3 +26,4 @@ namespace Capnp
         public ulong Id { get; }
     }
 }
+#nullable restore

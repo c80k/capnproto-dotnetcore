@@ -3,6 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
+#nullable enable
 namespace Capnp.Rpc
 {
     /// <summary>
@@ -38,7 +39,7 @@ namespace Capnp.Rpc
         /// <summary>
         /// Underlying low-level capability
         /// </summary>
-        protected internal ConsumedCapability ConsumedCap { get; private set; }
+        protected internal ConsumedCapability? ConsumedCap { get; private set; }
 
         /// <summary>
         /// Whether is this a broken capability.
@@ -99,12 +100,12 @@ namespace Capnp.Rpc
         {
         }
 
-        internal Proxy(ConsumedCapability cap)
+        internal Proxy(ConsumedCapability? cap)
         {
             Bind(cap);
         }
 
-        internal void Bind(ConsumedCapability cap)
+        internal void Bind(ConsumedCapability? cap)
         {
             if (ConsumedCap != null)
                 throw new InvalidOperationException("Proxy was already bound");
@@ -116,7 +117,7 @@ namespace Capnp.Rpc
             cap.AddRef();
         }
 
-        internal IProvidedCapability GetProvider()
+        internal IProvidedCapability? GetProvider()
         {
             switch (ConsumedCap)
             {
@@ -200,7 +201,7 @@ namespace Capnp.Rpc
 
             using (disposeThis ? this : null)
             {
-                return CapabilityReflection.CreateProxy<T>(ConsumedCap) as T;
+                return (CapabilityReflection.CreateProxy<T>(ConsumedCap) as T)!;
             }
         }
 
@@ -215,7 +216,7 @@ namespace Capnp.Rpc
                 ConsumedCap.Export(endpoint, writer);
         }
 
-        internal void Freeze(out IRpcEndpoint boundEndpoint)
+        internal void Freeze(out IRpcEndpoint? boundEndpoint)
         {
             if (_disposedValue)
                 throw new ObjectDisposedException(nameof(Proxy));
@@ -239,3 +240,4 @@ namespace Capnp.Rpc
 #endif
     }
 }
+#nullable restore

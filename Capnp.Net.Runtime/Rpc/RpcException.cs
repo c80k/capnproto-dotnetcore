@@ -1,4 +1,5 @@
-﻿namespace Capnp.Rpc
+﻿#nullable enable
+namespace Capnp.Rpc
 {
     /// <summary>
     /// Thrown when an RPC-related error condition occurs.
@@ -20,3 +21,4 @@
         }
     }
 }
+#nullable restore

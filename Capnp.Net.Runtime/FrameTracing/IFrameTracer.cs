@@ -1,5 +1,6 @@
 ﻿using System;
 
+#nullable enable
 namespace Capnp.FrameTracing
 {
     /// <summary>
@@ -31,3 +32,4 @@ namespace Capnp.FrameTracing
         void TraceFrame(FrameDirection direction, WireFrame frame);
     }
 }
+#nullable restore

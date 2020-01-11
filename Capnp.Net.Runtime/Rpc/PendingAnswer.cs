@@ -3,19 +3,20 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
+#nullable enable
 namespace Capnp.Rpc
 {
     class PendingAnswer: IDisposable
     {
         readonly object _reentrancyBlocker = new object();
-        readonly CancellationTokenSource _cts;
+        readonly CancellationTokenSource? _cts;
         readonly TaskCompletionSource<int> _whenCanceled;
         Task<AnswerOrCounterquestion> _callTask;
-        Task _initialTask;
-        Task _chainedTask;
+        Task? _initialTask;
+        Task? _chainedTask;
         bool _disposed;
 
-        public PendingAnswer(Task<AnswerOrCounterquestion> callTask, CancellationTokenSource cts)
+        public PendingAnswer(Task<AnswerOrCounterquestion> callTask, CancellationTokenSource? cts)
         {
             _cts = cts;
             _callTask = callTask ?? throw new ArgumentNullException(nameof(callTask));
@@ -138,7 +139,7 @@ namespace Capnp.Rpc
                             case ObjectKind.Capability:
                                 try
                                 {
-                                    var cap = aorcq.Answer.Caps[(int)cur.CapabilityIndex];
+                                    var cap = aorcq.Answer.Caps![(int)cur.CapabilityIndex];
                                     proxy = new Proxy(cap ?? LazyCapability.Null);
                                 }
                                 catch (ArgumentOutOfRangeException)
@@ -154,7 +155,7 @@ namespace Capnp.Rpc
                     else
                     {
                         var path = MemberAccessPath.Deserialize(rd);
-                        var cap = new RemoteAnswerCapability(aorcq.Counterquestion, path);
+                        var cap = new RemoteAnswerCapability(aorcq.Counterquestion!, path);
                         return new Proxy(cap);
                     }
                 }
@@ -169,7 +170,7 @@ namespace Capnp.Rpc
         {
             if (_cts != null)
             {
-                Task chainedTask;
+                Task? chainedTask;
 
                 lock (_reentrancyBlocker)
                 {
@@ -199,3 +200,4 @@ namespace Capnp.Rpc
         }
     }
 }
+#nullable restore

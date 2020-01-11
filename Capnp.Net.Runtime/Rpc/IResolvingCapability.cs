@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 
+#nullable enable
 namespace Capnp.Rpc
 {
     /// <summary>
@@ -13,3 +14,4 @@ namespace Capnp.Rpc
         Task<Proxy> WhenResolved { get; }
     }
 }
+#nullable restore

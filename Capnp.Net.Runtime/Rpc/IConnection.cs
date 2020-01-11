@@ -1,6 +1,7 @@
 ﻿using Capnp.FrameTracing;
 using System;
 
+#nullable enable
 namespace Capnp.Rpc
 {
     /// <summary>
@@ -58,3 +59,4 @@ namespace Capnp.Rpc
         void Close();
     }
 }
+#nullable restore

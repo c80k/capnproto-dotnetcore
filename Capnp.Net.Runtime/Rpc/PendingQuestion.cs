@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
+#nullable enable
 namespace Capnp.Rpc
 {
     /// <summary>
@@ -61,11 +62,11 @@ namespace Capnp.Rpc
 
         readonly TaskCompletionSource<DeserializerState> _tcs = new TaskCompletionSource<DeserializerState>();
         readonly uint _questionId;
-        ConsumedCapability _target;
-        SerializerState _inParams;
+        ConsumedCapability? _target;
+        SerializerState? _inParams;
         int _inhibitFinishCounter;
 
-        internal PendingQuestion(IRpcEndpoint ep, uint id, ConsumedCapability target, SerializerState inParams)
+        internal PendingQuestion(IRpcEndpoint ep, uint id, ConsumedCapability? target, SerializerState? inParams)
         {
             RpcEndpoint = ep ?? throw new ArgumentNullException(nameof(ep));
             _questionId = id;
@@ -75,7 +76,7 @@ namespace Capnp.Rpc
 
             if (inParams != null)
             {
-                foreach (var cap in inParams.Caps)
+                foreach (var cap in inParams.Caps!)
                 {
                     cap?.AddRef();
                 }
@@ -236,7 +237,7 @@ namespace Capnp.Rpc
         /// <param name="access">Access path</param>
         /// <returns>Low-level capability</returns>
         /// <exception cref="DeserializationException">The referenced member does not exist or does not resolve to a capability pointer.</exception>
-        public ConsumedCapability Access(MemberAccessPath access)
+        public ConsumedCapability? Access(MemberAccessPath access)
         {
             lock (ReentrancyBlocker)
             {
@@ -249,7 +250,7 @@ namespace Capnp.Rpc
                     }
                     catch (AggregateException exception)
                     {
-                        throw exception.InnerException;
+                        throw exception.InnerException!;
                     }
                 }
                 else
@@ -259,11 +260,11 @@ namespace Capnp.Rpc
             }
         }
 
-        static void ReleaseCaps(ConsumedCapability target, SerializerState inParams)
+        static void ReleaseCaps(ConsumedCapability? target, SerializerState? inParams)
         {
             if (inParams != null)
             {
-                foreach (var cap in inParams.Caps)
+                foreach (var cap in inParams.Caps!)
                 {
                     cap?.Release();
                 }
@@ -277,7 +278,7 @@ namespace Capnp.Rpc
 
         static void ReleaseOutCaps(DeserializerState outParams)
         {
-            foreach (var cap in outParams.Caps)
+            foreach (var cap in outParams.Caps!)
             {
                 cap?.Release();
             }
@@ -285,12 +286,13 @@ namespace Capnp.Rpc
 
         internal void Send()
         {
-            SerializerState inParams;
-            ConsumedCapability target;
+            SerializerState? inParams;
+            ConsumedCapability? target;
 
             lock (ReentrancyBlocker)
             {
-                Debug.Assert(!StateFlags.HasFlag(State.Sent));
+                if (StateFlags.HasFlag(State.Sent))
+                    throw new InvalidOperationException("Already sent");
 
                 inParams = _inParams;
                 _inParams = null;
@@ -299,7 +301,7 @@ namespace Capnp.Rpc
                 StateFlags |= State.Sent;
             }
 
-            var msg = (Message.WRITER)inParams.MsgBuilder.Root;
+            var msg = (Message.WRITER)inParams!.MsgBuilder!.Root!;
             Debug.Assert(msg.Call.Target.which != MessageTarget.WHICH.undefined);
             var call = msg.Call;
             call.QuestionId = QuestionId;
@@ -316,15 +318,15 @@ namespace Capnp.Rpc
                 OnException(exception);
             }
 
-            ReleaseCaps(target, inParams);
+            ReleaseCaps(target!, inParams);
         }
 
         #region IDisposable Support
 
         void Dispose(bool disposing)
         {
-            SerializerState inParams;
-            ConsumedCapability target;
+            SerializerState? inParams;
+            ConsumedCapability? target;
             bool justDisposed = false;
 
             lock (ReentrancyBlocker)
@@ -377,3 +379,4 @@ namespace Capnp.Rpc
         #endregion
     }
 }
+#nullable restore

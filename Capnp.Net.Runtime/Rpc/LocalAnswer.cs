@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
+#nullable enable
 namespace Capnp.Rpc
 {
     class LocalAnswer : IPromisedAnswer
@@ -50,3 +51,4 @@ namespace Capnp.Rpc
         }
     }
 }
+#nullable restore

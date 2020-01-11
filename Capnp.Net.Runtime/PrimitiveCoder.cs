@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 
+#nullable enable
 namespace Capnp
 {
     class PrimitiveCoder
     {
         class Coder<T>
         {
-            public static Func<T, T, T> Fn { get; set; }
+            public static Func<T, T, T>? Fn { get; set; }
         }
 
         static PrimitiveCoder()
@@ -45,3 +46,4 @@ namespace Capnp
         }
     }
 }
+#nullable restore

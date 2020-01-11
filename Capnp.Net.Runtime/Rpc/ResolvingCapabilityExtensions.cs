@@ -1,4 +1,5 @@
-﻿namespace Capnp.Rpc
+﻿#nullable enable
+namespace Capnp.Rpc
 {
     static class ResolvingCapabilityExtensions
     {
@@ -19,7 +20,7 @@
                     {
                         var resolvedCap = await cap.WhenResolved;
 
-                        endpoint.Resolve(preliminaryId, vine, () => resolvedCap.ConsumedCap);
+                        endpoint.Resolve(preliminaryId, vine, () => resolvedCap.ConsumedCap!);
                     }
                     catch (System.Exception exception)
                     {
@@ -42,3 +43,4 @@
         }
     }
 }
+#nullable restore

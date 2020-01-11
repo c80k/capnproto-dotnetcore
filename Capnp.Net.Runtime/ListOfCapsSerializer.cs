@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
+#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -34,7 +34,7 @@ namespace Capnp
         /// <exception cref="IndexOutOfRangeException"><paramref name="index"/> is out of range.</exception>
         public T this[int index]
         {
-            get => Rpc.CapabilityReflection.CreateProxy<T>(DecodeCapPointer(index)) as T;
+            get => (Rpc.CapabilityReflection.CreateProxy<T>(DecodeCapPointer(index)) as T)!;
             set
             {
                 if (!IsAllocated)
@@ -109,3 +109,4 @@ namespace Capnp
         }
     }
 }
+#nullable restore

@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
+#nullable enable
 namespace Capnp.Rpc
 {
     class RemoteAnswerCapability : RemoteResolvingCapability
@@ -18,7 +19,7 @@ namespace Capnp.Rpc
 
         readonly PendingQuestion _question;
         readonly MemberAccessPath _access;
-        Proxy _resolvedCap;
+        Proxy? _resolvedCap;
 
         public RemoteAnswerCapability(PendingQuestion question, MemberAccessPath access): base(question.RpcEndpoint)
         {
@@ -59,7 +60,7 @@ namespace Capnp.Rpc
             }
         }
 
-        protected override Proxy ResolvedCap
+        protected override Proxy? ResolvedCap
         {
             get
             {
@@ -74,7 +75,7 @@ namespace Capnp.Rpc
                         }
                         catch (AggregateException exception)
                         {
-                            throw exception.InnerException;
+                            throw exception.InnerException!;
                         }
 
                         _resolvedCap = new Proxy(_access.Eval(result));
@@ -87,7 +88,11 @@ namespace Capnp.Rpc
         async Task<Proxy> AwaitWhenResolved()
         {
             await _question.WhenReturned;
-            return ResolvedCap;
+
+            if (_question.IsTailCall)
+                throw new InvalidOperationException("Question is a tail call, so won't resolve back.");
+
+            return ResolvedCap!;
         }
 
         public override Task<Proxy> WhenResolved => AwaitWhenResolved();
@@ -168,7 +173,7 @@ namespace Capnp.Rpc
             return call;
         }
 
-        internal override void Freeze(out IRpcEndpoint boundEndpoint)
+        internal override void Freeze(out IRpcEndpoint? boundEndpoint)
         {
             lock (_question.ReentrancyBlocker)
             {
@@ -216,7 +221,7 @@ namespace Capnp.Rpc
 
                 if (_question.StateFlags.HasFlag(PendingQuestion.State.Returned))
                 {
-                    ResolvedCap.Export(endpoint, writer);
+                    ResolvedCap?.Export(endpoint, writer);
                 }
                 else
                 {
@@ -255,3 +260,4 @@ namespace Capnp.Rpc
         }
     }
 }
+#nullable restore

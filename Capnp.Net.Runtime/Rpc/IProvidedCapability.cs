@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
+#nullable enable
 namespace Capnp.Rpc
 {
 
@@ -22,3 +23,4 @@ namespace Capnp.Rpc
             DeserializerState args, CancellationToken cancellationToken = default);
     }
 }
+#nullable restore

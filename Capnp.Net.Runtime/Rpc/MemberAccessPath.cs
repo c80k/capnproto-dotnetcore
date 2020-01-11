@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+#nullable enable
 namespace Capnp.Rpc
 {
     /// <summary>
@@ -169,7 +170,7 @@ namespace Capnp.Rpc
         /// <param name="rpcState">The object (usually "params struct") on which to evaluate this path.</param>
         /// <returns>Resulting low-level capability</returns>
         /// <exception cref="DeserializationException">Evaluation of this path did not give a capability</exception>
-        public ConsumedCapability Eval(DeserializerState rpcState)
+        public ConsumedCapability? Eval(DeserializerState rpcState)
         {
             var cur = rpcState;
 
@@ -184,7 +185,7 @@ namespace Capnp.Rpc
                     return null;
 
                 case ObjectKind.Capability:
-                    return rpcState.Caps[(int)cur.CapabilityIndex];
+                    return rpcState.Caps![(int)cur.CapabilityIndex];
 
                 default:
                     throw new DeserializationException("Access path did not result in a capability");
@@ -192,3 +193,4 @@ namespace Capnp.Rpc
         }
     }
 }
+#nullable restore

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+#nullable enable
 namespace Capnp.Rpc
 {
     /// <summary>
@@ -179,8 +180,8 @@ namespace Capnp.Rpc
         ILogger Logger { get; } = Logging.CreateLogger<Skeleton<T>>();
 #endif
 
-        Func<DeserializerState, CancellationToken, Task<AnswerOrCounterquestion>>[] _methods;
-        CancellationTokenSource _disposed = new CancellationTokenSource();
+        Func<DeserializerState, CancellationToken, Task<AnswerOrCounterquestion>>[] _methods = null!;
+        CancellationTokenSource? _disposed = new CancellationTokenSource();
         readonly object _reentrancyBlocker = new object();
         int _pendingCalls;
 
@@ -204,7 +205,7 @@ namespace Capnp.Rpc
         /// <summary>
         /// Gets the underlying capability implementation.
         /// </summary>
-        protected T Impl { get; private set; }
+        protected T Impl { get; private set; } = default!;
 
         /// <summary>
         /// Gets the ID of the implemented interface.
@@ -299,3 +300,4 @@ namespace Capnp.Rpc
         }
     }
 }
+#nullable restore

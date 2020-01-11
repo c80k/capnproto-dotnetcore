@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
+#nullable enable
 namespace Capnp.Rpc
 {
     /// <summary>
@@ -11,7 +12,7 @@ namespace Capnp.Rpc
     public static class Impatient
     {
         static readonly ConditionalWeakTable<Task, IPromisedAnswer> _taskTable = new ConditionalWeakTable<Task, IPromisedAnswer>();
-        static readonly ThreadLocal<IRpcEndpoint> _askingEndpoint = new ThreadLocal<IRpcEndpoint>();
+        static readonly ThreadLocal<IRpcEndpoint?> _askingEndpoint = new ThreadLocal<IRpcEndpoint?>();
 
         /// <summary>
         /// Attaches a continuation to the given promise and registers the resulting task for pipelining.
@@ -51,7 +52,7 @@ namespace Capnp.Rpc
                     }
                     else if (rtask.IsFaulted)
                     {
-                        rtask = Task.FromException<T>(rtask.Exception.InnerException);
+                        rtask = Task.FromException<T>(rtask.Exception!.InnerException!);
                     }
                     else
                     {
@@ -86,7 +87,7 @@ namespace Capnp.Rpc
             return answer;
         }
 
-        internal static IPromisedAnswer TryGetAnswer(Task task)
+        internal static IPromisedAnswer? TryGetAnswer(Task task)
         {
             _taskTable.TryGetValue(task, out var answer);
             return answer;
@@ -102,10 +103,10 @@ namespace Capnp.Rpc
                     return proxy;
 
                 case null:
-                    return null;
+                    return CapabilityReflection.CreateProxy<T>(null);
             }
 
-            var skel = Skeleton.GetOrCreateSkeleton(item, false);
+            var skel = Skeleton.GetOrCreateSkeleton(item!, false);
             var localCap = LocalCapability.Create(skel);
             return CapabilityReflection.CreateProxy<T>(localCap);
         }
@@ -131,7 +132,7 @@ namespace Capnp.Rpc
             where TInterface : class
         {
             var lazyCap = new LazyCapability(AwaitProxy(task));
-            return CapabilityReflection.CreateProxy<TInterface>(lazyCap, memberName, sourceFilePath, sourceLineNumber) as TInterface;
+            return (CapabilityReflection.CreateProxy<TInterface>(lazyCap, memberName, sourceFilePath, sourceLineNumber) as TInterface)!;
         }
 
         static readonly MemberAccessPath Path_OneAndOnly = new MemberAccessPath(0U);
@@ -168,15 +169,15 @@ namespace Capnp.Rpc
                 }
 
                 var lazyCap = new LazyCapability(AwaitProxy(task));
-                return CapabilityReflection.CreateProxy<TInterface>(lazyCap) as TInterface;
+                return (CapabilityReflection.CreateProxy<TInterface>(lazyCap) as TInterface)!;
             }
             else
             {
-                return CapabilityReflection.CreateProxy<TInterface>(answer.Access(Path_OneAndOnly)) as TInterface;
+                return (CapabilityReflection.CreateProxy<TInterface>(answer.Access(Path_OneAndOnly)) as TInterface)!;
             }
         }
 
-        internal static IRpcEndpoint AskingEndpoint
+        internal static IRpcEndpoint? AskingEndpoint
         {
             get => _askingEndpoint.Value;
             set { _askingEndpoint.Value = value; }
@@ -252,3 +253,4 @@ namespace Capnp.Rpc
         }
     }
 }
+#nullable restore

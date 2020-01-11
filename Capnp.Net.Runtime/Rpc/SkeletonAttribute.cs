@@ -1,5 +1,6 @@
 ﻿using System;
 
+#nullable enable
 namespace Capnp.Rpc
 {
     /// <summary>
@@ -32,3 +33,4 @@ namespace Capnp.Rpc
         public Type SkeletonClass { get; }
     }
 }
+#nullable restore

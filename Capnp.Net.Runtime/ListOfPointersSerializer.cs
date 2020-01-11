@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -12,7 +13,7 @@ namespace Capnp
     /// <typeparam name="TS">SerializerState which represents the element type</typeparam>
     public class ListOfPointersSerializer<TS>:
         SerializerState,
-        IReadOnlyList<TS>
+        IReadOnlyList<TS?>
         where TS: SerializerState, new()
     {
         /// <summary>
@@ -51,7 +52,7 @@ namespace Capnp
         /// </summary>
         public int Count => ListElementCount;
 
-        IEnumerable<TS> Enumerate()
+        IEnumerable<TS?> Enumerate()
         {
             int count = Count;
 
@@ -64,7 +65,7 @@ namespace Capnp
         /// <summary>
         /// Implements <see cref="IEnumerable{TS}"/>.
         /// </summary>
-        public IEnumerator<TS> GetEnumerator()
+        public IEnumerator<TS?> GetEnumerator()
         {
             return Enumerate().GetEnumerator();
         }
@@ -115,4 +116,4 @@ namespace Capnp
         }
     }
 }
-
+#nullable enable

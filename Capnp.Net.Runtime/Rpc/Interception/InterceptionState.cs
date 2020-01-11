@@ -1,4 +1,5 @@
-﻿namespace Capnp.Rpc.Interception
+﻿#nullable enable
+namespace Capnp.Rpc.Interception
 {
     /// <summary>
     /// The state of an intercepted call from Alice to Bob.
@@ -26,3 +27,4 @@
         ReturnedToAlice
     }
 }
+#nullable restore

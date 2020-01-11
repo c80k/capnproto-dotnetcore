@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
+#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -29,7 +30,7 @@ namespace Capnp
                 if (index < 0 || index >= Count)
                     throw new IndexOutOfRangeException();
 
-                return Rpc.CapabilityReflection.CreateProxy<T>(State.DecodeCapPointer(index)) as T;
+                return (Rpc.CapabilityReflection.CreateProxy<T>(State.DecodeCapPointer(index)) as T)!;
             }
         }
 
@@ -70,3 +71,4 @@ namespace Capnp
         }
     }
 }
+#nullable restore

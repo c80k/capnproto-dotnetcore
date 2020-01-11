@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
+#nullable enable
 namespace Capnp.Rpc
 {
     class LocalAnswerCapability : RefCountingCapability, IResolvingCapability
@@ -15,7 +16,7 @@ namespace Capnp.Rpc
             _access = access;
         }
 
-        internal override void Freeze(out IRpcEndpoint boundEndpoint)
+        internal override void Freeze(out IRpcEndpoint? boundEndpoint)
         {
             boundEndpoint = null;
         }
@@ -43,7 +44,7 @@ namespace Capnp.Rpc
                 }
                 catch (AggregateException exception)
                 {
-                    throw exception.InnerException;
+                    throw exception.InnerException!;
                 }
 
                 using (var proxy = new Proxy(_access.Eval(result)))
@@ -87,3 +88,4 @@ namespace Capnp.Rpc
         }
     }
 }
+#nullable restore

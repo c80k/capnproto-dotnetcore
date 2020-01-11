@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
+#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -10,15 +11,15 @@ namespace Capnp
     /// </summary>
     public static class CapnpSerializable
     {
-        interface IConstructibleFromDeserializerState<out T>
+        interface IConstructibleFromDeserializerState
         {
-            T Create(DeserializerState state);
+            object? Create(DeserializerState state);
         }
 
-        class FromStruct<T>: IConstructibleFromDeserializerState<T>
+        class FromStruct<T>: IConstructibleFromDeserializerState
             where T : ICapnpSerializable, new()
         {
-            public T Create(DeserializerState state)
+            public object Create(DeserializerState state)
             {
                 var result = new T();
                 if (state.Kind != ObjectKind.Nil)
@@ -29,7 +30,7 @@ namespace Capnp
             }
         }
 
-        class FromList<T>: IConstructibleFromDeserializerState<IReadOnlyList<T>>
+        class FromList<T>: IConstructibleFromDeserializerState
             where T: class
         {
             readonly Func<DeserializerState, T> _elementSerializer;
@@ -39,23 +40,23 @@ namespace Capnp
                 _elementSerializer = (Func<DeserializerState, T>)GetSerializer(typeof(T));
 
             }
-            public IReadOnlyList<T> Create(DeserializerState state)
+            public object Create(DeserializerState state)
             {
                 return state.RequireList().Cast(_elementSerializer);
             }
         }
 
-        class FromCapability<T>: IConstructibleFromDeserializerState<T>
+        class FromCapability<T>: IConstructibleFromDeserializerState
             where T: class
         {
-            public T Create(DeserializerState state)
+            public object? Create(DeserializerState state)
             {
                 return state.RequireCap<T>();
             }
         }
 
-        static readonly ConditionalWeakTable<Type, Func<DeserializerState, object>> _typeMap =
-            new ConditionalWeakTable<Type, Func<DeserializerState, object>>();
+        static readonly ConditionalWeakTable<Type, Func<DeserializerState, object?>> _typeMap =
+            new ConditionalWeakTable<Type, Func<DeserializerState, object?>>();
 
         static CapnpSerializable()
         {
@@ -73,14 +74,14 @@ namespace Capnp
             _typeMap.Add(typeof(IReadOnlyList<double>), d => d.RequireList().CastDouble());
         }
 
-        static Func<DeserializerState, object> CreateSerializer(Type type)
+        static Func<DeserializerState, object?> CreateSerializer(Type type)
         {
             if (typeof(ICapnpSerializable).IsAssignableFrom(type))
             {
                 try
                 {
-                    return ((IConstructibleFromDeserializerState<object>)
-                        Activator.CreateInstance(typeof(FromStruct<>).MakeGenericType(type))).Create;
+                    return ((IConstructibleFromDeserializerState)
+                        Activator.CreateInstance(typeof(FromStruct<>).MakeGenericType(type))!).Create;
                 }
                 catch (Exception ex)
                 {
@@ -94,12 +95,12 @@ namespace Capnp
                 try
                 {
                     var elementType = type.GetGenericArguments()[0];
-                    return ((IConstructibleFromDeserializerState<object>)
-                        Activator.CreateInstance(typeof(FromList<>).MakeGenericType(elementType))).Create;
+                    return ((IConstructibleFromDeserializerState)
+                        Activator.CreateInstance(typeof(FromList<>).MakeGenericType(elementType))!).Create;
                 }
                 catch (TargetInvocationException ex)
                 {
-                    throw ex.InnerException;
+                    throw ex.InnerException!;
                 }
                 catch (Exception ex)
                 {
@@ -123,8 +124,8 @@ namespace Capnp
 
                 try
                 {
-                    return ((IConstructibleFromDeserializerState<object>)
-                        Activator.CreateInstance(typeof(FromCapability<>).MakeGenericType(type))).Create;
+                    return ((IConstructibleFromDeserializerState)
+                        Activator.CreateInstance(typeof(FromCapability<>).MakeGenericType(type))!).Create;
                 }
                 catch (Exception ex)
                 {
@@ -135,7 +136,7 @@ namespace Capnp
             }
         }
 
-        static Func<DeserializerState, object> GetSerializer(Type type)
+        static Func<DeserializerState, object?> GetSerializer(Type type)
         {
             return _typeMap.GetValue(type, CreateSerializer);
         }
@@ -164,10 +165,11 @@ namespace Capnp
         /// </typeparam>
         /// <param name="state"></param>
         /// <returns></returns>
-        public static T Create<T>(DeserializerState state)
+        public static T? Create<T>(DeserializerState state)
             where T: class
         {
-            return (T)GetSerializer(typeof(T))(state);
+            return (T?)GetSerializer(typeof(T))(state);
         }
     }
 }
+#nullable restore

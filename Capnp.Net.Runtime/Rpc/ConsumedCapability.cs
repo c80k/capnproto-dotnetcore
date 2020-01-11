@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
+#nullable enable
 namespace Capnp.Rpc
 {
     /// <summary>
@@ -18,7 +19,7 @@ namespace Capnp.Rpc
         /// </summary>
         protected abstract void ReleaseRemotely();
         internal abstract void Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer);
-        internal abstract void Freeze(out IRpcEndpoint boundEndpoint);
+        internal abstract void Freeze(out IRpcEndpoint? boundEndpoint);
         internal abstract void Unfreeze();
 
         internal abstract void AddRef();
@@ -31,3 +32,4 @@ namespace Capnp.Rpc
 #endif
     }
 }
+#nullable restore

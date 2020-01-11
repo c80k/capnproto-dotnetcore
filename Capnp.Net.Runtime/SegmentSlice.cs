@@ -1,5 +1,6 @@
 ﻿using System;
 
+#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -18,3 +19,4 @@ namespace Capnp
         public int Offset;
     }
 }
+#nullable restore

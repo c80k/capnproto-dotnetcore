@@ -1,5 +1,6 @@
 ﻿using System;
 
+#nullable enable
 namespace Capnp.Rpc.Interception
 {
     /// <summary>
@@ -21,3 +22,4 @@ namespace Capnp.Rpc.Interception
         void OnReturnFromBob(CallContext callContext);
     }
 }
+#nullable restore

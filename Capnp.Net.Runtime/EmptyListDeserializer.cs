@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -86,3 +87,4 @@ namespace Capnp
         public override IReadOnlyList<ushort> CastUShort() => new EmptyList<ushort>();
     }
 }
+#nullable restore

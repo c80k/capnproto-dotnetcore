@@ -1,4 +1,5 @@
-﻿namespace Capnp.Rpc
+﻿#nullable enable
+namespace Capnp.Rpc
 {
     /// <summary>
     /// Helper struct to support tail calls
@@ -33,11 +34,12 @@
         /// <summary>
         /// SerializerState, if applicable
         /// </summary>
-        public SerializerState Answer => _obj as SerializerState;
+        public SerializerState? Answer => _obj as SerializerState;
 
         /// <summary>
         /// PendingQuestion, if applicable
         /// </summary>
-        public PendingQuestion Counterquestion => _obj as PendingQuestion;
+        public PendingQuestion? Counterquestion => _obj as PendingQuestion;
     }
 }
+#nullable restore

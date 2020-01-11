@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
+#nullable enable
 namespace Capnp.Rpc
 {
     class PromisedCapability : RemoteResolvingCapability
@@ -19,7 +20,7 @@ namespace Capnp.Rpc
 
         public override Task<Proxy> WhenResolved => _resolvedCap.Task;
 
-        internal override void Freeze(out IRpcEndpoint boundEndpoint)
+        internal override void Freeze(out IRpcEndpoint? boundEndpoint)
         {
             lock (_reentrancyBlocker)
             {
@@ -31,7 +32,7 @@ namespace Capnp.Rpc
                     }
                     catch (AggregateException exception)
                     {
-                        throw exception.InnerException;
+                        throw exception.InnerException!;
                     }
                 }
                 else
@@ -148,7 +149,7 @@ namespace Capnp.Rpc
             }
         }
 
-        protected override Proxy ResolvedCap
+        protected override Proxy? ResolvedCap
         {
             get
             {
@@ -158,7 +159,7 @@ namespace Capnp.Rpc
                 }
                 catch (AggregateException exception)
                 {
-                    throw exception.InnerException;
+                    throw exception.InnerException!;
                 }
             }
         }
@@ -258,3 +259,4 @@ namespace Capnp.Rpc
         }
     }
 }
+#nullable restore

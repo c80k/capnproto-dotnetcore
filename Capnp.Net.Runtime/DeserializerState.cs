@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
+#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -47,7 +49,7 @@ namespace Capnp
         /// <summary>
         /// The capabilities imported from the capability table. Only valid in RPC context.
         /// </summary>
-        public IList<Rpc.ConsumedCapability> Caps { get; set; }
+        public IList<Rpc.ConsumedCapability?>? Caps { get; set; }
         /// <summary>
         /// Current segment (essentially Segments[CurrentSegmentIndex]
         /// </summary>
@@ -83,10 +85,15 @@ namespace Capnp
         /// The conversion is cheap, since it does not involve copying any payload.
         /// </summary>
         /// <param name="state">The serializer state to be converted</param>
+        /// <exception cref="ArgumentNullException"><paramref name="state"/> is null</exception>
+        /// <exception cref="InvalidOperationException"><paramref name="state"/> is not bound to a MessageBuilder</exception>
         public static implicit operator DeserializerState(SerializerState state)
         {
             if (state == null)
                 throw new ArgumentNullException(nameof(state));
+
+            if (state.MsgBuilder == null)
+                throw new InvalidOperationException("state is not bound to a MessageBuilder");
             
             switch (state.Kind)
             {
@@ -100,7 +107,7 @@ namespace Capnp
                 case ObjectKind.ListOfStructs:
                 case ObjectKind.Nil:
                 case ObjectKind.Struct:
-                    return new DeserializerState(state.Allocator.Segments)
+                    return new DeserializerState(state.Allocator!.Segments)
                     {
                         CurrentSegmentIndex = state.SegmentIndex,
                         Offset = state.Offset,
@@ -112,7 +119,7 @@ namespace Capnp
                     };
 
                 case ObjectKind.Capability:
-                    return new DeserializerState(state.Allocator.Segments)
+                    return new DeserializerState(state.Allocator!.Segments)
                     {
                         Kind = ObjectKind.Capability,
                         Caps = state.Caps,
@@ -376,11 +383,11 @@ namespace Capnp
         /// the capability table. Does not mutate this state.
         /// </summary>
         /// <param name="offset">Offset relative to this.Offset within current segment</param>
-        /// <returns>the low-level capability object</returns>
+        /// <returns>the low-level capability object, or null if it is a null pointer</returns>
         /// <exception cref="IndexOutOfRangeException">offset negative or out of range</exception>
         /// <exception cref="InvalidOperationException">capability table not set</exception>
         /// <exception cref="Rpc.RpcException">not a capability pointer or invalid capability index</exception>
-        internal Rpc.ConsumedCapability DecodeCapPointer(int offset)
+        internal Rpc.ConsumedCapability? DecodeCapPointer(int offset)
         {
             if (offset < 0)
             {
@@ -490,7 +497,7 @@ namespace Capnp
             return state;
         }
 
-        internal Rpc.ConsumedCapability StructReadRawCap(int index)
+        internal Rpc.ConsumedCapability? StructReadRawCap(int index)
         {
             if (Kind != ObjectKind.Struct && Kind != ObjectKind.Nil)
                 throw new InvalidOperationException("Allowed on structs only");
@@ -567,7 +574,7 @@ namespace Capnp
         /// <exception cref="IndexOutOfRangeException">negative index</exception>
         /// <exception cref="DeserializationException">state does not represent a struct, invalid pointer,
         /// non-list-of-bytes pointer, traversal limit exceeded</exception>
-        public string ReadText(int index, string defaultText = null)
+        public string? ReadText(int index, string? defaultText = null)
         {
             return StructReadPointer(index).RequireList().CastText() ?? defaultText;
         }
@@ -646,7 +653,7 @@ namespace Capnp
         /// <exception cref="IndexOutOfRangeException">negative index</exception>
         /// <exception cref="DeserializationException">state does not represent a struct, invalid pointer,
         /// non-capability pointer, traversal limit exceeded</exception>
-        public T ReadCap<T>(int index,
+        public T? ReadCap<T>(int index,
             [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
             [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
             [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0) where T: class
@@ -677,7 +684,7 @@ namespace Capnp
         /// <returns>capability instance or null if pointer was null</returns>
         /// <exception cref="IndexOutOfRangeException">negative index</exception>
         /// <exception cref="DeserializationException">state does not represent a capability</exception>
-        public T RequireCap<T>() where T: class
+        public T? RequireCap<T>() where T: class
         {
             if (Kind == ObjectKind.Nil)
                 return null;
@@ -685,7 +692,11 @@ namespace Capnp
             if (Kind != ObjectKind.Capability)
                 throw new DeserializationException("Expected a capability");
 
+            if (Caps == null)
+                throw new InvalidOperationException("Capability table not set. This is a bug.");
+
             return Rpc.CapabilityReflection.CreateProxy<T>(Caps[(int)CapabilityIndex]) as T;
         }
     }
 }
+#nullable restore

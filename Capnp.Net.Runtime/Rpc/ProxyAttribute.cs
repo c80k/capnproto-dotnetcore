@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
+#nullable enable
 namespace Capnp.Rpc
 {
     /// <summary>
@@ -28,3 +29,4 @@ namespace Capnp.Rpc
         public Type ProxyClass { get; }
     }
 }
+#nullable restore

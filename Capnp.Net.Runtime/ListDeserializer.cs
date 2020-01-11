@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -10,7 +11,7 @@ namespace Capnp
     {
         static class GenericCasts<T>
         {
-            public static Func<ListDeserializer, T> CastFunc;
+            public static Func<ListDeserializer, T>? CastFunc;
         }
 
         static ListDeserializer()
@@ -401,3 +402,4 @@ namespace Capnp
         }
     }
 }
+#nullable restore
