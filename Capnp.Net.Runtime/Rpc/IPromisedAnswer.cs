@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-#nullable enable
 namespace Capnp.Rpc
 {
     /// <summary>
@@ -26,4 +25,3 @@ namespace Capnp.Rpc
         ConsumedCapability? Access(MemberAccessPath access);
     }
 }
-#nullable restore

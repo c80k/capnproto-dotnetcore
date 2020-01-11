@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -28,4 +27,3 @@ namespace Capnp
         bool Allocate(uint nwords, uint preferredSegment, out SegmentSlice slice, bool forcePreferredSegment);
     }
 }
-#nullable restore

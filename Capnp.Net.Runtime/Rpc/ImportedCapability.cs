@@ -1,7 +1,4 @@
-﻿using System.Threading.Tasks;
-
-#nullable enable
-namespace Capnp.Rpc
+﻿namespace Capnp.Rpc
 {
     /// <summary>
     /// Low-level capability which as imported from a remote peer.
@@ -53,4 +50,3 @@ namespace Capnp.Rpc
         }
     }
 }
-#nullable restore

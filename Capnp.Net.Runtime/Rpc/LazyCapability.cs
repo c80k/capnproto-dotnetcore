@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-#nullable enable
 namespace Capnp.Rpc
 {
     class LazyCapability : RefCountingCapability, IResolvingCapability
@@ -107,4 +106,3 @@ namespace Capnp.Rpc
         }
     }
 }
-#nullable restore

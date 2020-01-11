@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
-#nullable enable
 namespace Capnp.Rpc
 {
     internal interface IRpcEndpoint
@@ -20,4 +17,3 @@ namespace Capnp.Rpc
         void DeleteQuestion(PendingQuestion question);
     }
 }
-#nullable restore

@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace Capnp.Rpc
+﻿namespace Capnp.Rpc
 {
     /// <summary>
     /// Generic Proxy implementation which exposes the (usually protected) Call method.
@@ -51,4 +50,3 @@ namespace Capnp.Rpc
         }
     }
 }
-#nullable restore

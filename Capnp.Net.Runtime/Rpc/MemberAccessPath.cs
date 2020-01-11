@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-#nullable enable
 namespace Capnp.Rpc
 {
     /// <summary>
@@ -193,4 +192,3 @@ namespace Capnp.Rpc
         }
     }
 }
-#nullable restore

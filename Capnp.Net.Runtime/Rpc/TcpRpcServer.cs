@@ -6,7 +6,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-#nullable enable
 namespace Capnp.Rpc
 {
     /// <summary>
@@ -322,4 +321,3 @@ namespace Capnp.Rpc
         public event Action<object, ConnectionEventArgs>? OnConnectionChanged;
     }
 }
-#nullable restore

@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace Capnp
+﻿namespace Capnp
 {
     /// <summary>
     /// Enumerates the list element categories which are defined by Cap'n Proto.
@@ -47,4 +46,3 @@ namespace Capnp
         ListOfStructs = 7
     }
 }
-#nullable restore

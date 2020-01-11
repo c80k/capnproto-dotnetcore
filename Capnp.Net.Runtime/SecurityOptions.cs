@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace Capnp
+﻿namespace Capnp
 {
     /// <summary>
     /// Provides the security bounds for defeating amplification and stack overflow DoS attacks.
@@ -17,4 +16,3 @@ namespace Capnp
         public static int RecursionLimit { get; set; } = 64;
     }
 }
-#nullable restore

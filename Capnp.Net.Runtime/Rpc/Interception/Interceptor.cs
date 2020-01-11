@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-#nullable enable
 namespace Capnp.Rpc.Interception
 {
     /// <summary>
@@ -114,4 +113,3 @@ namespace Capnp.Rpc.Interception
         }
     }
 }
-#nullable restore

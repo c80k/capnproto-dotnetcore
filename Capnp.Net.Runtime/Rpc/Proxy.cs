@@ -1,9 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-#nullable enable
 namespace Capnp.Rpc
 {
     /// <summary>
@@ -240,4 +238,3 @@ namespace Capnp.Rpc
 #endif
     }
 }
-#nullable restore

@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace Capnp.Rpc
+﻿namespace Capnp.Rpc
 {
     /// <summary>
     /// Will be thrown if a type did not qualify as capability interface.
@@ -23,4 +22,3 @@ namespace Capnp.Rpc
         }
     }
 }
-#nullable restore

@@ -1,16 +1,11 @@
 ﻿using Capnp.FrameTracing;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-#nullable enable
 namespace Capnp.Rpc
 {
     /// <summary>
@@ -269,4 +264,3 @@ namespace Capnp.Rpc
         public bool IsWaitingForData => _pump?.IsWaitingForData ?? false;
     }
 }
-#nullable restore

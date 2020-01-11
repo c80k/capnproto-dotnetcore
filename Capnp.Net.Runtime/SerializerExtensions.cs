@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -340,4 +339,3 @@ namespace Capnp
         }
     }
 }
-#nullable restore

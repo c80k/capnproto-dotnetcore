@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace Capnp.Rpc.Interception
+﻿namespace Capnp.Rpc.Interception
 {
     class CensorCapability : RefCountingCapability
     {
@@ -43,4 +42,3 @@ namespace Capnp.Rpc.Interception
         }
     }
 }
-#nullable restore

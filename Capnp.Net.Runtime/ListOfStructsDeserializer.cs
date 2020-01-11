@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
-#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -80,4 +78,3 @@ namespace Capnp
         }
     }
 }
-#nullable restore

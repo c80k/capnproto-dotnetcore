@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-#nullable enable
 namespace Capnp
 {
     class PrimitiveCoder
@@ -46,4 +43,3 @@ namespace Capnp
         }
     }
 }
-#nullable restore

@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 
-#nullable enable
 namespace Capnp.FrameTracing
 {
     /// <summary>
@@ -246,4 +245,3 @@ namespace Capnp.FrameTracing
         }
     }
 }
-#nullable restore

@@ -1,6 +1,5 @@
 ﻿using System;
 
-#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -26,4 +25,3 @@ namespace Capnp
         Span<ulong> StructDataSection { get; }
     }
 }
-#nullable restore

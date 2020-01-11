@@ -3,7 +3,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-#nullable enable
 namespace Capnp.Rpc
 {
     abstract class RemoteResolvingCapability : RemoteCapability, IResolvingCapability
@@ -128,4 +127,3 @@ namespace Capnp.Rpc
         }
     }
 }
-#nullable restore

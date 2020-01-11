@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace Capnp.Rpc
+﻿namespace Capnp.Rpc
 {
     /// <summary>
     /// State of an RPC connection
@@ -23,4 +22,3 @@ namespace Capnp.Rpc
         Down
     }
 }
-#nullable restore

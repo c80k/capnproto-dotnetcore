@@ -1,7 +1,4 @@
-﻿using System;
-
-#nullable enable
-namespace Capnp
+﻿namespace Capnp
 {
     /// <summary>
     /// Helper struct to represent the tuple (segment index, offset)
@@ -19,4 +16,3 @@ namespace Capnp
         public int Offset;
     }
 }
-#nullable restore

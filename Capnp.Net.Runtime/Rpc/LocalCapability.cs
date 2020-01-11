@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-#nullable enable
 namespace Capnp.Rpc
 {
     class LocalCapability : ConsumedCapability
@@ -70,4 +68,3 @@ namespace Capnp.Rpc
         }
     }
 }
-#nullable restore

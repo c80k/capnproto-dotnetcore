@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace Capnp.Rpc
+﻿namespace Capnp.Rpc
 {
     /// <summary>
     /// A mono skeleton (as opposed to <see cref="PolySkeleton"/>) is a skeleton which implements one particular RPC interface.
@@ -12,4 +11,3 @@ namespace Capnp.Rpc
         ulong InterfaceId { get; }
     }
 }
-#nullable restore

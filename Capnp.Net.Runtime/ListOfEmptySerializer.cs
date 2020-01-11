@@ -1,6 +1,5 @@
 ﻿using System;
 
-#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -32,4 +31,3 @@ namespace Capnp
         }
     }
 }
-#nullable restore

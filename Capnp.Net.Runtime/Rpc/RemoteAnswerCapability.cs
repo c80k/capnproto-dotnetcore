@@ -1,9 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Diagnostics;
+﻿using System;
 using System.Threading.Tasks;
 
-#nullable enable
 namespace Capnp.Rpc
 {
     class RemoteAnswerCapability : RemoteResolvingCapability
@@ -260,4 +257,3 @@ namespace Capnp.Rpc
         }
     }
 }
-#nullable restore

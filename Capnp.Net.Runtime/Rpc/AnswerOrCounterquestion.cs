@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace Capnp.Rpc
+﻿namespace Capnp.Rpc
 {
     /// <summary>
     /// Helper struct to support tail calls
@@ -42,4 +41,3 @@ namespace Capnp.Rpc
         public PendingQuestion? Counterquestion => _obj as PendingQuestion;
     }
 }
-#nullable restore

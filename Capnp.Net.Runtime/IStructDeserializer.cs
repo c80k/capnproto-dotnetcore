@@ -1,6 +1,5 @@
 ﻿using System;
 
-#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -21,4 +20,3 @@ namespace Capnp
         ulong StructReadData(ulong bitOffset, int bitCount);
     }
 }
-#nullable restore

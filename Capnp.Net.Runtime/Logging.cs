@@ -1,7 +1,5 @@
-﻿using System;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
-#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -22,4 +20,3 @@ namespace Capnp
         public static ILogger CreateLogger<T>() => LoggerFactory.CreateLogger<T>();
     }
 }
-#nullable restore

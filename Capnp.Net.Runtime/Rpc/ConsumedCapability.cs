@@ -1,9 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-#nullable enable
-namespace Capnp.Rpc
+﻿namespace Capnp.Rpc
 {
     /// <summary>
     /// Base class for a low-level capability at consumer side. It is created by the <see cref="RpcEngine"/>. An application does not directly interact with it
@@ -32,4 +27,3 @@ namespace Capnp.Rpc
 #endif
     }
 }
-#nullable restore

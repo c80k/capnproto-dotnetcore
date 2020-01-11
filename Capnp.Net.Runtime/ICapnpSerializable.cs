@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace Capnp
+﻿namespace Capnp
 {
     /// <summary>
     /// This interface is intended to be implemented by schema-generated domain classes which support deserialization from
@@ -20,4 +19,3 @@ namespace Capnp
         void Deserialize(DeserializerState state);
     }
 }
-#nullable restore

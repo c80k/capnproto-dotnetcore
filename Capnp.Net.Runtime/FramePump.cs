@@ -2,14 +2,11 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
-#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -197,4 +194,3 @@ namespace Capnp
         }
     }
 }
-#nullable restore

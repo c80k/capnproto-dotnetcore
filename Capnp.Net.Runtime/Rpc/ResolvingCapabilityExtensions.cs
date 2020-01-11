@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace Capnp.Rpc
+﻿namespace Capnp.Rpc
 {
     static class ResolvingCapabilityExtensions
     {
@@ -43,4 +42,3 @@ namespace Capnp.Rpc
         }
     }
 }
-#nullable restore

@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
 
-#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -102,4 +99,3 @@ namespace Capnp
         internal List<Rpc.ConsumedCapability?>? Caps => _capTable;
     }
 }
-#nullable restore

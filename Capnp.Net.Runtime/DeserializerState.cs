@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
-#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -695,8 +693,7 @@ namespace Capnp
             if (Caps == null)
                 throw new InvalidOperationException("Capability table not set. This is a bug.");
 
-            return Rpc.CapabilityReflection.CreateProxy<T>(Caps[(int)CapabilityIndex]) as T;
+            return (Rpc.CapabilityReflection.CreateProxy<T>(Caps[(int)CapabilityIndex]) as T)!;
         }
     }
 }
-#nullable restore

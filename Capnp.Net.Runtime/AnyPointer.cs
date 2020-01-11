@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace Capnp
+﻿namespace Capnp
 {
     /// <summary>
     /// Generic <see cref="ICapnpSerializable"/> implementation, based on a wrapper around <see cref="DeserializerState"/>.
@@ -30,4 +29,3 @@ namespace Capnp
         }
     }
 }
-#nullable restore

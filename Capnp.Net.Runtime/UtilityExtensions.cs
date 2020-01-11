@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 
 namespace Capnp
 {
-#nullable enable
     internal static class UtilityExtensions
     {
         /// <summary>
@@ -80,4 +79,3 @@ namespace Capnp
 #endif
     }
 }
-#nullable restore

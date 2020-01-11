@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-#nullable enable
 namespace Capnp.Rpc
 {
     /// <summary>
@@ -287,4 +285,3 @@ namespace Capnp.Rpc
         }
     }
 }
-#nullable restore

@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 
-#nullable enable
 namespace Capnp.Rpc
 {
     /// <summary>
@@ -379,4 +376,3 @@ namespace Capnp.Rpc
         #endregion
     }
 }
-#nullable restore

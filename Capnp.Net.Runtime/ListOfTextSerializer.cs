@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 
-#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -110,5 +109,3 @@ namespace Capnp
         }
     }
 }
-
-#nullable restore

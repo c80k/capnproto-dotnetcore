@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-#nullable enable
 namespace Capnp
 {
     /// <summary>
@@ -116,4 +113,3 @@ namespace Capnp
         }
     }
 }
-#nullable enable

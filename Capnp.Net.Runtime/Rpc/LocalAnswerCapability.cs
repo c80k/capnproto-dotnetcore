@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-#nullable enable
 namespace Capnp.Rpc
 {
     class LocalAnswerCapability : RefCountingCapability, IResolvingCapability
@@ -88,4 +87,3 @@ namespace Capnp.Rpc
         }
     }
 }
-#nullable restore

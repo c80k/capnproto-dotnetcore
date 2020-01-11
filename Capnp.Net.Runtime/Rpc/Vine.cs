@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-#nullable enable
 namespace Capnp.Rpc
 {
     class Vine : Skeleton
@@ -71,4 +68,3 @@ namespace Capnp.Rpc
         }
     }
 }
-#nullable restore
