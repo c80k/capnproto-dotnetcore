@@ -29,13 +29,13 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
                 case 1:
                     return GenericName(nameof(Task)).AddTypeArgumentListArguments(
-                        _names.MakeTypeSyntax(method.Results[0].Type, method.DeclaringInterface, TypeUsage.DomainClass));
+                        _names.MakeTypeSyntax(method.Results[0].Type, method.DeclaringInterface, TypeUsage.DomainClassNullable));
 
                 default:
                     return GenericName(nameof(Task)).AddTypeArgumentListArguments(
                         TupleType(SeparatedList(
                             method.Results.Select(
-                                f => TupleElement(_names.MakeTypeSyntax(f.Type, method.DeclaringInterface, TypeUsage.DomainClass))))));
+                                f => TupleElement(_names.MakeTypeSyntax(f.Type, method.DeclaringInterface, TypeUsage.DomainClassNullable))))));
             }
         }
 
@@ -50,14 +50,14 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 if (arg0.Name == null)
                 {
                     list.Add(Parameter(_names.AnonymousParameter.Identifier)
-                        .WithType(_names.MakeTypeSyntax(arg0.Type, method.DeclaringInterface, TypeUsage.DomainClass)));
+                        .WithType(_names.MakeTypeSyntax(arg0.Type, method.DeclaringInterface, TypeUsage.DomainClassNullable)));
                 }
                 else
                 {
                     foreach (var arg in method.Params)
                     {
                         list.Add(Parameter(Identifier(IdentifierRenamer.ToNonKeyword(arg.Name)))
-                            .WithType(_names.MakeTypeSyntax(arg.Type, method.DeclaringInterface, TypeUsage.DomainClass)));
+                            .WithType(_names.MakeTypeSyntax(arg.Type, method.DeclaringInterface, TypeUsage.DomainClassNullable)));
                     }
                 }
             }
@@ -85,7 +85,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
             {
                 yield return TypeParameterConstraintClause(
                     _names.GetGenericTypeParameter(name).IdentifierName)
-                        .AddConstraints(ClassOrStructConstraint(SyntaxKind.ClassConstraint));
+                        .AddConstraints(_names.MakeNullableClassConstraint());
             }
         }
 
@@ -233,7 +233,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         SyntaxKind.SimpleMemberAccessExpression,
                         IdentifierName(nameof(Capnp.CapnpSerializable)),
                         GenericName(nameof(Capnp.CapnpSerializable.Create))
-                            .AddTypeArgumentListArguments(domainType)))
+                            .AddTypeArgumentListArguments(MakeNonNullableType(domainType))))
                         .AddArgumentListArguments(
                             Argument(_names.DeserializerLocal.IdentifierName));
 
@@ -262,7 +262,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
             {
                 yield return TypeParameterConstraintClause(
                     _names.GetGenericTypeParameter(name).IdentifierName)
-                        .AddConstraints(ClassOrStructConstraint(SyntaxKind.ClassConstraint));
+                        .AddConstraints(_names.MakeNullableClassConstraint());
             }
         }
 
@@ -271,7 +271,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
             var classDecl = ClassDeclaration(_names.MakeTypeName(type, NameUsage.Proxy).Identifier)
                 .AddModifiers(Public)
                 .AddBaseListTypes(
-                    SimpleBaseType(Type<Capnp.Rpc.Proxy>()),
+                    SimpleBaseType(_names.Type<Capnp.Rpc.Proxy>(true)),
                     SimpleBaseType(_names.MakeGenericTypeName(type, NameUsage.Interface)));
 
             if (type.GenericParameters.Count > 0)
@@ -361,7 +361,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                     SyntaxKind.SimpleMemberAccessExpression,
                                     _names.ParamsLocal.IdentifierName,
                                     GenericName(nameof(Capnp.SerializerState.Rewrap))
-                                        .AddTypeArgumentListArguments(Type<Capnp.DynamicSerializerState>())))
+                                        .AddTypeArgumentListArguments(_names.Type<Capnp.DynamicSerializerState>())))
                                         .AddArgumentListArguments()),
                         Argument(
                             LiteralExpression(SyntaxKind.FalseLiteralExpression)),
@@ -446,7 +446,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         GenericName(_names.GetCodeIdentifier(method).ToString())
                             .AddTypeArgumentListArguments(
                                 Enumerable.Repeat(
-                                    Type<Capnp.AnyPointer>(),
+                                    _names.Type<Capnp.AnyPointer>(),
                                     method.GenericParameters.Count).ToArray()));
                 }
                 else
@@ -582,7 +582,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                             SyntaxKind.SimpleMemberAccessExpression,
                             IdentifierName(nameof(Capnp.CapnpSerializable)),
                             GenericName(nameof(Capnp.CapnpSerializable.Create))
-                                .AddTypeArgumentListArguments(domainType)))
+                                .AddTypeArgumentListArguments(MakeNonNullableType(domainType))))
                             .AddArgumentListArguments(
                                 Argument(_names.DeserializerLocal.IdentifierName));
 
@@ -662,13 +662,13 @@ namespace CapnpC.CSharp.Generator.CodeGen
             foreach (var method in def.Methods)
             {
                 var methodDecl = MethodDeclaration(
-                    Type<Task<Capnp.Rpc.AnswerOrCounterquestion>>(),
+                    _names.Type<Task<Capnp.Rpc.AnswerOrCounterquestion>>(),
                     _names.GetCodeIdentifier(method).Identifier)
                     .AddParameterListParameters(
                         Parameter(_names.DeserializerLocal.Identifier)
-                            .WithType(Type<Capnp.DeserializerState>()),
+                            .WithType(_names.Type<Capnp.DeserializerState>()),
                         Parameter(_names.CancellationTokenParameter.Identifier)
-                            .WithType(Type<CancellationToken>()))
+                            .WithType(_names.Type<CancellationToken>()))
                     .AddBodyStatements(
                         MakeSkeletonMethodBody(method).ToArray());
 
@@ -709,7 +709,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                     .AddArgumentListArguments(
                                         MakeSkeletonSetMethodTableArguments(type).ToArray()))),
                     // InterfaceId
-                    PropertyDeclaration(Type<ulong>(), nameof(Capnp.Rpc.Skeleton<object>.InterfaceId))
+                    PropertyDeclaration(_names.Type<ulong>(), nameof(Capnp.Rpc.Skeleton<object>.InterfaceId))
                         .AddModifiers(Public, Override)
                         .WithExpressionBody(
                             ArrowExpressionClause(

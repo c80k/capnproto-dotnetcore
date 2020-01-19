@@ -75,7 +75,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 return null;
             }
 
-            var prop = PropertyDeclaration(_names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.DomainClass),
+            var prop = PropertyDeclaration(_names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.DomainClassNullable),
                 _names.GetCodeIdentifier(field).Identifier)
                 .AddModifiers(Public).AddAccessorListAccessors(
                     AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
@@ -111,7 +111,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
         MemberDeclarationSyntax MakeUnionContentField()
         {
             return FieldDeclaration(
-                VariableDeclaration(SyntaxHelpers.Type<object>())
+                VariableDeclaration(_names.Type<object>())
                 .WithVariables(
                     SingletonSeparatedList<VariableDeclaratorSyntax>(
                         VariableDeclarator(_names.UnionContentField.Identifier))))
@@ -282,7 +282,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     value.Decode();
 
                     return ArrayCreationExpression(ArrayType(
-                        _names.MakeTypeSyntax(value.Type.ElementType, scope, TypeUsage.DomainClass))
+                        _names.MakeTypeSyntax(value.Type.ElementType, scope, TypeUsage.DomainClassNullable))
                         .WithRankSpecifiers(
                             SingletonList<ArrayRankSpecifierSyntax>(
                                 ArrayRankSpecifier(
@@ -611,7 +611,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                     SyntaxKind.SimpleMemberAccessExpression,
                                     IdentifierName(nameof(Capnp.CapnpSerializable)),
                                     GenericName(nameof(Capnp.CapnpSerializable.Create))
-                                        .AddTypeArgumentListArguments(elementType)))
+                                        .AddTypeArgumentListArguments(MakeNonNullableType(elementType))))
                                 .AddArgumentListArguments(Argument(IdentifierName("_"))))));
         }
 
@@ -645,7 +645,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     .AddArgumentListArguments(Argument(
                         SimpleLambdaExpression(
                             Parameter(Identifier("_")),
-                            CastExpression(Type<object>(), IdentifierName("_")))));
+                            CastExpression(_names.Type<object>(), IdentifierName("_")))));
         }
 
         ExpressionSyntax MakeDeserializeMethodRightHandSide(Field field)
@@ -662,10 +662,10 @@ namespace CapnpC.CSharp.Generator.CodeGen
                             IdentifierName(nameof(Capnp.CapnpSerializable)),
                             GenericName(nameof(Capnp.CapnpSerializable.Create))
                                 .AddTypeArgumentListArguments(
-                                    _names.MakeTypeSyntax(
+                                    MakeNonNullableType(_names.MakeTypeSyntax(
                                         field.Type, 
                                         field.DeclaringType, 
-                                        TypeUsage.DomainClass))))
+                                        TypeUsage.DomainClass)))))
                             .AddArgumentListArguments(Argument(MemberAccessExpression(
                                 SyntaxKind.SimpleMemberAccessExpression, 
                                 _names.ReaderParameter.IdentifierName,
@@ -684,7 +684,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                     SyntaxKind.SimpleMemberAccessExpression,
                                     _names.ReaderParameter.IdentifierName,
                                     _names.GetCodeIdentifier(field).IdentifierName),
-                                _names.MakeTypeSyntax(elementType, field.DeclaringType, TypeUsage.DomainClass),
+                                _names.MakeTypeSyntax(elementType, field.DeclaringType, TypeUsage.DomainClassNullable),
                                 rank);
 
                 case TypeTag.ListPointer:
@@ -849,7 +849,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     ExplicitInterfaceSpecifier(IdentifierName(nameof(Capnp.ICapnpSerializable))))
                 .AddParameterListParameters(
                     Parameter(_names.AnonymousParameter.Identifier)
-                        .WithType(Type<Capnp.SerializerState>()))
+                        .WithType(_names.Type<Capnp.SerializerState>(true)))
                 .AddBodyStatements(
                     ExpressionStatement(
                         InvocationExpression(_names.SerializeMethod.IdentifierName)
@@ -933,7 +933,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         ExplicitInterfaceSpecifier(IdentifierName(nameof(Capnp.ICapnpSerializable))))
                     .AddParameterListParameters(
                         Parameter(_names.AnonymousParameter.Identifier)
-                            .WithType(Type<Capnp.DeserializerState>()))
+                            .WithType(_names.Type<Capnp.DeserializerState>()))
                 .AddBodyStatements(stmts.ToArray());
         }
 

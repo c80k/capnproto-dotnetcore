@@ -22,7 +22,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
         {
             var whichEnum = EnumDeclaration(_names.UnionDiscriminatorEnum.ToString())
                 .AddModifiers(Public)
-                .AddBaseListTypes(SimpleBaseType(Type<ushort>()));
+                .AddBaseListTypes(SimpleBaseType(_names.Type<ushort>()));
 
             var discFields = def.Fields.Where(f => f.DiscValue.HasValue);
 
@@ -52,7 +52,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
             var decl = EnumDeclaration(def.Name)
                 .WithAttributeLists(MakeTypeIdAttributeLists(def.Id))
                 .AddModifiers(Public)
-                .AddBaseListTypes(SimpleBaseType(Type<ushort>()));
+                .AddBaseListTypes(SimpleBaseType(_names.Type<ushort>()));
 
             foreach (var enumerant in def.Enumerants.OrderBy(e => e.CodeOrder))
             {

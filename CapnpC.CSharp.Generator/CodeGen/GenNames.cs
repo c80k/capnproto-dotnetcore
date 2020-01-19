@@ -66,6 +66,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
         public string PipeliningExtensionsClassFormat { get; }
         public string ProxyClassFormat { get; }
         public string SkeletonClassFormat { get; }
+        public bool NullableEnable { get; set; }
         public GenNames(GeneratorOptions options)
         {
             TopNamespace = new Name(options.TopNamespaceName).IdentifierName;
@@ -288,14 +289,14 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 case TypeTag.AnyPointer:
                 case TypeTag.StructPointer:
                 case TypeTag.ListPointer:
-                    return SyntaxHelpers.Type<Capnp.ListOfPointersSerializer<Capnp.DynamicSerializerState>>();
+                    return Type<Capnp.ListOfPointersSerializer<Capnp.DynamicSerializerState>>(true);
 
                 case TypeTag.CapabilityPointer:
-                    return SyntaxHelpers.Type<Capnp.ListOfCapsSerializer<Capnp.Rpc.BareProxy>>();
+                    return Type<Capnp.ListOfCapsSerializer<Capnp.Rpc.BareProxy>>(true);
 
                 case TypeTag.Data:
-                    return SyntaxHelpers.Type<Capnp.ListOfPointersSerializer<
-                        Capnp.ListOfPrimitivesSerializer<byte>>>();
+                    return Type<Capnp.ListOfPointersSerializer<
+                        Capnp.ListOfPrimitivesSerializer<byte>>>(true);
 
                 case TypeTag.Enum:
                     return GenericName("ListOfPrimitivesSerializer")
@@ -315,44 +316,44 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         .AddTypeArgumentListArguments(MakeTypeSyntax(elementType, scope, TypeUsage.Writer));
 
                 case TypeTag.Text:
-                    return SyntaxHelpers.Type<Capnp.ListOfTextSerializer>();
+                    return Type<Capnp.ListOfTextSerializer>(true);
 
                 case TypeTag.Void:
-                    return SyntaxHelpers.Type<Capnp.ListOfEmptySerializer>();
+                    return Type<Capnp.ListOfEmptySerializer>(true);
 
                 case TypeTag.Bool:
-                    return SyntaxHelpers.Type<Capnp.ListOfBitsSerializer>();
+                    return Type<Capnp.ListOfBitsSerializer>(true);
 
                 case TypeTag.F32:
-                    return SyntaxHelpers.Type<Capnp.ListOfPrimitivesSerializer<float>>();
+                    return Type<Capnp.ListOfPrimitivesSerializer<float>>(true);
 
                 case TypeTag.F64:
-                    return SyntaxHelpers.Type<Capnp.ListOfPrimitivesSerializer<double>>();
+                    return Type<Capnp.ListOfPrimitivesSerializer<double>>(true);
 
                 case TypeTag.S8:
-                    return SyntaxHelpers.Type<Capnp.ListOfPrimitivesSerializer<sbyte>>();
+                    return Type<Capnp.ListOfPrimitivesSerializer<sbyte>>(true);
 
                 case TypeTag.U8:
-                    return SyntaxHelpers.Type<Capnp.ListOfPrimitivesSerializer<byte>>();
+                    return Type<Capnp.ListOfPrimitivesSerializer<byte>>(true);
 
                 case TypeTag.S16:
-                    return SyntaxHelpers.Type<Capnp.ListOfPrimitivesSerializer<short>>();
+                    return Type<Capnp.ListOfPrimitivesSerializer<short>>(true);
 
                 case TypeTag.U16:
                 case TypeTag.AnyEnum:
-                    return SyntaxHelpers.Type<Capnp.ListOfPrimitivesSerializer<ushort>>();
+                    return Type<Capnp.ListOfPrimitivesSerializer<ushort>>(true);
 
                 case TypeTag.S32:
-                    return SyntaxHelpers.Type<Capnp.ListOfPrimitivesSerializer<int>>();
+                    return Type<Capnp.ListOfPrimitivesSerializer<int>>(true);
 
                 case TypeTag.U32:
-                    return SyntaxHelpers.Type<Capnp.ListOfPrimitivesSerializer<uint>>();
+                    return Type<Capnp.ListOfPrimitivesSerializer<uint>>(true);
 
                 case TypeTag.S64:
-                    return SyntaxHelpers.Type<Capnp.ListOfPrimitivesSerializer<long>>();
+                    return Type<Capnp.ListOfPrimitivesSerializer<long>>(true);
 
                 case TypeTag.U64:
-                    return SyntaxHelpers.Type<Capnp.ListOfPrimitivesSerializer<ulong>>();
+                    return Type<Capnp.ListOfPrimitivesSerializer<ulong>>(true);
 
                 default:
                     throw new NotImplementedException("Unexpected type tag, don't know how to deal with this");
@@ -373,19 +374,22 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         public TypeSyntax MakeTypeSyntax(Model.Type type, TypeDefinition scope, TypeUsage usage)
         {
+            bool nonNullable = usage != TypeUsage.DomainClassNullable;
+
             switch (type.Tag)
             {
                 case TypeTag.AnyEnum:
-                    return MaybeNullableValueType(SyntaxHelpers.Type<ushort>(), usage);
+                    return MaybeNullableValueType(Type<ushort>(), usage);
 
                 case TypeTag.CapabilityPointer:
                     if (type.Parameter != null)
                     {
-                        return GetQName(type, scope);
+                        return nonNullable ? GetQName(type, scope) :
+                            MakeNullableType(GetQName(type, scope));
                     }
                     else
                     {
-                        return SyntaxHelpers.Type<Capnp.Rpc.BareProxy>();
+                        return Type<Capnp.Rpc.BareProxy>(nonNullable);
                     }
 
                 case TypeTag.AnyPointer:
@@ -393,20 +397,22 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     switch (usage)
                     {
                         case TypeUsage.Reader:
-                            return SyntaxHelpers.Type<Capnp.DeserializerState>();
+                            return Type<Capnp.DeserializerState>();
 
                         case TypeUsage.Writer:
-                            return SyntaxHelpers.Type<Capnp.DynamicSerializerState>();
+                            return Type<Capnp.DynamicSerializerState>();
 
                         case TypeUsage.DomainClass:
                         case TypeUsage.DomainClassNullable:
                             if (type.Parameter != null)
                             {
-                                return GetQName(type, scope);
+                                return nonNullable ?
+                                    GetQName(type, scope) :
+                                    MakeNullableType(GetQName(type, scope));
                             }
                             else
                             {
-                                return SyntaxHelpers.Type<object>();
+                                return Type<object>(nonNullable);
                             }
 
                         default:
@@ -414,7 +420,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     }
 
                 case TypeTag.Bool:
-                    return MaybeNullableValueType(SyntaxHelpers.Type<bool>(), usage);
+                    return MaybeNullableValueType(Type<bool>(), usage);
 
                 case TypeTag.Data:
                     switch (usage)
@@ -422,10 +428,10 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         case TypeUsage.Reader:
                         case TypeUsage.DomainClass:
                         case TypeUsage.DomainClassNullable:
-                            return SyntaxHelpers.Type<IReadOnlyList<byte>>();
+                            return Type<IReadOnlyList<byte>>(nonNullable);
 
                         case TypeUsage.Writer:
-                            return SyntaxHelpers.Type<Capnp.ListOfPrimitivesSerializer<byte>>();
+                            return Type<Capnp.ListOfPrimitivesSerializer<byte>>(true);
 
                         default:
                             throw new NotImplementedException();
@@ -448,21 +454,23 @@ namespace CapnpC.CSharp.Generator.CodeGen
                             return QualifiedName(GetQName(type, scope), ReaderStruct.IdentifierName);
 
                         case TypeUsage.DomainClass:
-                        case TypeUsage.DomainClassNullable:
                             return GetQName(type, scope);
+
+                        case TypeUsage.DomainClassNullable:
+                            return MakeNullableType(GetQName(type, scope));
 
                         default:
                             throw new NotImplementedException();
                     }
 
                 case TypeTag.F32:
-                    return MaybeNullableValueType(SyntaxHelpers.Type<float>(), usage);
+                    return MaybeNullableValueType(Type<float>(), usage);
 
                 case TypeTag.F64:
-                    return MaybeNullableValueType(SyntaxHelpers.Type<double>(), usage);
+                    return MaybeNullableValueType(Type<double>(), usage);
 
                 case TypeTag.List when type.ElementType.Tag == TypeTag.Void && usage != TypeUsage.Writer:
-                    return MaybeNullableValueType(SyntaxHelpers.Type<int>(), usage);
+                    return MaybeNullableValueType(Type<int>(), usage);
 
                 case TypeTag.List:
                     switch (usage)
@@ -477,7 +485,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         case TypeUsage.DomainClass:
                         case TypeUsage.DomainClassNullable:
                             return GenericName(Identifier("IReadOnlyList"))
-                                .AddTypeArgumentListArguments(MakeTypeSyntax(type.ElementType, scope, TypeUsage.DomainClass));
+                                .AddTypeArgumentListArguments(MakeTypeSyntax(type.ElementType, scope, usage));
 
                         default:
                             throw new NotImplementedException();
@@ -487,45 +495,47 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     switch (usage)
                     {
                         case TypeUsage.Writer:
-                            return SyntaxHelpers.Type<Capnp.SerializerState>();
+                            return Type<Capnp.SerializerState>();
 
                         case TypeUsage.Reader:
-                            return SyntaxHelpers.Type<IReadOnlyList<Capnp.DeserializerState>>();
+                            return Type<IReadOnlyList<Capnp.DeserializerState>>();
 
                         case TypeUsage.DomainClass:
+                            return Type<IReadOnlyList<object>>(false);
+
                         case TypeUsage.DomainClassNullable:
-                            return SyntaxHelpers.Type<IReadOnlyList<object>>();
+                            return Type<IReadOnlyList<object>>(true);
 
                         default:
                             throw new NotImplementedException();
                     }
 
                 case TypeTag.S16:
-                    return MaybeNullableValueType(SyntaxHelpers.Type<short>(), usage);
+                    return MaybeNullableValueType(Type<short>(), usage);
 
                 case TypeTag.S32:
-                    return MaybeNullableValueType(SyntaxHelpers.Type<int>(), usage);
+                    return MaybeNullableValueType(Type<int>(), usage);
 
                 case TypeTag.S64:
-                    return MaybeNullableValueType(SyntaxHelpers.Type<long>(), usage);
+                    return MaybeNullableValueType(Type<long>(), usage);
 
                 case TypeTag.S8:
-                    return MaybeNullableValueType(SyntaxHelpers.Type<sbyte>(), usage);
+                    return MaybeNullableValueType(Type<sbyte>(), usage);
 
                 case TypeTag.Text:
-                    return SyntaxHelpers.Type<string>();
+                    return Type<string>(nonNullable);
 
                 case TypeTag.U16:
-                    return MaybeNullableValueType(SyntaxHelpers.Type<ushort>(), usage);
+                    return MaybeNullableValueType(Type<ushort>(), usage);
 
                 case TypeTag.U32:
-                    return MaybeNullableValueType(SyntaxHelpers.Type<uint>(), usage);
+                    return MaybeNullableValueType(Type<uint>(), usage);
 
                 case TypeTag.U64:
-                    return MaybeNullableValueType(SyntaxHelpers.Type<ulong>(), usage);
+                    return MaybeNullableValueType(Type<ulong>(), usage);
 
                 case TypeTag.U8:
-                    return MaybeNullableValueType(SyntaxHelpers.Type<byte>(), usage);
+                    return MaybeNullableValueType(Type<byte>(), usage);
 
                 case TypeTag.Void:
                     return PredefinedType(Token(SyntaxKind.VoidKeyword));
@@ -637,5 +647,22 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 method.Name,
                 MakePipeliningSupportExtensionMethodName(path)));
         }
+
+        public TypeSyntax MakeNullableType(TypeSyntax type)
+        {
+            return NullableEnable ?
+                NullableType(type) :
+                type;
+
+        }
+
+        public TypeSyntax Type<T>(bool nonNullable = false)
+        {
+            return NullableEnable && !typeof(T).IsValueType && !nonNullable ?
+                NullableType(SyntaxHelpers.NonNullableType<T>()) :
+                SyntaxHelpers.NonNullableType<T>();                
+        }
+
+        public ClassOrStructConstraintSyntax MakeNullableClassConstraint() => ClassOrStructConstraint(SyntaxKind.ClassConstraint);
     }
 }

@@ -61,7 +61,7 @@
         {
             var topDecl = ClassDeclaration(_names.MakeTypeName(def).Identifier)                
                 .AddModifiers(Public)
-                .AddBaseListTypes(SimpleBaseType(Type<Capnp.ICapnpSerializable>()));
+                .AddBaseListTypes(SimpleBaseType(_names.Type<Capnp.ICapnpSerializable>(true)));
 
             if (def.GenericParameters.Count > 0)
             {

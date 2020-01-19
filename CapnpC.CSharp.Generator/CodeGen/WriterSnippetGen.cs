@@ -195,7 +195,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         PropertyDeclarationSyntax MakePrimitiveProperty<T>(Field field, string readName)
         {
-            return MakeProperty(Type<T>(), null, _names.GetCodeIdentifier(field).ToString(), 
+            return MakeProperty(_names.Type<T>(), null, _names.GetCodeIdentifier(field).ToString(), 
                 readName, 
                 nameof(Capnp.SerializerExtensions.WriteData),
                 field.BitOffset.Value,
@@ -207,7 +207,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         PropertyDeclarationSyntax MakeEnumProperty(Field field, string readName)
         {
-            return MakeProperty(_names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.NotRelevant), Type<ushort>(), 
+            return MakeProperty(_names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.NotRelevant), _names.Type<ushort>(), 
                 _names.GetCodeIdentifier(field).ToString(),
                 readName,
                 nameof(Capnp.SerializerExtensions.WriteData),
@@ -220,7 +220,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         PropertyDeclarationSyntax MakeTextProperty(Field field)
         {
-            return MakeProperty(Type<string>(), null, 
+            return MakeProperty(_names.Type<string>(), null, 
                 _names.GetCodeIdentifier(field).ToString(),
                 nameof(Capnp.SerializerState.ReadText),
                 nameof(Capnp.SerializerState.WriteText),
@@ -282,7 +282,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
         {
             return MakeProperty(
                 _names.UnionDiscriminatorEnum.IdentifierName,
-                Type<ushort>(),
+                _names.Type<ushort>(),
                 _names.UnionDiscriminatorProp.ToString(),
                 nameof(Capnp.SerializerExtensions.ReadDataUShort),
                 nameof(Capnp.SerializerExtensions.WriteData),
