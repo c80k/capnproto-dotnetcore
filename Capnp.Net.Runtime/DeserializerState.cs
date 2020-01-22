@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Capnp
 {
@@ -572,6 +573,7 @@ namespace Capnp
         /// <exception cref="IndexOutOfRangeException">negative index</exception>
         /// <exception cref="DeserializationException">state does not represent a struct, invalid pointer,
         /// non-list-of-bytes pointer, traversal limit exceeded</exception>
+        [return: NotNullIfNotNull("defaultText")]
         public string? ReadText(int index, string? defaultText = null)
         {
             return StructReadPointer(index).RequireList().CastText() ?? defaultText;

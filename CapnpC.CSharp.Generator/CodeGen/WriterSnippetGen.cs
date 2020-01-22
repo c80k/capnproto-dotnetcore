@@ -115,12 +115,21 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     .AddArgumentListArguments(
                         Argument(ValueOf(index)));
 
-        ExpressionSyntax MakeLinkSyntax(object index) =>
-            InvocationExpression(
+        ExpressionSyntax MakeLinkSyntax(object index, bool suppressNullableWarning)
+        {            
+            ExpressionSyntax value = IdentifierName("value");
+
+            if (suppressNullableWarning)
+            {
+                value = _names.SuppressNullableWarning(value);
+            }
+
+            return InvocationExpression(
                 IdentifierName(SerializerStateWorder.LinkName))
                 .AddArgumentListArguments(
                     Argument(ValueOf(index)),
-                    Argument(IdentifierName("value")));
+                    Argument(value));
+        }
 
         ExpressionSyntax MakeLinkObjectSyntax(object index) =>
             InvocationExpression(
@@ -129,22 +138,46 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     Argument(ValueOf(index)),
                     Argument(IdentifierName("value")));
 
+        PropertyDeclarationSyntax MakeWriterRefTypeProperty(
+            TypeSyntax type,
+            string name,
+            ExpressionSyntax getter,
+            ExpressionSyntax setter,
+            bool cast,
+            bool cond)
+        {
+            if (cond)
+            {
+                type = _names.MakeNullableRefType(type);
+            }
+
+            var prop = MakeWriterProperty(type, name, getter, setter, cast, cond);
+
+            if (cond && _names.NullableEnable)
+            {
+                prop = prop.AddAttributeLists(
+                    AttributeList(
+                        SingletonSeparatedList(
+                                Attribute(
+                                    IdentifierName("DisallowNull")))));
+            }
+            return prop;
+        }
+
         PropertyDeclarationSyntax MakePointerProperty(TypeSyntax type, string name, object index, bool cast, bool cond)
         {
             ExpressionSyntax getter = MakePointerSyntax(type, index);
-            ExpressionSyntax setter = MakeLinkSyntax(index);
+            ExpressionSyntax setter = MakeLinkSyntax(index, cond);
 
-            return MakeWriterProperty(type, name, getter, setter, cast, cond);
+            return MakeWriterRefTypeProperty(type, name, getter, setter, cast, cond);
         }
 
-        PropertyDeclarationSyntax MakePointerAsStructProperty(
-            TypeSyntax type, string name, object index,
-            bool cast, bool cond)
+        PropertyDeclarationSyntax MakePointerAsStructProperty(TypeSyntax type, string name, object index, bool cast, bool cond)
         {
             ExpressionSyntax getter = MakeTypedPointerSyntax(index, type);
-            ExpressionSyntax setter = MakeLinkSyntax(index);
+            ExpressionSyntax setter = MakeLinkSyntax(index, cond);
 
-            return MakeWriterProperty(type, name, getter, setter, cast, cond);
+            return MakeWriterRefTypeProperty(type, name, getter, setter, cast, cond);
         }
 
         PropertyDeclarationSyntax MakeProperty(
@@ -195,7 +228,10 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         PropertyDeclarationSyntax MakePrimitiveProperty<T>(Field field, string readName)
         {
-            return MakeProperty(_names.Type<T>(), null, _names.GetCodeIdentifier(field).ToString(), 
+            return MakeProperty(
+                _names.Type<T>(Nullability.NonNullable), 
+                null, 
+                _names.GetCodeIdentifier(field).ToString(), 
                 readName, 
                 nameof(Capnp.SerializerExtensions.WriteData),
                 field.BitOffset.Value,
@@ -207,7 +243,9 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         PropertyDeclarationSyntax MakeEnumProperty(Field field, string readName)
         {
-            return MakeProperty(_names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.NotRelevant), _names.Type<ushort>(), 
+            return MakeProperty(
+                _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.NotRelevant, Nullability.NonNullable), 
+                _names.Type<ushort>(Nullability.NonNullable), 
                 _names.GetCodeIdentifier(field).ToString(),
                 readName,
                 nameof(Capnp.SerializerExtensions.WriteData),
@@ -220,7 +258,9 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         PropertyDeclarationSyntax MakeTextProperty(Field field)
         {
-            return MakeProperty(_names.Type<string>(), null, 
+            return MakeProperty(
+                _names.Type<string>(Nullability.NullableRef), 
+                null, 
                 _names.GetCodeIdentifier(field).ToString(),
                 nameof(Capnp.SerializerState.ReadText),
                 nameof(Capnp.SerializerState.WriteText),
@@ -233,7 +273,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         PropertyDeclarationSyntax MakeStructProperty(Field field)
         {
-            var qtype = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Writer);
+            var qtype = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Writer, Nullability.NonNullable);
 
             return MakePointerAsStructProperty(qtype, _names.GetCodeIdentifier(field).ToString(),
                 (int)field.Offset, false, field.DiscValue.HasValue);
@@ -241,7 +281,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         PropertyDeclarationSyntax MakeGroupProperty(Field field)
         {
-            var type = QualifiedName(
+            TypeSyntax type = QualifiedName(
                 _names.MakeTypeName(field.Type.Definition).IdentifierName,
                 _names.WriterStruct.IdentifierName);
 
@@ -249,12 +289,17 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 GenericName(nameof(Capnp.SerializerState.Rewrap))
                     .AddTypeArgumentListArguments(type));
 
+            if (field.DiscValue.HasValue)
+            {
+                type = _names.MakeNullableRefType(type);
+            }
+
             return MakeWriterProperty(type, _names.GetCodeIdentifier(field).ToString(), getter, null, false, field.DiscValue.HasValue);
         }
 
         PropertyDeclarationSyntax MakeListProperty(Field field)
         {
-            var qtype = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Writer);
+            var qtype = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Writer, Nullability.NonNullable);
 
             return MakePointerProperty(qtype, _names.GetCodeIdentifier(field).ToString(),
                 (int)field.Offset, false, field.DiscValue.HasValue);
@@ -269,20 +314,21 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         PropertyDeclarationSyntax MakeCapProperty(Field field)
         {
-            var type = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Writer);
+            var nonNullableType = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Writer, Nullability.NonNullable);
+            var nullableType = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Writer, Nullability.NullableRef);
             int index = (int)field.Offset;
             string name = _names.GetCodeIdentifier(field).ToString();
-            ExpressionSyntax getter = MakeReadCapSyntax(type, index);
+            ExpressionSyntax getter = MakeReadCapSyntax(nonNullableType, index);
             ExpressionSyntax setter = MakeLinkObjectSyntax(index);
 
-            return MakeWriterProperty(type, name, getter, setter, false, field.DiscValue.HasValue);
+            return MakeWriterProperty(nullableType, name, getter, setter, false, field.DiscValue.HasValue);
         }
 
         PropertyDeclarationSyntax MakeWriterUnionSelector(TypeDefinition def)
         {
             return MakeProperty(
                 _names.UnionDiscriminatorEnum.IdentifierName,
-                _names.Type<ushort>(),
+                _names.Type<ushort>(Nullability.NonNullable),
                 _names.UnionDiscriminatorProp.ToString(),
                 nameof(Capnp.SerializerExtensions.ReadDataUShort),
                 nameof(Capnp.SerializerExtensions.WriteData),

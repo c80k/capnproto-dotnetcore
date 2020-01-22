@@ -69,7 +69,7 @@ namespace Capnp
         /// <param name="items">List content. Can be null in which case the list is simply not initialized.</param>
         /// <exception cref="InvalidOperationException">The list was already initialized</exception>
         /// <exception cref="ArgumentOutOfRangeException">More than 2^29-1 items.</exception>
-        public void Init(IReadOnlyList<T> items)
+        public void Init(IReadOnlyList<T>? items)
         {
             if (items == null)
             {

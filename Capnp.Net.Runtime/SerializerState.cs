@@ -882,7 +882,7 @@ namespace Capnp
         /// <item><description>Object at given position was already set.</description></item>
         /// </list></exception>
         /// <exception cref="IndexOutOfRangeException"><paramref name="index"/> is out of bounds.</exception>
-        public void WriteText(int index, string text, string defaultText)
+        public void WriteText(int index, string? text, string defaultText)
         {
             BuildPointer(index).WriteText(text ?? defaultText);
         }

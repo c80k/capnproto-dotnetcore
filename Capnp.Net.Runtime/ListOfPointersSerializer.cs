@@ -92,7 +92,7 @@ namespace Capnp
         /// <param name="init">Serialization action to transfer a particular item into the serializer state.</param>
         /// <exception cref="InvalidOperationException">The list was already initialized</exception>
         /// <exception cref="ArgumentOutOfRangeException">More than 2^29-1 items.</exception>
-        public void Init<T>(IReadOnlyList<T> items, Action<TS, T> init)
+        public void Init<T>(IReadOnlyList<T>? items, Action<TS, T> init)
         {
             if (items == null)
             {

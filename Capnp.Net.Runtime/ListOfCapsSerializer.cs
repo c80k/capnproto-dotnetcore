@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Capnp
 {
@@ -10,7 +11,7 @@ namespace Capnp
     /// <typeparam name="T">Capability interface</typeparam>
     public class ListOfCapsSerializer<T> :
         SerializerState,
-        IReadOnlyList<T>
+        IReadOnlyList<T?>
         where T : class
     {
         /// <summary>
@@ -31,6 +32,7 @@ namespace Capnp
         /// <returns>Proxy object of capability at given element index</returns>
         /// <exception cref="InvalidOperationException">List was not initialized, or attempting to overwrite an already set element.</exception>
         /// <exception cref="IndexOutOfRangeException"><paramref name="index"/> is out of range.</exception>
+        [AllowNull]
         public T this[int index]
         {
             get => (Rpc.CapabilityReflection.CreateProxy<T>(DecodeCapPointer(index)) as T)!;
@@ -42,10 +44,7 @@ namespace Capnp
                 if (index < 0 || index >= RawData.Length)
                     throw new IndexOutOfRangeException("index out of range");
 
-                uint id = ProvideCapability(value);
-                WirePointer ptr = default;
-                ptr.SetCapability(id);
-                RawData[index] = id;
+                RawData[index] = ProvideCapability(value);
             }
         }
 
@@ -66,7 +65,7 @@ namespace Capnp
         /// <param name="caps">List content. Can be null in which case the list is simply not initialized.</param>
         /// <exception cref="InvalidOperationException">The list was already initialized</exception>
         /// <exception cref="ArgumentOutOfRangeException">More than 2^29-1 items.</exception>
-        public void Init(IReadOnlyList<T> caps)
+        public void Init(IReadOnlyList<T?>? caps)
         {
             if (caps == null)
             {

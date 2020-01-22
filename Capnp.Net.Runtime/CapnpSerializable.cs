@@ -148,22 +148,24 @@ namespace Capnp
         /// <item><description>Type implementing <see cref="ICapnpSerializable"/>. The type must must have a public parameterless constructor.</description></item>
         /// <item><description>A capability interface (<seealso cref="Rpc.InvalidCapabilityInterfaceException"/> for further explanation)</description></item>
         /// <item><description><see cref="String"/></description></item>
-        /// <item><description><see cref="IReadOnlyList{Boolean}"/></description></item>
-        /// <item><description><see cref="IReadOnlyList{SByte}"/></description></item>
-        /// <item><description><see cref="IReadOnlyList{Byte}"/></description></item>
-        /// <item><description><see cref="IReadOnlyList{Int16}"/></description></item>
-        /// <item><description><see cref="IReadOnlyList{UInt16}"/></description></item>
-        /// <item><description><see cref="IReadOnlyList{Int32}"/></description></item>
-        /// <item><description><see cref="IReadOnlyList{UInt32}"/></description></item>
-        /// <item><description><see cref="IReadOnlyList{Int64}"/></description></item>
-        /// <item><description><see cref="IReadOnlyList{UInt64}"/></description></item>
-        /// <item><description><see cref="IReadOnlyList{Single}"/></description></item>
-        /// <item><description><see cref="IReadOnlyList{Double}"/></description></item>
-        /// <item><description><see cref="IReadOnlyList{T}"/> whereby T is one of the things listed here.</description></item>
+        /// <item><description><code>IReadOnlyList{Boolean}</code></description></item>
+        /// <item><description><code>IReadOnlyList{SByte}"</code></description></item>
+        /// <item><description><code>IReadOnlyList{Byte}"</code></description></item>
+        /// <item><description><code>IReadOnlyList{Int16}"</code></description></item>
+        /// <item><description><code>IReadOnlyList{UInt16}"</code></description></item>
+        /// <item><description><code>IReadOnlyList{Int32}"</code></description></item>
+        /// <item><description><code>IReadOnlyList{UInt32}"</code></description></item>
+        /// <item><description><code>IReadOnlyList{Int64}"</code></description></item>
+        /// <item><description><code>IReadOnlyList{UInt64}"</code></description></item>
+        /// <item><description><code>IReadOnlyList{Single}"</code></description></item>
+        /// <item><description><code>IReadOnlyList{Double}"</code></description></item>
+        /// <item><description><code>IReadOnlyList{T}</code> whereby T is one of the things listed here.</description></item>
         /// </list>
         /// </typeparam>
-        /// <param name="state"></param>
-        /// <returns></returns>
+        /// <param name="state">deserializer state to construct from</param>
+        /// <returns>The domain object instance. Nullability note: The returned reference will be null if (and only if) <typeparamref name="T"/> is a capability interface and
+        /// <paramref name="state"/> represents the nil object (obtained from a null pointer). For all other types, when the state is nil, 
+        /// the method still constructs a valid but "empty" object instance (such as domain object without any properties set, empty string, empty list etc.)</returns>
         public static T? Create<T>(DeserializerState state)
             where T: class
         {

@@ -61,7 +61,7 @@
         {
             var topDecl = ClassDeclaration(_names.MakeTypeName(def).Identifier)                
                 .AddModifiers(Public)
-                .AddBaseListTypes(SimpleBaseType(_names.Type<Capnp.ICapnpSerializable>(true)));
+                .AddBaseListTypes(SimpleBaseType(_names.Type<Capnp.ICapnpSerializable>(Nullability.NonNullable)));
 
             if (def.GenericParameters.Count > 0)
             {
@@ -184,6 +184,8 @@
 
         internal string Transform(GenFile file)
         {
+            _names.NullableEnable = file.NullableEnable;
+
             NameSyntax topNamespace = GenNames.NamespaceName(file.Namespace) ?? _names.TopNamespace;
 
             var ns = NamespaceDeclaration(topNamespace);
@@ -204,7 +206,15 @@
                 UsingDirective(ParseName("Capnp")),
                 UsingDirective(ParseName("Capnp.Rpc")),
                 UsingDirective(ParseName("System")),
-                UsingDirective(ParseName("System.Collections.Generic")),
+                UsingDirective(ParseName("System.Collections.Generic")));
+
+            if (_names.NullableEnable)
+            {
+                cu = cu.AddUsings(
+                    UsingDirective(ParseName("System.Diagnostics.CodeAnalysis")));
+            }
+
+            cu = cu.AddUsings(
                 UsingDirective(ParseName("System.Threading")),
                 UsingDirective(ParseName("System.Threading.Tasks")));
 

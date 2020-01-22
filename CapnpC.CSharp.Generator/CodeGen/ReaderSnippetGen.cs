@@ -57,7 +57,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     ParameterList(
                         SingletonSeparatedList<ParameterSyntax>(
                             Parameter(_names.ReaderContextField.Identifier)
-                            .WithType(_names.Type<Capnp.DeserializerState>()))))
+                            .WithType(_names.Type<Capnp.DeserializerState>(Nullability.NonNullable)))))
                 .WithExpressionBody(
                     ArrowExpressionClause(
                         ObjectCreationExpression(_names.ReaderStruct.IdentifierName)
@@ -78,7 +78,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         SingletonSeparatedList(
                             Parameter(_names.ContextParameter.Identifier)
                             .WithType(
-                                _names.Type<Capnp.DeserializerState>()))))
+                                _names.Type<Capnp.DeserializerState>(Nullability.NonNullable)))))
                 .WithExpressionBody(
                     ArrowExpressionClause(
                         ObjectCreationExpression(_names.ReaderStruct.IdentifierName)
@@ -90,7 +90,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
         {
             yield return FieldDeclaration(
                 VariableDeclaration(
-                    _names.Type<Capnp.DeserializerState>())
+                    _names.Type<Capnp.DeserializerState>(Nullability.NonNullable))
                 .AddVariables(_names.ReaderContextField.VariableDeclarator))
                 .AddModifiers(Readonly);
 
@@ -100,7 +100,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     ParameterList(
                         SingletonSeparatedList(
                             Parameter(_names.ContextParameter.Identifier)
-                            .WithType(_names.Type<Capnp.DeserializerState>()))))
+                            .WithType(_names.Type<Capnp.DeserializerState>(Nullability.NonNullable)))))
                 .WithBody(
                     Block(
                         SingletonList<StatementSyntax>(
@@ -122,7 +122,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
         {
             yield return FieldDeclaration(
                 VariableDeclaration(
-                    _names.Type<Capnp.DeserializerState>())
+                    _names.Type<Capnp.DeserializerState>(Nullability.NonNullable))
                 .AddVariables(_names.ReaderContextField.VariableDeclarator))
                 .AddModifiers(Readonly);
 
@@ -131,7 +131,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 .WithParameterList(
                     ParameterList(
                         SingletonSeparatedList(Parameter(_names.GroupReaderContextArg.Identifier)
-                            .WithType(_names.Type<Capnp.DeserializerState>()))))
+                            .WithType(_names.Type<Capnp.DeserializerState>(Nullability.NonNullable)))))
                 .WithBody(
                     Block(
                         SingletonList<StatementSyntax>(
@@ -173,57 +173,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
         }
 
-        static Func<ExpressionSyntax, ExpressionSyntax> MakeCastFunc(TypeSyntax type) => 
-            x => CastExpression(type, x);
-
-        static Func<ExpressionSyntax, ExpressionSyntax> MakeListCastFunc(string castName, Field field)
-        { 
-            // Insight: List may have complex default values (e.g. [true, false, false, true] as a
-            // valid default value for a list of bools. This does not yet fit the author's mindset.
-
-            //if (field.DefaultValueIsExplicit)
-            //{
-            //    return x => InvocationExpression(
-            //        MemberAccessExpression(
-            //            SyntaxKind.SimpleMemberAccessExpression,
-            //            x,
-            //            IdentifierName(castName))
-            //        )
-            //        .AddArgumentListArguments(
-            //            Argument(ValueOf(field.DefaultValue)));
-            //}
-            //else
-
-            {
-                return x => InvocationExpression(
-                    MemberAccessExpression(
-                        SyntaxKind.SimpleMemberAccessExpression,
-                        x,
-                        IdentifierName(castName))
-                    );
-            }
-        }
-
-        static Func<ExpressionSyntax, ExpressionSyntax> MakeListCastFuncWithCons(
-            string castName, ExpressionSyntax cons)
-        {
-            return x => InvocationExpression(
-                MemberAccessExpression(
-                    SyntaxKind.SimpleMemberAccessExpression,
-                    x,
-                    IdentifierName(castName))
-                ).AddArgumentListArguments(Argument(cons));
-        }
-
-        static Func<ExpressionSyntax, ExpressionSyntax> MakeGenericListCastFunc(string castName, TypeSyntax genericArgument)
-        {
-            return x => InvocationExpression(
-                MemberAccessExpression(
-                    SyntaxKind.SimpleMemberAccessExpression,
-                    x,
-                    GenericName(castName).AddTypeArgumentListArguments(genericArgument))
-                );
-        }
+        static Func<ExpressionSyntax, ExpressionSyntax> MakeCastFunc(TypeSyntax type) => x => CastExpression(type, x);
 
         PropertyDeclarationSyntax MakeReadProperty(TypeSyntax type, string name, SimpleNameSyntax readName, 
             object indexOrBitOffset, ExpressionSyntax secondArg,
@@ -261,13 +211,19 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         PropertyDeclarationSyntax MakeReadPrimitiveProperty<T>(Field field, string readName)
         {
-            return MakeReadProperty(_names.Type<T>(), _names.GetCodeIdentifier(field).ToString(), readName, field.BitOffset.Value,
-                ValueOf(field.DefaultValue.ScalarValue), null, field.DiscValue.HasValue);
+            return MakeReadProperty(
+                _names.Type<T>(Nullability.NonNullable), 
+                _names.GetCodeIdentifier(field).ToString(), 
+                readName, 
+                field.BitOffset.Value,
+                ValueOf(field.DefaultValue.ScalarValue), 
+                null, 
+                field.DiscValue.HasValue);
         }
 
         PropertyDeclarationSyntax MakeReadEnumProperty(Field field)
         {
-            var typeSyntax = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Reader);
+            var typeSyntax = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Reader, Nullability.NonNullable);
             return MakeReadProperty(typeSyntax, 
                 _names.GetCodeIdentifier(field).ToString(), 
                 nameof(Capnp.SerializerExtensions.ReadDataUShort), field.BitOffset.Value,
@@ -278,9 +234,16 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         PropertyDeclarationSyntax MakeReadTextProperty(Field field)
         {
-            return MakeReadProperty(_names.Type<string>(), _names.GetCodeIdentifier(field).ToString(),
-                nameof(Capnp.DeserializerState.ReadText), (int)field.Offset,
-                ValueOf(field.DefaultValue.ScalarValue), null, field.DiscValue.HasValue);
+            bool cantBeNull = !field.DiscValue.HasValue && field.DefaultValue.ScalarValue != null;
+
+            return MakeReadProperty(
+                _names.Type<string>(cantBeNull ? Nullability.NonNullable : Nullability.NullableRef), 
+                _names.GetCodeIdentifier(field).ToString(),
+                nameof(Capnp.DeserializerState.ReadText), 
+                (int)field.Offset,
+                ValueOf(field.DefaultValue.ScalarValue), 
+                null, 
+                field.DiscValue.HasValue);
         }
 
         MemberAccessExpressionSyntax MakeReaderCreator(TypeSyntax qtype)
@@ -293,7 +256,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         PropertyDeclarationSyntax MakeReadStructProperty(Field field)
         {
-            var qtype = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Reader);
+            var qtype = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Reader, Nullability.NonNullable);
             var creator = MakeReaderCreator(qtype);
 
             return MakeReadProperty(qtype, _names.GetCodeIdentifier(field).ToString(),
@@ -316,18 +279,16 @@ namespace CapnpC.CSharp.Generator.CodeGen
             return MakeReaderProperty(type, _names.GetCodeIdentifier(field).ToString(), right, field.DiscValue.HasValue);
         }
 
-        void MakeReadListPropertyImpl(Model.Type elementType, TypeDefinition scope, ExpressionSyntax context, int depth,
-            out TypeSyntax listType, out ExpressionSyntax impl)
+        ExpressionSyntax MakeReadListPropertyImpl(Model.Type elementType, TypeDefinition scope, ExpressionSyntax context, int depth)
         {
-            var elementTypeSyntax = _names.MakeTypeSyntax(elementType, scope, TypeUsage.Reader);
-            listType = GenericName("IReadOnlyList").AddTypeArgumentListArguments(elementTypeSyntax);
+            var elementTypeSyntax = _names.MakeTypeSyntax(elementType, scope, TypeUsage.Reader, Nullability.NonNullable);
 
             if (elementType.Tag == TypeTag.Interface ||
                 elementType.Tag == TypeTag.CapabilityPointer)
             {
                 if (depth == 0)
                 {
-                    impl = InvocationExpression(MemberAccessExpression(
+                    return InvocationExpression(MemberAccessExpression(
                             SyntaxKind.SimpleMemberAccessExpression,
                             _names.ReaderContextField.IdentifierName,
                             GenericName(nameof(Capnp.DeserializerState.ReadCapList))
@@ -336,15 +297,13 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 }
                 else
                 {
-                    impl = InvocationExpression(
+                    return InvocationExpression(
                         MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
                             context,
                             GenericName(nameof(Capnp.DeserializerState.RequireCapList))
                                 .AddTypeArgumentListArguments(elementTypeSyntax)
                             ));
                 }
-
-                return;
             }
 
             if (depth == 0)
@@ -374,56 +333,44 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 case TypeTag.List:
                     {
 
-                        MakeReadListPropertyImpl(
+                        var innerImpl = MakeReadListPropertyImpl(
                             elementType.ElementType,
                             scope,
                             lambdaArg,
-                            depth + 1,
-                            out var innerListType,
-                            out var innerImpl);
+                            depth + 1);
 
-                        listType = GenericName("IReadOnlyList").AddTypeArgumentListArguments(innerListType);
-
-                        impl = InvocationExpression(
+                        return InvocationExpression(
                             MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
                             context,
                             IdentifierName(nameof(Capnp.ListDeserializer.Cast))))
                                 .AddArgumentListArguments(
                                     Argument(SimpleLambdaExpression(lambdaParam, innerImpl)));
-
-                        return;
                     }
 
                 case TypeTag.ListPointer:
                     {
-                        listType = _names.Type<IReadOnlyList<object>>();
-
                         context = InvocationExpression(MemberAccessExpression(
                             SyntaxKind.SimpleMemberAccessExpression,
                             context,
                             IdentifierName(nameof(Capnp.DeserializerState.RequireList))
                             )).AddArgumentListArguments(Argument(lambdaArg));
 
-                        impl = InvocationExpression(
+                        return InvocationExpression(
                             MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
                             context,
                             IdentifierName(nameof(Capnp.ReadOnlyListExtensions.LazyListSelect))))
                                 .AddArgumentListArguments(
                                     Argument(SimpleLambdaExpression(lambdaParam, context)));
-
-                        return;
                     }
 
                 case TypeTag.Struct:
                     {
-                        impl = InvocationExpression(
+                        return InvocationExpression(
                             MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
                             context,
                             IdentifierName(nameof(Capnp.ListDeserializer.Cast))))
                                 .AddArgumentListArguments(
                                     Argument(MakeReaderCreator(elementTypeSyntax)));
-
-                        return;
                     }
 
                 case TypeTag.Enum:
@@ -432,32 +379,26 @@ namespace CapnpC.CSharp.Generator.CodeGen
                             lambdaParam,
                             CastExpression(elementTypeSyntax, lambdaArg));
 
-                        impl = InvocationExpression(
+                        return InvocationExpression(
                             MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
                             context,
                             IdentifierName(nameof(Capnp.ListDeserializer.CastEnums))))
                                 .AddArgumentListArguments(
                                     Argument(cons));
-
-                        return;
                     }
 
                 case TypeTag.AnyPointer:
                 case TypeTag.StructPointer:
                     {
-                        listType = _names.Type<IReadOnlyList<Capnp.DeserializerState>>();
-                        impl = context;
-                        return;
+                        return context;
                     }
 
                 case TypeTag.Void:
                     {
-                        listType = _names.Type<int>();
-                        impl = MemberAccessExpression(
+                        return MemberAccessExpression(
                             SyntaxKind.SimpleMemberAccessExpression,
                             context,
                             IdentifierName(nameof(Capnp.ListDeserializer.Count)));
-                        return;
                     }
 
                 case TypeTag.Data:
@@ -517,7 +458,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     throw new NotImplementedException("Unexpected type tag, don't know how to deal with this");
             }
 
-            impl = InvocationExpression(MemberAccessExpression(
+            return InvocationExpression(MemberAccessExpression(
                 SyntaxKind.SimpleMemberAccessExpression,
                 context,
                 IdentifierName(castFuncName)));
@@ -527,13 +468,18 @@ namespace CapnpC.CSharp.Generator.CodeGen
         {
             var elementType = field.Type.ElementType;
             var context = ValueOf((int)field.Offset);
-            MakeReadListPropertyImpl(elementType, field.DeclaringType, context, 0, out var listType, out var impl);
+            var impl = MakeReadListPropertyImpl(elementType, field.DeclaringType, context, 0);
+            var listType = _names.MakeTypeSyntax(
+                field.Type,
+                field.DeclaringType,
+                TypeUsage.Reader,
+                field.DiscValue.HasValue ? Nullability.NullableRef : Nullability.NonNullable);
             return MakeReaderProperty(listType, _names.GetCodeIdentifier(field).ToString(), impl, field.DiscValue.HasValue);
         }
 
         PropertyDeclarationSyntax MakeReadAnyListProperty(Field field)
         {
-            var type = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Reader);
+            var type = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Reader, Nullability.NonNullable);
 
             return MakeReadProperty(type, _names.GetCodeIdentifier(field).ToString(),
                 nameof(Capnp.DeserializerState.ReadList),
@@ -542,18 +488,19 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         PropertyDeclarationSyntax MakeReadCapProperty(Field field)
         {
-            var type = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Reader);
+            var nullableType = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Reader, Nullability.NullableRef);
+            var nonNullableType = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Reader, Nullability.NonNullable);
             var readName = GenericName(nameof(Capnp.DeserializerState.ReadCap))
-                .AddTypeArgumentListArguments(type);
+                .AddTypeArgumentListArguments(nonNullableType);
 
-            return MakeReadProperty(type, _names.GetCodeIdentifier(field).ToString(),
+            return MakeReadProperty(nullableType, _names.GetCodeIdentifier(field).ToString(),
                 readName,
                 (int)field.Offset, null, null, field.DiscValue.HasValue);
         }
 
         PropertyDeclarationSyntax MakeReadAnyCapProperty(Field field)
         {
-            var type = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Reader);
+            var type = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Reader, Nullability.NonNullable);
 
             return MakeReadProperty(type, _names.GetCodeIdentifier(field).ToString(),
                 nameof(Capnp.DeserializerState.ReadCap),
@@ -573,7 +520,8 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 IdentifierName(nameof(Capnp.ListDeserializer.CastByte))));
 
             return MakeReaderProperty(
-                _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Reader), 
+                _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.Reader, 
+                field.DiscValue.HasValue ? Nullability.NullableRefAndValue : Nullability.NonNullable), 
                 _names.GetCodeIdentifier(field).ToString(), impl, field.DiscValue.HasValue);
         }
 

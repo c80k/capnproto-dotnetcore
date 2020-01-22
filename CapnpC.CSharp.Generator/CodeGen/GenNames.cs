@@ -22,9 +22,15 @@ namespace CapnpC.CSharp.Generator.CodeGen
     {
         NotRelevant,
         DomainClass,
-        DomainClassNullable,
         Reader,
         Writer
+    }
+
+    enum Nullability
+    {
+        NonNullable,
+        NullableRefAndValue,
+        NullableRef
     }
 
     class GenNames
@@ -185,7 +191,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
         TypeSyntax ResolveGenericParameter(GenericParameter p, Model.Type boundType, TypeDefinition def)
         {
             var type = boundType.ResolveGenericParameter(p);
-            return MakeTypeSyntax(type, def, TypeUsage.DomainClass);
+            return MakeTypeSyntax(type, def, TypeUsage.DomainClass, Nullability.NonNullable);
         }
 
         public SimpleNameSyntax MakeGenericTypeName(TypeDefinition def, Model.Type boundType, NameUsage usage = NameUsage.Default)
@@ -289,82 +295,82 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 case TypeTag.AnyPointer:
                 case TypeTag.StructPointer:
                 case TypeTag.ListPointer:
-                    return Type<Capnp.ListOfPointersSerializer<Capnp.DynamicSerializerState>>(true);
+                    return Type<Capnp.ListOfPointersSerializer<Capnp.DynamicSerializerState>>(Nullability.NonNullable);
 
                 case TypeTag.CapabilityPointer:
-                    return Type<Capnp.ListOfCapsSerializer<Capnp.Rpc.BareProxy>>(true);
+                    return Type<Capnp.ListOfCapsSerializer<Capnp.Rpc.BareProxy>>(Nullability.NonNullable);
 
                 case TypeTag.Data:
                     return Type<Capnp.ListOfPointersSerializer<
-                        Capnp.ListOfPrimitivesSerializer<byte>>>(true);
+                        Capnp.ListOfPrimitivesSerializer<byte>>>(Nullability.NonNullable);
 
                 case TypeTag.Enum:
                     return GenericName("ListOfPrimitivesSerializer")
-                        .AddTypeArgumentListArguments(MakeTypeSyntax(elementType, scope, TypeUsage.Writer));
+                        .AddTypeArgumentListArguments(MakeTypeSyntax(elementType, scope, TypeUsage.Writer, Nullability.NonNullable));
 
                 case TypeTag.Group:
                 case TypeTag.Struct:
                     return GenericName("ListOfStructsSerializer")
-                        .AddTypeArgumentListArguments(MakeTypeSyntax(elementType, scope, TypeUsage.Writer));
+                        .AddTypeArgumentListArguments(MakeTypeSyntax(elementType, scope, TypeUsage.Writer, Nullability.NonNullable));
 
                 case TypeTag.Interface:
                     return GenericName("ListOfCapsSerializer")
-                        .AddTypeArgumentListArguments(MakeTypeSyntax(elementType, scope, TypeUsage.Writer));
+                        .AddTypeArgumentListArguments(MakeTypeSyntax(elementType, scope, TypeUsage.Writer, Nullability.NonNullable));
 
                 case TypeTag.List:
                     return GenericName("ListOfPointersSerializer")
-                        .AddTypeArgumentListArguments(MakeTypeSyntax(elementType, scope, TypeUsage.Writer));
+                        .AddTypeArgumentListArguments(MakeTypeSyntax(elementType, scope, TypeUsage.Writer, Nullability.NonNullable));
 
                 case TypeTag.Text:
-                    return Type<Capnp.ListOfTextSerializer>(true);
+                    return Type<Capnp.ListOfTextSerializer>(Nullability.NonNullable);
 
                 case TypeTag.Void:
-                    return Type<Capnp.ListOfEmptySerializer>(true);
+                    return Type<Capnp.ListOfEmptySerializer>(Nullability.NonNullable);
 
                 case TypeTag.Bool:
-                    return Type<Capnp.ListOfBitsSerializer>(true);
+                    return Type<Capnp.ListOfBitsSerializer>(Nullability.NonNullable);
 
                 case TypeTag.F32:
-                    return Type<Capnp.ListOfPrimitivesSerializer<float>>(true);
+                    return Type<Capnp.ListOfPrimitivesSerializer<float>>(Nullability.NonNullable);
 
                 case TypeTag.F64:
-                    return Type<Capnp.ListOfPrimitivesSerializer<double>>(true);
+                    return Type<Capnp.ListOfPrimitivesSerializer<double>>(Nullability.NonNullable);
 
                 case TypeTag.S8:
-                    return Type<Capnp.ListOfPrimitivesSerializer<sbyte>>(true);
+                    return Type<Capnp.ListOfPrimitivesSerializer<sbyte>>(Nullability.NonNullable);
 
                 case TypeTag.U8:
-                    return Type<Capnp.ListOfPrimitivesSerializer<byte>>(true);
+                    return Type<Capnp.ListOfPrimitivesSerializer<byte>>(Nullability.NonNullable);
 
                 case TypeTag.S16:
-                    return Type<Capnp.ListOfPrimitivesSerializer<short>>(true);
+                    return Type<Capnp.ListOfPrimitivesSerializer<short>>(Nullability.NonNullable);
 
                 case TypeTag.U16:
                 case TypeTag.AnyEnum:
-                    return Type<Capnp.ListOfPrimitivesSerializer<ushort>>(true);
+                    return Type<Capnp.ListOfPrimitivesSerializer<ushort>>(Nullability.NonNullable);
 
                 case TypeTag.S32:
-                    return Type<Capnp.ListOfPrimitivesSerializer<int>>(true);
+                    return Type<Capnp.ListOfPrimitivesSerializer<int>>(Nullability.NonNullable);
 
                 case TypeTag.U32:
-                    return Type<Capnp.ListOfPrimitivesSerializer<uint>>(true);
+                    return Type<Capnp.ListOfPrimitivesSerializer<uint>>(Nullability.NonNullable);
 
                 case TypeTag.S64:
-                    return Type<Capnp.ListOfPrimitivesSerializer<long>>(true);
+                    return Type<Capnp.ListOfPrimitivesSerializer<long>>(Nullability.NonNullable);
 
                 case TypeTag.U64:
-                    return Type<Capnp.ListOfPrimitivesSerializer<ulong>>(true);
+                    return Type<Capnp.ListOfPrimitivesSerializer<ulong>>(Nullability.NonNullable);
 
                 default:
                     throw new NotImplementedException("Unexpected type tag, don't know how to deal with this");
             }
         }
 
-        TypeSyntax MaybeNullableValueType(TypeSyntax typeSyntax, TypeUsage usage)
+        TypeSyntax MaybeNullableValueType(TypeSyntax typeSyntax, Nullability nullability)
         {
-            switch (usage)
+            switch (nullability)
             {
-                case TypeUsage.DomainClassNullable:
+                case Nullability.NullableRefAndValue:
                     return NullableType(typeSyntax);
 
                 default:
@@ -372,76 +378,77 @@ namespace CapnpC.CSharp.Generator.CodeGen
             }
         }
 
-        public TypeSyntax MakeTypeSyntax(Model.Type type, TypeDefinition scope, TypeUsage usage)
+        TypeSyntax MaybeNullableRefType(TypeSyntax typeSyntax, Nullability nullability)
         {
-            bool nonNullable = usage != TypeUsage.DomainClassNullable;
+            switch (nullability)
+            {
+                case Nullability.NullableRef:
+                case Nullability.NullableRefAndValue:
+                    return NullableType(typeSyntax);
 
+                default:
+                    return typeSyntax;
+            }
+        }
+
+        public TypeSyntax MakeTypeSyntax(Model.Type type, TypeDefinition scope, TypeUsage usage, Nullability nullability)
+        {
             switch (type.Tag)
             {
                 case TypeTag.AnyEnum:
-                    return MaybeNullableValueType(Type<ushort>(), usage);
+                    return Type<ushort>(nullability);
 
                 case TypeTag.CapabilityPointer:
                     if (type.Parameter != null)
-                    {
-                        return nonNullable ? GetQName(type, scope) :
-                            MakeNullableType(GetQName(type, scope));
-                    }
+                        return MaybeNullableRefType(GetQName(type, scope), nullability);
                     else
-                    {
-                        return Type<Capnp.Rpc.BareProxy>(nonNullable);
-                    }
+                        return Type<Capnp.Rpc.BareProxy>(nullability);
 
                 case TypeTag.AnyPointer:
                 case TypeTag.StructPointer:
                     switch (usage)
                     {
                         case TypeUsage.Reader:
-                            return Type<Capnp.DeserializerState>();
+                            return Type<Capnp.DeserializerState>(Nullability.NonNullable);
 
                         case TypeUsage.Writer:
-                            return Type<Capnp.DynamicSerializerState>();
+                            return Type<Capnp.DynamicSerializerState>(Nullability.NullableRef);
+
+                        case TypeUsage.DomainClass when type.Parameter == null:
+                            return Type<object>(nullability);
+
+                        case TypeUsage.DomainClass when nullability == Nullability.NonNullable:
+                            return GetQName(type, scope);
 
                         case TypeUsage.DomainClass:
-                        case TypeUsage.DomainClassNullable:
-                            if (type.Parameter != null)
-                            {
-                                return nonNullable ?
-                                    GetQName(type, scope) :
-                                    MakeNullableType(GetQName(type, scope));
-                            }
-                            else
-                            {
-                                return Type<object>(nonNullable);
-                            }
+                            return MakeNullableRefType(GetQName(type, scope));
 
                         default:
                             throw new NotImplementedException();
                     }
 
                 case TypeTag.Bool:
-                    return MaybeNullableValueType(Type<bool>(), usage);
+                    return Type<bool>(nullability);
 
                 case TypeTag.Data:
                     switch (usage)
                     {
                         case TypeUsage.Reader:
                         case TypeUsage.DomainClass:
-                        case TypeUsage.DomainClassNullable:
-                            return Type<IReadOnlyList<byte>>(nonNullable);
+                            return Type<IReadOnlyList<byte>>(nullability);
 
                         case TypeUsage.Writer:
-                            return Type<Capnp.ListOfPrimitivesSerializer<byte>>(true);
+                            return Type<Capnp.ListOfPrimitivesSerializer<byte>>(nullability);
 
                         default:
                             throw new NotImplementedException();
                     }
 
                 case TypeTag.Enum:
-                    return MaybeNullableValueType(GetQName(type, scope), usage);
+                    return MaybeNullableValueType(GetQName(type, scope), nullability);
 
                 case TypeTag.Interface:
-                    return GetQName(type, scope);
+                    return MaybeNullableRefType(GetQName(type, scope), nullability);
 
                 case TypeTag.Struct:
                 case TypeTag.Group:
@@ -453,39 +460,38 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         case TypeUsage.Reader:
                             return QualifiedName(GetQName(type, scope), ReaderStruct.IdentifierName);
 
-                        case TypeUsage.DomainClass:
+                        case TypeUsage.DomainClass when nullability == Nullability.NonNullable:
                             return GetQName(type, scope);
 
-                        case TypeUsage.DomainClassNullable:
-                            return MakeNullableType(GetQName(type, scope));
+                        case TypeUsage.DomainClass:
+                            return MakeNullableRefType(GetQName(type, scope));
 
                         default:
                             throw new NotImplementedException();
                     }
 
                 case TypeTag.F32:
-                    return MaybeNullableValueType(Type<float>(), usage);
+                    return Type<float>(nullability);
 
                 case TypeTag.F64:
-                    return MaybeNullableValueType(Type<double>(), usage);
+                    return Type<double>(nullability);
 
                 case TypeTag.List when type.ElementType.Tag == TypeTag.Void && usage != TypeUsage.Writer:
-                    return MaybeNullableValueType(Type<int>(), usage);
+                    return Type<int>(nullability);
 
                 case TypeTag.List:
                     switch (usage)
                     {
                         case TypeUsage.Writer:
-                            return MakeListSerializerSyntax(type.ElementType, scope);
+                            return MaybeNullableRefType(MakeListSerializerSyntax(type.ElementType, scope), nullability);
 
                         case TypeUsage.Reader:
-                            return GenericName(Identifier("IReadOnlyList"))
-                                .AddTypeArgumentListArguments(MakeTypeSyntax(type.ElementType, scope, TypeUsage.Reader));
+                            return MaybeNullableRefType(GenericName(Identifier("IReadOnlyList"))
+                                .AddTypeArgumentListArguments(MakeTypeSyntax(type.ElementType, scope, TypeUsage.Reader, Nullability.NonNullable)), nullability);
 
                         case TypeUsage.DomainClass:
-                        case TypeUsage.DomainClassNullable:
-                            return GenericName(Identifier("IReadOnlyList"))
-                                .AddTypeArgumentListArguments(MakeTypeSyntax(type.ElementType, scope, usage));
+                            return MaybeNullableRefType(GenericName(Identifier("IReadOnlyList"))
+                                .AddTypeArgumentListArguments(MakeTypeSyntax(type.ElementType, scope, TypeUsage.DomainClass, Nullability.NullableRef)), nullability);
 
                         default:
                             throw new NotImplementedException();
@@ -495,47 +501,49 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     switch (usage)
                     {
                         case TypeUsage.Writer:
-                            return Type<Capnp.SerializerState>();
+                            return Type<Capnp.SerializerState>(Nullability.NonNullable);
 
                         case TypeUsage.Reader:
-                            return Type<IReadOnlyList<Capnp.DeserializerState>>();
+                            return Type<IReadOnlyList<Capnp.DeserializerState>>(Nullability.NonNullable);
+
+                        case TypeUsage.DomainClass when nullability == Nullability.NonNullable:
+                            return GenericName(Identifier("IReadOnlyList"))
+                                .AddTypeArgumentListArguments(Type<object>(Nullability.NullableRef));
 
                         case TypeUsage.DomainClass:
-                            return Type<IReadOnlyList<object>>(false);
-
-                        case TypeUsage.DomainClassNullable:
-                            return Type<IReadOnlyList<object>>(true);
+                            return MakeNullableRefType(GenericName(Identifier("IReadOnlyList"))
+                                .AddTypeArgumentListArguments(Type<object>(Nullability.NullableRef)));
 
                         default:
                             throw new NotImplementedException();
                     }
 
                 case TypeTag.S16:
-                    return MaybeNullableValueType(Type<short>(), usage);
+                    return Type<short>(nullability);
 
                 case TypeTag.S32:
-                    return MaybeNullableValueType(Type<int>(), usage);
+                    return Type<int>(nullability);
 
                 case TypeTag.S64:
-                    return MaybeNullableValueType(Type<long>(), usage);
+                    return Type<long>(nullability);
 
                 case TypeTag.S8:
-                    return MaybeNullableValueType(Type<sbyte>(), usage);
+                    return Type<sbyte>(nullability);
 
                 case TypeTag.Text:
-                    return Type<string>(nonNullable);
+                    return Type<string>(nullability);
 
                 case TypeTag.U16:
-                    return MaybeNullableValueType(Type<ushort>(), usage);
+                    return Type<ushort>(nullability);
 
                 case TypeTag.U32:
-                    return MaybeNullableValueType(Type<uint>(), usage);
+                    return Type<uint>(nullability);
 
                 case TypeTag.U64:
-                    return MaybeNullableValueType(Type<ulong>(), usage);
+                    return Type<ulong>(nullability);
 
                 case TypeTag.U8:
-                    return MaybeNullableValueType(Type<byte>(), usage);
+                    return Type<byte>(nullability);
 
                 case TypeTag.Void:
                     return PredefinedType(Token(SyntaxKind.VoidKeyword));
@@ -648,7 +656,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 MakePipeliningSupportExtensionMethodName(path)));
         }
 
-        public TypeSyntax MakeNullableType(TypeSyntax type)
+        public TypeSyntax MakeNullableRefType(TypeSyntax type)
         {
             return NullableEnable ?
                 NullableType(type) :
@@ -656,13 +664,19 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         }
 
-        public TypeSyntax Type<T>(bool nonNullable = false)
+        public TypeSyntax Type<T>(Nullability nullability)
         {
-            return NullableEnable && !typeof(T).IsValueType && !nonNullable ?
+            return (NullableEnable && !typeof(T).IsValueType && nullability != Nullability.NonNullable) ||
+                   (                   typeof(T).IsValueType && nullability == Nullability.NullableRefAndValue) ?
                 NullableType(SyntaxHelpers.NonNullableType<T>()) :
                 SyntaxHelpers.NonNullableType<T>();                
         }
 
-        public ClassOrStructConstraintSyntax MakeNullableClassConstraint() => ClassOrStructConstraint(SyntaxKind.ClassConstraint);
+        public ExpressionSyntax SuppressNullableWarning(ExpressionSyntax expression)
+        {
+            return NullableEnable ?
+                PostfixUnaryExpression(SyntaxKind.SuppressNullableWarningExpression, expression) :
+                expression;
+        }
     }
 }

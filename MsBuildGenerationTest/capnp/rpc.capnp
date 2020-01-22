@@ -110,7 +110,7 @@
 # it for free.
 
 using Cxx = import "/capnp/c++.capnp";
-$Cxx.namespace("capnp::rpc");
+$Cxx.namespace("test::rpc");
 
 # ========================================================================================
 # The Four Tables
