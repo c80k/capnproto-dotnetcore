@@ -37,6 +37,7 @@ namespace CapnpC.CSharp.Generator.Model
 
         public Method UsingMethod { get; set; }
         public string Name { get; set; }
+        public string CsName { get; set; }
         public SpecialName SpecialName { get; set; }
         public DiscriminationInfo UnionInfo { get; set; }
         public List<Field> Fields { get; } = new List<Field>();

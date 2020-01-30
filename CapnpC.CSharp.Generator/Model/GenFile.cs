@@ -11,7 +11,7 @@ namespace CapnpC.CSharp.Generator.Model
 
         public string Name { get; set; }
         public string[] Namespace { get; set; }
-        public bool NullableEnable { get; set; } = true;
+        public bool? NullableEnable { get; set; }
 
         public IEnumerable<TypeDefinition> NestedTypes { get => this.GetNestedTypes(); }
         public ICollection<IDefinition> NestedDefinitions { get; } = new List<IDefinition>();

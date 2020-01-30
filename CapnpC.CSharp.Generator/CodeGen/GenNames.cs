@@ -114,61 +114,54 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         public Name MakeTypeName(TypeDefinition def, NameUsage usage = NameUsage.Default)
         {
-            if (def.Tag == TypeTag.Group)
+            string name;
+
+            switch (usage)
             {
-                return new Name(SyntaxHelpers.MakeAllLower(def.Name));
+                case NameUsage.Default:
+                    if (def.Tag == TypeTag.Interface)
+                        goto case NameUsage.Interface;
+
+                    switch (def.SpecialName)
+                    {
+                        case SpecialName.NothingSpecial:
+                            name = GetCodeIdentifier(def);
+                            break;
+
+                        case SpecialName.MethodParamsStruct:
+                            name = MakeParamsStructName(def.UsingMethod);
+                            break;
+
+                        case SpecialName.MethodResultStruct:
+                            name = MakeResultStructName(def.UsingMethod);
+                            break;
+
+                        default:
+                            throw new NotImplementedException();
+                    }
+                    break;
+
+                case NameUsage.Namespace:
+                    name = GetCodeIdentifier(def);
+                    break;
+
+                case NameUsage.Interface:
+                    name = "I" + GetCodeIdentifier(def);
+                    break;
+
+                case NameUsage.Proxy:
+                    name = string.Format(ProxyClassFormat, GetCodeIdentifier(def));
+                    break;
+
+                case NameUsage.Skeleton:
+                    name = string.Format(SkeletonClassFormat, GetCodeIdentifier(def));
+                    break;
+
+                default:
+                    throw new NotImplementedException();
             }
-            else
-            {
-                string name;
 
-                switch (usage)
-                {
-                    case NameUsage.Default:
-                        if (def.Tag == TypeTag.Interface)
-                            goto case NameUsage.Interface;
-
-                        switch (def.SpecialName)
-                        {
-                            case SpecialName.NothingSpecial:
-                                name = def.Name;
-                                break;
-
-                            case SpecialName.MethodParamsStruct:
-                                name = MakeParamsStructName(def.UsingMethod);
-                                break;
-
-                            case SpecialName.MethodResultStruct:
-                                name = MakeResultStructName(def.UsingMethod);
-                                break;
-
-                            default:
-                                throw new NotImplementedException();
-                        }
-                        break;
-
-                    case NameUsage.Namespace:
-                        name = def.Name;
-                        break;
-
-                    case NameUsage.Interface:
-                        name = "I" + def.Name;
-                        break;
-
-                    case NameUsage.Proxy:
-                        name = string.Format(ProxyClassFormat, def.Name);
-                        break;
-
-                    case NameUsage.Skeleton:
-                        name = string.Format(SkeletonClassFormat, def.Name);
-                        break;
-
-                    default:
-                        throw new NotImplementedException();
-                }
-
-                return new Name(name);
-            }
+            return new Name(name);
         }
 
         public SimpleNameSyntax MakeGenericTypeName(TypeDefinition def, NameUsage usage = NameUsage.Default)
@@ -231,10 +224,10 @@ namespace CapnpC.CSharp.Generator.CodeGen
             NameSyntax ident = null;
             if (@namespace != null)
             {
-                ident = IdentifierName(SyntaxHelpers.MakeCamel(@namespace[0]));
+                ident = IdentifierName(SyntaxHelpers.MakeUpperCamel(@namespace[0]));
                 foreach (string name in @namespace.Skip(1))
                 {
-                    var temp = IdentifierName(SyntaxHelpers.MakeCamel(name));
+                    var temp = IdentifierName(SyntaxHelpers.MakeUpperCamel(name));
                     ident = QualifiedName(ident, temp);
                 }
             }
@@ -380,6 +373,9 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         TypeSyntax MaybeNullableRefType(TypeSyntax typeSyntax, Nullability nullability)
         {
+            if (!NullableEnable) 
+                return typeSyntax;
+
             switch (nullability)
             {
                 case Nullability.NullableRef:
@@ -555,18 +551,21 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         public string MakeParamsStructName(Method method)
         {
-            return string.Format(ParamsStructFormat, method.Name);
+            return string.Format(ParamsStructFormat, GetCodeIdentifier(method));
         }
 
         public string MakeResultStructName(Method method)
         {
-            return string.Format(ResultStructFormat, method.Name);
+            return string.Format(ResultStructFormat, GetCodeIdentifier(method));
         }
 
         public Name GetCodeIdentifier(Method method)
         {
-            return new Name(SyntaxHelpers.MakeCamel(method.Name));
+            return new Name(method.CsName ?? IdentifierRenamer.ToNonKeyword(SyntaxHelpers.MakeUpperCamel(method.Name)));
         }
+
+        string GetCodeIdentifierUpperCamel(Field field) => field.CsName ?? SyntaxHelpers.MakeUpperCamel(field.Name);
+        string GetCodeIdentifierLowerCamel(Field field) => field.CsName ?? IdentifierRenamer.ToNonKeyword(SyntaxHelpers.MakeLowerCamel(field.Name));
 
         public Name GetCodeIdentifier(Field field)
         {
@@ -581,7 +580,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
             {
                 // Method parameters are internally represented with the same class "Field".
                 // They do not have a declaring type. Anyway, they don't suffer from the field-name-equals-nested-type-name problem.
-                return new Name(SyntaxHelpers.MakeCamel(field.Name));
+                return new Name(GetCodeIdentifierLowerCamel(field));
             }
 
             var typeNames = new HashSet<Name>(def.NestedTypes.Select(t => MakeTypeName(t)));
@@ -589,7 +588,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
             foreach (var member in def.Fields)
             {
-                var memberName = new Name(SyntaxHelpers.MakeCamel(member.Name));
+                var memberName = new Name(GetCodeIdentifierUpperCamel(member));
 
                 while (typeNames.Contains(memberName))
                 {
@@ -600,6 +599,16 @@ namespace CapnpC.CSharp.Generator.CodeGen
             }
 
             return _fieldNameMap[field];
+        }
+
+        public string GetCodeIdentifier(TypeDefinition def)
+        {
+            string id = def.CsName ?? def.Name;
+            if (def.Tag == TypeTag.Group) // special treatment for groups: Need to disambiguate between 
+            {  // the field name (use original name) and its type (make it start with a lower-case letter)
+                id = IdentifierRenamer.ToNonKeyword(SyntaxHelpers.MakeLowerCamel(id));
+            }
+            return id;
         }
 
         public Name GetGenericTypeParameter(string name)

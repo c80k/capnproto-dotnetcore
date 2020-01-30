@@ -9,8 +9,8 @@ namespace CapnpC.CSharp.Generator.CodeGen
 {
     static class SyntaxHelpers
     {
-        public static string MakeCamel(string name) => $"{char.ToUpperInvariant(name[0])}{name.Substring(1)}";
-        public static string MakeAllLower(string name) => $"@{name}";
+        public static string MakeUpperCamel(string name) => $"{char.ToUpperInvariant(name[0])}{name.Substring(1)}";
+        public static string MakeLowerCamel(string name) => $"{char.ToLowerInvariant(name[0])}{name.Substring(1)}";
 
         public static readonly SyntaxToken Async = Token(SyntaxKind.AsyncKeyword);
         public static readonly SyntaxToken Public = Token(SyntaxKind.PublicKeyword);

@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -15,6 +16,8 @@ namespace CapnpC.CSharp.Generator.Tests
         string _inputSchemaFileName;
         string _inputSchema;
         string _referenceOutputContent;
+        bool _nullableGenEnable;
+        bool _nullableSupportEnable;
 
         GenerationResult _result;
 
@@ -56,6 +59,7 @@ namespace CapnpC.CSharp.Generator.Tests
         public void GivenIHaveABinaryCodeGeneratorRequest(string binaryRequestFileName)
         {
             _inputStream = LoadResource(binaryRequestFileName);
+            _nullableGenEnable = false; // Assume false by default, may be enabled later
         }
 
         [Given(@"my reference output is ""(.*)""")]
@@ -71,9 +75,14 @@ namespace CapnpC.CSharp.Generator.Tests
         [When(@"I invoke capnpc-csharp")]
         public void WhenIInvokeCapnpc_Csharp()
         {
+            Console.WriteLine($"Generate nullable reference types? {_nullableGenEnable}");
+
             using (_inputStream)
             {
-                _result = CapnpCompilation.GenerateFromStream(_inputStream);
+                _result = CapnpCompilation.GenerateFromStream(_inputStream, new CodeGen.GeneratorOptions()
+                {
+                    NullableEnableDefault = _nullableGenEnable
+                });
             }
         }
         
@@ -111,13 +120,6 @@ namespace CapnpC.CSharp.Generator.Tests
         {
             Assert.IsFalse(_result.IsSuccess, "Tool invocation was supposed to fail, but it didn't");
             Assert.IsNotNull(_result.Exception, "Expected an exception");
-        }
-
-        [Then(@"the invocation must succeed and the generated code must compile")]
-        public void ThenTheInvocationMustSucceedAndTheGeneratedCodeMustCompile()
-        {
-            Assert.IsTrue(_result.IsSuccess, "Tool invocation was not successful");
-            Assert.IsTrue(Util.InlineAssemblyCompiler.TryCompileCapnp(_result.GeneratedFiles[0].GeneratedContent), "Compilation was not successful");
         }
 
         [Given(@"capnp\.exe is installed on my system")]
@@ -184,6 +186,70 @@ namespace CapnpC.CSharp.Generator.Tests
         public void ThenTheErrorOutputMustContainMultipleMessages()
         {
             Assert.IsTrue(_result.Messages.Count >= 2);
+        }
+
+        [Given(@"I enable generation of nullable reference types according to (.*)")]
+        public void GivenIEnableGenerationOfNullableReferenceTypesAccordingTo(bool enable)
+        {
+            _nullableGenEnable = enable;
+        }
+
+        [Given(@"I enable the compiler support of nullable reference types according to (.*)")]
+        public void GivenIEnableTheCompilerSupportOfNullableReferenceTypesAccordingTo(bool enable)
+        {
+            _nullableSupportEnable = enable;
+        }
+
+        [Then(@"the invocation must succeed and attempting to compile the generated code gives (.*)")]
+        public void ThenTheInvocationMustSucceedAndAttemptingToCompileTheGeneratedCodeGives(string result)
+        {
+            Console.WriteLine($"Compiler supports nullable reference types? {_nullableSupportEnable}");
+
+            Assert.IsTrue(_result.IsSuccess, "Tool invocation was not successful");
+            var summary = Util.InlineAssemblyCompiler.TryCompileCapnp(
+                _nullableSupportEnable ? NullableContextOptions.Enable : NullableContextOptions.Disable,
+                _result.GeneratedFiles[0].GeneratedContent);
+
+            try
+            {
+                switch (result)
+                {
+                    case "success":
+                        Assert.AreEqual(
+                            Util.InlineAssemblyCompiler.CompileSummary.Success,
+                            summary,
+                            "Compilation was expected to succeed");
+                        break;
+
+                    case "warnings":
+                        Assert.AreEqual(
+                            Util.InlineAssemblyCompiler.CompileSummary.SuccessWithWarnings,
+                            summary,
+                            "Compilation was expected to produce warnings");
+                        break;
+
+                    case "errors":
+                        Assert.AreEqual(
+                            Util.InlineAssemblyCompiler.CompileSummary.Error,
+                            summary,
+                            "Compilation was expected to fail");
+                        break;
+
+                    default:
+                        Assert.Fail("Test case bug: unknown outcome specified");
+                        break;
+
+                }
+            }
+            catch (AssertFailedException)
+            {
+                string generated = _result.GeneratedFiles.Single().GeneratedContent;
+                string path = Path.ChangeExtension(Path.GetTempFileName(), ".capnp.cs");
+                File.WriteAllText(path, generated);
+                Console.WriteLine($"Generated code was saved to {path}");
+
+                throw;
+            }
         }
     }
 }

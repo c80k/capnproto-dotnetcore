@@ -14,6 +14,7 @@
     internal class CodeGenerator
     {
         readonly SchemaModel _model;
+        readonly GeneratorOptions _options;
         readonly GenNames _names;
         readonly CommonSnippetGen _commonGen;
         readonly DomainClassSnippetGen _domClassGen;
@@ -24,6 +25,7 @@
         public CodeGenerator(SchemaModel model, GeneratorOptions options)
         {
             _model = model;
+            _options = options;
             _names = new GenNames(options);
             _commonGen = new CommonSnippetGen(_names);
             _domClassGen = new DomainClassSnippetGen(_names);
@@ -184,7 +186,7 @@
 
         internal string Transform(GenFile file)
         {
-            _names.NullableEnable = file.NullableEnable;
+            _names.NullableEnable = file.NullableEnable ?? _options.NullableEnableDefault;
 
             NameSyntax topNamespace = GenNames.NamespaceName(file.Namespace) ?? _names.TopNamespace;
 

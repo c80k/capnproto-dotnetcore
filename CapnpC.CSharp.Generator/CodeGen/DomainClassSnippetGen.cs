@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static CapnpC.CSharp.Generator.CodeGen.SyntaxHelpers;
+using Microsoft.CodeAnalysis;
 
 namespace CapnpC.CSharp.Generator.CodeGen
 {
@@ -452,13 +453,18 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                 Argument(domain),
                                 Argument(
                                     ParenthesizedLambdaExpression(
+                                        ParameterList(
+                                            SeparatedList<ParameterSyntax>(
+                                                new SyntaxNodeOrToken[]
+                                                {
+                                                    Parameter(Identifier(s)),
+                                                    Token(SyntaxKind.CommaToken),
+                                                    Parameter(Identifier(v))
+                                                })),
                                         MakeComplexSerializeParticle(
                                             type.ElementType,
                                             IdentifierName(s),
-                                            IdentifierName(v)))
-                                        .AddParameterListParameters(
-                                            Parameter(Identifier(s)),
-                                            Parameter(Identifier(v)))));
+                                            IdentifierName(v)))));
 
                 default:
                     return InvocationExpression(

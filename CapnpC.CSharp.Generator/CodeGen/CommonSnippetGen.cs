@@ -49,14 +49,14 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         public EnumDeclarationSyntax MakeEnum(TypeDefinition def)
         {
-            var decl = EnumDeclaration(def.Name)
+            var decl = EnumDeclaration(_names.GetCodeIdentifier(def))
                 .WithAttributeLists(MakeTypeIdAttributeLists(def.Id))
                 .AddModifiers(Public)
                 .AddBaseListTypes(SimpleBaseType(_names.Type<ushort>(Nullability.NonNullable)));
 
             foreach (var enumerant in def.Enumerants.OrderBy(e => e.CodeOrder))
             {
-                var mdecl = EnumMemberDeclaration(enumerant.Literal);
+                var mdecl = EnumMemberDeclaration(enumerant.CsLiteral ?? enumerant.Literal);
 
                 if (enumerant.Ordinal.HasValue)
                 {

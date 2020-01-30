@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis;
 
 namespace CapnpC.CSharp.Generator.CodeGen
 {
@@ -60,7 +61,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 {
                     foreach (var arg in method.Params)
                     {
-                        list.Add(Parameter(Identifier(IdentifierRenamer.ToNonKeyword(arg.Name)))
+                        list.Add(Parameter(_names.GetCodeIdentifier(arg).Identifier)
                             .WithType(_names.MakeTypeSyntax(arg.Type, method.DeclaringInterface, TypeUsage.DomainClass, Nullability.NullableRef)));
                     }
                 }
@@ -187,12 +188,15 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         IEnumerable<ExpressionSyntax> MakeProxyCallInitializerAssignments(Method method)
         {
-            foreach (var methodParam in method.Params)
+            for (int i = 0; i < method.Params.Count; i++)
             {
+                var methodParam = method.Params[i];
+                var field = method.ParamsStruct.Fields[i];
+
                 yield return AssignmentExpression(
                     SyntaxKind.SimpleAssignmentExpression,
-                    _names.GetCodeIdentifier(methodParam).IdentifierName,
-                    IdentifierName(IdentifierRenamer.ToNonKeyword(methodParam.Name)));
+                    _names.GetCodeIdentifier(field).IdentifierName,
+                    _names.GetCodeIdentifier(methodParam).IdentifierName);
             }
         }
 
@@ -650,10 +654,19 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     }
                     else
                     {
+                        // CodeAnalysis.CSharp 3.2.1 has a bug which prevents us from using AddParameterListParameters. :-(
+
+                        var paramList = new List<SyntaxNodeOrToken>();
+                        foreach (var arg in method.Results)
+                        {
+                            if (paramList.Count > 0)
+                                paramList.Add(Token(SyntaxKind.CommaToken));
+                            paramList.Add(Parameter(Identifier(arg.Name)));
+                        }
                         lambdaArg = ParenthesizedLambdaExpression(
-                            MakeMaybeTailCallLambdaBody(method))
-                            .AddParameterListParameters(
-                                method.Results.Select(arg => Parameter(Identifier(arg.Name))).ToArray());
+                            ParameterList(
+                                SeparatedList<ParameterSyntax>(paramList)),
+                            MakeMaybeTailCallLambdaBody(method));
                     }
                 }
                 else
@@ -835,9 +848,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         .AddModifiers(Static, Readonly);
 
 
-                    var methodDecl = MethodDeclaration(
-                        capTypeSyntax,
-                        methodName.Identifier)
+                    var methodDecl = MethodDeclaration(capTypeSyntax, methodName.Identifier)
                         .AddModifiers(Public, Static)
                         .AddParameterListParameters(
                             Parameter(

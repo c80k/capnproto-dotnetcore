@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
+using static CapnpC.CSharp.Generator.Model.SupportedAnnotations;
 
 namespace CapnpC.CSharp.Generator.Model
 {
@@ -92,6 +92,7 @@ namespace CapnpC.CSharp.Generator.Model
             state.parent = null;
             file.Namespace = GetNamespaceAnnotation(node);
             file.Name = name;
+            file.NullableEnable = GetNullableEnable(node);
             return ProcessNodePass1(id, name, state) as GenFile;
         }
 
@@ -145,6 +146,7 @@ namespace CapnpC.CSharp.Generator.Model
                 Trace.Assert(state.parent != null, $"The {node.GetTypeTag().ToString()} node {node.StrId()} was expected to have a parent.");
                 var typeDef = _typeDefMgr.CreateTypeDef(id, node.GetTypeTag(), state.parent);
                 typeDef.Name = name;
+                typeDef.CsName = GetCsName(node);
                 state.parent = typeDef;
                 def = typeDef;
             }
@@ -173,18 +175,6 @@ namespace CapnpC.CSharp.Generator.Model
                     if (pnode.ScopeId == 0) ProcessNodePass1(pnode.Id, null, state); // Anonymous generated type
                 }
             return def;
-        }
-
-        string[] GetNamespaceAnnotation(Schema.Node.Reader fileNode)
-        {
-            foreach (var annotation in fileNode.Annotations)
-            {
-                if (annotation.Id == 0xb9c6f99ebf805f2c) // Cxx namespace
-                {
-                    return annotation.Value.Text.Split(new string[1] { "::" }, default);
-                }
-            }
-            return null;
         }
 
         // 2nd pass: Generate types based on definitions
@@ -492,6 +482,7 @@ namespace CapnpC.CSharp.Generator.Model
                 {
                     DeclaringType = declaringType,
                     Name = fieldReader.Name,
+                    CsName = GetCsName(fieldReader),
                     CodeOrder = fieldReader.CodeOrder
                 };
 
@@ -505,6 +496,8 @@ namespace CapnpC.CSharp.Generator.Model
                     case 0 when fieldReader.IsGroup:
                         var def = ProcessTypeDef(fieldReader.Group_TypeId, state, TypeTag.Group);
                         field.Type = Types.FromDefinition(def);
+                        def.CsName = field.CsName; // Type definitions for unions are artificially generated.
+                                                   // Transfer the C# name of the using field.
                         break;
 
                     case 0 when fieldReader.IsSlot:
@@ -549,7 +542,8 @@ namespace CapnpC.CSharp.Generator.Model
                     {
                         DeclaringInterface = def,
                         Id = def.Methods.Count,
-                        Name = methodReader.Name
+                        Name = methodReader.Name,
+                        CsName = GetCsName(methodReader)
                     };
                     foreach (var implicitParameterReader in methodReader.ImplicitParameters)
                     {
@@ -664,6 +658,7 @@ namespace CapnpC.CSharp.Generator.Model
                 {
                     TypeDefinition = def,
                     Literal = fieldReader.Name,
+                    CsLiteral = GetCsName(fieldReader),
                     CodeOrder = fieldReader.CodeOrder
                 };
 
@@ -745,9 +740,6 @@ namespace CapnpC.CSharp.Generator.Model
 
     public static class SchemaExtensions
     {
-        public static string GetName(this Schema.Node.Reader node)
-            => node.DisplayName.Substring((int)node.DisplayNamePrefixLength);
-
         public static string StrId(this Schema.Node.Reader node)
             => $"0x{node.Id:X}";
 

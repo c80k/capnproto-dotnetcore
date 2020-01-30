@@ -1,25 +1,27 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace CapnpC.CSharp.Generator.Tests.Util
 {
     class InlineAssemblyCompiler
     {
-        public static bool TryCompileCapnp(string code)
+        public enum CompileSummary
         {
-            return TryCompileCapnp(new[] {code});
+            Success,
+            SuccessWithWarnings,
+            Error
         }
 
-        public static bool TryCompileCapnp(string[] code)
+        public static CompileSummary TryCompileCapnp(NullableContextOptions nullableContextOptions, params string[] code)
         {
             var options = new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary, 
-                optimizationLevel: OptimizationLevel.Debug);
+                optimizationLevel: OptimizationLevel.Debug,
+                nullableContextOptions: nullableContextOptions);
 
             string assemblyRoot = Path.GetDirectoryName(typeof(object).Assembly.Location);
 
@@ -29,7 +31,7 @@ namespace CapnpC.CSharp.Generator.Tests.Util
                 "Capnp.Net.Runtime",
                 "bin",
                 "Debug",
-                "netcoreapp2.1",
+                "netcoreapp3.0",
                 "Capnp.Net.Runtime.dll"));
 
             var compilation = CSharpCompilation.Create(
@@ -61,7 +63,17 @@ namespace CapnpC.CSharp.Generator.Tests.Util
                     }
                 }
 
-                return emitResult.Success;
+                if (emitResult.Success)
+                {
+                    if (emitResult.Diagnostics.Any(diag => diag.Severity == DiagnosticSeverity.Warning))
+                        return CompileSummary.SuccessWithWarnings;
+                    else
+                        return CompileSummary.Success;
+                }
+                else
+                {
+                    return CompileSummary.Error;
+                }
             }
         }
     }

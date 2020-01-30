@@ -49,11 +49,21 @@ Scenario: Multiple errors
 
 Scenario Outline: Valid generator output
 	Given I have a binary code generator request <bin>
+	And I enable generation of nullable reference types according to <nullablegen>
+	And I enable the compiler support of nullable reference types according to <nullablesupp>
 	When I invoke capnpc-csharp
-	Then the invocation must succeed and the generated code must compile
+	Then the invocation must succeed and attempting to compile the generated code gives <outcome>
 
 Examples:
-    | bin                 |
-    | Issue19.capnp.bin   |
-	| Issue21.capnp.bin   |
-	| Issue22.capnp.bin   |
+    | bin               | nullablegen | nullablesupp | outcome  |
+    | test.capnp.bin    | false       | false        | success  |
+    | test.capnp.bin    | true        | false        | success   |
+    | test.capnp.bin    | false       | true         | warnings |
+    | test.capnp.bin    | true        | true         | success  |
+    | Issue19.capnp.bin | false       | false        | success  |
+    | Issue21.capnp.bin | false       | false        | success  |
+    | Issue22.capnp.bin | false       | false        | success  |
+    | NullableDisable.capnp.bin   | true        | false        | success  |
+    | NullableDisable.capnp.bin   | true        | true         | warnings |
+    | NullableEnable.capnp.bin    | false       | true         | success  |
+	| NullableEnable.capnp.bin    | false       | false        | errors   |
