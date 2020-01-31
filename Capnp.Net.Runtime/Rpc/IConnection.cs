@@ -1,5 +1,6 @@
 ﻿using Capnp.FrameTracing;
 using System;
+using System.IO;
 
 namespace Capnp.Rpc
 {
@@ -50,6 +51,8 @@ namespace Capnp.Rpc
         /// <exception cref="ArgumentNullException"><paramref name="tracer"/> is null</exception>
         /// <exception cref="InvalidOperationException">Connection is not in state 'Initializing'</exception>
         void AttachTracer(IFrameTracer tracer);
+
+        void InjectMidlayer(Func<Stream, Stream> createFunc);
 
         /// <summary>
         /// Prematurely closes this connection. Note that there is usually no need to close a connection manually. The typical use case

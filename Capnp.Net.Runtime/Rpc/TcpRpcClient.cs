@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
@@ -44,6 +45,7 @@ namespace Capnp.Rpc
 
         readonly RpcEngine _rpcEngine;
         readonly TcpClient _client;
+        Func<Stream, Stream> _createLayers = _ => _;
         RpcEngine.RpcEndpoint _inboundEndpoint;
         OutboundTcpEndpoint _outboundEndpoint;
         FramePump _pump;
@@ -82,7 +84,9 @@ namespace Capnp.Rpc
             await ConnectAsync(host, port);
 
             State = ConnectionState.Active;
-            _pump = new FramePump(_client.GetStream());
+
+            var stream = _createLayers(_client.GetStream());
+            _pump = new FramePump(stream);
             _attachTracerAction?.Invoke();
             _outboundEndpoint = new OutboundTcpEndpoint(this, _pump);
             _inboundEndpoint = _rpcEngine.AddEndpoint(_outboundEndpoint);
@@ -216,6 +220,18 @@ namespace Capnp.Rpc
             {
                 _pump.AttachTracer(tracer);
             };
+        }
+
+        public void InjectMidlayer(Func<Stream, Stream> createFunc)
+        {
+            if (createFunc == null)
+                throw new ArgumentNullException(nameof(createFunc));
+
+            if (State != ConnectionState.Initializing)
+                throw new InvalidOperationException("Connection is not in state 'Initializing'");
+
+            var last = _createLayers;
+            _createLayers = _ => createFunc(last(_));
         }
 
         /// <summary>

@@ -22,6 +22,7 @@
     <Compile Include="..\Capnp.Net.Runtime.Tests\ProvidedCapabilityMock.cs" Link="ProvidedCapabilityMock.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\ProvidedCapabilityMultiCallMock.cs" Link="ProvidedCapabilityMultiCallMock.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\RpcSchemaTests.cs" Link="RpcSchemaTests.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\ScatteringStream.cs" Link="ScatteringStream.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\SegmentAllocatorTests.cs" Link="SegmentAllocatorTests.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\TcpRpc.cs" Link="TcpRpc.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\TcpRpcAdvancedStuff.cs" Link="TcpRpcAdvancedStuff.cs" />

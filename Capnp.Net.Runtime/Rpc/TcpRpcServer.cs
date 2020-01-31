@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -60,24 +61,29 @@ namespace Capnp.Rpc
         class Connection: IConnection
         {
             readonly TcpRpcServer _server;
+            Stream _stream;
 
-            public Connection(TcpRpcServer server, TcpClient client, FramePump pump, OutboundTcpEndpoint outboundEp, RpcEngine.RpcEndpoint inboundEp)
+            public Connection(TcpRpcServer server, TcpClient client)
             {
                 _server = server;
                 Client = client;
-                Pump = pump;
-                OutboundEp = outboundEp;
-                InboundEp = inboundEp;
+                _stream = client.GetStream();
             }
 
             public void Start()
             {
+                Pump = new FramePump(_stream);
+                OutboundEp = new OutboundTcpEndpoint(_server, Pump);
+                InboundEp = _server._rpcEngine.AddEndpoint(OutboundEp);
+                Pump.FrameReceived += InboundEp.Forward;
+
+                State = ConnectionState.Active;
+
                 PumpRunner = new Thread(o =>
                 {
                     try
                     {
                         Thread.CurrentThread.Name = $"TCP RPC Server Thread {Thread.CurrentThread.ManagedThreadId}";
-                        State = ConnectionState.Active;
 
                         Pump.Run();
                     }
@@ -122,6 +128,17 @@ namespace Capnp.Rpc
                 Pump.AttachTracer(tracer);
             }
 
+            public void InjectMidlayer(Func<Stream, Stream> createFunc)
+            {
+                if (createFunc == null)
+                    throw new ArgumentNullException(nameof(createFunc));
+
+                if (State != ConnectionState.Initializing)
+                    throw new InvalidOperationException("Connection is not in state 'Initializing'");
+
+                _stream = createFunc(_stream);
+            }
+
             public void Close()
             {
                 Client.Dispose();
@@ -149,12 +166,7 @@ namespace Capnp.Rpc
                 while (true)
                 {
                     var client = _listener.AcceptTcpClient();
-                    var pump = new FramePump(client.GetStream());
-                    var outboundEndpoint = new OutboundTcpEndpoint(this, pump);
-                    var inboundEndpoint = _rpcEngine.AddEndpoint(outboundEndpoint);
-                    pump.FrameReceived += inboundEndpoint.Forward;
-
-                    var connection = new Connection(this, client, pump, outboundEndpoint, inboundEndpoint);
+                    var connection = new Connection(this, client);
 
                     lock (_reentrancyBlocker)
                     {
