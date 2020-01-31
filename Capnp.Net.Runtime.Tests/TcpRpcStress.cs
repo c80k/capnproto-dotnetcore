@@ -89,5 +89,40 @@ namespace Capnp.Net.Runtime.Tests
             var t = new TcpRpc();
             Repeat(100, t.PipelineAfterReturn);
         }
+
+        [TestMethod]
+        public void ScatteredTransfer()
+        {
+
+            using (var server = SetupServer())
+            using (var client = new TcpRpcClient())
+            {
+                client.InjectMidlayer(s => new ScatteringStream(s, 10));
+                client.Connect("localhost", TcpPort);
+                client.WhenConnected.Wait();
+
+                var counters = new Counters();
+                server.Main = new TestInterfaceImpl(counters);
+                using (var main = client.GetMain<ITestInterface>())
+                {
+                    for (int i = 0; i < 100; i++)
+                    {
+                        var request1 = main.Foo(123, true, default);
+                        var request3 = Assert.ThrowsExceptionAsync<RpcException>(() => main.Bar(default));
+                        var s = new TestAllTypes();
+                        Common.InitTestMessage(s);
+                        var request2 = main.Baz(s, default);
+
+                        Assert.IsTrue(request1.Wait(MediumNonDbgTimeout));
+                        Assert.IsTrue(request2.Wait(MediumNonDbgTimeout));
+                        Assert.IsTrue(request3.Wait(MediumNonDbgTimeout));
+
+                        Assert.AreEqual("foo", request1.Result);
+                        Assert.AreEqual(2, counters.CallCount);
+                        counters.CallCount = 0;
+                    }
+                }
+            }
+        }
     }
 }
