@@ -484,7 +484,7 @@ namespace Capnp.Net.Runtime.Tests
                             }
                             catch (AggregateException exception) when (exception.InnerException is RpcException rpcException && rpcException.Message == "Cannot access a disposed object.")
                             {
-                                Logger.Log(LogLevel.Information, $"Oops, object disposed. Counter = {cap.Count}, tx count = {client.SendCount}, rx count = {client.RecvCount}");
+                                Console.WriteLine($"Oops, object disposed. Counter = {cap.Count}, tx count = {client.SendCount}, rx count = {client.RecvCount}");
                                 throw;
                             }
 
