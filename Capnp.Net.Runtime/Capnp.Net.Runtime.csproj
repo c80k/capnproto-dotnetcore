@@ -24,11 +24,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <DefineConstants>TRACE;DEBUG;DebugCapabilityLifecycle</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;DebugCapabilityLifecycle</DefineConstants>
+  <PropertyGroup>
+    <DefineConstants>DebugCapabilityLifecycle</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
