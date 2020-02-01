@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 using System.Threading;
 
@@ -94,9 +95,17 @@ namespace Capnp.Net.Runtime.Tests
         public void ScatteredTransfer()
         {
 
-            using (var server = SetupServer())
+            using (var server = new TcpRpcServer(IPAddress.Any, TcpPort))
             using (var client = new TcpRpcClient())
             {
+                server.OnConnectionChanged += (_, e) =>
+                {
+                    if (e.Connection.State == ConnectionState.Initializing)
+                    {
+                        e.Connection.InjectMidlayer(s => new ScatteringStream(s, 7));
+                    }
+                };
+
                 client.InjectMidlayer(s => new ScatteringStream(s, 10));
                 client.Connect("localhost", TcpPort);
                 client.WhenConnected.Wait();

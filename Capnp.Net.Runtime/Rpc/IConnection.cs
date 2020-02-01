@@ -52,6 +52,13 @@ namespace Capnp.Rpc
         /// <exception cref="InvalidOperationException">Connection is not in state 'Initializing'</exception>
         void AttachTracer(IFrameTracer tracer);
 
+        /// <summary>
+        /// Installs a midlayer. A midlayer is a protocal layer that resides somewhere between capnp serialization and the raw TCP stream.
+        /// Thus, we have a hook mechanism for transforming data before it is sent to the TCP connection or after it was received
+        /// by the TCP connection, respectively. This mechanism may be used for integrating various (de-)compression algorithms.
+        /// </summary>
+        /// <param name="createFunc">Callback for wrapping the midlayer around its underlying stream</param>
+        /// <exception cref="ArgumentNullException"><paramref name="createFunc"/> is null</exception>
         void InjectMidlayer(Func<Stream, Stream> createFunc);
 
         /// <summary>

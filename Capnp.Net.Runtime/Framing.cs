@@ -110,13 +110,14 @@ namespace Capnp
 #else
                 var buffer = MemoryMarshal.Cast<ulong, byte>(buffers[i].Span);
 
-                while (buffer.Length > 0)
+                do
                 {
                     int obtained = reader.Read(buffer);
                     if (obtained == 0)
                         throw StreamClosed();
                     buffer = buffer.Slice(obtained);
                 }
+                while (buffer.Length > 0);
 #endif
             }
         }
