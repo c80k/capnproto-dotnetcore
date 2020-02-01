@@ -79,7 +79,10 @@ namespace Capnp
 
             return new WireFrame(buffers);
         }
-        
+
+        static InvalidDataException StreamClosed() 
+            => new InvalidDataException("Prematurely reached end of stream. Expected more bytes according to framing header.");
+
         static void FillBuffersFromFrames(Memory<ulong>[] buffers, uint segmentCount, BinaryReader reader)
         {
             for (uint i = 0; i < segmentCount; i++)
@@ -90,7 +93,12 @@ namespace Capnp
 
                 if (tmpBuffer.Length != buffer.Length)
                 {
-                    throw new InvalidDataException("Expected more bytes according to framing header");
+                    // Note w.r.t. issue #37: If there are temporarily less bytes available, 
+                    // this will NOT cause ReadBytes to return a shorter buffer. 
+                    // Only if the end of the stream is reached will we enter this branch. And this will be an error condition,
+                    // since it would mean that the connection was closed in the middle of a frame transfer.
+
+                    throw StreamClosed();
                 }
                 
                 // Fastest way to do this without /unsafe
@@ -101,7 +109,15 @@ namespace Capnp
                 }
 #else
                 var buffer = MemoryMarshal.Cast<ulong, byte>(buffers[i].Span);
-                reader.Read(buffer);
+
+                do
+                {
+                    int obtained = reader.Read(buffer);
+                    if (obtained == 0)
+                        throw StreamClosed();
+                    buffer = buffer.Slice(obtained);
+                }
+                while (buffer.Length > 0);
 #endif
             }
         }

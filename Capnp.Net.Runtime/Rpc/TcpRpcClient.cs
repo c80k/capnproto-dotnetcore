@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
@@ -44,6 +45,7 @@ namespace Capnp.Rpc
 
         readonly RpcEngine _rpcEngine;
         readonly TcpClient _client;
+        Func<Stream, Stream> _createLayers = _ => _;
         RpcEngine.RpcEndpoint _inboundEndpoint;
         OutboundTcpEndpoint _outboundEndpoint;
         FramePump _pump;
@@ -82,7 +84,9 @@ namespace Capnp.Rpc
             await ConnectAsync(host, port);
 
             State = ConnectionState.Active;
-            _pump = new FramePump(_client.GetStream());
+
+            var stream = _createLayers(_client.GetStream());
+            _pump = new FramePump(stream);
             _attachTracerAction?.Invoke();
             _outboundEndpoint = new OutboundTcpEndpoint(this, _pump);
             _inboundEndpoint = _rpcEngine.AddEndpoint(_outboundEndpoint);
@@ -216,6 +220,25 @@ namespace Capnp.Rpc
             {
                 _pump.AttachTracer(tracer);
             };
+        }
+
+        /// <summary>
+        /// Installs a midlayer. A midlayer is a protocal layer that resides somewhere between capnp serialization and the raw TCP stream.
+        /// Thus, we have a hook mechanism for transforming data before it is sent to the TCP connection or after it was received
+        /// by the TCP connection, respectively. This mechanism may be used for integrating various (de-)compression algorithms.
+        /// </summary>
+        /// <param name="createFunc">Callback for wrapping the midlayer around its underlying stream</param>
+        /// <exception cref="ArgumentNullException"><paramref name="createFunc"/> is null</exception>
+        public void InjectMidlayer(Func<Stream, Stream> createFunc)
+        {
+            if (createFunc == null)
+                throw new ArgumentNullException(nameof(createFunc));
+
+            if (State != ConnectionState.Initializing)
+                throw new InvalidOperationException("Connection is not in state 'Initializing'");
+
+            var last = _createLayers;
+            _createLayers = _ => createFunc(last(_));
         }
 
         /// <summary>
