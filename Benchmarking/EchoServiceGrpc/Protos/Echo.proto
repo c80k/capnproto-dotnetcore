@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+service Echoer {
+  rpc Echo (EchoRequest) returns (EchoReply);
+}
+
+message EchoRequest {
+  bytes payload = 1;
+}
+
+message EchoReply {
+  bytes payload = 1;
+}
