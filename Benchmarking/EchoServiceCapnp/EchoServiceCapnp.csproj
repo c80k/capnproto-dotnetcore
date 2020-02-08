@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Capnp.Net.Runtime" Version="1.2.189" />
+    <PackageReference Include="CapnpC.CSharp.MsBuild.Generation" Version="1.2.138" />
+  </ItemGroup>
+
+</Project>
