@@ -34,6 +34,10 @@ namespace CapnpC.CSharp.Generator.Tests.Util
                 "netcoreapp3.0",
                 "Capnp.Net.Runtime.dll"));
 
+            var parseOptions = CSharpParseOptions.Default;
+            if (nullableContextOptions == NullableContextOptions.Disable)
+                parseOptions = parseOptions.WithLanguageVersion(LanguageVersion.CSharp7_1);
+
             var compilation = CSharpCompilation.Create(
                 "CompilationTestAssembly",
                 options: options,
@@ -44,7 +48,7 @@ namespace CapnpC.CSharp.Generator.Tests.Util
                     MetadataReference.CreateFromFile(Path.Combine(assemblyRoot, "System.Runtime.dll")),
                     MetadataReference.CreateFromFile(Path.Combine(assemblyRoot, "System.Private.CoreLib.dll")),
                     MetadataReference.CreateFromFile(capnpRuntimePath) },
-                syntaxTrees: Array.ConvertAll(code, new Converter<string, SyntaxTree>(c => CSharpSyntaxTree.ParseText(c))));
+                syntaxTrees: Array.ConvertAll(code, new Converter<string, SyntaxTree>(c => CSharpSyntaxTree.ParseText(c, parseOptions))));
 
             using (var stream = new MemoryStream())
             {

@@ -1454,10 +1454,10 @@ namespace Capnproto_test.Capnp.Test
         void ICapnpSerializable.Deserialize(DeserializerState arg_)
         {
             var reader = READER.create(arg_);
-            Union0 = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestUnion.@union0>(reader.Union0);
-            Union1 = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestUnion.@union1>(reader.Union1);
-            Union2 = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestUnion.@union2>(reader.Union2);
-            Union3 = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestUnion.@union3>(reader.Union3);
+            Union0 = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestUnion.union0>(reader.Union0);
+            Union1 = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestUnion.union1>(reader.Union1);
+            Union2 = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestUnion.union2>(reader.Union2);
+            Union3 = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestUnion.union3>(reader.Union3);
             Bit0 = reader.Bit0;
             Bit2 = reader.Bit2;
             Bit3 = reader.Bit3;
@@ -1494,25 +1494,25 @@ namespace Capnproto_test.Capnp.Test
         {
         }
 
-        public Capnproto_test.Capnp.Test.TestUnion.@union0 Union0
+        public Capnproto_test.Capnp.Test.TestUnion.union0 Union0
         {
             get;
             set;
         }
 
-        public Capnproto_test.Capnp.Test.TestUnion.@union1 Union1
+        public Capnproto_test.Capnp.Test.TestUnion.union1 Union1
         {
             get;
             set;
         }
 
-        public Capnproto_test.Capnp.Test.TestUnion.@union2 Union2
+        public Capnproto_test.Capnp.Test.TestUnion.union2 Union2
         {
             get;
             set;
         }
 
-        public Capnproto_test.Capnp.Test.TestUnion.@union3 Union3
+        public Capnproto_test.Capnp.Test.TestUnion.union3 Union3
         {
             get;
             set;
@@ -1577,10 +1577,10 @@ namespace Capnproto_test.Capnp.Test
             public static READER create(DeserializerState ctx) => new READER(ctx);
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-            public @union0.READER Union0 => new @union0.READER(ctx);
-            public @union1.READER Union1 => new @union1.READER(ctx);
-            public @union2.READER Union2 => new @union2.READER(ctx);
-            public @union3.READER Union3 => new @union3.READER(ctx);
+            public union0.READER Union0 => new union0.READER(ctx);
+            public union1.READER Union1 => new union1.READER(ctx);
+            public union2.READER Union2 => new union2.READER(ctx);
+            public union3.READER Union3 => new union3.READER(ctx);
             public bool Bit0 => ctx.ReadDataBool(128UL, false);
             public bool Bit2 => ctx.ReadDataBool(130UL, false);
             public bool Bit3 => ctx.ReadDataBool(131UL, false);
@@ -1598,24 +1598,24 @@ namespace Capnproto_test.Capnp.Test
                 this.SetStruct(8, 2);
             }
 
-            public @union0.WRITER Union0
+            public union0.WRITER Union0
             {
-                get => Rewrap<@union0.WRITER>();
+                get => Rewrap<union0.WRITER>();
             }
 
-            public @union1.WRITER Union1
+            public union1.WRITER Union1
             {
-                get => Rewrap<@union1.WRITER>();
+                get => Rewrap<union1.WRITER>();
             }
 
-            public @union2.WRITER Union2
+            public union2.WRITER Union2
             {
-                get => Rewrap<@union2.WRITER>();
+                get => Rewrap<union2.WRITER>();
             }
 
-            public @union3.WRITER Union3
+            public union3.WRITER Union3
             {
-                get => Rewrap<@union3.WRITER>();
+                get => Rewrap<union3.WRITER>();
             }
 
             public bool Bit0
@@ -1668,7 +1668,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xfc76a82eecb7a718UL)]
-        public class @union0 : ICapnpSerializable
+        public class union0 : ICapnpSerializable
         {
             public const UInt64 typeId = 0xfc76a82eecb7a718UL;
             public enum WHICH : ushort
@@ -2088,7 +2088,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xee0a6b99b7dc7ab2UL)]
-        public class @union1 : ICapnpSerializable
+        public class union1 : ICapnpSerializable
         {
             public const UInt64 typeId = 0xee0a6b99b7dc7ab2UL;
             public enum WHICH : ushort
@@ -2670,7 +2670,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xafc5fd419f0d66d4UL)]
-        public class @union2 : ICapnpSerializable
+        public class union2 : ICapnpSerializable
         {
             public const UInt64 typeId = 0xafc5fd419f0d66d4UL;
             public enum WHICH : ushort
@@ -2885,7 +2885,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xa2fb022ec7f30053UL)]
-        public class @union3 : ICapnpSerializable
+        public class union3 : ICapnpSerializable
         {
             public const UInt64 typeId = 0xa2fb022ec7f30053UL;
             public enum WHICH : ushort
@@ -3288,7 +3288,7 @@ namespace Capnproto_test.Capnp.Test
         void ICapnpSerializable.Deserialize(DeserializerState arg_)
         {
             var reader = READER.create(arg_);
-            Outer = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestUnionInUnion.@outer>(reader.Outer);
+            Outer = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestUnionInUnion.outer>(reader.Outer);
             applyDefaults();
         }
 
@@ -3306,7 +3306,7 @@ namespace Capnproto_test.Capnp.Test
         {
         }
 
-        public Capnproto_test.Capnp.Test.TestUnionInUnion.@outer Outer
+        public Capnproto_test.Capnp.Test.TestUnionInUnion.outer Outer
         {
             get;
             set;
@@ -3323,7 +3323,7 @@ namespace Capnproto_test.Capnp.Test
             public static READER create(DeserializerState ctx) => new READER(ctx);
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-            public @outer.READER Outer => new @outer.READER(ctx);
+            public outer.READER Outer => new outer.READER(ctx);
         }
 
         public class WRITER : SerializerState
@@ -3333,14 +3333,14 @@ namespace Capnproto_test.Capnp.Test
                 this.SetStruct(2, 0);
             }
 
-            public @outer.WRITER Outer
+            public outer.WRITER Outer
             {
-                get => Rewrap<@outer.WRITER>();
+                get => Rewrap<outer.WRITER>();
             }
         }
 
         [TypeId(0xd005f6c63707670cUL)]
-        public class @outer : ICapnpSerializable
+        public class outer : ICapnpSerializable
         {
             public const UInt64 typeId = 0xd005f6c63707670cUL;
             public enum WHICH : ushort
@@ -3356,7 +3356,7 @@ namespace Capnproto_test.Capnp.Test
                 switch (reader.which)
                 {
                     case WHICH.Inner:
-                        Inner = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestUnionInUnion.@outer.@inner>(reader.Inner);
+                        Inner = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestUnionInUnion.outer.inner>(reader.Inner);
                         break;
                     case WHICH.Baz:
                         Baz = reader.Baz;
@@ -3411,9 +3411,9 @@ namespace Capnproto_test.Capnp.Test
             {
             }
 
-            public Capnproto_test.Capnp.Test.TestUnionInUnion.@outer.@inner Inner
+            public Capnproto_test.Capnp.Test.TestUnionInUnion.outer.inner Inner
             {
-                get => _which == WHICH.Inner ? (Capnproto_test.Capnp.Test.TestUnionInUnion.@outer.@inner)_content : null;
+                get => _which == WHICH.Inner ? (Capnproto_test.Capnp.Test.TestUnionInUnion.outer.inner)_content : null;
                 set
                 {
                     _which = WHICH.Inner;
@@ -3443,7 +3443,7 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public WHICH which => (WHICH)ctx.ReadDataUShort(64U, (ushort)0);
-                public @inner.READER Inner => which == WHICH.Inner ? new @inner.READER(ctx) : default;
+                public inner.READER Inner => which == WHICH.Inner ? new inner.READER(ctx) : default;
                 public int Baz => which == WHICH.Baz ? ctx.ReadDataInt(0UL, 0) : default;
             }
 
@@ -3459,9 +3459,9 @@ namespace Capnproto_test.Capnp.Test
                     set => this.WriteData(64U, (ushort)value, (ushort)0);
                 }
 
-                public @inner.WRITER Inner
+                public inner.WRITER Inner
                 {
-                    get => which == WHICH.Inner ? Rewrap<@inner.WRITER>() : default;
+                    get => which == WHICH.Inner ? Rewrap<inner.WRITER>() : default;
                 }
 
                 public int Baz
@@ -3472,7 +3472,7 @@ namespace Capnproto_test.Capnp.Test
             }
 
             [TypeId(0xff9ce111c6f8e5dbUL)]
-            public class @inner : ICapnpSerializable
+            public class inner : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xff9ce111c6f8e5dbUL;
                 public enum WHICH : ushort
@@ -3614,7 +3614,7 @@ namespace Capnproto_test.Capnp.Test
         void ICapnpSerializable.Deserialize(DeserializerState arg_)
         {
             var reader = READER.create(arg_);
-            Groups = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGroups.@groups>(reader.Groups);
+            Groups = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGroups.groups>(reader.Groups);
             applyDefaults();
         }
 
@@ -3632,7 +3632,7 @@ namespace Capnproto_test.Capnp.Test
         {
         }
 
-        public Capnproto_test.Capnp.Test.TestGroups.@groups Groups
+        public Capnproto_test.Capnp.Test.TestGroups.groups Groups
         {
             get;
             set;
@@ -3649,7 +3649,7 @@ namespace Capnproto_test.Capnp.Test
             public static READER create(DeserializerState ctx) => new READER(ctx);
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-            public @groups.READER Groups => new @groups.READER(ctx);
+            public groups.READER Groups => new groups.READER(ctx);
         }
 
         public class WRITER : SerializerState
@@ -3659,14 +3659,14 @@ namespace Capnproto_test.Capnp.Test
                 this.SetStruct(2, 2);
             }
 
-            public @groups.WRITER Groups
+            public groups.WRITER Groups
             {
-                get => Rewrap<@groups.WRITER>();
+                get => Rewrap<groups.WRITER>();
             }
         }
 
         [TypeId(0xe22ae74ff9113268UL)]
-        public class @groups : ICapnpSerializable
+        public class groups : ICapnpSerializable
         {
             public const UInt64 typeId = 0xe22ae74ff9113268UL;
             public enum WHICH : ushort
@@ -3683,13 +3683,13 @@ namespace Capnproto_test.Capnp.Test
                 switch (reader.which)
                 {
                     case WHICH.Foo:
-                        Foo = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGroups.@groups.@foo>(reader.Foo);
+                        Foo = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGroups.groups.foo>(reader.Foo);
                         break;
                     case WHICH.Baz:
-                        Baz = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGroups.@groups.@baz>(reader.Baz);
+                        Baz = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGroups.groups.baz>(reader.Baz);
                         break;
                     case WHICH.Bar:
-                        Bar = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGroups.@groups.@bar>(reader.Bar);
+                        Bar = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGroups.groups.bar>(reader.Bar);
                         break;
                 }
 
@@ -3747,9 +3747,9 @@ namespace Capnproto_test.Capnp.Test
             {
             }
 
-            public Capnproto_test.Capnp.Test.TestGroups.@groups.@foo Foo
+            public Capnproto_test.Capnp.Test.TestGroups.groups.foo Foo
             {
-                get => _which == WHICH.Foo ? (Capnproto_test.Capnp.Test.TestGroups.@groups.@foo)_content : null;
+                get => _which == WHICH.Foo ? (Capnproto_test.Capnp.Test.TestGroups.groups.foo)_content : null;
                 set
                 {
                     _which = WHICH.Foo;
@@ -3757,9 +3757,9 @@ namespace Capnproto_test.Capnp.Test
                 }
             }
 
-            public Capnproto_test.Capnp.Test.TestGroups.@groups.@baz Baz
+            public Capnproto_test.Capnp.Test.TestGroups.groups.baz Baz
             {
-                get => _which == WHICH.Baz ? (Capnproto_test.Capnp.Test.TestGroups.@groups.@baz)_content : null;
+                get => _which == WHICH.Baz ? (Capnproto_test.Capnp.Test.TestGroups.groups.baz)_content : null;
                 set
                 {
                     _which = WHICH.Baz;
@@ -3767,9 +3767,9 @@ namespace Capnproto_test.Capnp.Test
                 }
             }
 
-            public Capnproto_test.Capnp.Test.TestGroups.@groups.@bar Bar
+            public Capnproto_test.Capnp.Test.TestGroups.groups.bar Bar
             {
-                get => _which == WHICH.Bar ? (Capnproto_test.Capnp.Test.TestGroups.@groups.@bar)_content : null;
+                get => _which == WHICH.Bar ? (Capnproto_test.Capnp.Test.TestGroups.groups.bar)_content : null;
                 set
                 {
                     _which = WHICH.Bar;
@@ -3789,9 +3789,9 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public WHICH which => (WHICH)ctx.ReadDataUShort(32U, (ushort)0);
-                public @foo.READER Foo => which == WHICH.Foo ? new @foo.READER(ctx) : default;
-                public @baz.READER Baz => which == WHICH.Baz ? new @baz.READER(ctx) : default;
-                public @bar.READER Bar => which == WHICH.Bar ? new @bar.READER(ctx) : default;
+                public foo.READER Foo => which == WHICH.Foo ? new foo.READER(ctx) : default;
+                public baz.READER Baz => which == WHICH.Baz ? new baz.READER(ctx) : default;
+                public bar.READER Bar => which == WHICH.Bar ? new bar.READER(ctx) : default;
             }
 
             public class WRITER : SerializerState
@@ -3806,24 +3806,24 @@ namespace Capnproto_test.Capnp.Test
                     set => this.WriteData(32U, (ushort)value, (ushort)0);
                 }
 
-                public @foo.WRITER Foo
+                public foo.WRITER Foo
                 {
-                    get => which == WHICH.Foo ? Rewrap<@foo.WRITER>() : default;
+                    get => which == WHICH.Foo ? Rewrap<foo.WRITER>() : default;
                 }
 
-                public @baz.WRITER Baz
+                public baz.WRITER Baz
                 {
-                    get => which == WHICH.Baz ? Rewrap<@baz.WRITER>() : default;
+                    get => which == WHICH.Baz ? Rewrap<baz.WRITER>() : default;
                 }
 
-                public @bar.WRITER Bar
+                public bar.WRITER Bar
                 {
-                    get => which == WHICH.Bar ? Rewrap<@bar.WRITER>() : default;
+                    get => which == WHICH.Bar ? Rewrap<bar.WRITER>() : default;
                 }
             }
 
             [TypeId(0xf5fcba89c0c1196fUL)]
-            public class @foo : ICapnpSerializable
+            public class foo : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xf5fcba89c0c1196fUL;
                 void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -3912,7 +3912,7 @@ namespace Capnproto_test.Capnp.Test
             }
 
             [TypeId(0xf0fa30304066a4b3UL)]
-            public class @baz : ICapnpSerializable
+            public class baz : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xf0fa30304066a4b3UL;
                 void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -4001,7 +4001,7 @@ namespace Capnproto_test.Capnp.Test
             }
 
             [TypeId(0xb727c0d0091a001dUL)]
-            public class @bar : ICapnpSerializable
+            public class bar : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xb727c0d0091a001dUL;
                 void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -4098,8 +4098,8 @@ namespace Capnproto_test.Capnp.Test
         void ICapnpSerializable.Deserialize(DeserializerState arg_)
         {
             var reader = READER.create(arg_);
-            Group1 = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterleavedGroups.@group1>(reader.Group1);
-            Group2 = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterleavedGroups.@group2>(reader.Group2);
+            Group1 = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterleavedGroups.group1>(reader.Group1);
+            Group2 = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterleavedGroups.group2>(reader.Group2);
             applyDefaults();
         }
 
@@ -4118,13 +4118,13 @@ namespace Capnproto_test.Capnp.Test
         {
         }
 
-        public Capnproto_test.Capnp.Test.TestInterleavedGroups.@group1 Group1
+        public Capnproto_test.Capnp.Test.TestInterleavedGroups.group1 Group1
         {
             get;
             set;
         }
 
-        public Capnproto_test.Capnp.Test.TestInterleavedGroups.@group2 Group2
+        public Capnproto_test.Capnp.Test.TestInterleavedGroups.group2 Group2
         {
             get;
             set;
@@ -4141,8 +4141,8 @@ namespace Capnproto_test.Capnp.Test
             public static READER create(DeserializerState ctx) => new READER(ctx);
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-            public @group1.READER Group1 => new @group1.READER(ctx);
-            public @group2.READER Group2 => new @group2.READER(ctx);
+            public group1.READER Group1 => new group1.READER(ctx);
+            public group2.READER Group2 => new group2.READER(ctx);
         }
 
         public class WRITER : SerializerState
@@ -4152,19 +4152,19 @@ namespace Capnproto_test.Capnp.Test
                 this.SetStruct(6, 6);
             }
 
-            public @group1.WRITER Group1
+            public group1.WRITER Group1
             {
-                get => Rewrap<@group1.WRITER>();
+                get => Rewrap<group1.WRITER>();
             }
 
-            public @group2.WRITER Group2
+            public group2.WRITER Group2
             {
-                get => Rewrap<@group2.WRITER>();
+                get => Rewrap<group2.WRITER>();
             }
         }
 
         [TypeId(0xc7485a3516c7d3c8UL)]
-        public class @group1 : ICapnpSerializable
+        public class group1 : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc7485a3516c7d3c8UL;
             public enum WHICH : ushort
@@ -4184,7 +4184,7 @@ namespace Capnproto_test.Capnp.Test
                         Qux = reader.Qux;
                         break;
                     case WHICH.Corge:
-                        Corge = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterleavedGroups.@group1.@corge>(reader.Corge);
+                        Corge = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterleavedGroups.group1.corge>(reader.Corge);
                         break;
                     case WHICH.Fred:
                         Fred = reader.Fred;
@@ -4274,9 +4274,9 @@ namespace Capnproto_test.Capnp.Test
                 }
             }
 
-            public Capnproto_test.Capnp.Test.TestInterleavedGroups.@group1.@corge Corge
+            public Capnproto_test.Capnp.Test.TestInterleavedGroups.group1.corge Corge
             {
-                get => _which == WHICH.Corge ? (Capnproto_test.Capnp.Test.TestInterleavedGroups.@group1.@corge)_content : null;
+                get => _which == WHICH.Corge ? (Capnproto_test.Capnp.Test.TestInterleavedGroups.group1.corge)_content : null;
                 set
                 {
                     _which = WHICH.Corge;
@@ -4315,7 +4315,7 @@ namespace Capnproto_test.Capnp.Test
                 public uint Foo => ctx.ReadDataUInt(0UL, 0U);
                 public ulong Bar => ctx.ReadDataULong(64UL, 0UL);
                 public ushort Qux => which == WHICH.Qux ? ctx.ReadDataUShort(192UL, (ushort)0) : default;
-                public @corge.READER Corge => which == WHICH.Corge ? new @corge.READER(ctx) : default;
+                public corge.READER Corge => which == WHICH.Corge ? new corge.READER(ctx) : default;
                 public string Waldo => ctx.ReadText(0, "");
                 public string Fred => which == WHICH.Fred ? ctx.ReadText(2, "") : default;
             }
@@ -4350,9 +4350,9 @@ namespace Capnproto_test.Capnp.Test
                     set => this.WriteData(192UL, value, (ushort)0);
                 }
 
-                public @corge.WRITER Corge
+                public corge.WRITER Corge
                 {
-                    get => which == WHICH.Corge ? Rewrap<@corge.WRITER>() : default;
+                    get => which == WHICH.Corge ? Rewrap<corge.WRITER>() : default;
                 }
 
                 public string Waldo
@@ -4369,7 +4369,7 @@ namespace Capnproto_test.Capnp.Test
             }
 
             [TypeId(0xdb0afd413f4a313aUL)]
-            public class @corge : ICapnpSerializable
+            public class corge : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xdb0afd413f4a313aUL;
                 void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -4474,7 +4474,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xcc85a335569990e9UL)]
-        public class @group2 : ICapnpSerializable
+        public class group2 : ICapnpSerializable
         {
             public const UInt64 typeId = 0xcc85a335569990e9UL;
             public enum WHICH : ushort
@@ -4494,7 +4494,7 @@ namespace Capnproto_test.Capnp.Test
                         Qux = reader.Qux;
                         break;
                     case WHICH.Corge:
-                        Corge = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterleavedGroups.@group2.@corge>(reader.Corge);
+                        Corge = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterleavedGroups.group2.corge>(reader.Corge);
                         break;
                     case WHICH.Fred:
                         Fred = reader.Fred;
@@ -4584,9 +4584,9 @@ namespace Capnproto_test.Capnp.Test
                 }
             }
 
-            public Capnproto_test.Capnp.Test.TestInterleavedGroups.@group2.@corge Corge
+            public Capnproto_test.Capnp.Test.TestInterleavedGroups.group2.corge Corge
             {
-                get => _which == WHICH.Corge ? (Capnproto_test.Capnp.Test.TestInterleavedGroups.@group2.@corge)_content : null;
+                get => _which == WHICH.Corge ? (Capnproto_test.Capnp.Test.TestInterleavedGroups.group2.corge)_content : null;
                 set
                 {
                     _which = WHICH.Corge;
@@ -4625,7 +4625,7 @@ namespace Capnproto_test.Capnp.Test
                 public uint Foo => ctx.ReadDataUInt(32UL, 0U);
                 public ulong Bar => ctx.ReadDataULong(128UL, 0UL);
                 public ushort Qux => which == WHICH.Qux ? ctx.ReadDataUShort(208UL, (ushort)0) : default;
-                public @corge.READER Corge => which == WHICH.Corge ? new @corge.READER(ctx) : default;
+                public corge.READER Corge => which == WHICH.Corge ? new corge.READER(ctx) : default;
                 public string Waldo => ctx.ReadText(1, "");
                 public string Fred => which == WHICH.Fred ? ctx.ReadText(3, "") : default;
             }
@@ -4660,9 +4660,9 @@ namespace Capnproto_test.Capnp.Test
                     set => this.WriteData(208UL, value, (ushort)0);
                 }
 
-                public @corge.WRITER Corge
+                public corge.WRITER Corge
                 {
-                    get => which == WHICH.Corge ? Rewrap<@corge.WRITER>() : default;
+                    get => which == WHICH.Corge ? Rewrap<corge.WRITER>() : default;
                 }
 
                 public string Waldo
@@ -4679,7 +4679,7 @@ namespace Capnproto_test.Capnp.Test
             }
 
             [TypeId(0xa017f0366827ee37UL)]
-            public class @corge : ICapnpSerializable
+            public class corge : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xa017f0366827ee37UL;
                 void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -4814,16 +4814,16 @@ namespace Capnproto_test.Capnp.Test
         public void applyDefaults()
         {
             S16s8s64s8Set = S16s8s64s8Set ?? new Capnproto_test.Capnp.Test.TestUnion()
-            {Union0 = new Capnproto_test.Capnp.Test.TestUnion.@union0()
-            {}, Union1 = new Capnproto_test.Capnp.Test.TestUnion.@union1()
-            {}, Union2 = new Capnproto_test.Capnp.Test.TestUnion.@union2()
-            {}, Union3 = new Capnproto_test.Capnp.Test.TestUnion.@union3()
+            {Union0 = new Capnproto_test.Capnp.Test.TestUnion.union0()
+            {}, Union1 = new Capnproto_test.Capnp.Test.TestUnion.union1()
+            {}, Union2 = new Capnproto_test.Capnp.Test.TestUnion.union2()
+            {}, Union3 = new Capnproto_test.Capnp.Test.TestUnion.union3()
             {}, Bit0 = false, Bit2 = false, Bit3 = false, Bit4 = false, Bit5 = false, Bit6 = false, Bit7 = false, Byte0 = 0};
             S0sps1s32Set = S0sps1s32Set ?? new Capnproto_test.Capnp.Test.TestUnion()
-            {Union0 = new Capnproto_test.Capnp.Test.TestUnion.@union0()
-            {}, Union1 = new Capnproto_test.Capnp.Test.TestUnion.@union1()
-            {}, Union2 = new Capnproto_test.Capnp.Test.TestUnion.@union2()
-            {}, Union3 = new Capnproto_test.Capnp.Test.TestUnion.@union3()
+            {Union0 = new Capnproto_test.Capnp.Test.TestUnion.union0()
+            {}, Union1 = new Capnproto_test.Capnp.Test.TestUnion.union1()
+            {}, Union2 = new Capnproto_test.Capnp.Test.TestUnion.union2()
+            {}, Union3 = new Capnproto_test.Capnp.Test.TestUnion.union3()
             {}, Bit0 = false, Bit2 = false, Bit3 = false, Bit4 = false, Bit5 = false, Bit6 = false, Bit7 = false, Byte0 = 0};
             Unnamed1 = Unnamed1 ?? new Capnproto_test.Capnp.Test.TestUnnamedUnion()
             {Before = null, Middle = 0, After = null};
@@ -6462,8 +6462,8 @@ namespace Capnproto_test.Capnp.Test
             Foo = reader.Foo;
             Bar = reader.Bar;
             Baz = reader.Baz;
-            TheUnion = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestLateUnion.@theUnion>(reader.TheUnion);
-            AnotherUnion = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestLateUnion.@anotherUnion>(reader.AnotherUnion);
+            TheUnion = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestLateUnion.theUnion>(reader.TheUnion);
+            AnotherUnion = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestLateUnion.anotherUnion>(reader.AnotherUnion);
             applyDefaults();
         }
 
@@ -6503,13 +6503,13 @@ namespace Capnproto_test.Capnp.Test
             set;
         }
 
-        public Capnproto_test.Capnp.Test.TestLateUnion.@theUnion TheUnion
+        public Capnproto_test.Capnp.Test.TestLateUnion.theUnion TheUnion
         {
             get;
             set;
         }
 
-        public Capnproto_test.Capnp.Test.TestLateUnion.@anotherUnion AnotherUnion
+        public Capnproto_test.Capnp.Test.TestLateUnion.anotherUnion AnotherUnion
         {
             get;
             set;
@@ -6529,8 +6529,8 @@ namespace Capnproto_test.Capnp.Test
             public int Foo => ctx.ReadDataInt(0UL, 0);
             public string Bar => ctx.ReadText(0, "");
             public short Baz => ctx.ReadDataShort(32UL, (short)0);
-            public @theUnion.READER TheUnion => new @theUnion.READER(ctx);
-            public @anotherUnion.READER AnotherUnion => new @anotherUnion.READER(ctx);
+            public theUnion.READER TheUnion => new theUnion.READER(ctx);
+            public anotherUnion.READER AnotherUnion => new anotherUnion.READER(ctx);
         }
 
         public class WRITER : SerializerState
@@ -6558,19 +6558,19 @@ namespace Capnproto_test.Capnp.Test
                 set => this.WriteData(32UL, value, (short)0);
             }
 
-            public @theUnion.WRITER TheUnion
+            public theUnion.WRITER TheUnion
             {
-                get => Rewrap<@theUnion.WRITER>();
+                get => Rewrap<theUnion.WRITER>();
             }
 
-            public @anotherUnion.WRITER AnotherUnion
+            public anotherUnion.WRITER AnotherUnion
             {
-                get => Rewrap<@anotherUnion.WRITER>();
+                get => Rewrap<anotherUnion.WRITER>();
             }
         }
 
         [TypeId(0x807280a2901aa079UL)]
-        public class @theUnion : ICapnpSerializable
+        public class theUnion : ICapnpSerializable
         {
             public const UInt64 typeId = 0x807280a2901aa079UL;
             public enum WHICH : ushort
@@ -6731,7 +6731,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xc1973984dee98e3aUL)]
-        public class @anotherUnion : ICapnpSerializable
+        public class anotherUnion : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc1973984dee98e3aUL;
             public enum WHICH : ushort
@@ -7237,7 +7237,7 @@ namespace Capnproto_test.Capnp.Test
             switch (reader.which)
             {
                 case WHICH.A:
-                    A = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestNewUnionVersion.@a>(reader.A);
+                    A = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestNewUnionVersion.a>(reader.A);
                     break;
                 case WHICH.B:
                     B = reader.B;
@@ -7292,9 +7292,9 @@ namespace Capnproto_test.Capnp.Test
         {
         }
 
-        public Capnproto_test.Capnp.Test.TestNewUnionVersion.@a A
+        public Capnproto_test.Capnp.Test.TestNewUnionVersion.a A
         {
-            get => _which == WHICH.A ? (Capnproto_test.Capnp.Test.TestNewUnionVersion.@a)_content : null;
+            get => _which == WHICH.A ? (Capnproto_test.Capnp.Test.TestNewUnionVersion.a)_content : null;
             set
             {
                 _which = WHICH.A;
@@ -7324,7 +7324,7 @@ namespace Capnproto_test.Capnp.Test
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
             public WHICH which => (WHICH)ctx.ReadDataUShort(0U, (ushort)0);
-            public @a.READER A => which == WHICH.A ? new @a.READER(ctx) : default;
+            public a.READER A => which == WHICH.A ? new a.READER(ctx) : default;
             public ulong B => which == WHICH.B ? ctx.ReadDataULong(64UL, 0UL) : default;
         }
 
@@ -7341,9 +7341,9 @@ namespace Capnproto_test.Capnp.Test
                 set => this.WriteData(0U, (ushort)value, (ushort)0);
             }
 
-            public @a.WRITER A
+            public a.WRITER A
             {
-                get => which == WHICH.A ? Rewrap<@a.WRITER>() : default;
+                get => which == WHICH.A ? Rewrap<a.WRITER>() : default;
             }
 
             public ulong B
@@ -7354,7 +7354,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0x86232c1de4513e84UL)]
-        public class @a : ICapnpSerializable
+        public class a : ICapnpSerializable
         {
             public const UInt64 typeId = 0x86232c1de4513e84UL;
             public enum WHICH : ushort
@@ -7476,7 +7476,7 @@ namespace Capnproto_test.Capnp.Test
         void ICapnpSerializable.Deserialize(DeserializerState arg_)
         {
             var reader = READER.create(arg_);
-            Un = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestStructUnion.@un>(reader.Un);
+            Un = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestStructUnion.un>(reader.Un);
             applyDefaults();
         }
 
@@ -7494,7 +7494,7 @@ namespace Capnproto_test.Capnp.Test
         {
         }
 
-        public Capnproto_test.Capnp.Test.TestStructUnion.@un Un
+        public Capnproto_test.Capnp.Test.TestStructUnion.un Un
         {
             get;
             set;
@@ -7511,7 +7511,7 @@ namespace Capnproto_test.Capnp.Test
             public static READER create(DeserializerState ctx) => new READER(ctx);
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-            public @un.READER Un => new @un.READER(ctx);
+            public un.READER Un => new un.READER(ctx);
         }
 
         public class WRITER : SerializerState
@@ -7521,14 +7521,14 @@ namespace Capnproto_test.Capnp.Test
                 this.SetStruct(1, 1);
             }
 
-            public @un.WRITER Un
+            public un.WRITER Un
             {
-                get => Rewrap<@un.WRITER>();
+                get => Rewrap<un.WRITER>();
             }
         }
 
         [TypeId(0x992edc677bef5a3cUL)]
-        public class @un : ICapnpSerializable
+        public class un : ICapnpSerializable
         {
             public const UInt64 typeId = 0x992edc677bef5a3cUL;
             public enum WHICH : ushort
@@ -7984,7 +7984,7 @@ namespace Capnproto_test.Capnp.Test
                     which = reader.which;
                     break;
                 case WHICH.Ug:
-                    Ug = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.@ug>(reader.Ug);
+                    Ug = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.ug>(reader.Ug);
                     break;
             }
 
@@ -8053,9 +8053,9 @@ namespace Capnproto_test.Capnp.Test
             set;
         }
 
-        public Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.@ug Ug
+        public Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.ug Ug
         {
-            get => _which == WHICH.Ug ? (Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.@ug)_content : null;
+            get => _which == WHICH.Ug ? (Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.ug)_content : null;
             set
             {
                 _which = WHICH.Ug;
@@ -8083,7 +8083,7 @@ namespace Capnproto_test.Capnp.Test
             public WHICH which => (WHICH)ctx.ReadDataUShort(0U, (ushort)0);
             public DeserializerState Foo => ctx.StructReadPointer(0);
             public Capnproto_test.Capnp.Test.TestGenerics<TBar, TFoo>.READER Rev => ctx.ReadStruct(1, Capnproto_test.Capnp.Test.TestGenerics<TBar, TFoo>.READER.create);
-            public @ug.READER Ug => which == WHICH.Ug ? new @ug.READER(ctx) : default;
+            public ug.READER Ug => which == WHICH.Ug ? new ug.READER(ctx) : default;
             public IReadOnlyList<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner.READER> List => ctx.ReadList(2).Cast(Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner.READER.create);
         }
 
@@ -8112,9 +8112,9 @@ namespace Capnproto_test.Capnp.Test
                 set => Link(1, value);
             }
 
-            public @ug.WRITER Ug
+            public ug.WRITER Ug
             {
-                get => which == WHICH.Ug ? Rewrap<@ug.WRITER>() : default;
+                get => which == WHICH.Ug ? Rewrap<ug.WRITER>() : default;
             }
 
             public ListOfStructsSerializer<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner.WRITER> List
@@ -8125,7 +8125,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xb46a779beaf3384eUL)]
-        public class @ug : ICapnpSerializable
+        public class ug : ICapnpSerializable
         {
             public const UInt64 typeId = 0xb46a779beaf3384eUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -8476,12 +8476,12 @@ namespace Capnproto_test.Capnp.Test
                 {
                     public async Task Call(CancellationToken cancellationToken_ = default)
                     {
-                        var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<TBaz>.DeepNest<TQux>.DeepNestInterface<TQuux>.Params_call.WRITER>();
-                        var arg_ = new Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<TBaz>.DeepNest<TQux>.DeepNestInterface<TQuux>.Params_call()
+                        var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<TBaz>.DeepNest<TQux>.DeepNestInterface<TQuux>.Params_Call.WRITER>();
+                        var arg_ = new Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<TBaz>.DeepNest<TQux>.DeepNestInterface<TQuux>.Params_Call()
                         {};
                         arg_?.serialize(in_);
                         var d_ = await Call(9816138025992274567UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-                        var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<TBaz>.DeepNest<TQux>.DeepNestInterface<TQuux>.Result_call>(d_);
+                        var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<TBaz>.DeepNest<TQux>.DeepNestInterface<TQuux>.Result_Call>(d_);
                         return;
                     }
                 }
@@ -8497,7 +8497,7 @@ namespace Capnproto_test.Capnp.Test
                     async Task<AnswerOrCounterquestion> Call(DeserializerState d_, CancellationToken cancellationToken_)
                     {
                         await Impl.Call(cancellationToken_);
-                        var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<TBaz>.DeepNest<TQux>.DeepNestInterface<TQuux>.Result_call.WRITER>();
+                        var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<TBaz>.DeepNest<TQux>.DeepNestInterface<TQuux>.Result_Call.WRITER>();
                         return s_;
                     }
                 }
@@ -8506,7 +8506,7 @@ namespace Capnproto_test.Capnp.Test
                     where TQuux : class
                 {
                     [TypeId(0xb84eecc799437049UL)]
-                    public class Params_call : ICapnpSerializable
+                    public class Params_Call : ICapnpSerializable
                     {
                         public const UInt64 typeId = 0xb84eecc799437049UL;
                         void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -8551,7 +8551,7 @@ namespace Capnproto_test.Capnp.Test
                     }
 
                     [TypeId(0xe080f0fc54614f6fUL)]
-                    public class Result_call : ICapnpSerializable
+                    public class Result_Call : ICapnpSerializable
                     {
                         public const UInt64 typeId = 0xe080f0fc54614f6fUL;
                         void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -8612,7 +8612,7 @@ namespace Capnproto_test.Capnp.Test
                 arg_?.serialize(in_);
                 return Impatient.MakePipelineAware(Call(14548678385738242652UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
                 {
-                    var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Interface<TQux>.Result_call>(d_);
+                    var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Interface<TQux>.Result_Call>(d_);
                     return (r_.Qux, r_.Gen);
                 }
 
@@ -8632,8 +8632,8 @@ namespace Capnproto_test.Capnp.Test
             {
                 return Impatient.MaybeTailCall(Impl.Call(CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<string>>(d_), cancellationToken_), (qux, gen) =>
                 {
-                    var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Interface<TQux>.Result_call.WRITER>();
-                    var r_ = new Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Interface<TQux>.Result_call{Qux = qux, Gen = gen};
+                    var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Interface<TQux>.Result_Call.WRITER>();
+                    var r_ = new Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Interface<TQux>.Result_Call{Qux = qux, Gen = gen};
                     r_.serialize(s_);
                     return s_;
                 }
@@ -8646,7 +8646,7 @@ namespace Capnproto_test.Capnp.Test
             where TQux : class
         {
             [TypeId(0xa5b46224e33581adUL)]
-            public class Result_call : ICapnpSerializable
+            public class Result_Call : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xa5b46224e33581adUL;
                 void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -8980,18 +8980,18 @@ namespace Capnproto_test.Capnp.Test
     [TypeId(0x8b9717a3f8d85a9aUL), Proxy(typeof(TestImplicitMethodParams_Proxy)), Skeleton(typeof(TestImplicitMethodParams_Skeleton))]
     public interface ITestImplicitMethodParams : IDisposable
     {
-        Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT foo, TU bar, CancellationToken cancellationToken_ = default)
+        Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT Foo, TU Bar, CancellationToken cancellationToken_ = default)
             where TT : class where TU : class;
     }
 
     public class TestImplicitMethodParams_Proxy : Proxy, ITestImplicitMethodParams
     {
-        public Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT foo, TU bar, CancellationToken cancellationToken_ = default)
+        public Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT Foo, TU Bar, CancellationToken cancellationToken_ = default)
             where TT : class where TU : class
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestImplicitMethodParams.Params_call<TT, TU>.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestImplicitMethodParams.Params_call<TT, TU>()
-            {Foo = foo, Bar = bar};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestImplicitMethodParams.Params_Call<TT, TU>.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestImplicitMethodParams.Params_Call<TT, TU>()
+            {Foo = Foo, Bar = Bar};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(10058534285777328794UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
@@ -9014,7 +9014,7 @@ namespace Capnproto_test.Capnp.Test
         Task<AnswerOrCounterquestion> Call<TT, TU>(DeserializerState d_, CancellationToken cancellationToken_)
             where TT : class where TU : class
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestImplicitMethodParams.Params_call<TT, TU>>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestImplicitMethodParams.Params_Call<TT, TU>>(d_);
             return Impatient.MaybeTailCall(Impl.Call<TT, TU>(in_.Foo, in_.Bar, cancellationToken_), r_ =>
             {
                 var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>.WRITER>();
@@ -9029,7 +9029,7 @@ namespace Capnproto_test.Capnp.Test
     public static class TestImplicitMethodParams
     {
         [TypeId(0xf83f8caf54bdc486UL)]
-        public class Params_call<TT, TU> : ICapnpSerializable where TT : class where TU : class
+        public class Params_Call<TT, TU> : ICapnpSerializable where TT : class where TU : class
         {
             public const UInt64 typeId = 0xf83f8caf54bdc486UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -9107,18 +9107,18 @@ namespace Capnproto_test.Capnp.Test
     [TypeId(0xdf9ccdeb81a704c9UL), Proxy(typeof(TestImplicitMethodParamsInGeneric_Proxy<>)), Skeleton(typeof(TestImplicitMethodParamsInGeneric_Skeleton<>))]
     public interface ITestImplicitMethodParamsInGeneric<TV> : IDisposable where TV : class
     {
-        Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT foo, TU bar, CancellationToken cancellationToken_ = default)
+        Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT Foo, TU Bar, CancellationToken cancellationToken_ = default)
             where TT : class where TU : class;
     }
 
     public class TestImplicitMethodParamsInGeneric_Proxy<TV> : Proxy, ITestImplicitMethodParamsInGeneric<TV> where TV : class
     {
-        public Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT foo, TU bar, CancellationToken cancellationToken_ = default)
+        public Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT Foo, TU Bar, CancellationToken cancellationToken_ = default)
             where TT : class where TU : class
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestImplicitMethodParamsInGeneric<TV>.Params_call<TT, TU>.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestImplicitMethodParamsInGeneric<TV>.Params_call<TT, TU>()
-            {Foo = foo, Bar = bar};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestImplicitMethodParamsInGeneric<TV>.Params_Call<TT, TU>.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestImplicitMethodParamsInGeneric<TV>.Params_Call<TT, TU>()
+            {Foo = Foo, Bar = Bar};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(16112979978201007305UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
@@ -9141,7 +9141,7 @@ namespace Capnproto_test.Capnp.Test
         Task<AnswerOrCounterquestion> Call<TT, TU>(DeserializerState d_, CancellationToken cancellationToken_)
             where TT : class where TU : class
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestImplicitMethodParamsInGeneric<TV>.Params_call<TT, TU>>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestImplicitMethodParamsInGeneric<TV>.Params_Call<TT, TU>>(d_);
             return Impatient.MaybeTailCall(Impl.Call<TT, TU>(in_.Foo, in_.Bar, cancellationToken_), r_ =>
             {
                 var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>.WRITER>();
@@ -9157,7 +9157,7 @@ namespace Capnproto_test.Capnp.Test
         where TV : class
     {
         [TypeId(0x9aab8e25c808d71eUL)]
-        public class Params_call<TT, TU> : ICapnpSerializable where TT : class where TU : class
+        public class Params_Call<TT, TU> : ICapnpSerializable where TT : class where TU : class
         {
             public const UInt64 typeId = 0x9aab8e25c808d71eUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -10016,43 +10016,43 @@ namespace Capnproto_test.Capnp.Test
     [TypeId(0x88eb12a0e0af92b2UL), Proxy(typeof(TestInterface_Proxy)), Skeleton(typeof(TestInterface_Skeleton))]
     public interface ITestInterface : IDisposable
     {
-        Task<string> Foo(uint i, bool j, CancellationToken cancellationToken_ = default);
+        Task<string> Foo(uint I, bool J, CancellationToken cancellationToken_ = default);
         Task Bar(CancellationToken cancellationToken_ = default);
-        Task Baz(Capnproto_test.Capnp.Test.TestAllTypes s, CancellationToken cancellationToken_ = default);
+        Task Baz(Capnproto_test.Capnp.Test.TestAllTypes S, CancellationToken cancellationToken_ = default);
     }
 
     public class TestInterface_Proxy : Proxy, ITestInterface
     {
-        public async Task<string> Foo(uint i, bool j, CancellationToken cancellationToken_ = default)
+        public async Task<string> Foo(uint I, bool J, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_foo.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_foo()
-            {I = i, J = j};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_Foo.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_Foo()
+            {I = I, J = J};
             arg_?.serialize(in_);
             var d_ = await Call(9865999890858873522UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Result_foo>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Result_Foo>(d_);
             return (r_.X);
         }
 
         public async Task Bar(CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_bar.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_bar()
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_Bar.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_Bar()
             {};
             arg_?.serialize(in_);
             var d_ = await Call(9865999890858873522UL, 1, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Result_bar>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Result_Bar>(d_);
             return;
         }
 
-        public async Task Baz(Capnproto_test.Capnp.Test.TestAllTypes s, CancellationToken cancellationToken_ = default)
+        public async Task Baz(Capnproto_test.Capnp.Test.TestAllTypes S, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_baz.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_baz()
-            {S = s};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_Baz.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_Baz()
+            {S = S};
             arg_?.serialize(in_);
             var d_ = await Call(9865999890858873522UL, 2, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Result_baz>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Result_Baz>(d_);
             return;
         }
     }
@@ -10067,11 +10067,11 @@ namespace Capnproto_test.Capnp.Test
         public override ulong InterfaceId => 9865999890858873522UL;
         Task<AnswerOrCounterquestion> Foo(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Params_foo>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Params_Foo>(d_);
             return Impatient.MaybeTailCall(Impl.Foo(in_.I, in_.J, cancellationToken_), x =>
             {
-                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Result_foo.WRITER>();
-                var r_ = new Capnproto_test.Capnp.Test.TestInterface.Result_foo{X = x};
+                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Result_Foo.WRITER>();
+                var r_ = new Capnproto_test.Capnp.Test.TestInterface.Result_Foo{X = x};
                 r_.serialize(s_);
                 return s_;
             }
@@ -10082,15 +10082,15 @@ namespace Capnproto_test.Capnp.Test
         async Task<AnswerOrCounterquestion> Bar(DeserializerState d_, CancellationToken cancellationToken_)
         {
             await Impl.Bar(cancellationToken_);
-            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Result_bar.WRITER>();
+            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Result_Bar.WRITER>();
             return s_;
         }
 
         async Task<AnswerOrCounterquestion> Baz(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Params_baz>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Params_Baz>(d_);
             await Impl.Baz(in_.S, cancellationToken_);
-            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Result_baz.WRITER>();
+            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Result_Baz.WRITER>();
             return s_;
         }
     }
@@ -10098,7 +10098,7 @@ namespace Capnproto_test.Capnp.Test
     public static class TestInterface
     {
         [TypeId(0xb874edc0d559b391UL)]
-        public class Params_foo : ICapnpSerializable
+        public class Params_Foo : ICapnpSerializable
         {
             public const UInt64 typeId = 0xb874edc0d559b391UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -10173,7 +10173,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xb04fcaddab714ba4UL)]
-        public class Result_foo : ICapnpSerializable
+        public class Result_Foo : ICapnpSerializable
         {
             public const UInt64 typeId = 0xb04fcaddab714ba4UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -10233,7 +10233,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xd044893357b42568UL)]
-        public class Params_bar : ICapnpSerializable
+        public class Params_Bar : ICapnpSerializable
         {
             public const UInt64 typeId = 0xd044893357b42568UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -10278,7 +10278,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0x9bf141df4247d52fUL)]
-        public class Result_bar : ICapnpSerializable
+        public class Result_Bar : ICapnpSerializable
         {
             public const UInt64 typeId = 0x9bf141df4247d52fUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -10323,7 +10323,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xd9ac8abb2a91cfbcUL)]
-        public class Params_baz : ICapnpSerializable
+        public class Params_Baz : ICapnpSerializable
         {
             public const UInt64 typeId = 0xd9ac8abb2a91cfbcUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -10383,7 +10383,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0x9b99d14f2f375b2dUL)]
-        public class Result_baz : ICapnpSerializable
+        public class Result_Baz : ICapnpSerializable
         {
             public const UInt64 typeId = 0x9b99d14f2f375b2dUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -10440,12 +10440,12 @@ namespace Capnproto_test.Capnp.Test
     {
         public async Task Qux(CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestExtends.Params_qux.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestExtends.Params_qux()
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestExtends.Params_Qux.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestExtends.Params_Qux()
             {};
             arg_?.serialize(in_);
             var d_ = await Call(16494920484927878984UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestExtends.Result_qux>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestExtends.Result_Qux>(d_);
             return;
         }
 
@@ -10454,14 +10454,14 @@ namespace Capnproto_test.Capnp.Test
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestAllTypes.WRITER>();
             arg_?.serialize(in_);
             var d_ = await Call(16494920484927878984UL, 1, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestExtends.Result_corge>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestExtends.Result_Corge>(d_);
             return;
         }
 
         public async Task<Capnproto_test.Capnp.Test.TestAllTypes> Grault(CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestExtends.Params_grault.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestExtends.Params_grault()
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestExtends.Params_Grault.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestExtends.Params_Grault()
             {};
             arg_?.serialize(in_);
             var d_ = await Call(16494920484927878984UL, 2, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
@@ -10469,36 +10469,36 @@ namespace Capnproto_test.Capnp.Test
             return r_;
         }
 
-        public async Task<string> Foo(uint i, bool j, CancellationToken cancellationToken_ = default)
+        public async Task<string> Foo(uint I, bool J, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_foo.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_foo()
-            {I = i, J = j};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_Foo.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_Foo()
+            {I = I, J = J};
             arg_?.serialize(in_);
             var d_ = await Call(9865999890858873522UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Result_foo>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Result_Foo>(d_);
             return (r_.X);
         }
 
         public async Task Bar(CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_bar.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_bar()
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_Bar.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_Bar()
             {};
             arg_?.serialize(in_);
             var d_ = await Call(9865999890858873522UL, 1, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Result_bar>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Result_Bar>(d_);
             return;
         }
 
-        public async Task Baz(Capnproto_test.Capnp.Test.TestAllTypes s, CancellationToken cancellationToken_ = default)
+        public async Task Baz(Capnproto_test.Capnp.Test.TestAllTypes S, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_baz.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_baz()
-            {S = s};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_Baz.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_Baz()
+            {S = S};
             arg_?.serialize(in_);
             var d_ = await Call(9865999890858873522UL, 2, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Result_baz>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Result_Baz>(d_);
             return;
         }
     }
@@ -10514,14 +10514,14 @@ namespace Capnproto_test.Capnp.Test
         async Task<AnswerOrCounterquestion> Qux(DeserializerState d_, CancellationToken cancellationToken_)
         {
             await Impl.Qux(cancellationToken_);
-            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestExtends.Result_qux.WRITER>();
+            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestExtends.Result_Qux.WRITER>();
             return s_;
         }
 
         async Task<AnswerOrCounterquestion> Corge(DeserializerState d_, CancellationToken cancellationToken_)
         {
             await Impl.Corge(CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestAllTypes>(d_), cancellationToken_);
-            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestExtends.Result_corge.WRITER>();
+            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestExtends.Result_Corge.WRITER>();
             return s_;
         }
 
@@ -10541,7 +10541,7 @@ namespace Capnproto_test.Capnp.Test
     public static class TestExtends
     {
         [TypeId(0x83a4bc5471363f17UL)]
-        public class Params_qux : ICapnpSerializable
+        public class Params_Qux : ICapnpSerializable
         {
             public const UInt64 typeId = 0x83a4bc5471363f17UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -10586,7 +10586,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0x8e4b3d1a3e2753ddUL)]
-        public class Result_qux : ICapnpSerializable
+        public class Result_Qux : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8e4b3d1a3e2753ddUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -10631,7 +10631,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xacf67532a7e7bad9UL)]
-        public class Result_corge : ICapnpSerializable
+        public class Result_Corge : ICapnpSerializable
         {
             public const UInt64 typeId = 0xacf67532a7e7bad9UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -10676,7 +10676,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xf3b834e851ea8af6UL)]
-        public class Params_grault : ICapnpSerializable
+        public class Params_Grault : ICapnpSerializable
         {
             public const UInt64 typeId = 0xf3b834e851ea8af6UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -10730,12 +10730,12 @@ namespace Capnproto_test.Capnp.Test
     {
         public async Task Qux(CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestExtends.Params_qux.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestExtends.Params_qux()
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestExtends.Params_Qux.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestExtends.Params_Qux()
             {};
             arg_?.serialize(in_);
             var d_ = await Call(16494920484927878984UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestExtends.Result_qux>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestExtends.Result_Qux>(d_);
             return;
         }
 
@@ -10744,14 +10744,14 @@ namespace Capnproto_test.Capnp.Test
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestAllTypes.WRITER>();
             arg_?.serialize(in_);
             var d_ = await Call(16494920484927878984UL, 1, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestExtends.Result_corge>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestExtends.Result_Corge>(d_);
             return;
         }
 
         public async Task<Capnproto_test.Capnp.Test.TestAllTypes> Grault(CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestExtends.Params_grault.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestExtends.Params_grault()
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestExtends.Params_Grault.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestExtends.Params_Grault()
             {};
             arg_?.serialize(in_);
             var d_ = await Call(16494920484927878984UL, 2, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
@@ -10759,36 +10759,36 @@ namespace Capnproto_test.Capnp.Test
             return r_;
         }
 
-        public async Task<string> Foo(uint i, bool j, CancellationToken cancellationToken_ = default)
+        public async Task<string> Foo(uint I, bool J, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_foo.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_foo()
-            {I = i, J = j};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_Foo.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_Foo()
+            {I = I, J = J};
             arg_?.serialize(in_);
             var d_ = await Call(9865999890858873522UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Result_foo>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Result_Foo>(d_);
             return (r_.X);
         }
 
         public async Task Bar(CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_bar.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_bar()
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_Bar.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_Bar()
             {};
             arg_?.serialize(in_);
             var d_ = await Call(9865999890858873522UL, 1, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Result_bar>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Result_Bar>(d_);
             return;
         }
 
-        public async Task Baz(Capnproto_test.Capnp.Test.TestAllTypes s, CancellationToken cancellationToken_ = default)
+        public async Task Baz(Capnproto_test.Capnp.Test.TestAllTypes S, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_baz.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_baz()
-            {S = s};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_Baz.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_Baz()
+            {S = S};
             arg_?.serialize(in_);
             var d_ = await Call(9865999890858873522UL, 2, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Result_baz>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestInterface.Result_Baz>(d_);
             return;
         }
     }
@@ -10806,48 +10806,48 @@ namespace Capnproto_test.Capnp.Test
     [TypeId(0xa5a404caa61d4cd0UL), Proxy(typeof(TestPipeline_Proxy)), Skeleton(typeof(TestPipeline_Skeleton))]
     public interface ITestPipeline : IDisposable
     {
-        Task<(string, Capnproto_test.Capnp.Test.TestPipeline.Box)> GetCap(uint n, Capnproto_test.Capnp.Test.ITestInterface inCap, CancellationToken cancellationToken_ = default);
-        Task TestPointers(Capnproto_test.Capnp.Test.ITestInterface cap, object obj, IReadOnlyList<Capnproto_test.Capnp.Test.ITestInterface> list, CancellationToken cancellationToken_ = default);
-        Task<(string, Capnproto_test.Capnp.Test.TestPipeline.AnyBox)> GetAnyCap(uint n, BareProxy inCap, CancellationToken cancellationToken_ = default);
+        Task<(string, Capnproto_test.Capnp.Test.TestPipeline.Box)> GetCap(uint N, Capnproto_test.Capnp.Test.ITestInterface InCap, CancellationToken cancellationToken_ = default);
+        Task TestPointers(Capnproto_test.Capnp.Test.ITestInterface Cap, object Obj, IReadOnlyList<Capnproto_test.Capnp.Test.ITestInterface> List, CancellationToken cancellationToken_ = default);
+        Task<(string, Capnproto_test.Capnp.Test.TestPipeline.AnyBox)> GetAnyCap(uint N, BareProxy InCap, CancellationToken cancellationToken_ = default);
     }
 
     public class TestPipeline_Proxy : Proxy, ITestPipeline
     {
-        public Task<(string, Capnproto_test.Capnp.Test.TestPipeline.Box)> GetCap(uint n, Capnproto_test.Capnp.Test.ITestInterface inCap, CancellationToken cancellationToken_ = default)
+        public Task<(string, Capnproto_test.Capnp.Test.TestPipeline.Box)> GetCap(uint N, Capnproto_test.Capnp.Test.ITestInterface InCap, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestPipeline.Params_getCap.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestPipeline.Params_getCap()
-            {N = n, InCap = inCap};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestPipeline.Params_GetCap.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestPipeline.Params_GetCap()
+            {N = N, InCap = InCap};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(11935670180855499984UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
-                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestPipeline.Result_getCap>(d_);
+                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestPipeline.Result_GetCap>(d_);
                 return (r_.S, r_.OutBox);
             }
 
             );
         }
 
-        public async Task TestPointers(Capnproto_test.Capnp.Test.ITestInterface cap, object obj, IReadOnlyList<Capnproto_test.Capnp.Test.ITestInterface> list, CancellationToken cancellationToken_ = default)
+        public async Task TestPointers(Capnproto_test.Capnp.Test.ITestInterface Cap, object Obj, IReadOnlyList<Capnproto_test.Capnp.Test.ITestInterface> List, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestPipeline.Params_testPointers.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestPipeline.Params_testPointers()
-            {Cap = cap, Obj = obj, List = list};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestPipeline.Params_TestPointers.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestPipeline.Params_TestPointers()
+            {Cap = Cap, Obj = Obj, List = List};
             arg_?.serialize(in_);
             var d_ = await Call(11935670180855499984UL, 1, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestPipeline.Result_testPointers>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestPipeline.Result_TestPointers>(d_);
             return;
         }
 
-        public Task<(string, Capnproto_test.Capnp.Test.TestPipeline.AnyBox)> GetAnyCap(uint n, BareProxy inCap, CancellationToken cancellationToken_ = default)
+        public Task<(string, Capnproto_test.Capnp.Test.TestPipeline.AnyBox)> GetAnyCap(uint N, BareProxy InCap, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestPipeline.Params_getAnyCap.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestPipeline.Params_getAnyCap()
-            {N = n, InCap = inCap};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestPipeline.Params_GetAnyCap.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestPipeline.Params_GetAnyCap()
+            {N = N, InCap = InCap};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(11935670180855499984UL, 2, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
-                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestPipeline.Result_getAnyCap>(d_);
+                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestPipeline.Result_GetAnyCap>(d_);
                 return (r_.S, r_.OutBox);
             }
 
@@ -10865,11 +10865,11 @@ namespace Capnproto_test.Capnp.Test
         public override ulong InterfaceId => 11935670180855499984UL;
         Task<AnswerOrCounterquestion> GetCap(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestPipeline.Params_getCap>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestPipeline.Params_GetCap>(d_);
             return Impatient.MaybeTailCall(Impl.GetCap(in_.N, in_.InCap, cancellationToken_), (s, outBox) =>
             {
-                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestPipeline.Result_getCap.WRITER>();
-                var r_ = new Capnproto_test.Capnp.Test.TestPipeline.Result_getCap{S = s, OutBox = outBox};
+                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestPipeline.Result_GetCap.WRITER>();
+                var r_ = new Capnproto_test.Capnp.Test.TestPipeline.Result_GetCap{S = s, OutBox = outBox};
                 r_.serialize(s_);
                 return s_;
             }
@@ -10879,19 +10879,19 @@ namespace Capnproto_test.Capnp.Test
 
         async Task<AnswerOrCounterquestion> TestPointers(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestPipeline.Params_testPointers>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestPipeline.Params_TestPointers>(d_);
             await Impl.TestPointers(in_.Cap, in_.Obj, in_.List, cancellationToken_);
-            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestPipeline.Result_testPointers.WRITER>();
+            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestPipeline.Result_TestPointers.WRITER>();
             return s_;
         }
 
         Task<AnswerOrCounterquestion> GetAnyCap(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestPipeline.Params_getAnyCap>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestPipeline.Params_GetAnyCap>(d_);
             return Impatient.MaybeTailCall(Impl.GetAnyCap(in_.N, in_.InCap, cancellationToken_), (s, outBox) =>
             {
-                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestPipeline.Result_getAnyCap.WRITER>();
-                var r_ = new Capnproto_test.Capnp.Test.TestPipeline.Result_getAnyCap{S = s, OutBox = outBox};
+                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestPipeline.Result_GetAnyCap.WRITER>();
+                var r_ = new Capnproto_test.Capnp.Test.TestPipeline.Result_GetAnyCap{S = s, OutBox = outBox};
                 r_.serialize(s_);
                 return s_;
             }
@@ -11023,7 +11023,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xc7e8df5096257034UL)]
-        public class Params_getCap : ICapnpSerializable
+        public class Params_GetCap : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc7e8df5096257034UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -11098,7 +11098,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xb2442a9e0ba28fdfUL)]
-        public class Result_getCap : ICapnpSerializable
+        public class Result_GetCap : ICapnpSerializable
         {
             public const UInt64 typeId = 0xb2442a9e0ba28fdfUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -11173,7 +11173,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xa604ee63cf37819fUL)]
-        public class Params_testPointers : ICapnpSerializable
+        public class Params_TestPointers : ICapnpSerializable
         {
             public const UInt64 typeId = 0xa604ee63cf37819fUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -11263,7 +11263,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0x8eda54756c6070d6UL)]
-        public class Result_testPointers : ICapnpSerializable
+        public class Result_TestPointers : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8eda54756c6070d6UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -11308,7 +11308,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xf8e36b53ab093d4eUL)]
-        public class Params_getAnyCap : ICapnpSerializable
+        public class Params_GetAnyCap : ICapnpSerializable
         {
             public const UInt64 typeId = 0xf8e36b53ab093d4eUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -11383,7 +11383,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xbf44b4c94c26ef79UL)]
-        public class Result_getAnyCap : ICapnpSerializable
+        public class Result_GetAnyCap : ICapnpSerializable
         {
             public const UInt64 typeId = 0xbf44b4c94c26ef79UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -11461,19 +11461,19 @@ namespace Capnproto_test.Capnp.Test
     [TypeId(0xa0e77035bdff0051UL), Proxy(typeof(TestCallOrder_Proxy)), Skeleton(typeof(TestCallOrder_Skeleton))]
     public interface ITestCallOrder : IDisposable
     {
-        Task<uint> GetCallSequence(uint expected, CancellationToken cancellationToken_ = default);
+        Task<uint> GetCallSequence(uint Expected, CancellationToken cancellationToken_ = default);
     }
 
     public class TestCallOrder_Proxy : Proxy, ITestCallOrder
     {
-        public async Task<uint> GetCallSequence(uint expected, CancellationToken cancellationToken_ = default)
+        public async Task<uint> GetCallSequence(uint Expected, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestCallOrder.Params_getCallSequence.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestCallOrder.Params_getCallSequence()
-            {Expected = expected};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestCallOrder.Params_GetCallSequence.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestCallOrder.Params_GetCallSequence()
+            {Expected = Expected};
             arg_?.serialize(in_);
             var d_ = await Call(11594359141811814481UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestCallOrder.Result_getCallSequence>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestCallOrder.Result_GetCallSequence>(d_);
             return (r_.N);
         }
     }
@@ -11488,11 +11488,11 @@ namespace Capnproto_test.Capnp.Test
         public override ulong InterfaceId => 11594359141811814481UL;
         Task<AnswerOrCounterquestion> GetCallSequence(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestCallOrder.Params_getCallSequence>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestCallOrder.Params_GetCallSequence>(d_);
             return Impatient.MaybeTailCall(Impl.GetCallSequence(in_.Expected, cancellationToken_), n =>
             {
-                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestCallOrder.Result_getCallSequence.WRITER>();
-                var r_ = new Capnproto_test.Capnp.Test.TestCallOrder.Result_getCallSequence{N = n};
+                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestCallOrder.Result_GetCallSequence.WRITER>();
+                var r_ = new Capnproto_test.Capnp.Test.TestCallOrder.Result_GetCallSequence{N = n};
                 r_.serialize(s_);
                 return s_;
             }
@@ -11504,7 +11504,7 @@ namespace Capnproto_test.Capnp.Test
     public static class TestCallOrder
     {
         [TypeId(0x8f1e8cd56ceb74dcUL)]
-        public class Params_getCallSequence : ICapnpSerializable
+        public class Params_GetCallSequence : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8f1e8cd56ceb74dcUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -11564,7 +11564,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xdedbb6bf3810eab7UL)]
-        public class Result_getCallSequence : ICapnpSerializable
+        public class Result_GetCallSequence : ICapnpSerializable
         {
             public const UInt64 typeId = 0xdedbb6bf3810eab7UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -11627,16 +11627,16 @@ namespace Capnproto_test.Capnp.Test
     [TypeId(0xddd699207eb8e23bUL), Proxy(typeof(TestTailCallee_Proxy)), Skeleton(typeof(TestTailCallee_Skeleton))]
     public interface ITestTailCallee : IDisposable
     {
-        Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int i, string t, CancellationToken cancellationToken_ = default);
+        Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int I, string T, CancellationToken cancellationToken_ = default);
     }
 
     public class TestTailCallee_Proxy : Proxy, ITestTailCallee
     {
-        public Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int i, string t, CancellationToken cancellationToken_ = default)
+        public Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int I, string T, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestTailCallee.Params_foo.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestTailCallee.Params_foo()
-            {I = i, T = t};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestTailCallee.Params_Foo.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestTailCallee.Params_Foo()
+            {I = I, T = T};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(15985132292242203195UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
@@ -11658,7 +11658,7 @@ namespace Capnproto_test.Capnp.Test
         public override ulong InterfaceId => 15985132292242203195UL;
         Task<AnswerOrCounterquestion> Foo(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestTailCallee.Params_foo>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestTailCallee.Params_Foo>(d_);
             return Impatient.MaybeTailCall(Impl.Foo(in_.I, in_.T, cancellationToken_), r_ =>
             {
                 var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestTailCallee.TailResult.WRITER>();
@@ -11763,7 +11763,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xc5e1efc325614957UL)]
-        public class Params_foo : ICapnpSerializable
+        public class Params_Foo : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc5e1efc325614957UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -11841,16 +11841,16 @@ namespace Capnproto_test.Capnp.Test
     [TypeId(0x870bf40110ce3035UL), Proxy(typeof(TestTailCaller_Proxy)), Skeleton(typeof(TestTailCaller_Skeleton))]
     public interface ITestTailCaller : IDisposable
     {
-        Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int i, Capnproto_test.Capnp.Test.ITestTailCallee callee, CancellationToken cancellationToken_ = default);
+        Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int I, Capnproto_test.Capnp.Test.ITestTailCallee Callee, CancellationToken cancellationToken_ = default);
     }
 
     public class TestTailCaller_Proxy : Proxy, ITestTailCaller
     {
-        public Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int i, Capnproto_test.Capnp.Test.ITestTailCallee callee, CancellationToken cancellationToken_ = default)
+        public Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int I, Capnproto_test.Capnp.Test.ITestTailCallee Callee, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestTailCaller.Params_foo.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestTailCaller.Params_foo()
-            {I = i, Callee = callee};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestTailCaller.Params_Foo.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestTailCaller.Params_Foo()
+            {I = I, Callee = Callee};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(9731139705278181429UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
@@ -11872,7 +11872,7 @@ namespace Capnproto_test.Capnp.Test
         public override ulong InterfaceId => 9731139705278181429UL;
         Task<AnswerOrCounterquestion> Foo(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestTailCaller.Params_foo>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestTailCaller.Params_Foo>(d_);
             return Impatient.MaybeTailCall(Impl.Foo(in_.I, in_.Callee, cancellationToken_), r_ =>
             {
                 var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestTailCallee.TailResult.WRITER>();
@@ -11887,7 +11887,7 @@ namespace Capnproto_test.Capnp.Test
     public static class TestTailCaller
     {
         [TypeId(0xb07a279515dc8ac5UL)]
-        public class Params_foo : ICapnpSerializable
+        public class Params_Foo : ICapnpSerializable
         {
             public const UInt64 typeId = 0xb07a279515dc8ac5UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -11984,143 +11984,143 @@ namespace Capnproto_test.Capnp.Test
     [TypeId(0xddc70bf9784133cfUL), Proxy(typeof(TestMoreStuff_Proxy)), Skeleton(typeof(TestMoreStuff_Skeleton))]
     public interface ITestMoreStuff : Capnproto_test.Capnp.Test.ITestCallOrder
     {
-        Task<string> CallFoo(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default);
-        Task<string> CallFooWhenResolved(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default);
-        Task<Capnproto_test.Capnp.Test.ITestInterface> NeverReturn(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default);
-        Task Hold(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default);
+        Task<string> CallFoo(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default);
+        Task<string> CallFooWhenResolved(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default);
+        Task<Capnproto_test.Capnp.Test.ITestInterface> NeverReturn(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default);
+        Task Hold(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default);
         Task<string> CallHeld(CancellationToken cancellationToken_ = default);
         Task<Capnproto_test.Capnp.Test.ITestInterface> GetHeld(CancellationToken cancellationToken_ = default);
-        Task<Capnproto_test.Capnp.Test.ITestCallOrder> Echo(Capnproto_test.Capnp.Test.ITestCallOrder cap, CancellationToken cancellationToken_ = default);
-        Task ExpectCancel(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default);
-        Task<(string, string)> MethodWithDefaults(string a, uint b, string c, CancellationToken cancellationToken_ = default);
+        Task<Capnproto_test.Capnp.Test.ITestCallOrder> Echo(Capnproto_test.Capnp.Test.ITestCallOrder Cap, CancellationToken cancellationToken_ = default);
+        Task ExpectCancel(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default);
+        Task<(string, string)> MethodWithDefaults(string A, uint B, string C, CancellationToken cancellationToken_ = default);
         Task<Capnproto_test.Capnp.Test.ITestHandle> GetHandle(CancellationToken cancellationToken_ = default);
         Task<Capnproto_test.Capnp.Test.ITestMoreStuff> GetNull(CancellationToken cancellationToken_ = default);
         Task<string> GetEnormousString(CancellationToken cancellationToken_ = default);
-        Task MethodWithNullDefault(string a, Capnproto_test.Capnp.Test.ITestInterface b, CancellationToken cancellationToken_ = default);
+        Task MethodWithNullDefault(string A, Capnproto_test.Capnp.Test.ITestInterface B, CancellationToken cancellationToken_ = default);
     }
 
     public class TestMoreStuff_Proxy : Proxy, ITestMoreStuff
     {
-        public async Task<string> CallFoo(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default)
+        public async Task<string> CallFoo(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_callFoo.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_callFoo()
-            {Cap = cap};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_CallFoo.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_CallFoo()
+            {Cap = Cap};
             arg_?.serialize(in_);
             var d_ = await Call(15980754968839795663UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_callFoo>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_CallFoo>(d_);
             return (r_.S);
         }
 
-        public async Task<string> CallFooWhenResolved(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default)
+        public async Task<string> CallFooWhenResolved(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_callFooWhenResolved.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_callFooWhenResolved()
-            {Cap = cap};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_CallFooWhenResolved.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_CallFooWhenResolved()
+            {Cap = Cap};
             arg_?.serialize(in_);
             var d_ = await Call(15980754968839795663UL, 1, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_callFooWhenResolved>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_CallFooWhenResolved>(d_);
             return (r_.S);
         }
 
-        public Task<Capnproto_test.Capnp.Test.ITestInterface> NeverReturn(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default)
+        public Task<Capnproto_test.Capnp.Test.ITestInterface> NeverReturn(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_neverReturn.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_neverReturn()
-            {Cap = cap};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_NeverReturn.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_NeverReturn()
+            {Cap = Cap};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(15980754968839795663UL, 2, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
-                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_neverReturn>(d_);
+                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_NeverReturn>(d_);
                 return (r_.CapCopy);
             }
 
             );
         }
 
-        public async Task Hold(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default)
+        public async Task Hold(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_hold.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_hold()
-            {Cap = cap};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_Hold.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_Hold()
+            {Cap = Cap};
             arg_?.serialize(in_);
             var d_ = await Call(15980754968839795663UL, 3, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_hold>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_Hold>(d_);
             return;
         }
 
         public async Task<string> CallHeld(CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_callHeld.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_callHeld()
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_CallHeld.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_CallHeld()
             {};
             arg_?.serialize(in_);
             var d_ = await Call(15980754968839795663UL, 4, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_callHeld>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_CallHeld>(d_);
             return (r_.S);
         }
 
         public Task<Capnproto_test.Capnp.Test.ITestInterface> GetHeld(CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_getHeld.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_getHeld()
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_GetHeld.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_GetHeld()
             {};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(15980754968839795663UL, 5, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
-                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_getHeld>(d_);
+                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_GetHeld>(d_);
                 return (r_.Cap);
             }
 
             );
         }
 
-        public Task<Capnproto_test.Capnp.Test.ITestCallOrder> Echo(Capnproto_test.Capnp.Test.ITestCallOrder cap, CancellationToken cancellationToken_ = default)
+        public Task<Capnproto_test.Capnp.Test.ITestCallOrder> Echo(Capnproto_test.Capnp.Test.ITestCallOrder Cap, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_echo.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_echo()
-            {Cap = cap};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_Echo.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_Echo()
+            {Cap = Cap};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(15980754968839795663UL, 6, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
-                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_echo>(d_);
+                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_Echo>(d_);
                 return (r_.Cap);
             }
 
             );
         }
 
-        public async Task ExpectCancel(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default)
+        public async Task ExpectCancel(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_expectCancel.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_expectCancel()
-            {Cap = cap};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_ExpectCancel.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_ExpectCancel()
+            {Cap = Cap};
             arg_?.serialize(in_);
             var d_ = await Call(15980754968839795663UL, 7, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_expectCancel>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_ExpectCancel>(d_);
             return;
         }
 
-        public async Task<(string, string)> MethodWithDefaults(string a, uint b, string c, CancellationToken cancellationToken_ = default)
+        public async Task<(string, string)> MethodWithDefaults(string A, uint B, string C, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_methodWithDefaults.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_methodWithDefaults()
-            {A = a, B = b, C = c};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_MethodWithDefaults.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_MethodWithDefaults()
+            {A = A, B = B, C = C};
             arg_?.serialize(in_);
             var d_ = await Call(15980754968839795663UL, 8, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_methodWithDefaults>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_MethodWithDefaults>(d_);
             return (r_.D, r_.E);
         }
 
         public Task<Capnproto_test.Capnp.Test.ITestHandle> GetHandle(CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_getHandle.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_getHandle()
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_GetHandle.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_GetHandle()
             {};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(15980754968839795663UL, 9, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
-                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_getHandle>(d_);
+                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_GetHandle>(d_);
                 return (r_.Handle);
             }
 
@@ -12129,13 +12129,13 @@ namespace Capnproto_test.Capnp.Test
 
         public Task<Capnproto_test.Capnp.Test.ITestMoreStuff> GetNull(CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_getNull.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_getNull()
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_GetNull.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_GetNull()
             {};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(15980754968839795663UL, 10, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
-                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_getNull>(d_);
+                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_GetNull>(d_);
                 return (r_.NullCap);
             }
 
@@ -12144,34 +12144,34 @@ namespace Capnproto_test.Capnp.Test
 
         public async Task<string> GetEnormousString(CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_getEnormousString.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_getEnormousString()
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_GetEnormousString.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_GetEnormousString()
             {};
             arg_?.serialize(in_);
             var d_ = await Call(15980754968839795663UL, 11, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_getEnormousString>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_GetEnormousString>(d_);
             return (r_.Str);
         }
 
-        public async Task MethodWithNullDefault(string a, Capnproto_test.Capnp.Test.ITestInterface b, CancellationToken cancellationToken_ = default)
+        public async Task MethodWithNullDefault(string A, Capnproto_test.Capnp.Test.ITestInterface B, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_methodWithNullDefault.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_methodWithNullDefault()
-            {A = a, B = b};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_MethodWithNullDefault.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_MethodWithNullDefault()
+            {A = A, B = B};
             arg_?.serialize(in_);
             var d_ = await Call(15980754968839795663UL, 12, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_methodWithNullDefault>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Result_MethodWithNullDefault>(d_);
             return;
         }
 
-        public async Task<uint> GetCallSequence(uint expected, CancellationToken cancellationToken_ = default)
+        public async Task<uint> GetCallSequence(uint Expected, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestCallOrder.Params_getCallSequence.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestCallOrder.Params_getCallSequence()
-            {Expected = expected};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestCallOrder.Params_GetCallSequence.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestCallOrder.Params_GetCallSequence()
+            {Expected = Expected};
             arg_?.serialize(in_);
             var d_ = await Call(11594359141811814481UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestCallOrder.Result_getCallSequence>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestCallOrder.Result_GetCallSequence>(d_);
             return (r_.N);
         }
     }
@@ -12186,11 +12186,11 @@ namespace Capnproto_test.Capnp.Test
         public override ulong InterfaceId => 15980754968839795663UL;
         Task<AnswerOrCounterquestion> CallFoo(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Params_callFoo>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Params_CallFoo>(d_);
             return Impatient.MaybeTailCall(Impl.CallFoo(in_.Cap, cancellationToken_), s =>
             {
-                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_callFoo.WRITER>();
-                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_callFoo{S = s};
+                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_CallFoo.WRITER>();
+                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_CallFoo{S = s};
                 r_.serialize(s_);
                 return s_;
             }
@@ -12200,11 +12200,11 @@ namespace Capnproto_test.Capnp.Test
 
         Task<AnswerOrCounterquestion> CallFooWhenResolved(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Params_callFooWhenResolved>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Params_CallFooWhenResolved>(d_);
             return Impatient.MaybeTailCall(Impl.CallFooWhenResolved(in_.Cap, cancellationToken_), s =>
             {
-                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_callFooWhenResolved.WRITER>();
-                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_callFooWhenResolved{S = s};
+                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_CallFooWhenResolved.WRITER>();
+                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_CallFooWhenResolved{S = s};
                 r_.serialize(s_);
                 return s_;
             }
@@ -12214,11 +12214,11 @@ namespace Capnproto_test.Capnp.Test
 
         Task<AnswerOrCounterquestion> NeverReturn(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Params_neverReturn>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Params_NeverReturn>(d_);
             return Impatient.MaybeTailCall(Impl.NeverReturn(in_.Cap, cancellationToken_), capCopy =>
             {
-                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_neverReturn.WRITER>();
-                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_neverReturn{CapCopy = capCopy};
+                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_NeverReturn.WRITER>();
+                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_NeverReturn{CapCopy = capCopy};
                 r_.serialize(s_);
                 return s_;
             }
@@ -12228,9 +12228,9 @@ namespace Capnproto_test.Capnp.Test
 
         async Task<AnswerOrCounterquestion> Hold(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Params_hold>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Params_Hold>(d_);
             await Impl.Hold(in_.Cap, cancellationToken_);
-            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_hold.WRITER>();
+            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_Hold.WRITER>();
             return s_;
         }
 
@@ -12238,8 +12238,8 @@ namespace Capnproto_test.Capnp.Test
         {
             return Impatient.MaybeTailCall(Impl.CallHeld(cancellationToken_), s =>
             {
-                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_callHeld.WRITER>();
-                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_callHeld{S = s};
+                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_CallHeld.WRITER>();
+                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_CallHeld{S = s};
                 r_.serialize(s_);
                 return s_;
             }
@@ -12251,8 +12251,8 @@ namespace Capnproto_test.Capnp.Test
         {
             return Impatient.MaybeTailCall(Impl.GetHeld(cancellationToken_), cap =>
             {
-                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_getHeld.WRITER>();
-                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_getHeld{Cap = cap};
+                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_GetHeld.WRITER>();
+                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_GetHeld{Cap = cap};
                 r_.serialize(s_);
                 return s_;
             }
@@ -12262,11 +12262,11 @@ namespace Capnproto_test.Capnp.Test
 
         Task<AnswerOrCounterquestion> Echo(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Params_echo>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Params_Echo>(d_);
             return Impatient.MaybeTailCall(Impl.Echo(in_.Cap, cancellationToken_), cap =>
             {
-                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_echo.WRITER>();
-                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_echo{Cap = cap};
+                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_Echo.WRITER>();
+                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_Echo{Cap = cap};
                 r_.serialize(s_);
                 return s_;
             }
@@ -12276,19 +12276,19 @@ namespace Capnproto_test.Capnp.Test
 
         async Task<AnswerOrCounterquestion> ExpectCancel(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Params_expectCancel>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Params_ExpectCancel>(d_);
             await Impl.ExpectCancel(in_.Cap, cancellationToken_);
-            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_expectCancel.WRITER>();
+            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_ExpectCancel.WRITER>();
             return s_;
         }
 
         Task<AnswerOrCounterquestion> MethodWithDefaults(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Params_methodWithDefaults>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Params_MethodWithDefaults>(d_);
             return Impatient.MaybeTailCall(Impl.MethodWithDefaults(in_.A, in_.B, in_.C, cancellationToken_), (d, e) =>
             {
-                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_methodWithDefaults.WRITER>();
-                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_methodWithDefaults{D = d, E = e};
+                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_MethodWithDefaults.WRITER>();
+                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_MethodWithDefaults{D = d, E = e};
                 r_.serialize(s_);
                 return s_;
             }
@@ -12300,8 +12300,8 @@ namespace Capnproto_test.Capnp.Test
         {
             return Impatient.MaybeTailCall(Impl.GetHandle(cancellationToken_), handle =>
             {
-                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_getHandle.WRITER>();
-                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_getHandle{Handle = handle};
+                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_GetHandle.WRITER>();
+                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_GetHandle{Handle = handle};
                 r_.serialize(s_);
                 return s_;
             }
@@ -12313,8 +12313,8 @@ namespace Capnproto_test.Capnp.Test
         {
             return Impatient.MaybeTailCall(Impl.GetNull(cancellationToken_), nullCap =>
             {
-                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_getNull.WRITER>();
-                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_getNull{NullCap = nullCap};
+                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_GetNull.WRITER>();
+                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_GetNull{NullCap = nullCap};
                 r_.serialize(s_);
                 return s_;
             }
@@ -12326,8 +12326,8 @@ namespace Capnproto_test.Capnp.Test
         {
             return Impatient.MaybeTailCall(Impl.GetEnormousString(cancellationToken_), str =>
             {
-                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_getEnormousString.WRITER>();
-                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_getEnormousString{Str = str};
+                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_GetEnormousString.WRITER>();
+                var r_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Result_GetEnormousString{Str = str};
                 r_.serialize(s_);
                 return s_;
             }
@@ -12337,9 +12337,9 @@ namespace Capnproto_test.Capnp.Test
 
         async Task<AnswerOrCounterquestion> MethodWithNullDefault(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Params_methodWithNullDefault>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMoreStuff.Params_MethodWithNullDefault>(d_);
             await Impl.MethodWithNullDefault(in_.A, in_.B, cancellationToken_);
-            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_methodWithNullDefault.WRITER>();
+            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Result_MethodWithNullDefault.WRITER>();
             return s_;
         }
     }
@@ -12347,7 +12347,7 @@ namespace Capnproto_test.Capnp.Test
     public static class TestMoreStuff
     {
         [TypeId(0x931ba418da60f6e4UL)]
-        public class Params_callFoo : ICapnpSerializable
+        public class Params_CallFoo : ICapnpSerializable
         {
             public const UInt64 typeId = 0x931ba418da60f6e4UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -12407,7 +12407,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0x9a28970beccecdd0UL)]
-        public class Result_callFoo : ICapnpSerializable
+        public class Result_CallFoo : ICapnpSerializable
         {
             public const UInt64 typeId = 0x9a28970beccecdd0UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -12467,7 +12467,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xfabc700c2ebe6378UL)]
-        public class Params_callFooWhenResolved : ICapnpSerializable
+        public class Params_CallFooWhenResolved : ICapnpSerializable
         {
             public const UInt64 typeId = 0xfabc700c2ebe6378UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -12527,7 +12527,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xa54ce1e9aa822f90UL)]
-        public class Result_callFooWhenResolved : ICapnpSerializable
+        public class Result_CallFooWhenResolved : ICapnpSerializable
         {
             public const UInt64 typeId = 0xa54ce1e9aa822f90UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -12587,7 +12587,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0x94fe60465c95182bUL)]
-        public class Params_neverReturn : ICapnpSerializable
+        public class Params_NeverReturn : ICapnpSerializable
         {
             public const UInt64 typeId = 0x94fe60465c95182bUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -12647,7 +12647,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xdef4e5fa6999c5dcUL)]
-        public class Result_neverReturn : ICapnpSerializable
+        public class Result_NeverReturn : ICapnpSerializable
         {
             public const UInt64 typeId = 0xdef4e5fa6999c5dcUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -12707,7 +12707,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xfe7c8fbb769d8e58UL)]
-        public class Params_hold : ICapnpSerializable
+        public class Params_Hold : ICapnpSerializable
         {
             public const UInt64 typeId = 0xfe7c8fbb769d8e58UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -12767,7 +12767,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xf839fb1374d003c9UL)]
-        public class Result_hold : ICapnpSerializable
+        public class Result_Hold : ICapnpSerializable
         {
             public const UInt64 typeId = 0xf839fb1374d003c9UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -12812,7 +12812,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xf8c5e5ef1edf83beUL)]
-        public class Params_callHeld : ICapnpSerializable
+        public class Params_CallHeld : ICapnpSerializable
         {
             public const UInt64 typeId = 0xf8c5e5ef1edf83beUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -12857,7 +12857,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xe59935f160ac7578UL)]
-        public class Result_callHeld : ICapnpSerializable
+        public class Result_CallHeld : ICapnpSerializable
         {
             public const UInt64 typeId = 0xe59935f160ac7578UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -12917,7 +12917,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xfeffc025fce317e3UL)]
-        public class Params_getHeld : ICapnpSerializable
+        public class Params_GetHeld : ICapnpSerializable
         {
             public const UInt64 typeId = 0xfeffc025fce317e3UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -12962,7 +12962,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xef4e146185af67ceUL)]
-        public class Result_getHeld : ICapnpSerializable
+        public class Result_GetHeld : ICapnpSerializable
         {
             public const UInt64 typeId = 0xef4e146185af67ceUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -13022,7 +13022,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xc07526f7e2e533b9UL)]
-        public class Params_echo : ICapnpSerializable
+        public class Params_Echo : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc07526f7e2e533b9UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -13082,7 +13082,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xa6224536593d5b92UL)]
-        public class Result_echo : ICapnpSerializable
+        public class Result_Echo : ICapnpSerializable
         {
             public const UInt64 typeId = 0xa6224536593d5b92UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -13142,7 +13142,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xa1cc32d87f3edeb1UL)]
-        public class Params_expectCancel : ICapnpSerializable
+        public class Params_ExpectCancel : ICapnpSerializable
         {
             public const UInt64 typeId = 0xa1cc32d87f3edeb1UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -13202,7 +13202,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0x8a3eba1758c0916eUL)]
-        public class Result_expectCancel : ICapnpSerializable
+        public class Result_ExpectCancel : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8a3eba1758c0916eUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -13247,7 +13247,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0x99160a25fa50fbf1UL)]
-        public class Params_methodWithDefaults : ICapnpSerializable
+        public class Params_MethodWithDefaults : ICapnpSerializable
         {
             public const UInt64 typeId = 0x99160a25fa50fbf1UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -13339,7 +13339,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0x9c7e066f845a6c56UL)]
-        public class Result_methodWithDefaults : ICapnpSerializable
+        public class Result_MethodWithDefaults : ICapnpSerializable
         {
             public const UInt64 typeId = 0x9c7e066f845a6c56UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -13415,7 +13415,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xead024a301a092a1UL)]
-        public class Params_getHandle : ICapnpSerializable
+        public class Params_GetHandle : ICapnpSerializable
         {
             public const UInt64 typeId = 0xead024a301a092a1UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -13460,7 +13460,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xc3490d75420a1fe8UL)]
-        public class Result_getHandle : ICapnpSerializable
+        public class Result_GetHandle : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc3490d75420a1fe8UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -13520,7 +13520,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xd8493f0e175d61f2UL)]
-        public class Params_getNull : ICapnpSerializable
+        public class Params_GetNull : ICapnpSerializable
         {
             public const UInt64 typeId = 0xd8493f0e175d61f2UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -13565,7 +13565,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xe6955d8ef1023671UL)]
-        public class Result_getNull : ICapnpSerializable
+        public class Result_GetNull : ICapnpSerializable
         {
             public const UInt64 typeId = 0xe6955d8ef1023671UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -13625,7 +13625,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0x805df436f55dd07aUL)]
-        public class Params_getEnormousString : ICapnpSerializable
+        public class Params_GetEnormousString : ICapnpSerializable
         {
             public const UInt64 typeId = 0x805df436f55dd07aUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -13670,7 +13670,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0x860e7512dc3925b0UL)]
-        public class Result_getEnormousString : ICapnpSerializable
+        public class Result_GetEnormousString : ICapnpSerializable
         {
             public const UInt64 typeId = 0x860e7512dc3925b0UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -13730,7 +13730,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xfb92899aeb0ee74fUL)]
-        public class Params_methodWithNullDefault : ICapnpSerializable
+        public class Params_MethodWithNullDefault : ICapnpSerializable
         {
             public const UInt64 typeId = 0xfb92899aeb0ee74fUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -13805,7 +13805,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0x8467348247305cf7UL)]
-        public class Result_methodWithNullDefault : ICapnpSerializable
+        public class Result_MethodWithNullDefault : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8467348247305cf7UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -13854,9 +13854,9 @@ namespace Capnproto_test.Capnp.Test
     public interface ITestMembrane : IDisposable
     {
         Task<Capnproto_test.Capnp.Test.TestMembrane.IThing> MakeThing(CancellationToken cancellationToken_ = default);
-        Task<Capnproto_test.Capnp.Test.TestMembrane.Result> CallPassThrough(Capnproto_test.Capnp.Test.TestMembrane.IThing thing, bool tailCall, CancellationToken cancellationToken_ = default);
-        Task<Capnproto_test.Capnp.Test.TestMembrane.Result> CallIntercept(Capnproto_test.Capnp.Test.TestMembrane.IThing thing, bool tailCall, CancellationToken cancellationToken_ = default);
-        Task<Capnproto_test.Capnp.Test.TestMembrane.IThing> Loopback(Capnproto_test.Capnp.Test.TestMembrane.IThing thing, CancellationToken cancellationToken_ = default);
+        Task<Capnproto_test.Capnp.Test.TestMembrane.Result> CallPassThrough(Capnproto_test.Capnp.Test.TestMembrane.IThing Thing, bool TailCall, CancellationToken cancellationToken_ = default);
+        Task<Capnproto_test.Capnp.Test.TestMembrane.Result> CallIntercept(Capnproto_test.Capnp.Test.TestMembrane.IThing Thing, bool TailCall, CancellationToken cancellationToken_ = default);
+        Task<Capnproto_test.Capnp.Test.TestMembrane.IThing> Loopback(Capnproto_test.Capnp.Test.TestMembrane.IThing Thing, CancellationToken cancellationToken_ = default);
         Task WaitForever(CancellationToken cancellationToken_ = default);
     }
 
@@ -13864,50 +13864,50 @@ namespace Capnproto_test.Capnp.Test
     {
         public Task<Capnproto_test.Capnp.Test.TestMembrane.IThing> MakeThing(CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Params_makeThing.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestMembrane.Params_makeThing()
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Params_MakeThing.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestMembrane.Params_MakeThing()
             {};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(13870398341137210380UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
-                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMembrane.Result_makeThing>(d_);
+                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMembrane.Result_MakeThing>(d_);
                 return (r_.Thing);
             }
 
             );
         }
 
-        public async Task<Capnproto_test.Capnp.Test.TestMembrane.Result> CallPassThrough(Capnproto_test.Capnp.Test.TestMembrane.IThing thing, bool tailCall, CancellationToken cancellationToken_ = default)
+        public async Task<Capnproto_test.Capnp.Test.TestMembrane.Result> CallPassThrough(Capnproto_test.Capnp.Test.TestMembrane.IThing Thing, bool TailCall, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Params_callPassThrough.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestMembrane.Params_callPassThrough()
-            {Thing = thing, TailCall = tailCall};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Params_CallPassThrough.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestMembrane.Params_CallPassThrough()
+            {Thing = Thing, TailCall = TailCall};
             arg_?.serialize(in_);
             var d_ = await Call(13870398341137210380UL, 1, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
             var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMembrane.Result>(d_);
             return r_;
         }
 
-        public async Task<Capnproto_test.Capnp.Test.TestMembrane.Result> CallIntercept(Capnproto_test.Capnp.Test.TestMembrane.IThing thing, bool tailCall, CancellationToken cancellationToken_ = default)
+        public async Task<Capnproto_test.Capnp.Test.TestMembrane.Result> CallIntercept(Capnproto_test.Capnp.Test.TestMembrane.IThing Thing, bool TailCall, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Params_callIntercept.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestMembrane.Params_callIntercept()
-            {Thing = thing, TailCall = tailCall};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Params_CallIntercept.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestMembrane.Params_CallIntercept()
+            {Thing = Thing, TailCall = TailCall};
             arg_?.serialize(in_);
             var d_ = await Call(13870398341137210380UL, 2, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
             var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMembrane.Result>(d_);
             return r_;
         }
 
-        public Task<Capnproto_test.Capnp.Test.TestMembrane.IThing> Loopback(Capnproto_test.Capnp.Test.TestMembrane.IThing thing, CancellationToken cancellationToken_ = default)
+        public Task<Capnproto_test.Capnp.Test.TestMembrane.IThing> Loopback(Capnproto_test.Capnp.Test.TestMembrane.IThing Thing, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Params_loopback.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestMembrane.Params_loopback()
-            {Thing = thing};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Params_Loopback.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestMembrane.Params_Loopback()
+            {Thing = Thing};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(13870398341137210380UL, 3, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
-                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMembrane.Result_loopback>(d_);
+                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMembrane.Result_Loopback>(d_);
                 return (r_.Thing);
             }
 
@@ -13916,12 +13916,12 @@ namespace Capnproto_test.Capnp.Test
 
         public async Task WaitForever(CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Params_waitForever.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestMembrane.Params_waitForever()
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Params_WaitForever.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestMembrane.Params_WaitForever()
             {};
             arg_?.serialize(in_);
             var d_ = await Call(13870398341137210380UL, 4, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMembrane.Result_waitForever>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMembrane.Result_WaitForever>(d_);
             return;
         }
     }
@@ -13938,8 +13938,8 @@ namespace Capnproto_test.Capnp.Test
         {
             return Impatient.MaybeTailCall(Impl.MakeThing(cancellationToken_), thing =>
             {
-                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Result_makeThing.WRITER>();
-                var r_ = new Capnproto_test.Capnp.Test.TestMembrane.Result_makeThing{Thing = thing};
+                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Result_MakeThing.WRITER>();
+                var r_ = new Capnproto_test.Capnp.Test.TestMembrane.Result_MakeThing{Thing = thing};
                 r_.serialize(s_);
                 return s_;
             }
@@ -13949,7 +13949,7 @@ namespace Capnproto_test.Capnp.Test
 
         Task<AnswerOrCounterquestion> CallPassThrough(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMembrane.Params_callPassThrough>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMembrane.Params_CallPassThrough>(d_);
             return Impatient.MaybeTailCall(Impl.CallPassThrough(in_.Thing, in_.TailCall, cancellationToken_), r_ =>
             {
                 var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Result.WRITER>();
@@ -13962,7 +13962,7 @@ namespace Capnproto_test.Capnp.Test
 
         Task<AnswerOrCounterquestion> CallIntercept(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMembrane.Params_callIntercept>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMembrane.Params_CallIntercept>(d_);
             return Impatient.MaybeTailCall(Impl.CallIntercept(in_.Thing, in_.TailCall, cancellationToken_), r_ =>
             {
                 var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Result.WRITER>();
@@ -13975,11 +13975,11 @@ namespace Capnproto_test.Capnp.Test
 
         Task<AnswerOrCounterquestion> Loopback(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMembrane.Params_loopback>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestMembrane.Params_Loopback>(d_);
             return Impatient.MaybeTailCall(Impl.Loopback(in_.Thing, cancellationToken_), thing =>
             {
-                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Result_loopback.WRITER>();
-                var r_ = new Capnproto_test.Capnp.Test.TestMembrane.Result_loopback{Thing = thing};
+                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Result_Loopback.WRITER>();
+                var r_ = new Capnproto_test.Capnp.Test.TestMembrane.Result_Loopback{Thing = thing};
                 r_.serialize(s_);
                 return s_;
             }
@@ -13990,7 +13990,7 @@ namespace Capnproto_test.Capnp.Test
         async Task<AnswerOrCounterquestion> WaitForever(DeserializerState d_, CancellationToken cancellationToken_)
         {
             await Impl.WaitForever(cancellationToken_);
-            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Result_waitForever.WRITER>();
+            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Result_WaitForever.WRITER>();
             return s_;
         }
     }
@@ -14008,8 +14008,8 @@ namespace Capnproto_test.Capnp.Test
         {
             public async Task<Capnproto_test.Capnp.Test.TestMembrane.Result> PassThrough(CancellationToken cancellationToken_ = default)
             {
-                var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Thing.Params_passThrough.WRITER>();
-                var arg_ = new Capnproto_test.Capnp.Test.TestMembrane.Thing.Params_passThrough()
+                var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Thing.Params_PassThrough.WRITER>();
+                var arg_ = new Capnproto_test.Capnp.Test.TestMembrane.Thing.Params_PassThrough()
                 {};
                 arg_?.serialize(in_);
                 var d_ = await Call(10615798940090972439UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
@@ -14019,8 +14019,8 @@ namespace Capnproto_test.Capnp.Test
 
             public async Task<Capnproto_test.Capnp.Test.TestMembrane.Result> Intercept(CancellationToken cancellationToken_ = default)
             {
-                var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Thing.Params_intercept.WRITER>();
-                var arg_ = new Capnproto_test.Capnp.Test.TestMembrane.Thing.Params_intercept()
+                var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Thing.Params_Intercept.WRITER>();
+                var arg_ = new Capnproto_test.Capnp.Test.TestMembrane.Thing.Params_Intercept()
                 {};
                 arg_?.serialize(in_);
                 var d_ = await Call(10615798940090972439UL, 1, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
@@ -14065,7 +14065,7 @@ namespace Capnproto_test.Capnp.Test
         public static class Thing
         {
             [TypeId(0xff9bdcd05085d786UL)]
-            public class Params_passThrough : ICapnpSerializable
+            public class Params_PassThrough : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xff9bdcd05085d786UL;
                 void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -14110,7 +14110,7 @@ namespace Capnproto_test.Capnp.Test
             }
 
             [TypeId(0xee94bed3615ee745UL)]
-            public class Params_intercept : ICapnpSerializable
+            public class Params_Intercept : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xee94bed3615ee745UL;
                 void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -14216,7 +14216,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xd8ac2acc3ece6556UL)]
-        public class Params_makeThing : ICapnpSerializable
+        public class Params_MakeThing : ICapnpSerializable
         {
             public const UInt64 typeId = 0xd8ac2acc3ece6556UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -14261,7 +14261,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xe5d4904814ccbf29UL)]
-        public class Result_makeThing : ICapnpSerializable
+        public class Result_MakeThing : ICapnpSerializable
         {
             public const UInt64 typeId = 0xe5d4904814ccbf29UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -14321,7 +14321,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0x945d9f634a6a29daUL)]
-        public class Params_callPassThrough : ICapnpSerializable
+        public class Params_CallPassThrough : ICapnpSerializable
         {
             public const UInt64 typeId = 0x945d9f634a6a29daUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -14396,7 +14396,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0x8749aac3375c5c71UL)]
-        public class Params_callIntercept : ICapnpSerializable
+        public class Params_CallIntercept : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8749aac3375c5c71UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -14471,7 +14471,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0x869a1b7ab34b42c9UL)]
-        public class Params_loopback : ICapnpSerializable
+        public class Params_Loopback : ICapnpSerializable
         {
             public const UInt64 typeId = 0x869a1b7ab34b42c9UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -14531,7 +14531,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xecd19398fd88ab5cUL)]
-        public class Result_loopback : ICapnpSerializable
+        public class Result_Loopback : ICapnpSerializable
         {
             public const UInt64 typeId = 0xecd19398fd88ab5cUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -14591,7 +14591,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0x8f6bb30cc62917ffUL)]
-        public class Params_waitForever : ICapnpSerializable
+        public class Params_WaitForever : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8f6bb30cc62917ffUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -14636,7 +14636,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xc343a4907280be01UL)]
-        public class Result_waitForever : ICapnpSerializable
+        public class Result_WaitForever : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc343a4907280be01UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -14904,45 +14904,45 @@ namespace Capnproto_test.Capnp.Test
     {
         public async Task Delete(CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestKeywordMethods.Params_delete.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestKeywordMethods.Params_delete()
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestKeywordMethods.Params_Delete.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestKeywordMethods.Params_Delete()
             {};
             arg_?.serialize(in_);
             var d_ = await Call(11160837778045172988UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestKeywordMethods.Result_delete>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestKeywordMethods.Result_Delete>(d_);
             return;
         }
 
         public async Task Class(CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestKeywordMethods.Params_class.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestKeywordMethods.Params_class()
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestKeywordMethods.Params_Class.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestKeywordMethods.Params_Class()
             {};
             arg_?.serialize(in_);
             var d_ = await Call(11160837778045172988UL, 1, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestKeywordMethods.Result_class>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestKeywordMethods.Result_Class>(d_);
             return;
         }
 
         public async Task Void(CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestKeywordMethods.Params_void.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestKeywordMethods.Params_void()
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestKeywordMethods.Params_Void.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestKeywordMethods.Params_Void()
             {};
             arg_?.serialize(in_);
             var d_ = await Call(11160837778045172988UL, 2, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestKeywordMethods.Result_void>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestKeywordMethods.Result_Void>(d_);
             return;
         }
 
         public async Task Return(CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestKeywordMethods.Params_return.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestKeywordMethods.Params_return()
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestKeywordMethods.Params_Return.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestKeywordMethods.Params_Return()
             {};
             arg_?.serialize(in_);
             var d_ = await Call(11160837778045172988UL, 3, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestKeywordMethods.Result_return>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestKeywordMethods.Result_Return>(d_);
             return;
         }
     }
@@ -14958,28 +14958,28 @@ namespace Capnproto_test.Capnp.Test
         async Task<AnswerOrCounterquestion> Delete(DeserializerState d_, CancellationToken cancellationToken_)
         {
             await Impl.Delete(cancellationToken_);
-            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestKeywordMethods.Result_delete.WRITER>();
+            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestKeywordMethods.Result_Delete.WRITER>();
             return s_;
         }
 
         async Task<AnswerOrCounterquestion> Class(DeserializerState d_, CancellationToken cancellationToken_)
         {
             await Impl.Class(cancellationToken_);
-            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestKeywordMethods.Result_class.WRITER>();
+            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestKeywordMethods.Result_Class.WRITER>();
             return s_;
         }
 
         async Task<AnswerOrCounterquestion> Void(DeserializerState d_, CancellationToken cancellationToken_)
         {
             await Impl.Void(cancellationToken_);
-            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestKeywordMethods.Result_void.WRITER>();
+            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestKeywordMethods.Result_Void.WRITER>();
             return s_;
         }
 
         async Task<AnswerOrCounterquestion> Return(DeserializerState d_, CancellationToken cancellationToken_)
         {
             await Impl.Return(cancellationToken_);
-            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestKeywordMethods.Result_return.WRITER>();
+            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestKeywordMethods.Result_Return.WRITER>();
             return s_;
         }
     }
@@ -14987,7 +14987,7 @@ namespace Capnproto_test.Capnp.Test
     public static class TestKeywordMethods
     {
         [TypeId(0xca3a89cdeb6bd6b7UL)]
-        public class Params_delete : ICapnpSerializable
+        public class Params_Delete : ICapnpSerializable
         {
             public const UInt64 typeId = 0xca3a89cdeb6bd6b7UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -15032,7 +15032,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xeeb5843598307592UL)]
-        public class Result_delete : ICapnpSerializable
+        public class Result_Delete : ICapnpSerializable
         {
             public const UInt64 typeId = 0xeeb5843598307592UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -15077,7 +15077,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0x9cf5a8313c5db036UL)]
-        public class Params_class : ICapnpSerializable
+        public class Params_Class : ICapnpSerializable
         {
             public const UInt64 typeId = 0x9cf5a8313c5db036UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -15122,7 +15122,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xc0253868ac12e7d8UL)]
-        public class Result_class : ICapnpSerializable
+        public class Result_Class : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc0253868ac12e7d8UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -15167,7 +15167,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xa4a08763833c7757UL)]
-        public class Params_void : ICapnpSerializable
+        public class Params_Void : ICapnpSerializable
         {
             public const UInt64 typeId = 0xa4a08763833c7757UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -15212,7 +15212,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xde82773089c0aeabUL)]
-        public class Result_void : ICapnpSerializable
+        public class Result_Void : ICapnpSerializable
         {
             public const UInt64 typeId = 0xde82773089c0aeabUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -15257,7 +15257,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0x99817360625e8ca3UL)]
-        public class Params_return : ICapnpSerializable
+        public class Params_Return : ICapnpSerializable
         {
             public const UInt64 typeId = 0x99817360625e8ca3UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -15302,7 +15302,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xb70872e07eaa992fUL)]
-        public class Result_return : ICapnpSerializable
+        public class Result_Return : ICapnpSerializable
         {
             public const UInt64 typeId = 0xb70872e07eaa992fUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -15357,13 +15357,13 @@ namespace Capnproto_test.Capnp.Test
     {
         public Task<TVatId> GetCallerId(CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestAuthenticatedBootstrap<TVatId>.Params_getCallerId.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestAuthenticatedBootstrap<TVatId>.Params_getCallerId()
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestAuthenticatedBootstrap<TVatId>.Params_GetCallerId.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestAuthenticatedBootstrap<TVatId>.Params_GetCallerId()
             {};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(16893789964317726925UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
-                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestAuthenticatedBootstrap<TVatId>.Result_getCallerId>(d_);
+                var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestAuthenticatedBootstrap<TVatId>.Result_GetCallerId>(d_);
                 return (r_.Caller);
             }
 
@@ -15383,8 +15383,8 @@ namespace Capnproto_test.Capnp.Test
         {
             return Impatient.MaybeTailCall(Impl.GetCallerId(cancellationToken_), caller =>
             {
-                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestAuthenticatedBootstrap<TVatId>.Result_getCallerId.WRITER>();
-                var r_ = new Capnproto_test.Capnp.Test.TestAuthenticatedBootstrap<TVatId>.Result_getCallerId{Caller = caller};
+                var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestAuthenticatedBootstrap<TVatId>.Result_GetCallerId.WRITER>();
+                var r_ = new Capnproto_test.Capnp.Test.TestAuthenticatedBootstrap<TVatId>.Result_GetCallerId{Caller = caller};
                 r_.serialize(s_);
                 return s_;
             }
@@ -15397,7 +15397,7 @@ namespace Capnproto_test.Capnp.Test
         where TVatId : class
     {
         [TypeId(0x8ec30e2451f1cffeUL)]
-        public class Params_getCallerId : ICapnpSerializable
+        public class Params_GetCallerId : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8ec30e2451f1cffeUL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -15442,7 +15442,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xc71cf776034a3e67UL)]
-        public class Result_getCallerId : ICapnpSerializable
+        public class Result_GetCallerId : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc71cf776034a3e67UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -15913,7 +15913,7 @@ namespace Capnproto_test.Capnp.Test
             }
 
             AnotherBadFieldName = reader.AnotherBadFieldName;
-            BadlyNamedUnion = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestNameAnnotation.@badlyNamedUnion>(reader.BadlyNamedUnion);
+            BadlyNamedUnion = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestNameAnnotation.badlyNamedUnion>(reader.BadlyNamedUnion);
             applyDefaults();
         }
 
@@ -15991,7 +15991,7 @@ namespace Capnproto_test.Capnp.Test
             set;
         }
 
-        public Capnproto_test.Capnp.Test.TestNameAnnotation.@badlyNamedUnion BadlyNamedUnion
+        public Capnproto_test.Capnp.Test.TestNameAnnotation.badlyNamedUnion BadlyNamedUnion
         {
             get;
             set;
@@ -16012,7 +16012,7 @@ namespace Capnproto_test.Capnp.Test
             public bool BadFieldName => which == WHICH.BadFieldName ? ctx.ReadDataBool(0UL, false) : default;
             public sbyte Bar => which == WHICH.Bar ? ctx.ReadDataSByte(0UL, (sbyte)0) : default;
             public Capnproto_test.Capnp.Test.TestNameAnnotation.BadlyNamedEnum AnotherBadFieldName => (Capnproto_test.Capnp.Test.TestNameAnnotation.BadlyNamedEnum)ctx.ReadDataUShort(32UL, (ushort)0);
-            public @badlyNamedUnion.READER BadlyNamedUnion => new @badlyNamedUnion.READER(ctx);
+            public badlyNamedUnion.READER BadlyNamedUnion => new badlyNamedUnion.READER(ctx);
         }
 
         public class WRITER : SerializerState
@@ -16046,14 +16046,14 @@ namespace Capnproto_test.Capnp.Test
                 set => this.WriteData(32UL, (ushort)value, (ushort)0);
             }
 
-            public @badlyNamedUnion.WRITER BadlyNamedUnion
+            public badlyNamedUnion.WRITER BadlyNamedUnion
             {
-                get => Rewrap<@badlyNamedUnion.WRITER>();
+                get => Rewrap<badlyNamedUnion.WRITER>();
             }
         }
 
         [TypeId(0x89d9d1626b34017cUL)]
-        public class @badlyNamedUnion : ICapnpSerializable
+        public class badlyNamedUnion : ICapnpSerializable
         {
             public const UInt64 typeId = 0x89d9d1626b34017cUL;
             public enum WHICH : ushort
@@ -16069,7 +16069,7 @@ namespace Capnproto_test.Capnp.Test
                 switch (reader.which)
                 {
                     case WHICH.BadlyNamedGroup:
-                        BadlyNamedGroup = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestNameAnnotation.@badlyNamedUnion.@badlyNamedGroup>(reader.BadlyNamedGroup);
+                        BadlyNamedGroup = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestNameAnnotation.badlyNamedUnion.badlyNamedGroup>(reader.BadlyNamedGroup);
                         break;
                     case WHICH.Baz:
                         Baz = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestNameAnnotation.NestedStruct>(reader.Baz);
@@ -16124,9 +16124,9 @@ namespace Capnproto_test.Capnp.Test
             {
             }
 
-            public Capnproto_test.Capnp.Test.TestNameAnnotation.@badlyNamedUnion.@badlyNamedGroup BadlyNamedGroup
+            public Capnproto_test.Capnp.Test.TestNameAnnotation.badlyNamedUnion.badlyNamedGroup BadlyNamedGroup
             {
-                get => _which == WHICH.BadlyNamedGroup ? (Capnproto_test.Capnp.Test.TestNameAnnotation.@badlyNamedUnion.@badlyNamedGroup)_content : null;
+                get => _which == WHICH.BadlyNamedGroup ? (Capnproto_test.Capnp.Test.TestNameAnnotation.badlyNamedUnion.badlyNamedGroup)_content : null;
                 set
                 {
                     _which = WHICH.BadlyNamedGroup;
@@ -16156,7 +16156,7 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public WHICH which => (WHICH)ctx.ReadDataUShort(48U, (ushort)0);
-                public @badlyNamedGroup.READER BadlyNamedGroup => which == WHICH.BadlyNamedGroup ? new @badlyNamedGroup.READER(ctx) : default;
+                public badlyNamedGroup.READER BadlyNamedGroup => which == WHICH.BadlyNamedGroup ? new badlyNamedGroup.READER(ctx) : default;
                 public Capnproto_test.Capnp.Test.TestNameAnnotation.NestedStruct.READER Baz => which == WHICH.Baz ? ctx.ReadStruct(0, Capnproto_test.Capnp.Test.TestNameAnnotation.NestedStruct.READER.create) : default;
             }
 
@@ -16172,9 +16172,9 @@ namespace Capnproto_test.Capnp.Test
                     set => this.WriteData(48U, (ushort)value, (ushort)0);
                 }
 
-                public @badlyNamedGroup.WRITER BadlyNamedGroup
+                public badlyNamedGroup.WRITER BadlyNamedGroup
                 {
-                    get => which == WHICH.BadlyNamedGroup ? Rewrap<@badlyNamedGroup.WRITER>() : default;
+                    get => which == WHICH.BadlyNamedGroup ? Rewrap<badlyNamedGroup.WRITER>() : default;
                 }
 
                 public Capnproto_test.Capnp.Test.TestNameAnnotation.NestedStruct.WRITER Baz
@@ -16185,7 +16185,7 @@ namespace Capnproto_test.Capnp.Test
             }
 
             [TypeId(0xc3594bce5b24b722UL)]
-            public class @badlyNamedGroup : ICapnpSerializable
+            public class badlyNamedGroup : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xc3594bce5b24b722UL;
                 void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -16324,19 +16324,19 @@ namespace Capnproto_test.Capnp.Test
     [TypeId(0xd112a69d31ed918bUL), Proxy(typeof(TestNameAnnotationInterface_Proxy)), Skeleton(typeof(TestNameAnnotationInterface_Skeleton))]
     public interface ITestNameAnnotationInterface : IDisposable
     {
-        Task BadlyNamedMethod(byte badlyNamedParam, CancellationToken cancellationToken_ = default);
+        Task BadlyNamedMethod(byte BadlyNamedParam, CancellationToken cancellationToken_ = default);
     }
 
     public class TestNameAnnotationInterface_Proxy : Proxy, ITestNameAnnotationInterface
     {
-        public async Task BadlyNamedMethod(byte badlyNamedParam, CancellationToken cancellationToken_ = default)
+        public async Task BadlyNamedMethod(byte BadlyNamedParam, CancellationToken cancellationToken_ = default)
         {
-            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestNameAnnotationInterface.Params_badlyNamedMethod.WRITER>();
-            var arg_ = new Capnproto_test.Capnp.Test.TestNameAnnotationInterface.Params_badlyNamedMethod()
-            {BadlyNamedParam = badlyNamedParam};
+            var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestNameAnnotationInterface.Params_BadlyNamedMethod.WRITER>();
+            var arg_ = new Capnproto_test.Capnp.Test.TestNameAnnotationInterface.Params_BadlyNamedMethod()
+            {BadlyNamedParam = BadlyNamedParam};
             arg_?.serialize(in_);
             var d_ = await Call(15065286897585459595UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned;
-            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestNameAnnotationInterface.Result_badlyNamedMethod>(d_);
+            var r_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestNameAnnotationInterface.Result_BadlyNamedMethod>(d_);
             return;
         }
     }
@@ -16351,9 +16351,9 @@ namespace Capnproto_test.Capnp.Test
         public override ulong InterfaceId => 15065286897585459595UL;
         async Task<AnswerOrCounterquestion> BadlyNamedMethod(DeserializerState d_, CancellationToken cancellationToken_)
         {
-            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestNameAnnotationInterface.Params_badlyNamedMethod>(d_);
+            var in_ = CapnpSerializable.Create<Capnproto_test.Capnp.Test.TestNameAnnotationInterface.Params_BadlyNamedMethod>(d_);
             await Impl.BadlyNamedMethod(in_.BadlyNamedParam, cancellationToken_);
-            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestNameAnnotationInterface.Result_badlyNamedMethod.WRITER>();
+            var s_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestNameAnnotationInterface.Result_BadlyNamedMethod.WRITER>();
             return s_;
         }
     }
@@ -16361,7 +16361,7 @@ namespace Capnproto_test.Capnp.Test
     public static class TestNameAnnotationInterface
     {
         [TypeId(0xc12efc3b075adfe9UL)]
-        public class Params_badlyNamedMethod : ICapnpSerializable
+        public class Params_BadlyNamedMethod : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc12efc3b075adfe9UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)
@@ -16421,7 +16421,7 @@ namespace Capnproto_test.Capnp.Test
         }
 
         [TypeId(0xdcc3cdb4b28f6c86UL)]
-        public class Result_badlyNamedMethod : ICapnpSerializable
+        public class Result_BadlyNamedMethod : ICapnpSerializable
         {
             public const UInt64 typeId = 0xdcc3cdb4b28f6c86UL;
             void ICapnpSerializable.Deserialize(DeserializerState arg_)

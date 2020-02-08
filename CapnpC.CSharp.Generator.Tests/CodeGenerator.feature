@@ -55,15 +55,19 @@ Scenario Outline: Valid generator output
 	Then the invocation must succeed and attempting to compile the generated code gives <outcome>
 
 Examples:
-    | bin               | nullablegen | nullablesupp | outcome  |
-    | test.capnp.bin    | false       | false        | success  |
-    | test.capnp.bin    | true        | false        | success   |
-    | test.capnp.bin    | false       | true         | warnings |
-    | test.capnp.bin    | true        | true         | success  |
-    | Issue19.capnp.bin | false       | false        | success  |
-    | Issue21.capnp.bin | false       | false        | success  |
-    | Issue22.capnp.bin | false       | false        | success  |
+    | bin                         | nullablegen | nullablesupp | outcome  |
+    | test.capnp.bin              | false       | false        | success  |
+    | test.capnp.bin              | true        | false        | errors   |
+    | test.capnp.bin              | false       | true         | warnings |
+    | test.capnp.bin              | true        | true         | success  |
+    | Issue19.capnp.bin           | false       | false        | success  |
+    | Issue21.capnp.bin           | false       | false        | success  |
+    | Issue22.capnp.bin           | false       | false        | success  |
     | NullableDisable.capnp.bin   | true        | false        | success  |
     | NullableDisable.capnp.bin   | true        | true         | warnings |
     | NullableEnable.capnp.bin    | false       | true         | success  |
 	| NullableEnable.capnp.bin    | false       | false        | errors   |
+	| NullableDisable2.capnp.bin  | false       | false        | errors   |
+    | NullableDisable2.capnp.bin  | false       | true         | success  |
+    | NullableEnable2.capnp.bin   | false       | false        | errors   |
+	| NullableEnable2.capnp.bin   | false       | true         | success  |

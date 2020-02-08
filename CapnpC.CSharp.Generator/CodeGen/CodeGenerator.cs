@@ -191,6 +191,20 @@
             NameSyntax topNamespace = GenNames.NamespaceName(file.Namespace) ?? _names.TopNamespace;
 
             var ns = NamespaceDeclaration(topNamespace);
+            
+            if (file.EmitNullableDirective)
+            {
+                ns = ns.WithLeadingTrivia(
+                    Trivia(
+                        NullableDirectiveTrivia(
+                            Token(_names.NullableEnable ? SyntaxKind.EnableKeyword : SyntaxKind.DisableKeyword),
+                            true)))
+                    .WithTrailingTrivia(
+                        Trivia(
+                            NullableDirectiveTrivia(
+                                Token(SyntaxKind.RestoreKeyword),
+                                true)));
+            }
 
             foreach (var def in file.NestedTypes)
             {

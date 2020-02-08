@@ -372,7 +372,7 @@ namespace Capnp.Rpc
                 }
 
                 IProvidedCapability? cap;
-                PendingAnswer? pendingAnswer = null;
+                PendingAnswer pendingAnswer;
                 bool releaseParamCaps = false;
 
                 void AwaitAnswerAndReply()

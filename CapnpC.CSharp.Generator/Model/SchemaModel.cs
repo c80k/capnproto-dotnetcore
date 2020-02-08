@@ -93,6 +93,7 @@ namespace CapnpC.CSharp.Generator.Model
             file.Namespace = GetNamespaceAnnotation(node);
             file.Name = name;
             file.NullableEnable = GetNullableEnable(node);
+            file.EmitNullableDirective = GetEmitNullableDirective(node) ?? false;
             return ProcessNodePass1(id, name, state) as GenFile;
         }
 

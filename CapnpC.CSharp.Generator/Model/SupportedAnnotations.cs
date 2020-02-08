@@ -18,6 +18,7 @@ namespace CapnpC.CSharp.Generator.Model
                 public const ulong Namespace = 0xeb0d831668c6eda0;
                 public const ulong NullableEnable = 0xeb0d831668c6eda1;
                 public const ulong Name = 0xeb0d831668c6eda2;
+                public const ulong EmitNullableDirective = 0xeb0d831668c6eda3;
             }
         }
 
@@ -79,6 +80,18 @@ namespace CapnpC.CSharp.Generator.Model
             foreach (var annotation in node.Annotations)
             {
                 if (annotation.Id == AnnotationIds.Cs.NullableEnable && annotation.Value.IsBool)
+                {
+                    return annotation.Value.Bool;
+                }
+            }
+            return null;
+        }
+
+        public static bool? GetEmitNullableDirective(Schema.Node.Reader node)
+        {
+            foreach (var annotation in node.Annotations)
+            {
+                if (annotation.Id == AnnotationIds.Cs.EmitNullableDirective && annotation.Value.IsBool)
                 {
                     return annotation.Value.Bool;
                 }
