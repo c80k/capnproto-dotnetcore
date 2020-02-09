@@ -77,10 +77,17 @@ namespace Capnp
             }
 
             Init(items.Count);
-            
-            for (int i = 0; i < items.Count; i++)
+
+            if (items is T[] array)
             {
-                this[i] = items[i];
+                array.CopyTo(Data);
+            }
+            else
+            {
+                for (int i = 0; i < items.Count; i++)
+                {
+                    this[i] = items[i];
+                }
             }
         }
 
