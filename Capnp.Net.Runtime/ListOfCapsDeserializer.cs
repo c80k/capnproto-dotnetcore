@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Capnp
 {
@@ -29,7 +28,7 @@ namespace Capnp
                 if (index < 0 || index >= Count)
                     throw new IndexOutOfRangeException();
 
-                return Rpc.CapabilityReflection.CreateProxy<T>(State.DecodeCapPointer(index)) as T;
+                return (Rpc.CapabilityReflection.CreateProxy<T>(State.DecodeCapPointer(index)) as T)!;
             }
         }
 

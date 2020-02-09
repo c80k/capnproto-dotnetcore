@@ -2,9 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -22,7 +20,7 @@ namespace Capnp
 
         int _disposing;
         readonly Stream _stream;
-        readonly BinaryWriter _writer;
+        readonly BinaryWriter? _writer;
         readonly object _writeLock = new object();
         readonly List<IFrameTracer> _tracers = new List<IFrameTracer>();
 
@@ -62,7 +60,7 @@ namespace Capnp
         /// <summary>
         /// Event handler for frame reception.
         /// </summary>
-        public event Action<WireFrame> FrameReceived;
+        public event Action<WireFrame>? FrameReceived;
 
         /// <summary>
         /// Sends a message over the stream.

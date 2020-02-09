@@ -109,12 +109,12 @@ namespace Capnp.Rpc
             public FramePump Pump { get; private set; }
             public OutboundTcpEndpoint OutboundEp { get; private set; }
             public RpcEngine.RpcEndpoint InboundEp { get; private set; }
-            public Thread PumpRunner { get; private set; }
+            public Thread? PumpRunner { get; private set; }
             public int? LocalPort => ((IPEndPoint)Client.Client.LocalEndPoint)?.Port;
             public int? RemotePort => ((IPEndPoint)Client.Client.RemoteEndPoint)?.Port;
             public long RecvCount => InboundEp.RecvCount;
             public long SendCount => InboundEp.SendCount;
-            public bool IsComputing => PumpRunner.ThreadState == ThreadState.Running;
+            public bool IsComputing => PumpRunner?.ThreadState == ThreadState.Running;
             public bool IsWaitingForData => Pump.IsWaitingForData;
 
             public void AttachTracer(IFrameTracer tracer)
@@ -184,7 +184,7 @@ namespace Capnp.Rpc
                         connection.Start();
                     }
 
-                    connection.PumpRunner.Start();
+                    connection.PumpRunner!.Start();
                 }
             }
             catch (SocketException)
@@ -199,8 +199,13 @@ namespace Capnp.Rpc
             }
         }
 
-        void SafeJoin(Thread thread)
+        void SafeJoin(Thread? thread)
         {
+            if (thread == null)
+            {
+                return;
+            }
+
             for (int retry = 0; retry < 5; ++retry)
             {
                 try
@@ -332,6 +337,6 @@ namespace Capnp.Rpc
         /// <summary>
         /// Fires when a new incoming connection was accepted, or when an active connection is closed.
         /// </summary>
-        public event Action<object, ConnectionEventArgs> OnConnectionChanged;
+        public event Action<object, ConnectionEventArgs>? OnConnectionChanged;
     }
 }

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace Capnp
 {
@@ -12,7 +10,7 @@ namespace Capnp
     {
         readonly ISegmentAllocator _allocator;
         readonly DynamicSerializerState _rootPtrBuilder;
-        List<Rpc.ConsumedCapability> _capTable;
+        List<Rpc.ConsumedCapability?>? _capTable;
 
         MessageBuilder(ISegmentAllocator allocator)
         {
@@ -56,10 +54,11 @@ namespace Capnp
         /// Gets or sets the root object. The root object must be set exactly once per message.
         /// Setting it manually is only required (and allowed) when it was created with <see cref="CreateObject{TS}"/>.
         /// </summary>
-        public SerializerState Root
+        /// <exception cref="ArgumentNullException">Attempt to set null reference</exception>
+        public SerializerState? Root
         {
             get => _rootPtrBuilder.TryGetPointer(0);
-            set => _rootPtrBuilder.Link(0, value);
+            set => _rootPtrBuilder.Link(0, value ?? throw new ArgumentNullException(nameof(value)));
         }
 
         /// <summary>
@@ -90,13 +89,13 @@ namespace Capnp
             if (_capTable != null)
                 throw new InvalidOperationException("Capability table was already initialized");
 
-            _capTable = new List<Rpc.ConsumedCapability>();
+            _capTable = new List<Rpc.ConsumedCapability?>();
         }
 
         /// <summary>
         /// Returns this message builder's segment allocator.
         /// </summary>
         public ISegmentAllocator Allocator => _allocator;
-        internal List<Rpc.ConsumedCapability> Caps => _capTable;
+        internal List<Rpc.ConsumedCapability?>? Caps => _capTable;
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Capnp.Rpc
+﻿namespace Capnp.Rpc
 {
     /// <summary>
     /// Base class for a low-level capability at consumer side. It is created by the <see cref="RpcEngine"/>. An application does not directly interact with it
@@ -18,7 +14,7 @@ namespace Capnp.Rpc
         /// </summary>
         protected abstract void ReleaseRemotely();
         internal abstract void Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer);
-        internal abstract void Freeze(out IRpcEndpoint boundEndpoint);
+        internal abstract void Freeze(out IRpcEndpoint? boundEndpoint);
         internal abstract void Unfreeze();
 
         internal abstract void AddRef();

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Capnp
 {
@@ -8,7 +6,7 @@ namespace Capnp
     {
         class Coder<T>
         {
-            public static Func<T, T, T> Fn { get; set; }
+            public static Func<T, T, T>? Fn { get; set; }
         }
 
         static PrimitiveCoder()

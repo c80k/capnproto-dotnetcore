@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,7 +13,7 @@ namespace Capnp.Rpc
         public static ConsumedCapability Create(Skeleton skeleton)
         {
             if (skeleton is Vine vine)
-                return vine.Proxy.ConsumedCap;
+                return vine.Proxy.ConsumedCap!;
             else
                 return _localCaps.GetValue(skeleton, _ => new LocalCapability(_));
         }
@@ -22,7 +21,7 @@ namespace Capnp.Rpc
         static async Task<DeserializerState> AwaitAnswer(Task<AnswerOrCounterquestion> call)
         {
             var aorcq = await call;
-            return aorcq.Answer ?? await aorcq.Counterquestion.WhenReturned;
+            return aorcq.Answer ?? await aorcq.Counterquestion!.WhenReturned;
         }
 
         public Skeleton ProvidedCap { get; }
@@ -55,7 +54,7 @@ namespace Capnp.Rpc
             capDesc.SenderHosted = endpoint.AllocateExport(ProvidedCap, out bool _);
         }
 
-        internal override void Freeze(out IRpcEndpoint boundEndpoint)
+        internal override void Freeze(out IRpcEndpoint? boundEndpoint)
         {
             boundEndpoint = null;
         }

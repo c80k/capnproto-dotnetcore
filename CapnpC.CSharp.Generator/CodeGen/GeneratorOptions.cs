@@ -1,6 +1,6 @@
 ﻿namespace CapnpC.CSharp.Generator.CodeGen
 {
-    class GeneratorOptions
+    public class GeneratorOptions
     {
         public string TopNamespaceName { get; set; } = "CapnpGen";
         public string ReaderStructName { get; set; } = "READER";
@@ -37,5 +37,6 @@
         public string TaskParameterName { get; set; } = "task";
         public string EagerMethodName { get; set; } = "Eager";
         public string TypeIdFieldName { get; set; } = "typeId";
+        public bool NullableEnableDefault { get; set; } = false;
     }
 }

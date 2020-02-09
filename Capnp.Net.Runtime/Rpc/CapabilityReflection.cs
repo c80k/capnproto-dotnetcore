@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -110,7 +109,7 @@ namespace Capnp.Rpc
 
             return (SkeletonFactory)Activator.CreateInstance(
                 typeof(SkeletonFactory<>)
-                .MakeGenericType(skeletonClass));
+                .MakeGenericType(skeletonClass))!;
         }
 
         static SkeletonFactory GetSkeletonFactory(Type type)
@@ -190,7 +189,7 @@ namespace Capnp.Rpc
 
                         return (ProxyFactory)Activator.CreateInstance(
                             typeof(ProxyFactory<>)
-                            .MakeGenericType(proxyClass));
+                            .MakeGenericType(proxyClass))!;
                     }
                     else
                     {
@@ -263,7 +262,7 @@ namespace Capnp.Rpc
         /// <exception cref="System.Reflection.TargetInvocationException">Problem with instatiating the Proxy (constructor threw exception).</exception>
         /// <exception cref="MemberAccessException">Caller does not have permission to invoke the Proxy constructor.</exception>
         /// <exception cref="TypeLoadException">Problem with building the Proxy type, or problem with loading some dependent class.</exception>
-        public static Proxy CreateProxy<TInterface>(ConsumedCapability cap,
+        public static Proxy CreateProxy<TInterface>(ConsumedCapability? cap,
             [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
             [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
             [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0)

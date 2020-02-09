@@ -8,6 +8,7 @@ namespace CapnpC.CSharp.Generator.Model
         public TypeDefinition DeclaringInterface { get; set; }
         public int Id { get; set; }
         public string Name { get; set; }
+        public string CsName { get; set; }
         public List<Field> Params { get; } = new List<Field>();
         public List<Field> Results { get; } = new List<Field>();
         public Type ParamsStruct { get; set; }
@@ -21,6 +22,7 @@ namespace CapnpC.CSharp.Generator.Model
                 DeclaringInterface = DeclaringInterface,
                 Id = Id,
                 Name = Name,
+                CsName = CsName,
                 ParamsStruct = ParamsStruct,
                 ResultStruct = ResultStruct
             };

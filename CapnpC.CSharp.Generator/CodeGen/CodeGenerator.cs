@@ -14,6 +14,7 @@
     internal class CodeGenerator
     {
         readonly SchemaModel _model;
+        readonly GeneratorOptions _options;
         readonly GenNames _names;
         readonly CommonSnippetGen _commonGen;
         readonly DomainClassSnippetGen _domClassGen;
@@ -24,6 +25,7 @@
         public CodeGenerator(SchemaModel model, GeneratorOptions options)
         {
             _model = model;
+            _options = options;
             _names = new GenNames(options);
             _commonGen = new CommonSnippetGen(_names);
             _domClassGen = new DomainClassSnippetGen(_names);
@@ -61,7 +63,7 @@
         {
             var topDecl = ClassDeclaration(_names.MakeTypeName(def).Identifier)                
                 .AddModifiers(Public)
-                .AddBaseListTypes(SimpleBaseType(Type<Capnp.ICapnpSerializable>()));
+                .AddBaseListTypes(SimpleBaseType(_names.Type<Capnp.ICapnpSerializable>(Nullability.NonNullable)));
 
             if (def.GenericParameters.Count > 0)
             {
@@ -184,9 +186,25 @@
 
         internal string Transform(GenFile file)
         {
+            _names.NullableEnable = file.NullableEnable ?? _options.NullableEnableDefault;
+
             NameSyntax topNamespace = GenNames.NamespaceName(file.Namespace) ?? _names.TopNamespace;
 
             var ns = NamespaceDeclaration(topNamespace);
+            
+            if (file.EmitNullableDirective)
+            {
+                ns = ns.WithLeadingTrivia(
+                    Trivia(
+                        NullableDirectiveTrivia(
+                            Token(_names.NullableEnable ? SyntaxKind.EnableKeyword : SyntaxKind.DisableKeyword),
+                            true)))
+                    .WithTrailingTrivia(
+                        Trivia(
+                            NullableDirectiveTrivia(
+                                Token(SyntaxKind.RestoreKeyword),
+                                true)));
+            }
 
             foreach (var def in file.NestedTypes)
             {
@@ -204,7 +222,15 @@
                 UsingDirective(ParseName("Capnp")),
                 UsingDirective(ParseName("Capnp.Rpc")),
                 UsingDirective(ParseName("System")),
-                UsingDirective(ParseName("System.Collections.Generic")),
+                UsingDirective(ParseName("System.Collections.Generic")));
+
+            if (_names.NullableEnable)
+            {
+                cu = cu.AddUsings(
+                    UsingDirective(ParseName("System.Diagnostics.CodeAnalysis")));
+            }
+
+            cu = cu.AddUsings(
                 UsingDirective(ParseName("System.Threading")),
                 UsingDirective(ParseName("System.Threading.Tasks")));
 

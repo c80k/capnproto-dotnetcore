@@ -1,4 +1,5 @@
 #pragma warning disable CS1591
+#nullable disable
 
 using Capnp;
 using Capnp.Rpc;
@@ -2641,3 +2642,5 @@ namespace Capnp.Rpc
         }
     }
 }
+
+#nullable restore

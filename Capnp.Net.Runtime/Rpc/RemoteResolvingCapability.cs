@@ -23,14 +23,17 @@ namespace Capnp.Rpc
         }
 
         protected int _pendingCallsOnPromise;
-        Task _disembargo;
+        Task? _disembargo;
 
-        protected abstract Proxy ResolvedCap { get; }
+        protected abstract Proxy? ResolvedCap { get; }
 
         protected abstract void GetMessageTarget(MessageTarget.WRITER wr);
 
         protected IPromisedAnswer CallOnResolution(ulong interfaceId, ushort methodId, DynamicSerializerState args)
         {
+            if (ResolvedCap == null)
+                throw new InvalidOperationException("Capability not yet resolved, calling on resolution not possible");
+
             try
             {
                 ResolvedCap.Freeze(out var resolvedCapEndpoint);

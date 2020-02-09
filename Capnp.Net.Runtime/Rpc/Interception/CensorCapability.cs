@@ -32,7 +32,7 @@
             writer.SenderHosted = endpoint.AllocateExport(MyVine, out bool _);
         }
 
-        internal override void Freeze(out IRpcEndpoint boundEndpoint)
+        internal override void Freeze(out IRpcEndpoint? boundEndpoint)
         {
             boundEndpoint = null;
         }

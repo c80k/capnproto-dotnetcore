@@ -9,7 +9,7 @@ namespace Capnp
     /// </summary>
     public class ListOfTextSerializer :
         SerializerState,
-        IReadOnlyList<string>
+        IReadOnlyList<string?>
     {
         /// <summary>
         /// Gets or sets the text at given index. Once an element is set, it cannot be overwritten.
@@ -18,7 +18,7 @@ namespace Capnp
         /// <exception cref="InvalidOperationException">List is not initialized</exception>
         /// <exception cref="IndexOutOfRangeException"><paramref name="index"/> is out of range.</exception>
         /// <exception cref="ArgumentOutOfRangeException">UTF-8 encoding exceeds 2^29-2 bytes</exception>
-        public string this[int index]
+        public string? this[int index]
         {
             get
             {
@@ -47,7 +47,7 @@ namespace Capnp
         /// </summary>
         public int Count => ListElementCount;
 
-        IEnumerable<string> Enumerate()
+        IEnumerable<string?> Enumerate()
         {
             int count = Count;
 
@@ -60,7 +60,7 @@ namespace Capnp
         /// <summary>
         /// Implementation of <see cref="IEnumerable{String}"/>/>
         /// </summary>
-        public IEnumerator<string> GetEnumerator()
+        public IEnumerator<string?> GetEnumerator()
         {
             return Enumerate().GetEnumerator();
         }
@@ -88,7 +88,7 @@ namespace Capnp
         /// <param name="items">List content. Can be null in which case the list is simply not initialized.</param>
         /// <exception cref="InvalidOperationException">The list was already initialized</exception>
         /// <exception cref="ArgumentOutOfRangeException">More than 2^29-1 items, or the UTF-8 encoding of an individual string requires more than 2^29-2 bytes.</exception>
-        public void Init(IReadOnlyList<string> items)
+        public void Init(IReadOnlyList<string?>? items)
         {
             if (items == null)
             {
@@ -109,4 +109,3 @@ namespace Capnp
         }
     }
 }
-

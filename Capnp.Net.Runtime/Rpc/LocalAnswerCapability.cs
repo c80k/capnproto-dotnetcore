@@ -15,7 +15,7 @@ namespace Capnp.Rpc
             _access = access;
         }
 
-        internal override void Freeze(out IRpcEndpoint boundEndpoint)
+        internal override void Freeze(out IRpcEndpoint? boundEndpoint)
         {
             boundEndpoint = null;
         }
@@ -43,7 +43,7 @@ namespace Capnp.Rpc
                 }
                 catch (AggregateException exception)
                 {
-                    throw exception.InnerException;
+                    throw exception.InnerException!;
                 }
 
                 using (var proxy = new Proxy(_access.Eval(result)))

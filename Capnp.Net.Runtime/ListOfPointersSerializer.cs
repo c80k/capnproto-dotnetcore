@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Capnp
 {
@@ -12,7 +10,7 @@ namespace Capnp
     /// <typeparam name="TS">SerializerState which represents the element type</typeparam>
     public class ListOfPointersSerializer<TS>:
         SerializerState,
-        IReadOnlyList<TS>
+        IReadOnlyList<TS?>
         where TS: SerializerState, new()
     {
         /// <summary>
@@ -51,7 +49,7 @@ namespace Capnp
         /// </summary>
         public int Count => ListElementCount;
 
-        IEnumerable<TS> Enumerate()
+        IEnumerable<TS?> Enumerate()
         {
             int count = Count;
 
@@ -64,7 +62,7 @@ namespace Capnp
         /// <summary>
         /// Implements <see cref="IEnumerable{TS}"/>.
         /// </summary>
-        public IEnumerator<TS> GetEnumerator()
+        public IEnumerator<TS?> GetEnumerator()
         {
             return Enumerate().GetEnumerator();
         }
@@ -94,7 +92,7 @@ namespace Capnp
         /// <param name="init">Serialization action to transfer a particular item into the serializer state.</param>
         /// <exception cref="InvalidOperationException">The list was already initialized</exception>
         /// <exception cref="ArgumentOutOfRangeException">More than 2^29-1 items.</exception>
-        public void Init<T>(IReadOnlyList<T> items, Action<TS, T> init)
+        public void Init<T>(IReadOnlyList<T>? items, Action<TS, T> init)
         {
             if (items == null)
             {
@@ -115,4 +113,3 @@ namespace Capnp
         }
     }
 }
-

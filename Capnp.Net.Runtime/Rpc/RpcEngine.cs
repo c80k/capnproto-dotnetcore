@@ -4,9 +4,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -65,8 +62,8 @@ namespace Capnp.Rpc
 
         internal class RpcEndpoint : IEndpoint, IRpcEndpoint
         {
-            static readonly ThreadLocal<Action> _exportCapTablePostActions = new ThreadLocal<Action>();
-            static readonly ThreadLocal<PendingQuestion> _tailCall = new ThreadLocal<PendingQuestion>();
+            static readonly ThreadLocal<Action?> _exportCapTablePostActions = new ThreadLocal<Action?>();
+            static readonly ThreadLocal<PendingQuestion?> _tailCall = new ThreadLocal<PendingQuestion?>();
             static readonly ThreadLocal<bool> _canDeferCalls = new ThreadLocal<bool>();
 
             ILogger Logger { get; } = Logging.CreateLogger<RpcEndpoint>();
@@ -145,8 +142,7 @@ namespace Capnp.Rpc
                 Tx(mb.Frame);
             }
 
-            void IRpcEndpoint.Resolve(uint preliminaryId, Skeleton preliminaryCap, 
-                Func<ConsumedCapability> resolvedCapGetter)
+            void IRpcEndpoint.Resolve(uint preliminaryId, Skeleton preliminaryCap, Func<ConsumedCapability> resolvedCapGetter)
             {
                 lock (_reentrancyBlocker)
                 {
@@ -232,7 +228,7 @@ namespace Capnp.Rpc
                 return AllocateExport(providedCapability, out first);
             }
 
-            PendingQuestion AllocateQuestion(ConsumedCapability target, SerializerState inParams)
+            PendingQuestion AllocateQuestion(ConsumedCapability? target, SerializerState? inParams)
             {
                 lock (_reentrancyBlocker)
                 {
@@ -293,7 +289,7 @@ namespace Capnp.Rpc
                 uint q = req.QuestionId;
 
                 var bootstrap = DynamicSerializerState.CreateForRpc();
-                var ans = bootstrap.MsgBuilder.BuildRoot<Message.WRITER>();
+                var ans = bootstrap.MsgBuilder!.BuildRoot<Message.WRITER>();
 
                 ans.which = Message.WHICH.Return;
                 var ret = ans.Return;
@@ -305,7 +301,7 @@ namespace Capnp.Rpc
                 if (bootstrapCap != null)
                 {
                     ret.which = Return.WHICH.Results;
-                    bootstrap.SetCapability(bootstrap.ProvideCapability(LocalCapability.Create(_host.BootstrapCap)));
+                    bootstrap.SetCapability(bootstrap.ProvideCapability(LocalCapability.Create(bootstrapCap)));
                     ret.Results.Content = bootstrap;
 
                     bootstrapTask = Task.FromResult<AnswerOrCounterquestion>(bootstrap);
@@ -371,12 +367,12 @@ namespace Capnp.Rpc
                     }
                     catch (RpcException exception)
                     {
-                        Logger.LogWarning($"Unable to return call: {exception.InnerException.Message}");
+                        Logger.LogWarning($"Unable to return call: {exception.InnerException?.Message ?? exception.Message}");
                     }
                 }
 
-                IProvidedCapability cap;
-                PendingAnswer pendingAnswer = null;
+                IProvidedCapability? cap;
+                PendingAnswer pendingAnswer;
                 bool releaseParamCaps = false;
 
                 void AwaitAnswerAndReply()
@@ -414,8 +410,8 @@ namespace Capnp.Rpc
                                     }
                                     else if (aorcq.Answer != null || aorcq.Counterquestion != _tailCall.Value)
                                     {
-                                        var results = aorcq.Answer ?? (DynamicSerializerState)(await aorcq.Counterquestion.WhenReturned);
-                                        var ret = SetupReturn(results.MsgBuilder);
+                                        var results = aorcq.Answer ?? (DynamicSerializerState)(await aorcq.Counterquestion!.WhenReturned);
+                                        var ret = SetupReturn(results.MsgBuilder!);
 
                                         switch (req.SendResultsTo.which)
                                         {
@@ -569,7 +565,7 @@ namespace Capnp.Rpc
                         case MessageTarget.WHICH.PromisedAnswer:
                             {
                                 bool exists;
-                                PendingAnswer previousAnswer;
+                                PendingAnswer? previousAnswer;
 
                                 lock (_reentrancyBlocker)
                                 {
@@ -578,7 +574,7 @@ namespace Capnp.Rpc
 
                                 if (exists)
                                 {
-                                    previousAnswer.Chain(
+                                    previousAnswer!.Chain(
                                         false,
                                         req.Target.PromisedAnswer,
                                         async t =>
@@ -633,7 +629,7 @@ namespace Capnp.Rpc
 
             void ProcessReturn(Return.READER req)
             {
-                PendingQuestion question;
+                PendingQuestion? question;
 
                 lock (_reentrancyBlocker)
                 {
@@ -674,7 +670,7 @@ namespace Capnp.Rpc
                     case Return.WHICH.TakeFromOtherQuestion:
                         {
                             bool exists;
-                            PendingAnswer pendingAnswer;
+                            PendingAnswer? pendingAnswer;
 
                             lock (_reentrancyBlocker)
                             {
@@ -683,7 +679,7 @@ namespace Capnp.Rpc
 
                             if (exists)
                             {
-                                pendingAnswer.Chain(false, async t =>
+                                pendingAnswer!.Chain(false, async t =>
                                 {
                                     try
                                     {
@@ -747,6 +743,8 @@ namespace Capnp.Rpc
                         lock (_reentrancyBlocker)
                         {
                             var resolvedCap = ImportCap(resolve.Cap);
+                            if (resolvedCap == null)
+                                resolvedCap = LazyCapability.CreateBrokenCap("Failed to resolve this capability");
                             resolvableCap.ResolveTo(resolvedCap);
                         }
                         break;
@@ -935,7 +933,7 @@ namespace Capnp.Rpc
                         {
                             foreach (var cap in results.Caps)
                             {
-                                cap.Release();
+                                cap?.Release();
                             }
                         }
                     });
@@ -984,8 +982,8 @@ namespace Capnp.Rpc
                         try
                         {
                             int icount = checked((int)count);
-                            rc.Release(icount);
-                            rc.Cap.Relinquish(icount);
+                            rc!.Release(icount);
+                            rc!.Cap.Relinquish(icount);
 
                             if (rc.RefCount == 0)
                             {
@@ -1171,7 +1169,7 @@ namespace Capnp.Rpc
                 }
             }
 
-            ConsumedCapability ImportCap(CapDescriptor.READER capDesc)
+            ConsumedCapability? ImportCap(CapDescriptor.READER capDesc)
             {
                 lock (_reentrancyBlocker)
                 {
@@ -1192,8 +1190,7 @@ namespace Capnp.Rpc
                                     rcw.Cap.SetTarget(impCap);
                                 }
 
-                                Debug.Assert(impCap != null);
-                                return impCap;
+                                return impCap!;
                             }
                             else
                             {
@@ -1236,7 +1233,6 @@ namespace Capnp.Rpc
                         case CapDescriptor.WHICH.ReceiverHosted:
                             if (_exportTable.TryGetValue(capDesc.ReceiverHosted, out var rc))
                             {
-                                Debug.Assert(rc.Cap != null);
                                 return LocalCapability.Create(rc.Cap);
                             }
                             else
@@ -1311,9 +1307,9 @@ namespace Capnp.Rpc
                 }
             }
 
-            public IList<ConsumedCapability> ImportCapTable(Payload.READER payload)
+            public IList<ConsumedCapability?> ImportCapTable(Payload.READER payload)
             {
-                var list = new List<ConsumedCapability>();
+                var list = new List<ConsumedCapability?>();
 
                 if (payload.CapTable != null)
                 {
@@ -1341,7 +1337,7 @@ namespace Capnp.Rpc
                 Debug.Assert(_exportCapTablePostActions.Value == null);
                 _exportCapTablePostActions.Value = null;
 
-                payload.CapTable.Init(state.MsgBuilder.Caps.Count);
+                payload.CapTable.Init(state.MsgBuilder!.Caps!.Count);
 
                 int i = 0;
                 foreach (var cap in state.MsgBuilder.Caps)
@@ -1454,7 +1450,7 @@ namespace Capnp.Rpc
                     }
                     catch (RpcException exception)
                     {
-                        Logger.LogWarning($"Unable to release import: {exception.InnerException.Message}");
+                        Logger.LogWarning($"Unable to release import: {exception.InnerException?.Message ?? exception.Message}");
                     }
                 }
             }
@@ -1492,12 +1488,12 @@ namespace Capnp.Rpc
             return inboundEndpoint;
         }
 
-        Skeleton _bootstrapCap;
+        Skeleton? _bootstrapCap;
 
         /// <summary>
         /// Gets or sets the bootstrap capability.
         /// </summary>
-        public Skeleton BootstrapCap
+        public Skeleton? BootstrapCap
         {
             get => _bootstrapCap;
             set

@@ -33,7 +33,7 @@
         /// Constructs an instance and binds it to the given low-level capability.
         /// </summary>
         /// <param name="cap">low-level capability</param>
-        public BareProxy(ConsumedCapability cap): base(cap)
+        public BareProxy(ConsumedCapability? cap): base(cap)
         {
         }
 

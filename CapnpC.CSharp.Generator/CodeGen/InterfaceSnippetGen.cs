@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis;
 
 namespace CapnpC.CSharp.Generator.CodeGen
 {
@@ -27,15 +28,19 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 case 0:
                     return IdentifierName(nameof(Task));
 
+                case 1 when method.Results[0].Type.Tag == TypeTag.Struct:
+                    return GenericName(nameof(Task)).AddTypeArgumentListArguments(
+                        _names.MakeTypeSyntax(method.Results[0].Type, method.DeclaringInterface, TypeUsage.DomainClass, Nullability.NonNullable));
+
                 case 1:
                     return GenericName(nameof(Task)).AddTypeArgumentListArguments(
-                        _names.MakeTypeSyntax(method.Results[0].Type, method.DeclaringInterface, TypeUsage.DomainClass));
+                        _names.MakeTypeSyntax(method.Results[0].Type, method.DeclaringInterface, TypeUsage.DomainClass, Nullability.NullableRef));
 
                 default:
                     return GenericName(nameof(Task)).AddTypeArgumentListArguments(
                         TupleType(SeparatedList(
                             method.Results.Select(
-                                f => TupleElement(_names.MakeTypeSyntax(f.Type, method.DeclaringInterface, TypeUsage.DomainClass))))));
+                                f => TupleElement(_names.MakeTypeSyntax(f.Type, method.DeclaringInterface, TypeUsage.DomainClass, Nullability.NullableRef))))));
             }
         }
 
@@ -50,14 +55,14 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 if (arg0.Name == null)
                 {
                     list.Add(Parameter(_names.AnonymousParameter.Identifier)
-                        .WithType(_names.MakeTypeSyntax(arg0.Type, method.DeclaringInterface, TypeUsage.DomainClass)));
+                        .WithType(_names.MakeTypeSyntax(arg0.Type, method.DeclaringInterface, TypeUsage.DomainClass, Nullability.NullableRef)));
                 }
                 else
                 {
                     foreach (var arg in method.Params)
                     {
-                        list.Add(Parameter(Identifier(IdentifierRenamer.ToNonKeyword(arg.Name)))
-                            .WithType(_names.MakeTypeSyntax(arg.Type, method.DeclaringInterface, TypeUsage.DomainClass)));
+                        list.Add(Parameter(_names.GetCodeIdentifier(arg).Identifier)
+                            .WithType(_names.MakeTypeSyntax(arg.Type, method.DeclaringInterface, TypeUsage.DomainClass, Nullability.NullableRef)));
                     }
                 }
             }
@@ -124,7 +129,8 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     ifaceDecl = ifaceDecl.AddBaseListTypes(
                         SimpleBaseType(_names.MakeTypeSyntax(
                             superClass, type,
-                            TypeUsage.NotRelevant)));
+                            TypeUsage.DomainClass,
+                            Nullability.NonNullable)));
                 }
             }
 
@@ -182,12 +188,15 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         IEnumerable<ExpressionSyntax> MakeProxyCallInitializerAssignments(Method method)
         {
-            foreach (var methodParam in method.Params)
+            for (int i = 0; i < method.Params.Count; i++)
             {
+                var methodParam = method.Params[i];
+                var field = method.ParamsStruct.Fields[i];
+
                 yield return AssignmentExpression(
                     SyntaxKind.SimpleAssignmentExpression,
-                    _names.GetCodeIdentifier(methodParam).IdentifierName,
-                    IdentifierName(IdentifierRenamer.ToNonKeyword(methodParam.Name)));
+                    _names.GetCodeIdentifier(field).IdentifierName,
+                    _names.GetCodeIdentifier(methodParam).IdentifierName);
             }
         }
 
@@ -226,16 +235,23 @@ namespace CapnpC.CSharp.Generator.CodeGen
         StatementSyntax MakeProxyCreateResult(Method method)
         {
             var resultType = method.ResultStruct;
-            var domainType = _names.MakeTypeSyntax(resultType, method.DeclaringInterface, TypeUsage.DomainClass);
+            var domainType = _names.MakeTypeSyntax(resultType, method.DeclaringInterface, TypeUsage.DomainClass, Nullability.NonNullable);
 
-            var createDomain = InvocationExpression(
+            ExpressionSyntax createDomain = InvocationExpression(
                     MemberAccessExpression(
                         SyntaxKind.SimpleMemberAccessExpression,
                         IdentifierName(nameof(Capnp.CapnpSerializable)),
                         GenericName(nameof(Capnp.CapnpSerializable.Create))
-                            .AddTypeArgumentListArguments(domainType)))
+                            .AddTypeArgumentListArguments(MakeNonNullableType(domainType))))
                         .AddArgumentListArguments(
                             Argument(_names.DeserializerLocal.IdentifierName));
+
+            if (_names.NullableEnable)
+            {
+                createDomain = PostfixUnaryExpression(
+                    SyntaxKind.SuppressNullableWarningExpression,
+                    createDomain);
+            }
 
             return LocalDeclarationStatement(
                 VariableDeclaration(
@@ -271,7 +287,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
             var classDecl = ClassDeclaration(_names.MakeTypeName(type, NameUsage.Proxy).Identifier)
                 .AddModifiers(Public)
                 .AddBaseListTypes(
-                    SimpleBaseType(Type<Capnp.Rpc.Proxy>()),
+                    SimpleBaseType(_names.Type<Capnp.Rpc.Proxy>(Nullability.NonNullable)),
                     SimpleBaseType(_names.MakeGenericTypeName(type, NameUsage.Interface)));
 
             if (type.GenericParameters.Count > 0)
@@ -311,7 +327,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                                                 _names.MakeTypeSyntax(
                                                                     method.ParamsStruct, 
                                                                     method.ParamsStruct.Definition, 
-                                                                    TypeUsage.Writer))))))))))));
+                                                                    TypeUsage.Writer, Nullability.NonNullable))))))))))));
 
                 if (method.ParamsStruct.Definition.SpecialName == SpecialName.MethodParamsStruct)
                 {
@@ -328,7 +344,8 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                                     _names.MakeTypeSyntax(
                                                         method.ParamsStruct,
                                                         method.ParamsStruct.Definition,
-                                                        TypeUsage.DomainClass))
+                                                        TypeUsage.DomainClass,
+                                                        Nullability.NonNullable))
                                                 .WithArgumentList(
                                                     ArgumentList())
                                                 .WithInitializer(
@@ -340,13 +357,12 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 }
 
                 bodyStmts.Add(ExpressionStatement(
-                    InvocationExpression(
-                        MemberAccessExpression(
-                            SyntaxKind.SimpleMemberAccessExpression,
-                            _names.AnonymousParameter.IdentifierName,
-                            _names.SerializeMethod.IdentifierName))
-                            .AddArgumentListArguments(
-                                Argument(_names.ParamsLocal.IdentifierName))));
+                    ConditionalAccessExpression(
+                        _names.AnonymousParameter.IdentifierName,
+                        InvocationExpression(
+                            MemberBindingExpression(_names.SerializeMethod.IdentifierName))
+                        .AddArgumentListArguments(
+                            Argument(_names.ParamsLocal.IdentifierName)))));
 
                 var call = InvocationExpression(IdentifierName(nameof(Capnp.Rpc.BareProxy.Call)))
                     .AddArgumentListArguments(
@@ -361,7 +377,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                     SyntaxKind.SimpleMemberAccessExpression,
                                     _names.ParamsLocal.IdentifierName,
                                     GenericName(nameof(Capnp.SerializerState.Rewrap))
-                                        .AddTypeArgumentListArguments(Type<Capnp.DynamicSerializerState>())))
+                                        .AddTypeArgumentListArguments(_names.Type<Capnp.DynamicSerializerState>(Nullability.NonNullable))))
                                         .AddArgumentListArguments()),
                         Argument(
                             LiteralExpression(SyntaxKind.FalseLiteralExpression)),
@@ -446,7 +462,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         GenericName(_names.GetCodeIdentifier(method).ToString())
                             .AddTypeArgumentListArguments(
                                 Enumerable.Repeat(
-                                    Type<Capnp.AnyPointer>(),
+                                    _names.Type<Capnp.AnyPointer>(Nullability.NonNullable),
                                     method.GenericParameters.Count).ToArray()));
                 }
                 else
@@ -502,7 +518,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                                     _names.MakeTypeSyntax(
                                                         method.ResultStruct,
                                                         method.ResultStruct.Definition,
-                                                        TypeUsage.Writer)))))))))));
+                                                        TypeUsage.Writer, Nullability.NonNullable)))))))))));
 
         }
 
@@ -523,7 +539,8 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                     _names.MakeTypeSyntax(
                                         method.ResultStruct,
                                         method.ResultStruct.Definition,
-                                        TypeUsage.DomainClass))
+                                        TypeUsage.DomainClass,
+                                        Nullability.NonNullable))
                                     .WithInitializer(
                                         InitializerExpression(SyntaxKind.ObjectInitializerExpression)
                                             .AddExpressions(
@@ -575,16 +592,23 @@ namespace CapnpC.CSharp.Generator.CodeGen
             if (method.Params.Count > 0)
             {
                 var paramsType = method.ParamsStruct;
-                var domainType = _names.MakeTypeSyntax(paramsType, method.ParamsStruct.Definition, TypeUsage.DomainClass);
+                var domainType = _names.MakeTypeSyntax(paramsType, method.ParamsStruct.Definition, TypeUsage.DomainClass, Nullability.NonNullable);
 
-                var createDomain = InvocationExpression(
+                ExpressionSyntax createDomain = InvocationExpression(
                         MemberAccessExpression(
                             SyntaxKind.SimpleMemberAccessExpression,
                             IdentifierName(nameof(Capnp.CapnpSerializable)),
                             GenericName(nameof(Capnp.CapnpSerializable.Create))
-                                .AddTypeArgumentListArguments(domainType)))
+                                .AddTypeArgumentListArguments(MakeNonNullableType(domainType))))
                             .AddArgumentListArguments(
                                 Argument(_names.DeserializerLocal.IdentifierName));
+
+                if (_names.NullableEnable)
+                {
+                    createDomain = PostfixUnaryExpression(
+                        SyntaxKind.SuppressNullableWarningExpression,
+                        createDomain);
+                }
 
                 if (method.ParamsStruct.Definition.SpecialName == SpecialName.MethodParamsStruct)
                 {
@@ -630,10 +654,19 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     }
                     else
                     {
+                        // CodeAnalysis.CSharp 3.2.1 has a bug which prevents us from using AddParameterListParameters. :-(
+
+                        var paramList = new List<SyntaxNodeOrToken>();
+                        foreach (var arg in method.Results)
+                        {
+                            if (paramList.Count > 0)
+                                paramList.Add(Token(SyntaxKind.CommaToken));
+                            paramList.Add(Parameter(Identifier(arg.Name)));
+                        }
                         lambdaArg = ParenthesizedLambdaExpression(
-                            MakeMaybeTailCallLambdaBody(method))
-                            .AddParameterListParameters(
-                                method.Results.Select(arg => Parameter(Identifier(arg.Name))).ToArray());
+                            ParameterList(
+                                SeparatedList<ParameterSyntax>(paramList)),
+                            MakeMaybeTailCallLambdaBody(method));
                     }
                 }
                 else
@@ -662,13 +695,13 @@ namespace CapnpC.CSharp.Generator.CodeGen
             foreach (var method in def.Methods)
             {
                 var methodDecl = MethodDeclaration(
-                    Type<Task<Capnp.Rpc.AnswerOrCounterquestion>>(),
+                    _names.Type<Task<Capnp.Rpc.AnswerOrCounterquestion>>(Nullability.NonNullable),
                     _names.GetCodeIdentifier(method).Identifier)
                     .AddParameterListParameters(
                         Parameter(_names.DeserializerLocal.Identifier)
-                            .WithType(Type<Capnp.DeserializerState>()),
+                            .WithType(_names.Type<Capnp.DeserializerState>(Nullability.NonNullable)),
                         Parameter(_names.CancellationTokenParameter.Identifier)
-                            .WithType(Type<CancellationToken>()))
+                            .WithType(_names.Type<CancellationToken>(Nullability.NonNullable)))
                     .AddBodyStatements(
                         MakeSkeletonMethodBody(method).ToArray());
 
@@ -709,7 +742,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                     .AddArgumentListArguments(
                                         MakeSkeletonSetMethodTableArguments(type).ToArray()))),
                     // InterfaceId
-                    PropertyDeclaration(Type<ulong>(), nameof(Capnp.Rpc.Skeleton<object>.InterfaceId))
+                    PropertyDeclaration(_names.Type<ulong>(Nullability.NonNullable), nameof(Capnp.Rpc.Skeleton<object>.InterfaceId))
                         .AddModifiers(Public, Override)
                         .WithExpressionBody(
                             ArrowExpressionClause(
@@ -790,7 +823,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     var accessPath = _names.MakeMemberAccessPathFieldName(method, path);
                     var methodName = _names.MakePipeliningSupportExtensionMethodName(path);
                     var capType = path[path.Count - 1].Type;
-                    var capTypeSyntax = _names.MakeTypeSyntax(capType, null, TypeUsage.DomainClass);
+                    var capTypeSyntax = _names.MakeTypeSyntax(capType, null, TypeUsage.DomainClass, Nullability.NonNullable);
 
                     if (!_existingExtensionMethods.Add((capTypeSyntax.ToString(), methodName.ToString())))
                     {
@@ -815,9 +848,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         .AddModifiers(Static, Readonly);
 
 
-                    var methodDecl = MethodDeclaration(
-                        capTypeSyntax,
-                        methodName.Identifier)
+                    var methodDecl = MethodDeclaration(capTypeSyntax, methodName.Identifier)
                         .AddModifiers(Public, Static)
                         .AddParameterListParameters(
                             Parameter(

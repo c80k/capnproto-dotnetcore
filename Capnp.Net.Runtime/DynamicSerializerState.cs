@@ -144,7 +144,7 @@ namespace Capnp
         /// <item><description>A <code><![CDATA[IReadOnlyList<object>]]></code> whereby each list item is one of the things listed here.</description></item>
         /// </list>
         /// </param>
-        public void SetObject(object obj)
+        public void SetObject(object? obj)
         {
             switch (obj)
             {

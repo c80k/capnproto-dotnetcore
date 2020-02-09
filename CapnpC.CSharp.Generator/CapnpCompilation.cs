@@ -27,10 +27,11 @@ namespace CapnpC.CSharp.Generator
         /// <summary>
         /// Generates C# code from given input stream
         /// </summary>
-        /// <param name="input">input stream containing the binary code generation request, which the frontend capnpc emits</param>
+        /// <param name="input">Input stream containing the binary code generation request, which the frontend capnpc emits</param>
+        /// <param name="options">Configuration options for code generator. If null, default options will be used.</param>
         /// <returns>generation result</returns>
         /// <exception cref="ArgumentNullException">if <paramref name="input"/> is null</exception>
-        public static GenerationResult GenerateFromStream(Stream input)
+        public static GenerationResult GenerateFromStream(Stream input, CodeGen.GeneratorOptions options)
         {
             if (input == null)
                 throw new ArgumentNullException(nameof(input));
@@ -41,7 +42,7 @@ namespace CapnpC.CSharp.Generator
                 var dec = DeserializerState.CreateRoot(segments);
                 var reader = Schema.CodeGeneratorRequest.Reader.Create(dec);
                 var model = Model.SchemaModel.Create(reader);
-                var codeGen = new CodeGen.CodeGenerator(model, new CodeGen.GeneratorOptions());
+                var codeGen = new CodeGen.CodeGenerator(model, options ?? new CodeGen.GeneratorOptions());
                 return new GenerationResult(codeGen.Generate());
             }
             catch (Exception exception)
@@ -49,6 +50,14 @@ namespace CapnpC.CSharp.Generator
                 return new GenerationResult(exception);
             }
         }
+
+        /// <summary>
+        /// Generates C# code from given input stream
+        /// </summary>
+        /// <param name="input">input stream containing the binary code generation request, which the frontend capnpc emits</param>
+        /// <returns>generation result</returns>
+        /// <exception cref="ArgumentNullException">if <paramref name="input"/> is null</exception>
+        public static GenerationResult GenerateFromStream(Stream input) => GenerateFromStream(input, null);
 
         /// <summary>
         /// Invokes "capnp.exe -o-" with given additional arguments and redirects the output to the C# generator backend.

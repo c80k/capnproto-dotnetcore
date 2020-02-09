@@ -1,25 +1,27 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace CapnpC.CSharp.Generator.Tests.Util
 {
     class InlineAssemblyCompiler
     {
-        public static bool TryCompileCapnp(string code)
+        public enum CompileSummary
         {
-            return TryCompileCapnp(new[] {code});
+            Success,
+            SuccessWithWarnings,
+            Error
         }
 
-        public static bool TryCompileCapnp(string[] code)
+        public static CompileSummary TryCompileCapnp(NullableContextOptions nullableContextOptions, params string[] code)
         {
             var options = new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary, 
-                optimizationLevel: OptimizationLevel.Debug);
+                optimizationLevel: OptimizationLevel.Debug,
+                nullableContextOptions: nullableContextOptions);
 
             string assemblyRoot = Path.GetDirectoryName(typeof(object).Assembly.Location);
 
@@ -29,8 +31,12 @@ namespace CapnpC.CSharp.Generator.Tests.Util
                 "Capnp.Net.Runtime",
                 "bin",
                 "Debug",
-                "netcoreapp2.1",
+                "netcoreapp3.0",
                 "Capnp.Net.Runtime.dll"));
+
+            var parseOptions = CSharpParseOptions.Default;
+            if (nullableContextOptions == NullableContextOptions.Disable)
+                parseOptions = parseOptions.WithLanguageVersion(LanguageVersion.CSharp7_1);
 
             var compilation = CSharpCompilation.Create(
                 "CompilationTestAssembly",
@@ -42,7 +48,7 @@ namespace CapnpC.CSharp.Generator.Tests.Util
                     MetadataReference.CreateFromFile(Path.Combine(assemblyRoot, "System.Runtime.dll")),
                     MetadataReference.CreateFromFile(Path.Combine(assemblyRoot, "System.Private.CoreLib.dll")),
                     MetadataReference.CreateFromFile(capnpRuntimePath) },
-                syntaxTrees: Array.ConvertAll(code, new Converter<string, SyntaxTree>(c => CSharpSyntaxTree.ParseText(c))));
+                syntaxTrees: Array.ConvertAll(code, new Converter<string, SyntaxTree>(c => CSharpSyntaxTree.ParseText(c, parseOptions))));
 
             using (var stream = new MemoryStream())
             {
@@ -61,7 +67,17 @@ namespace CapnpC.CSharp.Generator.Tests.Util
                     }
                 }
 
-                return emitResult.Success;
+                if (emitResult.Success)
+                {
+                    if (emitResult.Diagnostics.Any(diag => diag.Severity == DiagnosticSeverity.Warning))
+                        return CompileSummary.SuccessWithWarnings;
+                    else
+                        return CompileSummary.Success;
+                }
+                else
+                {
+                    return CompileSummary.Error;
+                }
             }
         }
     }

@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static CapnpC.CSharp.Generator.CodeGen.SyntaxHelpers;
+using Microsoft.CodeAnalysis;
 
 namespace CapnpC.CSharp.Generator.CodeGen
 {
@@ -20,7 +21,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         MemberDeclarationSyntax MakeUnionField(Field field)
         {
-            var type = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.DomainClassNullable);
+            var type = _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.DomainClass, Nullability.NullableRefAndValue);
 
             switch (field.Type.Tag)
             {
@@ -75,7 +76,8 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 return null;
             }
 
-            var prop = PropertyDeclaration(_names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.DomainClass),
+            var prop = PropertyDeclaration(
+                _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.DomainClass, Nullability.NullableRef),
                 _names.GetCodeIdentifier(field).Identifier)
                 .AddModifiers(Public).AddAccessorListAccessors(
                     AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
@@ -111,7 +113,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
         MemberDeclarationSyntax MakeUnionContentField()
         {
             return FieldDeclaration(
-                VariableDeclaration(SyntaxHelpers.Type<object>())
+                VariableDeclaration(_names.Type<object>(Nullability.NullableRef))
                 .WithVariables(
                     SingletonSeparatedList<VariableDeclaratorSyntax>(
                         VariableDeclarator(_names.UnionContentField.Identifier))))
@@ -163,7 +165,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
                 case TypeTag.Enum:
                     return MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                        _names.MakeTypeSyntax(value.Type, scope, TypeUsage.NotRelevant),
+                        _names.MakeTypeSyntax(value.Type, scope, TypeUsage.NotRelevant, Nullability.NonNullable),
                         IdentifierName(value.GetEnumerant().Literal));
 
                 case TypeTag.F32:
@@ -262,7 +264,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     value.Decode();
 
                     return ObjectCreationExpression(
-                        _names.MakeTypeSyntax(value.Type, scope, TypeUsage.DomainClass))
+                        _names.MakeTypeSyntax(value.Type, scope, TypeUsage.DomainClass, Nullability.NonNullable))
                         .WithArgumentList(ArgumentList())
                         .WithInitializer(
                             InitializerExpression(
@@ -282,7 +284,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     value.Decode();
 
                     return ArrayCreationExpression(ArrayType(
-                        _names.MakeTypeSyntax(value.Type.ElementType, scope, TypeUsage.DomainClass))
+                        _names.MakeTypeSyntax(value.Type.ElementType, scope, TypeUsage.DomainClass, Nullability.NullableRef))
                         .WithRankSpecifiers(
                             SingletonList<ArrayRankSpecifierSyntax>(
                                 ArrayRankSpecifier(
@@ -344,7 +346,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
                     case TypeTag.Enum:
                         return CastExpression(
-                            _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.NotRelevant),
+                            _names.MakeTypeSyntax(field.Type, field.DeclaringType, TypeUsage.NotRelevant, Nullability.NonNullable),
                             LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0)));
 
                     case TypeTag.F32:
@@ -451,13 +453,18 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                 Argument(domain),
                                 Argument(
                                     ParenthesizedLambdaExpression(
+                                        ParameterList(
+                                            SeparatedList<ParameterSyntax>(
+                                                new SyntaxNodeOrToken[]
+                                                {
+                                                    Parameter(Identifier(s)),
+                                                    Token(SyntaxKind.CommaToken),
+                                                    Parameter(Identifier(v))
+                                                })),
                                         MakeComplexSerializeParticle(
                                             type.ElementType,
                                             IdentifierName(s),
-                                            IdentifierName(v)))
-                                        .AddParameterListParameters(
-                                            Parameter(Identifier(s)),
-                                            Parameter(Identifier(v)))));
+                                            IdentifierName(v)))));
 
                 default:
                     return InvocationExpression(
@@ -486,6 +493,11 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        ExpressionSyntax ConditionalSuppressNullableWarning(ExpressionSyntax expression, bool suppress)
+        {
+            return suppress ? _names.SuppressNullableWarning(expression) : expression;
         }
 
         StatementSyntax MakeSerializeMethodFieldAssignment(Field field)
@@ -519,7 +531,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                         writerProp,
                                         MemberAccessExpression(
                                             SyntaxKind.SimpleMemberAccessExpression,
-                                            _names.GetCodeIdentifier(field).IdentifierName,
+                                            _names.SuppressNullableWarning(_names.GetCodeIdentifier(field).IdentifierName),
                                             IdentifierName(nameof(Nullable<int>.Value)))));
                     }
                     else
@@ -538,10 +550,11 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         InvocationExpression(
                             MemberAccessExpression(
                                 SyntaxKind.SimpleMemberAccessExpression,
-                                MemberAccessExpression(
+                                ConditionalSuppressNullableWarning(MemberAccessExpression(
                                     SyntaxKind.SimpleMemberAccessExpression,
                                     _names.WriterParameter.IdentifierName,
                                     _names.GetCodeIdentifier(field).IdentifierName),
+                                    field.DiscValue.HasValue),
                                 IdentifierName(nameof(Capnp.DynamicSerializerState.SetObject))))
                         .AddArgumentListArguments(
                             Argument(_names.GetCodeIdentifier(field).IdentifierName)));
@@ -568,7 +581,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     return ExpressionStatement(
                         MakeComplexSerializeParticle(
                             field.Type, 
-                            writerProp, 
+                            field.DiscValue.HasValue ? _names.SuppressNullableWarning(writerProp) : writerProp, 
                             _names.GetCodeIdentifier(field).IdentifierName));
 
                 case TypeTag.Void:
@@ -599,20 +612,20 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         ExpressionSyntax MakeInnerStructListConversion(ExpressionSyntax context, TypeSyntax elementType)
         {
-            return InvocationExpression(
-                MemberAccessExpression(
-                    SyntaxKind.SimpleMemberAccessExpression,
-                    context,
-                    IdentifierName(nameof(Capnp.ReadOnlyListExtensions.ToReadOnlyList))))
-                    .AddArgumentListArguments(Argument(
-                        SimpleLambdaExpression(Parameter(Identifier("_")),
-                            InvocationExpression(
-                                MemberAccessExpression(
-                                    SyntaxKind.SimpleMemberAccessExpression,
-                                    IdentifierName(nameof(Capnp.CapnpSerializable)),
-                                    GenericName(nameof(Capnp.CapnpSerializable.Create))
-                                        .AddTypeArgumentListArguments(elementType)))
-                                .AddArgumentListArguments(Argument(IdentifierName("_"))))));
+            return ConditionalAccessExpression(
+                context,
+                InvocationExpression(
+                    MemberBindingExpression(
+                        IdentifierName(nameof(Capnp.ReadOnlyListExtensions.ToReadOnlyList))))
+                .AddArgumentListArguments(Argument(
+                    SimpleLambdaExpression(Parameter(Identifier("_")),
+                        InvocationExpression(
+                            MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                IdentifierName(nameof(Capnp.CapnpSerializable)),
+                                GenericName(nameof(Capnp.CapnpSerializable.Create))
+                                    .AddTypeArgumentListArguments(MakeNonNullableType(elementType))))
+                            .AddArgumentListArguments(Argument(IdentifierName("_")))))));
         }
 
         ExpressionSyntax MakeStructListConversion(ExpressionSyntax context, TypeSyntax elementType, int rank)
@@ -624,28 +637,28 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
             string lambdaVarName = $"_{rank}";
 
-            return InvocationExpression(
-                MemberAccessExpression(
-                    SyntaxKind.SimpleMemberAccessExpression,
-                    context,
-                    IdentifierName(nameof(Capnp.ReadOnlyListExtensions.ToReadOnlyList))))
-                    .AddArgumentListArguments(Argument(
-                        SimpleLambdaExpression(
-                            Parameter(Identifier(lambdaVarName)),
-                            MakeStructListConversion(IdentifierName(lambdaVarName), elementType, rank - 1))));
+            return ConditionalAccessExpression(
+                context,
+                InvocationExpression(
+                    MemberBindingExpression(
+                        IdentifierName(nameof(Capnp.ReadOnlyListExtensions.ToReadOnlyList))))
+                .AddArgumentListArguments(Argument(
+                    SimpleLambdaExpression(
+                        Parameter(Identifier(lambdaVarName)),
+                        MakeStructListConversion(IdentifierName(lambdaVarName), elementType, rank - 1)))));
         }
 
         ExpressionSyntax MakeAnyListConversion(ExpressionSyntax context)
         {
-            return InvocationExpression(
-                MemberAccessExpression(
-                    SyntaxKind.SimpleMemberAccessExpression,
-                    context,
-                    IdentifierName(nameof(Capnp.ReadOnlyListExtensions.ToReadOnlyList))))
-                    .AddArgumentListArguments(Argument(
-                        SimpleLambdaExpression(
-                            Parameter(Identifier("_")),
-                            CastExpression(Type<object>(), IdentifierName("_")))));
+            return ConditionalAccessExpression(
+                context,
+                InvocationExpression(
+                    MemberBindingExpression(
+                        IdentifierName(nameof(Capnp.ReadOnlyListExtensions.ToReadOnlyList))))
+                .AddArgumentListArguments(Argument(
+                    SimpleLambdaExpression(
+                        Parameter(Identifier("_")),
+                        CastExpression(_names.Type<object>(Nullability.NonNullable), IdentifierName("_"))))));
         }
 
         ExpressionSyntax MakeDeserializeMethodRightHandSide(Field field)
@@ -662,10 +675,11 @@ namespace CapnpC.CSharp.Generator.CodeGen
                             IdentifierName(nameof(Capnp.CapnpSerializable)),
                             GenericName(nameof(Capnp.CapnpSerializable.Create))
                                 .AddTypeArgumentListArguments(
-                                    _names.MakeTypeSyntax(
+                                    MakeNonNullableType(_names.MakeTypeSyntax(
                                         field.Type, 
                                         field.DeclaringType, 
-                                        TypeUsage.DomainClass))))
+                                        TypeUsage.DomainClass, 
+                                        Nullability.NonNullable)))))
                             .AddArgumentListArguments(Argument(MemberAccessExpression(
                                 SyntaxKind.SimpleMemberAccessExpression, 
                                 _names.ReaderParameter.IdentifierName,
@@ -684,7 +698,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                     SyntaxKind.SimpleMemberAccessExpression,
                                     _names.ReaderParameter.IdentifierName,
                                     _names.GetCodeIdentifier(field).IdentifierName),
-                                _names.MakeTypeSyntax(elementType, field.DeclaringType, TypeUsage.DomainClass),
+                                _names.MakeTypeSyntax(elementType, field.DeclaringType, TypeUsage.DomainClass, Nullability.NullableRef),
                                 rank);
 
                 case TypeTag.ListPointer:
@@ -716,18 +730,6 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
                 if (unionField.Type.Tag != TypeTag.Void)
                 {
-                    ExpressionSyntax right = _names.GetCodeIdentifier(unionField).IdentifierName;
-
-                    var syntax = _names.MakeTypeSyntax(unionField.Type, unionField.DeclaringType, TypeUsage.DomainClassNullable);
-
-                    if (syntax is NullableTypeSyntax)
-                    {
-                        right = MemberAccessExpression(
-                            SyntaxKind.SimpleMemberAccessExpression,
-                            right,
-                            IdentifierName(nameof(Nullable<int>.Value)));
-                    }
-
                     section = section.AddStatements(MakeSerializeMethodFieldAssignment(unionField));
                 }
 
@@ -849,7 +851,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     ExplicitInterfaceSpecifier(IdentifierName(nameof(Capnp.ICapnpSerializable))))
                 .AddParameterListParameters(
                     Parameter(_names.AnonymousParameter.Identifier)
-                        .WithType(Type<Capnp.SerializerState>()))
+                        .WithType(_names.Type<Capnp.SerializerState>(Nullability.NonNullable)))
                 .AddBodyStatements(
                     ExpressionStatement(
                         InvocationExpression(_names.SerializeMethod.IdentifierName)
@@ -933,7 +935,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         ExplicitInterfaceSpecifier(IdentifierName(nameof(Capnp.ICapnpSerializable))))
                     .AddParameterListParameters(
                         Parameter(_names.AnonymousParameter.Identifier)
-                            .WithType(Type<Capnp.DeserializerState>()))
+                            .WithType(_names.Type<Capnp.DeserializerState>(Nullability.NonNullable)))
                 .AddBodyStatements(stmts.ToArray());
         }
 
@@ -944,7 +946,10 @@ namespace CapnpC.CSharp.Generator.CodeGen
             if (def.UnionInfo != null)
             {
                 yield return MakeUnionDiscriminatorField();
-                yield return MakeUnionContentField();
+                if (def.Fields.Any(f => f.DiscValue.HasValue && f.Type.Tag != TypeTag.Void))
+                {
+                    yield return MakeUnionContentField();
+                }
                 yield return MakeUnionDiscriminatorProperty(def);
             }
 

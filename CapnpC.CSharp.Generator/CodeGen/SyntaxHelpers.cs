@@ -9,8 +9,8 @@ namespace CapnpC.CSharp.Generator.CodeGen
 {
     static class SyntaxHelpers
     {
-        public static string MakeCamel(string name) => $"{char.ToUpperInvariant(name[0])}{name.Substring(1)}";
-        public static string MakeAllLower(string name) => $"@{name}";
+        public static string MakeUpperCamel(string name) => $"{char.ToUpperInvariant(name[0])}{name.Substring(1)}";
+        public static string MakeLowerCamel(string name) => $"{char.ToLowerInvariant(name[0])}{name.Substring(1)}";
 
         public static readonly SyntaxToken Async = Token(SyntaxKind.AsyncKeyword);
         public static readonly SyntaxToken Public = Token(SyntaxKind.PublicKeyword);
@@ -21,7 +21,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
         public static readonly SyntaxToken Partial = Token(SyntaxKind.PartialKeyword);
         public static readonly SyntaxToken This = Token(SyntaxKind.ThisKeyword);
 
-        public static TypeSyntax Type(Type type)
+        public static TypeSyntax NonNullableType(Type type)
         {
             switch (0)
             {
@@ -66,14 +66,14 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
                 case 0 when type.IsGenericType:
                     return GenericName(type.Name.Substring(0, type.Name.IndexOf('`')))
-                        .AddTypeArgumentListArguments(type.GetGenericArguments().Select(Type).ToArray());
+                        .AddTypeArgumentListArguments(type.GetGenericArguments().Select(NonNullableType).ToArray());
 
                 default:
                     return ParseTypeName(type.Name);
             }
         }
 
-        public static TypeSyntax Type<T>() => Type(typeof(T));
+        public static TypeSyntax NonNullableType<T>() => NonNullableType(typeof(T));
 
         public static ExpressionSyntax ValueOf(object value)
         {
@@ -83,16 +83,16 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     return LiteralExpression(x ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression);
 
                 case sbyte x:
-                    return CastExpression(Type<sbyte>(), LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(x)));
+                    return CastExpression(NonNullableType<sbyte>(), LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(x)));
 
                 case byte x:
-                    return CastExpression(Type<byte>(), LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(x)));
+                    return CastExpression(NonNullableType<byte>(), LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(x)));
 
                 case short x:
-                    return CastExpression(Type<short>(), LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(x)));
+                    return CastExpression(NonNullableType<short>(), LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(x)));
 
                 case ushort x:
-                    return CastExpression(Type<ushort>(), LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(x)));
+                    return CastExpression(NonNullableType<ushort>(), LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(x)));
 
                 case int x:
                     return LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(x));
@@ -121,6 +121,15 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        public static TypeSyntax MakeNonNullableType(TypeSyntax type)
+        {
+            if (type is NullableTypeSyntax nts)
+            {
+                type = nts.ElementType;
+            }
+            return type;
         }
     }
 }

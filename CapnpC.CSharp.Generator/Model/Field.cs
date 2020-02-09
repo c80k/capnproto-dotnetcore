@@ -5,6 +5,7 @@
         public TypeDefinition DeclaringType { get; set; }
         public Field Parent { get; set; }
         public string Name { get; set; }
+        public string CsName { get; set; }
         public Type Type { get; set; }
         public Value DefaultValue { get; set; }
         public bool DefaultValueIsExplicit { get; set; }

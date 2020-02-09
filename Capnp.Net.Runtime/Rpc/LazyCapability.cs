@@ -27,7 +27,7 @@ namespace Capnp.Rpc
             WhenResolved = capabilityTask;
         }
 
-        internal override void Freeze(out IRpcEndpoint boundEndpoint)
+        internal override void Freeze(out IRpcEndpoint? boundEndpoint)
         {
             if (WhenResolved.IsCompleted)
             {
@@ -37,7 +37,7 @@ namespace Capnp.Rpc
                 }
                 catch (AggregateException exception)
                 {
-                    throw exception.InnerException;
+                    throw exception.InnerException!;
                 }
             }
             else
