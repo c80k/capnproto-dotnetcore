@@ -34,7 +34,7 @@ namespace Capnp
         /// </summary>
         protected readonly DeserializerState State;
 
-        internal ListDeserializer(ref DeserializerState state)
+        internal ListDeserializer(in DeserializerState state)
         {
             State = state;
         }

@@ -10,8 +10,8 @@ namespace Capnp
     /// </summary>
     public class ListOfEmptyDeserializer : ListDeserializer, IReadOnlyList<DeserializerState>
     {
-        internal ListOfEmptyDeserializer(ref DeserializerState state) : 
-            base(ref state)
+        internal ListOfEmptyDeserializer(in DeserializerState state) : 
+            base(state)
         {
         }
 

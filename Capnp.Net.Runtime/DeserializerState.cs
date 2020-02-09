@@ -516,28 +516,28 @@ namespace Capnp
             switch (Kind)
             {
                 case ObjectKind.ListOfBits:
-                    return new ListOfBitsDeserializer(ref this, false);
+                    return new ListOfBitsDeserializer(this, false);
 
                 case ObjectKind.ListOfBytes:
-                    return new ListOfPrimitivesDeserializer<byte>(ref this, ListKind.ListOfBytes);
+                    return new ListOfPrimitivesDeserializer<byte>(this, ListKind.ListOfBytes);
 
                 case ObjectKind.ListOfEmpty:
-                    return new ListOfEmptyDeserializer(ref this);
+                    return new ListOfEmptyDeserializer(this);
 
                 case ObjectKind.ListOfInts:
-                    return new ListOfPrimitivesDeserializer<int>(ref this, ListKind.ListOfInts);
+                    return new ListOfPrimitivesDeserializer<int>(this, ListKind.ListOfInts);
 
                 case ObjectKind.ListOfLongs:
-                    return new ListOfPrimitivesDeserializer<long>(ref this, ListKind.ListOfLongs);
+                    return new ListOfPrimitivesDeserializer<long>(this, ListKind.ListOfLongs);
 
                 case ObjectKind.ListOfPointers:
-                    return new ListOfPointersDeserializer(ref this);
+                    return new ListOfPointersDeserializer(this);
 
                 case ObjectKind.ListOfShorts:
-                    return new ListOfPrimitivesDeserializer<short>(ref this, ListKind.ListOfShorts);
+                    return new ListOfPrimitivesDeserializer<short>(this, ListKind.ListOfShorts);
 
                 case ObjectKind.ListOfStructs:
-                    return new ListOfStructsDeserializer(ref this);
+                    return new ListOfStructsDeserializer(this);
 
                 case ObjectKind.Nil:
                     return new EmptyListDeserializer();
@@ -557,7 +557,7 @@ namespace Capnp
             switch (Kind)
             {
                 case ObjectKind.ListOfPointers:
-                    return new ListOfCapsDeserializer<T>(ref this);
+                    return new ListOfCapsDeserializer<T>(this);
 
                 default:
                     throw new DeserializationException("Cannot deserialize this object as capability list");

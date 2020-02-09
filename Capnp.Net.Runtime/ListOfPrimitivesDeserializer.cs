@@ -11,7 +11,7 @@ namespace Capnp
     /// </summary>
     /// <typeparam name="T">List element type</typeparam>
     public class ListOfPrimitivesDeserializer<T>: ListDeserializer, IReadOnlyList<T>
-        where T: struct
+        where T: unmanaged
     {
         class ListOfULongAsStructView<U> : IReadOnlyList<U>
         {
@@ -73,12 +73,10 @@ namespace Capnp
 
         readonly ListKind _kind;
 
-        internal ListOfPrimitivesDeserializer(ref DeserializerState state, ListKind kind) : 
-            base(ref state)
+        internal ListOfPrimitivesDeserializer(in DeserializerState state, ListKind kind) : 
+            base(state)
         {
             _kind = kind;
-
-            var binCoder = PrimitiveCoder.Get<T>();
         }
 
         /// <summary>
@@ -96,13 +94,12 @@ namespace Capnp
         /// <exception cref="IndexOutOfRangeException"><paramref name="index"/> is out of range.</exception>
         public T this[int index] => Data[index];
 
-        ListOfPrimitivesDeserializer<U> PrimitiveCast<U>() where U: struct
+        ListOfPrimitivesDeserializer<U> PrimitiveCast<U>() where U: unmanaged
         {
             if (Marshal.SizeOf<U>() != Marshal.SizeOf<T>())
                 throw new NotSupportedException("Source and target types have different sizes, cannot cast");
 
-            var stateCopy = State;
-            return new ListOfPrimitivesDeserializer<U>(ref stateCopy, Kind);
+            return new ListOfPrimitivesDeserializer<U>(State, Kind);
         }
 
         /// <summary>
