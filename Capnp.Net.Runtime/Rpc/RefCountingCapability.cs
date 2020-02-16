@@ -29,8 +29,8 @@ namespace Capnp.Rpc
 #if DebugCapabilityLifecycle
         ILogger Logger { get; } = Logging.CreateLogger<RefCountingCapability>();
 
-        string _releasingMethodName;
-        string _releasingFilePath;
+        string? _releasingMethodName;
+        string? _releasingFilePath;
         int _releasingLineNumber;
 #endif
 

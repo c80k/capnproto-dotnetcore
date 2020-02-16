@@ -60,6 +60,7 @@ namespace Capnp.Rpc
 
         class Connection: IConnection
         {
+            readonly List<IFrameTracer> _tracers = new List<IFrameTracer>();
             readonly TcpRpcServer _server;
             Stream _stream;
 
@@ -73,6 +74,13 @@ namespace Capnp.Rpc
             public void Start()
             {
                 Pump = new FramePump(_stream);
+
+                foreach (var tracer in _tracers)
+                {
+                    Pump.AttachTracer(tracer);
+                }
+                _tracers.Clear();
+
                 OutboundEp = new OutboundTcpEndpoint(_server, Pump);
                 InboundEp = _server._rpcEngine.AddEndpoint(OutboundEp);
                 Pump.FrameReceived += InboundEp.Forward;
@@ -106,16 +114,16 @@ namespace Capnp.Rpc
 
             public ConnectionState State { get; set; } = ConnectionState.Initializing;
             public TcpClient Client { get; private set; }
-            public FramePump Pump { get; private set; }
-            public OutboundTcpEndpoint OutboundEp { get; private set; }
-            public RpcEngine.RpcEndpoint InboundEp { get; private set; }
+            public FramePump? Pump { get; private set; }
+            public OutboundTcpEndpoint? OutboundEp { get; private set; }
+            public RpcEngine.RpcEndpoint? InboundEp { get; private set; }
             public Thread? PumpRunner { get; private set; }
             public int? LocalPort => ((IPEndPoint)Client.Client.LocalEndPoint)?.Port;
             public int? RemotePort => ((IPEndPoint)Client.Client.RemoteEndPoint)?.Port;
-            public long RecvCount => InboundEp.RecvCount;
-            public long SendCount => InboundEp.SendCount;
+            public long RecvCount => InboundEp?.RecvCount ?? 0;
+            public long SendCount => InboundEp?.SendCount ?? 0;
             public bool IsComputing => PumpRunner?.ThreadState == ThreadState.Running;
-            public bool IsWaitingForData => Pump.IsWaitingForData;
+            public bool IsWaitingForData => Pump?.IsWaitingForData ?? false;
 
             public void AttachTracer(IFrameTracer tracer)
             {
@@ -125,7 +133,7 @@ namespace Capnp.Rpc
                 if (State != ConnectionState.Initializing)
                     throw new InvalidOperationException("Connection is not in state 'Initializing'");
 
-                Pump.AttachTracer(tracer);
+                _tracers.Add(tracer);
             }
 
             /// <summary>
@@ -248,7 +256,7 @@ namespace Capnp.Rpc
             foreach (var connection in connections)
             {
                 connection.Client.Dispose();
-                connection.Pump.Dispose();
+                connection.Pump?.Dispose();
                 SafeJoin(connection.PumpRunner);
             }
 
