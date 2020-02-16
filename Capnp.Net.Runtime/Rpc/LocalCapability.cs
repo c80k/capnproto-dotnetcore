@@ -36,7 +36,10 @@ namespace Capnp.Rpc
             ProvidedCap.Claim();
         }
 
-        internal override void Release()
+        internal override void Release(
+            [System.Runtime.CompilerServices.CallerMemberName] string methodName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string filePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int lineNumber = 0)
         {
             ProvidedCap.Relinquish();
         }

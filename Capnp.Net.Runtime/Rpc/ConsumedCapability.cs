@@ -18,7 +18,10 @@
         internal abstract void Unfreeze();
 
         internal abstract void AddRef();
-        internal abstract void Release();
+        internal abstract void Release(
+            [System.Runtime.CompilerServices.CallerMemberName] string methodName = "", 
+            [System.Runtime.CompilerServices.CallerFilePath] string filePath = "", 
+            [System.Runtime.CompilerServices.CallerLineNumber] int lineNumber = 0);
 
 #if DebugFinalizers
         public string CreatorMemberName { get; set; }

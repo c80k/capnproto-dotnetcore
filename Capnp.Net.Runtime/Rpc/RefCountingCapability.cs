@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 
 namespace Capnp.Rpc
@@ -24,6 +25,14 @@ namespace Capnp.Rpc
         // In order to distinguish state A from C, the member _refCount stores the reference count *plus one*. 
         // Value 0 has the special meaning of being in state C.
         long _refCount = 1;
+
+#if DebugCapabilityLifecycle
+        ILogger Logger { get; } = Logging.CreateLogger<RefCountingCapability>();
+
+        string _releasingMethodName;
+        string _releasingFilePath;
+        int _releasingLineNumber;
+#endif
 
         ~RefCountingCapability()
         {
@@ -71,12 +80,20 @@ namespace Capnp.Rpc
                 {
                     --_refCount;
 
+#if DebugCapabilityLifecycle
+                    Logger.LogError($"Attempted to add reference to capability which was already released. " +
+                                    $"Releasing entity: {_releasingFilePath}, line {_releasingLineNumber}, method {_releasingMethodName}" +
+                                    $"Current stack trace: {Environment.StackTrace}");
+#endif
                     throw new ObjectDisposedException(ToString(), "Attempted to add reference to capability which was already released");
                 }
             }
         }
 
-        internal sealed override void Release()
+        internal sealed override void Release(
+            [System.Runtime.CompilerServices.CallerMemberName] string methodName = "",
+            [System.Runtime.CompilerServices.CallerFilePath] string filePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int lineNumber = 0)
         {
             lock (_reentrancyBlocker)
             {
@@ -85,6 +102,13 @@ namespace Capnp.Rpc
                     case 1: // initial state, actually ref. count 0
                     case 2: // actually ref. count 1
                         _refCount = 0;
+
+#if DebugCapabilityLifecycle
+                        _releasingMethodName = methodName;
+                        _releasingFilePath = filePath;
+                        _releasingLineNumber = lineNumber;
+#endif
+
                         Dispose(true);
                         GC.SuppressFinalize(this);
                         break;
