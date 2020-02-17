@@ -7,7 +7,7 @@ using System.Text;
 namespace Capnp
 {
     /// <summary>
-    /// ListDeserializer specialization for List(Int*), List(UInt*), List(Float*), and List(Enum).
+    /// ListDeserializer specialization for unmanaged primitive types (including enum).
     /// </summary>
     /// <typeparam name="T">List element type</typeparam>
     public class ListOfPrimitivesDeserializer<T>: ListDeserializer, IReadOnlyList<T>
@@ -84,7 +84,10 @@ namespace Capnp
         /// </summary>
         public override ListKind Kind => _kind;
 
-        ReadOnlySpan<T> Data => MemoryMarshal.Cast<ulong, T>(State.CurrentSegment.Slice(State.Offset)).Slice(0, Count);
+        /// <summary>
+        /// Retrieves the underlying memory span of this object
+        /// </summary>
+        public ReadOnlySpan<T> Span => MemoryMarshal.Cast<ulong, T>(State.CurrentSegment.Slice(State.Offset)).Slice(0, Count);
 
         /// <summary>
         /// Returns the element at given index.
@@ -92,7 +95,7 @@ namespace Capnp
         /// <param name="index">Element index</param>
         /// <returns>Element value</returns>
         /// <exception cref="IndexOutOfRangeException"><paramref name="index"/> is out of range.</exception>
-        public T this[int index] => Data[index];
+        public T this[int index] => Span[index];
 
         ListOfPrimitivesDeserializer<U> PrimitiveCast<U>() where U: unmanaged
         {
@@ -202,7 +205,7 @@ namespace Capnp
         /// <exception cref="NotSupportedException">Element size is different from 1 byte.</exception>
         public override string CastText()
         {
-            var utf8Bytes = PrimitiveCast<byte>().Data;
+            var utf8Bytes = PrimitiveCast<byte>().Span;
             if (utf8Bytes.Length == 0) return string.Empty;
             var utf8GytesNoZterm = utf8Bytes.Slice(0, utf8Bytes.Length - 1);
             return Encoding.UTF8.GetString(utf8GytesNoZterm.ToArray());
