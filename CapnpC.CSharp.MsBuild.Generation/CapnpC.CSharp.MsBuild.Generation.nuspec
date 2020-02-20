@@ -14,9 +14,7 @@
     <license type="expression">MIT</license>
     <tags>capnproto csharp msbuild</tags>
     <copyright>Christian Köllner and contributors</copyright>
-    <dependencies>
-        <dependency id="Capnp.Net.Runtime" version="1.0" />
-    </dependencies>
+    <dependencies/>
   </metadata>
   <files>
     <file src="build\**\*" target="build" />
