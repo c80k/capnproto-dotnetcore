@@ -16,7 +16,7 @@ namespace CapnpProfile
             using var client = new TcpRpcClient("localhost", 5002);
             await client.WhenConnected;
             using var echoer = client.GetMain<IEchoer>();
-            var payload = new byte[200000];
+            var payload = new byte[20];
             new Random().NextBytes(payload);
 
             while (true)

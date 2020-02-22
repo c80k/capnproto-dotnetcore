@@ -5,9 +5,14 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Capnp.Net.Runtime" Version="1.3.22-g47cb578057" />
-    <PackageReference Include="CapnpC.CSharp.MsBuild.Generation" Version="1.3.0" />
+    <PackageReference Include="Capnp.Net.Runtime" Version="1.3.29-g6d711b8579" />
+    <PackageReference Include="CapnpC.CSharp.MsBuild.Generation" Version="1.3.29-g6d711b8579" />
   </ItemGroup>
 
 </Project>
