@@ -8,10 +8,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Capnp.Net.Runtime" Version="1.3.29-g6d711b8579" />
+    <PackageReference Include="Capnp.Net.Runtime" Version="1.3.30-g1649067ef6" />
     <PackageReference Include="CapnpC.CSharp.MsBuild.Generation" Version="1.3.29-g6d711b8579" />
   </ItemGroup>
 

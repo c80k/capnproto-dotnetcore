@@ -68,6 +68,7 @@ namespace Capnp.Rpc
                 _server = server;
                 Client = client;
                 _stream = client.GetStream();
+                InjectMidlayer(s => new Util.DuplexBufferedStream(s));
             }
 
             public void Start()
