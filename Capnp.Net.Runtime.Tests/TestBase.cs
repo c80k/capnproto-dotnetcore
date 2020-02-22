@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,7 +22,29 @@ namespace Capnp.Net.Runtime.Tests
         protected ILogger Logger { get; set; }
 
         protected TcpRpcClient SetupClient() => new TcpRpcClient("localhost", TcpPort);
-        protected TcpRpcServer SetupServer() => new TcpRpcServer(IPAddress.Any, TcpPort);
+        protected TcpRpcServer SetupServer()
+        {
+            int attempt = 0;
+
+            while (true)
+            {
+                try
+                {
+                    return new TcpRpcServer(IPAddress.Any, TcpPort);
+                }
+                catch (SocketException)
+                {
+                    // If the TCP listening port is occupied by some other process, 
+                    // retry with a different one
+
+                    if (attempt == 5)
+                        throw;
+                }
+
+                IncrementTcpPort();
+                ++attempt;
+            }
+        }
 
         protected (TcpRpcServer, TcpRpcClient) SetupClientServerPair()
         {

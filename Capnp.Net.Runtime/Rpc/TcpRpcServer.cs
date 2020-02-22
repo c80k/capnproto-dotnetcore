@@ -284,7 +284,9 @@ namespace Capnp.Rpc
             _listener = new TcpListener(localAddr, port);
             _listener.ExclusiveAddressUse = false;
 
-            for (int retry = 0; retry < 5; retry++)
+            int attempt = 0;
+
+            while (true)
             {
                 try
                 {
@@ -293,9 +295,13 @@ namespace Capnp.Rpc
                 }
                 catch (SocketException socketException)
                 {
-                    Logger.LogWarning($"Failed to listen on port {port}, attempt {retry}: {socketException}");
-                    Thread.Sleep(10);
+                    if (attempt == 5)
+                        throw;
+                    
+                    Logger.LogWarning($"Failed to listen on port {port}, attempt {attempt}: {socketException}");
                 }
+
+                ++attempt;
             }
 
             _acceptorThread = new Thread(AcceptClients);
