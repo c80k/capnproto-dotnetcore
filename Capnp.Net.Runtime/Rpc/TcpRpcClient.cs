@@ -128,8 +128,6 @@ namespace Capnp.Rpc
             _rpcEngine = new RpcEngine();
             _client = new TcpClient();
             _client.ExclusiveAddressUse = false;
-
-            InjectMidlayer(s => new Util.DuplexBufferedStream(s));
         }
 
         /// <summary>

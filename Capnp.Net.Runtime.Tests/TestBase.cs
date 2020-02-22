@@ -21,7 +21,13 @@ namespace Capnp.Net.Runtime.Tests
 
         protected ILogger Logger { get; set; }
 
-        protected TcpRpcClient SetupClient() => new TcpRpcClient("localhost", TcpPort);
+        protected TcpRpcClient SetupClient()
+        {
+            var client = new TcpRpcClient("localhost", TcpPort);
+            client.AddBuffering();
+            return client;
+        }
+
         protected TcpRpcServer SetupServer()
         {
             int attempt = 0;
@@ -30,7 +36,9 @@ namespace Capnp.Net.Runtime.Tests
             {
                 try
                 {
-                    return new TcpRpcServer(IPAddress.Any, TcpPort);
+                    var server = new TcpRpcServer(IPAddress.Any, TcpPort);
+                    server.AddBuffering();
+                    return server;
                 }
                 catch (SocketException)
                 {

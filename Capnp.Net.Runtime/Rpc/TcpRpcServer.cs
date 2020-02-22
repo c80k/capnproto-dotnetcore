@@ -32,7 +32,7 @@ namespace Capnp.Rpc
     /// <summary>
     /// Cap'n Proto RPC TCP server.
     /// </summary>
-    public class TcpRpcServer: IDisposable
+    public class TcpRpcServer: ISupportsMidlayers, IDisposable
     {
         ILogger Logger { get; } = Logging.CreateLogger<TcpRpcServer>();
 
@@ -68,7 +68,6 @@ namespace Capnp.Rpc
                 _server = server;
                 Client = client;
                 _stream = client.GetStream();
-                InjectMidlayer(s => new Util.DuplexBufferedStream(s));
             }
 
             public void Start()
@@ -270,6 +269,24 @@ namespace Capnp.Rpc
             catch (SocketException)
             {
             }
+        }
+
+        /// <summary>
+        /// Installs a midlayer.
+        /// A midlayer is a protocal layer that resides somewhere between capnp serialization and the raw TCP stream.
+        /// Thus, we have a hook mechanism for transforming data before it is sent to the TCP connection or after it was received
+        /// by the TCP connection, respectively. This mechanism can be used for buffering, various (de-)compression algorithms, and more.
+        /// </summary>
+        /// <param name="createFunc"></param>
+        public void InjectMidlayer(Func<Stream, Stream> createFunc)
+        {
+            OnConnectionChanged += (_, e) =>
+            {
+                if (e.Connection.State == ConnectionState.Initializing)
+                {
+                    e.Connection.InjectMidlayer(createFunc);
+                }
+            };
         }
 
         /// <summary>
