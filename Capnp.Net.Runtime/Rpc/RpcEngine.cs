@@ -921,9 +921,9 @@ namespace Capnp.Rpc
 
             void ReleaseResultCaps(PendingAnswer answer)
             {
-                try
+                answer.Chain(async t =>
                 {
-                    answer.Chain(async t =>
+                    try
                     {
                         var aorcq = await t;
                         var results = aorcq.Answer;
@@ -935,11 +935,11 @@ namespace Capnp.Rpc
                                 cap?.Release();
                             }
                         }
-                    });
-                }
-                catch
-                {
-                }
+                    }
+                    catch
+                    {
+                    }
+                });
             }
 
             void ProcessFinish(Finish.READER finish)
