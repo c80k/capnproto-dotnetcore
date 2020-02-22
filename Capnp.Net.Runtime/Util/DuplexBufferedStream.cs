@@ -5,14 +5,22 @@ namespace Capnp.Util
 {
     internal class DuplexBufferedStream : Stream
     {
+        const int DefaultBufferSize = 4096;
+
         readonly BufferedStream _readStream;
         readonly BufferedStream _writeStream;
+        readonly int _bufferSize;
         readonly object _reentrancyBlocker = new object();
 
-        public DuplexBufferedStream(Stream stream)
+        public DuplexBufferedStream(Stream stream, int bufferSize)
         {
-            _readStream = new BufferedStream(stream);
-            _writeStream = new BufferedStream(stream);
+            _readStream = new BufferedStream(stream, bufferSize);
+            _writeStream = new BufferedStream(stream, bufferSize);
+            _bufferSize = bufferSize;
+        }
+
+        public DuplexBufferedStream(Stream stream): this(stream, DefaultBufferSize)
+        {
         }
 
         public override bool CanRead => true;
@@ -51,6 +59,9 @@ namespace Capnp.Util
 
         public override void Write(byte[] buffer, int offset, int count)
         {
+            if (buffer.Length > _bufferSize) // avoid moiré-like timing effects
+                _writeStream.Flush();        
+
             _writeStream.Write(buffer, offset, count);
         }
 
