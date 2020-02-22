@@ -49,7 +49,7 @@ namespace Capnp
         /// <param name="defaultSegmentSize">Default size (in words) of a newly allocated segment. If a single allocation requires 
         /// a bigger size, a bigger dedicated segment will be allocated. On the wire, segments will be truncated to their actual
         /// occupancies.</param>
-        public SegmentAllocator(int defaultSegmentSize = 128)
+        public SegmentAllocator(int defaultSegmentSize = 64)
         {
             _defaultSegmentSize = defaultSegmentSize;
         }
