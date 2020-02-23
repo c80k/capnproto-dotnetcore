@@ -11,8 +11,10 @@ namespace CapnpProfile
     {
         static async Task Main(string[] args)
         {
-            using var server = new TcpRpcServer(IPAddress.Any, 5002);
+            using var server = new TcpRpcServer();
             server.Main = new CapnpEchoService();
+            server.AddBuffering();
+            server.StartAccepting(IPAddress.Any, 5002);
             using var client = new TcpRpcClient("localhost", 5002);
             await client.WhenConnected;
             using var echoer = client.GetMain<IEchoer>();

@@ -5,7 +5,9 @@ namespace Capnp.Util
 {
     internal class DuplexBufferedStream : Stream
     {
-        const int DefaultBufferSize = 4096;
+        // A buffer size of 1024 bytes seems to be a good comprise, giving good performance 
+        // in TCP/IP-over-localhost scenarios for small to medium (200kiB) frame sizes.
+        const int DefaultBufferSize = 1024;
 
         readonly BufferedStream _readStream;
         readonly BufferedStream _writeStream;
