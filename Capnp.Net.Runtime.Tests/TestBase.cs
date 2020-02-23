@@ -23,8 +23,9 @@ namespace Capnp.Net.Runtime.Tests
 
         protected TcpRpcClient SetupClient()
         {
-            var client = new TcpRpcClient("localhost", TcpPort);
+            var client = new TcpRpcClient();
             client.AddBuffering();
+            client.Connect("localhost", TcpPort);
             return client;
         }
 
