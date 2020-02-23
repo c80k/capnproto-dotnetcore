@@ -11,6 +11,7 @@ namespace EchoServiceCapnp
         {
             using (var server = new TcpRpcServer(IPAddress.Any, 5002))
             {
+                server.AddBuffering();
                 server.Main = new CapnpEchoService();
                 Console.WriteLine("Press RETURN to stop listening");
                 Console.ReadLine();
