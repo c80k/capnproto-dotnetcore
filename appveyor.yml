@@ -11,9 +11,15 @@ install:
   - vcpkg install capnproto
   - cd %APPVEYOR_BUILD_FOLDER%
   - dotnet tool install -g nbgv
+  - choco install opencover --version=4.7.922 --force -y
+  - choco install reportgenerator.portable --version=2.5.0.0 --force -y
+  - dotnet tool install -g coveralls.net --version 1.0.0
 init:
   # Good practise, because Windows line endings are different from Unix/Linux ones
   - cmd: git config --global core.autocrlf true
+environment:
+  COVERALLS_REPO_TOKEN:
+    secure: mwxwOymoS7vB56iQN5Obbt8+oMqbRpK8Ei2GZUI7Mm46C8asDR/Wu0RAXYlhp85Q
 before_build:
   - cmd: nbgv cloud
   - cmd: dotnet --version
@@ -51,6 +57,9 @@ artifacts:
  - path: capnpc-csharp\nupkg\*.nupkg
    name: capnpc-csharp
    type: NuGetPackage
+ - path: coverage\report\*
+   name: Coverage report
+   type: zip
 test_script:
   - cmd: |
       nbgv get-version -v NuGetPackageVersion >> version.txt
@@ -80,6 +89,10 @@ test_script:
       vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\net471\Capnp.Net.Runtime.Tests.Std20.dll
       vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests.Core21\bin\Debug\netcoreapp2.1\Capnp.Net.Runtime.Tests.Core21.dll
       vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests.Core21\bin\Release\netcoreapp2.1\Capnp.Net.Runtime.Tests.Core21.dll
+  - ps: |
+     .\scipts\measure-coverage.ps1
+     $coveralls = ".\tools\csmacnz.coveralls.exe"
+     & $coveralls --reportgenerator -i coverage/report --repoToken $env:COVERALLS_REPO_TOKEN --commitId $env:APPVEYOR_REPO_COMMIT --commitBranch $env:APPVEYOR_REPO_BRANCH --commitAuthor $env:APPVEYOR_REPO_COMMIT_AUTHOR --commitEmail $env:APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL --commitMessage $env:APPVEYOR_REPO_COMMIT_MESSAGE --jobId $env:APPVEYOR_JOB_ID
 on_finish :
   # any cleanup in here
 deploy:

@@ -14,6 +14,7 @@ using System.Threading.Tasks.Dataflow;
 namespace Capnp.Net.Runtime.Tests
 {
     [TestClass]
+    [TestCategory("Coverage")]
     public class Interception: TestBase
     {
         class MyPolicy : IInterceptionPolicy

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 namespace Capnp.Net.Runtime.Tests
 {
     [TestClass]
+    [TestCategory("Coverage")]
     public class FramePumpTests
     {
         class MyStruct : SerializerState

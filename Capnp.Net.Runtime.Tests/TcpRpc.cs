@@ -12,6 +12,7 @@ namespace Capnp.Net.Runtime.Tests
 {
 
     [TestClass]
+    [TestCategory("Coverage")]
     public class TcpRpc
     {
         public static int TcpPort = 49153;

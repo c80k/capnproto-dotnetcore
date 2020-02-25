@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Capnp.Net.Runtime.Tests
 {
     [TestClass]
+    [TestCategory("Coverage")]
     public class RpcSchemaTests
     {
         [TestMethod]
