@@ -89,7 +89,7 @@ namespace Capnp
         /// <returns>Capability list representation</returns>
         /// <exception cref="NotSupportedException">If this kind of list cannot be represented as list of capabilities (because it is a list of non-pointers)</exception>
         /// <exception cref="Rpc.InvalidCapabilityInterfaceException">If <typeparamref name="T"/> does not qualify as capability interface.</exception>
-        public virtual IReadOnlyList<ListOfCapsDeserializer<T>> CastCapList<T>() where T: class
+        public virtual IReadOnlyList<T> CastCapList<T>() where T: class
         {
             throw new NotSupportedException("This kind of list does not contain nested lists");
         }

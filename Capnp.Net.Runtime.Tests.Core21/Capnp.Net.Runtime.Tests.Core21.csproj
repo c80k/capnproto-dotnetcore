@@ -34,7 +34,6 @@
     <Compile Include="..\Capnp.Net.Runtime.Tests\TestBase.cs" Link="TestBase.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\TestCallContext.cs" Link="TestCallContext.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\TestCapImplementations.cs" Link="TestCapImplementations.cs" />
-    <Compile Include="..\Capnp.Net.Runtime.Tests\TestInterfaces.cs" Link="TestInterfaces.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\WirePointerTests.cs" Link="WirePointerTests.cs" />
   </ItemGroup>
 

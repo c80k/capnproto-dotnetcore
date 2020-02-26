@@ -35,16 +35,29 @@ namespace Capnp
         [AllowNull]
         public T this[int index]
         {
-            get => (Rpc.CapabilityReflection.CreateProxy<T>(DecodeCapPointer(index)) as T)!;
+            get
+            {
+                ListSerializerHelper.EnsureAllocated(this);
+
+                try
+                {
+                    return (Rpc.CapabilityReflection.CreateProxy<T>(DecodeCapPointer(index)) as T)!;
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    throw new IndexOutOfRangeException();
+                }
+            }
             set
             {
-                if (!IsAllocated)
-                    throw new InvalidOperationException("Call Init() first");
+                ListSerializerHelper.EnsureAllocated(this);
 
                 if (index < 0 || index >= RawData.Length)
                     throw new IndexOutOfRangeException("index out of range");
 
-                RawData[index] = ProvideCapability(value);
+                var p = default(WirePointer);
+                p.SetCapability(ProvideCapability(value));
+                RawData[index] = p;
             }
         }
 

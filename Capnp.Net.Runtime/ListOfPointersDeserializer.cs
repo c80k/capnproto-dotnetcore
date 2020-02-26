@@ -83,9 +83,9 @@ namespace Capnp
         /// </summary>
         /// <typeparam name="T">Capability interface</typeparam>
         /// <returns>The desired representation. Since it is evaluated lazily, type conflicts will not happen before accessing the resulting list's elements.</returns>
-        public override IReadOnlyList<ListOfCapsDeserializer<T>> CastCapList<T>()
+        public override IReadOnlyList<T> CastCapList<T>()
         {
-            return this.LazyListSelect(d => d.RequireCapList<T>());
+            return State.RequireCapList<T>();
         }
     }
 }

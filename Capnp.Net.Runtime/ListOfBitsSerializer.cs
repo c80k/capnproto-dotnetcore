@@ -51,6 +51,8 @@ namespace Capnp
         {
             get
             {
+                ListSerializerHelper.EnsureAllocated(this);
+
                 if (index < 0 || index >= Count)
                     throw new IndexOutOfRangeException();
 
@@ -61,6 +63,8 @@ namespace Capnp
             }
             set
             {
+                ListSerializerHelper.EnsureAllocated(this);
+
                 if (index < 0 || index >= Count)
                     throw new IndexOutOfRangeException();
 
