@@ -24,6 +24,7 @@
     <Compile Include="..\Capnp.Net.Runtime.Tests\RpcSchemaTests.cs" Link="RpcSchemaTests.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\ScatteringStream.cs" Link="ScatteringStream.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\SegmentAllocatorTests.cs" Link="SegmentAllocatorTests.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\SerializationTests.cs" Link="SerializationTests.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\TcpRpc.cs" Link="TcpRpc.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\TcpRpcAdvancedStuff.cs" Link="TcpRpcAdvancedStuff.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\TcpRpcInterop.cs" Link="TcpRpcInterop.cs" />

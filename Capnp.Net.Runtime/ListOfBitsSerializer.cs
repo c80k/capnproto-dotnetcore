@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Capnp
 {
@@ -10,6 +11,34 @@ namespace Capnp
     /// </summary>
     public class ListOfBitsSerializer: SerializerState, IReadOnlyList<bool>
     {
+        class Enumerator : IEnumerator<bool>
+        {
+            readonly ListOfBitsSerializer _self;
+            int _pos = -1;
+
+            public Enumerator(ListOfBitsSerializer self)
+            {
+                _self = self;
+            }
+
+            public bool Current => _pos >= 0 && _pos < _self.Count ? _self[_pos] : false;
+
+            object IEnumerator.Current => Current;
+
+            public void Dispose()
+            {
+            }
+
+            public bool MoveNext()
+            {
+                return ++_pos < _self.Count;
+            }
+
+            public void Reset()
+            {
+                _pos = -1;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the element at given index.
@@ -91,8 +120,8 @@ namespace Capnp
         /// <summary>
         /// Implements <see cref="IEnumerable{Boolean}"/>
         /// </summary>
-        public IEnumerator<bool> GetEnumerator() => (IEnumerator<bool>)this.ToArray().GetEnumerator();
+        public IEnumerator<bool> GetEnumerator() => new Enumerator(this);
 
-        IEnumerator IEnumerable.GetEnumerator() => this.ToArray().GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

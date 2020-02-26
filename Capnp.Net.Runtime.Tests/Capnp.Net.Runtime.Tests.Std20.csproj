@@ -10,6 +10,8 @@
     <OutputType>Library</OutputType>
 
     <Configurations>Debug;Release</Configurations>
+
+    <RootNamespace>Capnp.Net.Runtime.Tests</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

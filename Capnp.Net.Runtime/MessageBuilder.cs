@@ -64,7 +64,7 @@ namespace Capnp
         /// <summary>
         /// Creates an object and sets it as root object.
         /// </summary>
-        /// <typeparam name="TS">Serializer state specialization</typeparam>
+        /// <typeparam name="TS">Serializer state specialization (must be a struct)</typeparam>
         /// <returns>Serializer state instance representing the new object</returns>
         public TS BuildRoot<TS>() where TS: SerializerState, new()
         {
@@ -72,6 +72,9 @@ namespace Capnp
                 throw new InvalidOperationException("Root already set");
 
             var root = CreateObject<TS>();
+            if (root.Kind != ObjectKind.Struct)
+                throw new InvalidOperationException("Root object must be a struct");
+
             Root = root;
             return root;
         }
