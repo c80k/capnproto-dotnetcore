@@ -28,7 +28,10 @@ namespace Capnp
             }
         }
 
-        Span<T> Data => MemoryMarshal.Cast<ulong, T>(RawData);
+        /// <summary>
+        /// The list's data
+        /// </summary>
+        public Span<T> Data => MemoryMarshal.Cast<ulong, T>(RawData);
 
         /// <summary>
         /// Gets or sets the value at given index.

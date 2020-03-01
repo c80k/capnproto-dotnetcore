@@ -36,7 +36,8 @@ namespace Capnp
 
             public FromList()
             {
-                _elementSerializer = (Func<DeserializerState, T>)GetSerializer(typeof(T));
+                var deser = GetSerializer(typeof(T));
+                _elementSerializer = d => (deser(d) as T)!;
 
             }
             public object Create(DeserializerState state)
@@ -147,28 +148,29 @@ namespace Capnp
         /// <list type="bullet">
         /// <item><description>Type implementing <see cref="ICapnpSerializable"/>. The type must must have a public parameterless constructor.</description></item>
         /// <item><description>A capability interface (<seealso cref="Rpc.InvalidCapabilityInterfaceException"/> for further explanation)</description></item>
-        /// <item><description><see cref="String"/></description></item>
-        /// <item><description><code>IReadOnlyList{Boolean}</code></description></item>
-        /// <item><description><code>IReadOnlyList{SByte}"</code></description></item>
-        /// <item><description><code>IReadOnlyList{Byte}"</code></description></item>
-        /// <item><description><code>IReadOnlyList{Int16}"</code></description></item>
-        /// <item><description><code>IReadOnlyList{UInt16}"</code></description></item>
-        /// <item><description><code>IReadOnlyList{Int32}"</code></description></item>
-        /// <item><description><code>IReadOnlyList{UInt32}"</code></description></item>
-        /// <item><description><code>IReadOnlyList{Int64}"</code></description></item>
-        /// <item><description><code>IReadOnlyList{UInt64}"</code></description></item>
-        /// <item><description><code>IReadOnlyList{Single}"</code></description></item>
-        /// <item><description><code>IReadOnlyList{Double}"</code></description></item>
-        /// <item><description><code>IReadOnlyList{T}</code> whereby T is one of the things listed here.</description></item>
+        /// <item><description><see cref="string"/></description></item>
+        /// <item><description>IReadOnlyList&lt;bool&gt;, IReadOnlyList&lt;sbyte&gt;, IReadOnlyList&lt;byte&gt;</description></item>
+        /// <item><description>IReadOnlyList&lt;short&gt;, IReadOnlyList&lt;ushort&gt;, IReadOnlyList&lt;int&gt;</description></item>
+        /// <item><description>IReadOnlyList&lt;uint&gt;, IReadOnlyList&lt;long&gt;, IReadOnlyList&lt;ulong&gt;</description></item>
+        /// <item><description>IReadOnlyList&lt;float&gt;, IReadOnlyList&lt;double&gt;</description></item>
+        /// <item><description>IReadOnlyList&lt;T&gt; whereby T is one of the things listed here.</description></item>
         /// </list>
         /// </typeparam>
         /// <param name="state">deserializer state to construct from</param>
         /// <returns>The domain object instance. Nullability note: The returned reference may be null if
         /// <paramref name="state"/> represents the nil object.</returns>
+        /// <exception cref="ArgumentException">Cannot construct object of type <typeparamref name="T"/></exception>
         public static T? Create<T>(DeserializerState state)
             where T: class
         {
-            return (T?)GetSerializer(typeof(T))(state);
+            try
+            {
+                return (T?)GetSerializer(typeof(T))(state);
+            }
+            catch (TargetInvocationException ex)
+            {
+                throw new ArgumentException("Failed to construct domain object", ex);
+            }
         }
     }
 }

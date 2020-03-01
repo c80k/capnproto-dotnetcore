@@ -290,5 +290,229 @@ namespace Capnp.Net.Runtime.Tests
             Assert.IsNull(list3[2]);
             Assert.AreEqual("3", list3[3]);
         }
+
+        [TestMethod]
+        public void CapnpSerializableListBool()
+        {
+            var expected = new bool[] { true, false, true };
+            var b = MessageBuilder.Create();
+            var list = b.CreateObject<ListOfBitsSerializer>();
+            list.Init(expected);
+            DeserializerState d = list;
+            var list2 = CapnpSerializable.Create<IReadOnlyList<bool>>(d);
+            CollectionAssert.AreEqual(expected, list2.ToArray());
+        }
+
+        [TestMethod]
+        public void CapnpSerializableListByte()
+        {
+            var expected = new byte[] { 1, 2, 3 };
+            var b = MessageBuilder.Create();
+            var list = b.CreateObject<ListOfPrimitivesSerializer<byte>>();
+            list.Init(expected);
+            DeserializerState d = list;
+            var list2 = CapnpSerializable.Create<IReadOnlyList<byte>>(d);
+            CollectionAssert.AreEqual(expected, list2.ToArray());
+        }
+
+        [TestMethod]
+        public void CapnpSerializableListSByte()
+        {
+            var expected = new sbyte[] { -1, -2, -3 };
+            var b = MessageBuilder.Create();
+            var list = b.CreateObject<ListOfPrimitivesSerializer<sbyte>>();
+            list.Init(expected);
+            DeserializerState d = list;
+            var list2 = CapnpSerializable.Create<IReadOnlyList<sbyte>>(d);
+            CollectionAssert.AreEqual(expected, list2.ToArray());
+        }
+
+        [TestMethod]
+        public void CapnpSerializableListUShort()
+        {
+            var expected = new ushort[] { 1, 2, 3 };
+            var b = MessageBuilder.Create();
+            var list = b.CreateObject<ListOfPrimitivesSerializer<ushort>>();
+            list.Init(expected);
+            DeserializerState d = list;
+            var list2 = CapnpSerializable.Create<IReadOnlyList<ushort>>(d);
+            CollectionAssert.AreEqual(expected, list2.ToArray());
+        }
+
+        [TestMethod]
+        public void CapnpSerializableListShort()
+        {
+            var expected = new short[] { -1, -2, -3 };
+            var b = MessageBuilder.Create();
+            var list = b.CreateObject<ListOfPrimitivesSerializer<short>>();
+            list.Init(expected);
+            DeserializerState d = list;
+            var list2 = CapnpSerializable.Create<IReadOnlyList<short>>(d);
+            CollectionAssert.AreEqual(expected, list2.ToArray());
+        }
+
+        [TestMethod]
+        public void CapnpSerializableListInt()
+        {
+            var expected = new int[] { -1, -2, -3 };
+            var b = MessageBuilder.Create();
+            var list = b.CreateObject<ListOfPrimitivesSerializer<int>>();
+            list.Init(expected);
+            DeserializerState d = list;
+            var list2 = CapnpSerializable.Create<IReadOnlyList<int>>(d);
+            CollectionAssert.AreEqual(expected, list2.ToArray());
+        }
+
+        [TestMethod]
+        public void CapnpSerializableListUInt()
+        {
+            var expected = new uint[] { 1, 2, 3 };
+            var b = MessageBuilder.Create();
+            var list = b.CreateObject<ListOfPrimitivesSerializer<uint>>();
+            list.Init(expected);
+            DeserializerState d = list;
+            var list2 = CapnpSerializable.Create<IReadOnlyList<uint>>(d);
+            CollectionAssert.AreEqual(expected, list2.ToArray());
+        }
+
+        [TestMethod]
+        public void CapnpSerializableListLong()
+        {
+            var expected = new long[] { -1, -2, -3 };
+            var b = MessageBuilder.Create();
+            var list = b.CreateObject<ListOfPrimitivesSerializer<long>>();
+            list.Init(expected);
+            DeserializerState d = list;
+            var list2 = CapnpSerializable.Create<IReadOnlyList<long>>(d);
+            CollectionAssert.AreEqual(expected, list2.ToArray());
+        }
+
+        [TestMethod]
+        public void CapnpSerializableListULong()
+        {
+            var expected = new ulong[] { 1, 2, 3 };
+            var b = MessageBuilder.Create();
+            var list = b.CreateObject<ListOfPrimitivesSerializer<ulong>>();
+            list.Init(expected);
+            DeserializerState d = list;
+            var list2 = CapnpSerializable.Create<IReadOnlyList<ulong>>(d);
+            CollectionAssert.AreEqual(expected, list2.ToArray());
+        }
+
+        [TestMethod]
+        public void CapnpSerializableListFloat()
+        {
+            var expected = new float[] { -1.0f, 2.0f, -3.0f };
+            var b = MessageBuilder.Create();
+            var list = b.CreateObject<ListOfPrimitivesSerializer<float>>();
+            list.Init(expected);
+            DeserializerState d = list;
+            var list2 = CapnpSerializable.Create<IReadOnlyList<float>>(d);
+            CollectionAssert.AreEqual(expected, list2.ToArray());
+        }
+
+        [TestMethod]
+        public void CapnpSerializableListDouble()
+        {
+            var expected = new double[] { -1, -2, -3 };
+            var b = MessageBuilder.Create();
+            var list = b.CreateObject<ListOfPrimitivesSerializer<double>>();
+            list.Init(expected);
+            DeserializerState d = list;
+            var list2 = CapnpSerializable.Create<IReadOnlyList<double>>(d);
+            CollectionAssert.AreEqual(expected, list2.ToArray());
+        }
+
+        [TestMethod]
+        public void CapnpSerializableStruct()
+        {
+            var b = MessageBuilder.Create();
+            var obj = b.CreateObject<SomeStruct.WRITER>();
+            obj.SomeText = "hello";
+            obj.MoreText = "world";
+            DeserializerState d = obj;
+            var obj2 = CapnpSerializable.Create<SomeStruct>(d);
+            Assert.AreEqual("hello", obj2.SomeText);
+            Assert.AreEqual("world", obj2.MoreText);
+        }
+
+        [TestMethod]
+        public void CapnpSerializableCapList()
+        {
+            var b = MessageBuilder.Create();
+            b.InitCapTable();
+            var wr = b.CreateObject<ListOfCapsSerializer<ITestInterface>>();
+            var c1 = new Counters();
+            var cap1 = new TestInterfaceImpl(c1);
+            var c2 = new Counters();
+            var cap2 = new TestInterfaceImpl(c2);
+            wr.Init(new ITestInterface[] { null, cap1, cap2 });
+            DeserializerState d = wr;
+            var list = CapnpSerializable.Create<IReadOnlyList<ITestInterface>>(d);
+            list[1].Foo(123u, true);
+            Assert.AreEqual(1, c1.CallCount);
+            list[2].Foo(123u, true);
+            Assert.AreEqual(1, c2.CallCount);
+        }
+
+        [TestMethod]
+        public void CapnpSerializableString()
+        {
+            string expected = "1, 2, 3";
+            var b = MessageBuilder.Create();
+            var list = b.CreateObject<ListOfPrimitivesSerializer<byte>>();
+            var bytes = Encoding.UTF8.GetBytes(expected);
+            list.Init(bytes.Length + 1);
+            bytes.CopyTo(list.Data);
+            DeserializerState d = list;
+            var str = CapnpSerializable.Create<string>(d);
+            Assert.AreEqual(expected, str);
+        }
+
+        class Unconstructible1 : ICapnpSerializable
+        {
+            public Unconstructible1(int annoyingParameter)
+            {
+
+            }
+
+            public void Deserialize(DeserializerState state)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Serialize(SerializerState state)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        class Unconstructible2 : ICapnpSerializable
+        {
+            public Unconstructible2()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Deserialize(DeserializerState state)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Serialize(SerializerState state)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        [TestMethod]
+        public void CapnpSerializableWrongUse()
+        {
+            var d = default(DeserializerState);
+            Assert.ThrowsException<ArgumentException>(() => CapnpSerializable.Create<SerializationTests>(d));
+            Assert.ThrowsException<ArgumentException>(() => CapnpSerializable.Create<IReadOnlyList<SerializationTests>>(d));
+            Assert.ThrowsException<ArgumentException>(() => CapnpSerializable.Create<Unconstructible1>(d));
+            Assert.ThrowsException<ArgumentException>(() => CapnpSerializable.Create<Unconstructible2>(d));
+        }
     }
 }
