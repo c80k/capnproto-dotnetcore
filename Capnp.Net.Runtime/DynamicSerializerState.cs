@@ -135,6 +135,13 @@ namespace Capnp
         /// </param>
         public void SetObject(object? obj)
         {
+            void RewrapAndInheritBack<T>(Action<T> init) where T : SerializerState, new()
+            {
+                var r = Rewrap<T>();
+                init(r);
+                InheritFrom(r);
+            }
+
             switch (obj)
             {
                 case ICapnpSerializable serializable:
@@ -146,55 +153,55 @@ namespace Capnp
                     break;
 
                 case IReadOnlyList<byte> bytes:
-                    Rewrap<ListOfPrimitivesSerializer<byte>>().Init(bytes);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<byte>>(_ => _.Init(bytes));
                     break;
 
                 case IReadOnlyList<sbyte> sbytes:
-                    Rewrap<ListOfPrimitivesSerializer<sbyte>>().Init(sbytes);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<sbyte>>(_ => _.Init(sbytes));
                     break;
 
                 case IReadOnlyList<ushort> ushorts:
-                    Rewrap<ListOfPrimitivesSerializer<ushort>>().Init(ushorts);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<ushort>>(_ => _.Init(ushorts));
                     break;
 
                 case IReadOnlyList<short> shorts:
-                    Rewrap<ListOfPrimitivesSerializer<short>>().Init(shorts);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<short>>(_ => _.Init(shorts));
                     break;
 
                 case IReadOnlyList<uint> uints:
-                    Rewrap<ListOfPrimitivesSerializer<uint>>().Init(uints);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<uint>>(_ => _.Init(uints));
                     break;
 
                 case IReadOnlyList<int> ints:
-                    Rewrap<ListOfPrimitivesSerializer<int>>().Init(ints);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<int>>(_ => _.Init(ints));
                     break;
 
                 case IReadOnlyList<ulong> ulongs:
-                    Rewrap<ListOfPrimitivesSerializer<ulong>>().Init(ulongs);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<ulong>>(_ => _.Init(ulongs));
                     break;
 
                 case IReadOnlyList<long> longs:
-                    Rewrap<ListOfPrimitivesSerializer<long>>().Init(longs);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<long>>(_ => _.Init(longs));
                     break;
 
                 case IReadOnlyList<float> floats:
-                    Rewrap<ListOfPrimitivesSerializer<float>>().Init(floats);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<float>>(_ => _.Init(floats));
                     break;
 
                 case IReadOnlyList<double> doubles:
-                    Rewrap<ListOfPrimitivesSerializer<double>>().Init(doubles);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<double>>(_ => _.Init(doubles));
                     break;
 
                 case IReadOnlyList<bool> bools:
-                    Rewrap<ListOfBitsSerializer>().Init(bools);
+                    RewrapAndInheritBack<ListOfBitsSerializer>(_ => _.Init(bools));
                     break;
 
                 case IReadOnlyList<string> strings:
-                    Rewrap<ListOfTextSerializer>().Init(strings);
+                    RewrapAndInheritBack<ListOfTextSerializer>(_ => _.Init(strings));
                     break;
 
                 case IReadOnlyList<object> objects:
-                    Rewrap<ListOfPointersSerializer<DynamicSerializerState>>().Init(objects, (s, o) => s.SetObject(o));
+                    RewrapAndInheritBack<ListOfPointersSerializer<DynamicSerializerState>>(_ => _.Init(objects, (s, o) => s.SetObject(o)));
                     break;
 
                 case DeserializerState ds:

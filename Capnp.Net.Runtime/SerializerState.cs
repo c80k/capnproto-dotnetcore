@@ -75,6 +75,18 @@ namespace Capnp
             MsgBuilder = owner.MsgBuilder;
         }
 
+        internal void InheritFrom(SerializerState other)
+        {
+            SegmentIndex = other.SegmentIndex;
+            Offset = other.Offset;
+            ListElementCount = other.ListElementCount;
+            StructDataCount = other.StructDataCount;
+            StructPtrCount = other.StructPtrCount;
+            Kind = other.Kind;
+            CapabilityIndex = other.CapabilityIndex;
+            _linkedStates = other._linkedStates;
+        }
+
         /// <summary>
         /// Represents this state by a different serializer state specialization. This is similar to a type-cast: The underlying object remains the same,
         /// but the specialization adds a particular "view" on that data.
@@ -114,14 +126,7 @@ namespace Capnp
                         break;
                 }
 
-                ts.SegmentIndex = SegmentIndex;
-                ts.Offset = Offset;
-                ts.ListElementCount = ListElementCount;
-                ts.StructDataCount = StructDataCount;
-                ts.StructPtrCount = StructPtrCount;
-                ts.Kind = Kind;
-                ts.CapabilityIndex = CapabilityIndex;
-                ts._linkedStates = _linkedStates;
+                ts.InheritFrom(this);
             }
 
             if (Owner != null)
@@ -130,18 +135,6 @@ namespace Capnp
                 ts.Bind(MsgBuilder ?? throw Unbound());
 
             return ts;
-        }
-
-        internal void InheritFrom(SerializerState other)
-        {
-            SegmentIndex = other.SegmentIndex;
-            Offset = other.Offset;
-            ListElementCount = other.ListElementCount;
-            StructDataCount = other.StructDataCount;
-            StructPtrCount = other.StructPtrCount;
-            Kind = other.Kind;
-            CapabilityIndex = other.CapabilityIndex;
-            _linkedStates = other._linkedStates;
         }
 
         /// <summary>

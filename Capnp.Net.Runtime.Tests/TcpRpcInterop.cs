@@ -367,6 +367,7 @@ namespace Capnp.Net.Runtime.Tests
         }
 
         [TestMethod]
+        [TestCategory("Coverage")]
         public void TestTailCallClient()
         {
             LaunchCompatTestProcess("server:TailCaller", stdout =>

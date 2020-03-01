@@ -469,6 +469,21 @@ namespace Capnp.Net.Runtime.Tests
             Assert.AreEqual(expected, str);
         }
 
+        [TestMethod]
+        public void CapnpSerializableAnyPointer()
+        {
+            var b = MessageBuilder.Create();
+            var obj = b.CreateObject<SomeStruct.WRITER>();
+            obj.SomeText = "hello";
+            obj.MoreText = "world";
+            DeserializerState d = obj;
+            var any = CapnpSerializable.Create<AnyPointer>(d);
+            var obj2 = new SomeStruct.READER(any.State);
+            Assert.AreEqual("hello", obj2.SomeText);
+            Assert.AreEqual("world", obj2.MoreText);
+
+        }
+
         class Unconstructible1 : ICapnpSerializable
         {
             public Unconstructible1(int annoyingParameter)
@@ -511,8 +526,203 @@ namespace Capnp.Net.Runtime.Tests
             var d = default(DeserializerState);
             Assert.ThrowsException<ArgumentException>(() => CapnpSerializable.Create<SerializationTests>(d));
             Assert.ThrowsException<ArgumentException>(() => CapnpSerializable.Create<IReadOnlyList<SerializationTests>>(d));
+            Assert.ThrowsException<ArgumentException>(() => CapnpSerializable.Create<IReadOnlyList<DeserializerState>>(d));
             Assert.ThrowsException<ArgumentException>(() => CapnpSerializable.Create<Unconstructible1>(d));
             Assert.ThrowsException<ArgumentException>(() => CapnpSerializable.Create<Unconstructible2>(d));
+        }
+
+        [TestMethod]
+        public void DynamicSerializerStateBytes()
+        {
+            var expected = new byte[] { 1, 2, 3 };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            CollectionAssert.AreEqual(expected, d.RequireList().CastByte().ToArray());
+        }
+
+        [TestMethod]
+        public void DynamicSerializerStateSBytes()
+        {
+            var expected = new sbyte[] { 1, 2, 3 };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            CollectionAssert.AreEqual(expected, d.RequireList().CastSByte().ToArray());
+        }
+
+        [TestMethod]
+        public void DynamicSerializerStateShorts()
+        {
+            var expected = new short[] { 1, 2, 3 };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            CollectionAssert.AreEqual(expected, d.RequireList().CastShort().ToArray());
+        }
+
+        [TestMethod]
+        public void DynamicSerializerStateUShorts()
+        {
+            var expected = new ushort[] { 1, 2, 3 };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            CollectionAssert.AreEqual(expected, d.RequireList().CastUShort().ToArray());
+        }
+
+        [TestMethod]
+        public void DynamicSerializerStateInts()
+        {
+            var expected = new int[] { 1, 2, 3 };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            CollectionAssert.AreEqual(expected, d.RequireList().CastInt().ToArray());
+        }
+
+        [TestMethod]
+        public void DynamicSerializerStateUInts()
+        {
+            var expected = new uint[] { 1, 2, 3 };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            CollectionAssert.AreEqual(expected, d.RequireList().CastUInt().ToArray());
+        }
+
+        [TestMethod]
+        public void DynamicSerializerStateLongs()
+        {
+            var expected = new long[] { 1, 2, 3 };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            CollectionAssert.AreEqual(expected, d.RequireList().CastLong().ToArray());
+        }
+
+        [TestMethod]
+        public void DynamicSerializerStateULongs()
+        {
+            var expected = new ulong[] { 1, 2, 3 };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            CollectionAssert.AreEqual(expected, d.RequireList().CastULong().ToArray());
+        }
+
+        [TestMethod]
+        public void DynamicSerializerStateFloats()
+        {
+            var expected = new float[] { 1.0f, 2.0f, 3.0f };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            CollectionAssert.AreEqual(expected, d.RequireList().CastFloat().ToArray());
+        }
+
+        [TestMethod]
+        public void DynamicSerializerStateDoubles()
+        {
+            var expected = new double[] { 1.0, 2.0, 3.0 };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            CollectionAssert.AreEqual(expected, d.RequireList().CastDouble().ToArray());
+        }
+
+        [TestMethod]
+        public void DynamicSerializerStateBools()
+        {
+            var expected = new bool[] { true, true, false };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            CollectionAssert.AreEqual(expected, d.RequireList().CastBool().ToArray());
+        }
+
+        [TestMethod]
+        public void DynamicSerializerStateStrings()
+        {
+            var expected = new string[] { "foo", "bar", "baz" };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            CollectionAssert.AreEqual(expected, d.RequireList().CastText2().ToArray());
+        }
+
+        [TestMethod]
+        public void DynamicSerializerStateObjects()
+        {
+            var c = new Counters();
+            var cap = new TestInterfaceImpl(c);
+            var expected = new object[] { null, "foo", cap };
+
+            var b = MessageBuilder.Create();
+            b.InitCapTable();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var list = d.RequireList().Cast(_ => _);
+            Assert.AreEqual(3, list.Count);
+            Assert.IsTrue(list[0].Kind == ObjectKind.Nil);
+            Assert.AreEqual("foo", list[1].RequireList().CastText());
+            var proxy = list[2].RequireCap<ITestInterface>();
+            proxy.Foo(123u, true);
+            Assert.AreEqual(1, c.CallCount);
+        }
+
+        [TestMethod]
+        public void DynamicSerializerStateFromDeserializerState()
+        {
+            var expected = new string[] { "foo", "bar", "baz" };
+
+            var b = MessageBuilder.Create();
+            var lots = b.CreateObject<ListOfTextSerializer>();
+            lots.Init(expected);
+            DeserializerState d = lots;
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(d);
+            DeserializerState d2 = dss;
+            CollectionAssert.AreEqual(expected, d2.RequireList().CastText2().ToArray());
+        }
+
+        [TestMethod]
+        public void DynamicSerializerStateFromSerializerState()
+        {
+            var expected = new string[] { "foo", "bar", "baz" };
+
+            var b = MessageBuilder.Create();
+            var lots = b.CreateObject<ListOfTextSerializer>();
+            lots.Init(expected);
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(lots);
+            DeserializerState d2 = dss;
+            CollectionAssert.AreEqual(expected, d2.RequireList().CastText2().ToArray());
         }
     }
 }
