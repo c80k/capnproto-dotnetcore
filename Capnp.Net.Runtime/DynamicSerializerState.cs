@@ -121,27 +121,16 @@ namespace Capnp
         /// <param name="obj">Object representation. Must be one of the following:
         /// <list type="bullet">
         /// <item><description>An instance implementing <see cref="ICapnpSerializable"/></description></item>
-        /// <item><description>null</description></item>
-        /// <item><description>A <see cref="String"/></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<byte>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<sbyte>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<ushort>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<short>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<int>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<uint>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<long>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<ulong>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<float>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<double>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<bool>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<string>]]></code></description></item>
-        /// <item><description>Another <see cref="DeserializerState"/></description></item>
-        /// <item><description>Another <see cref="SerializerState"/></description></item>
+        /// <item><description>null</description>, <see cref="String"/></item>
+        /// <item><description><c>IReadOnlyList&lt;byte&gt;</c>, <c>IReadOnlyList&lt;sbyte&gt;</c>, <c>IReadOnlyList&lt;ushort&gt;</c>, <c>IReadOnlyList&lt;short&gt;</c></description></item>
+        /// <item><description><c>IReadOnlyList&lt;int&gt;</c>, <c>IReadOnlyList&lt;uint&gt;</c>, <c>IReadOnlyList&lt;long&gt;</c>, <c>IReadOnlyList&lt;ulong&gt;</c></description></item>
+        /// <item><description><c>IReadOnlyList&lt;float&gt;</c>, <c>IReadOnlyList&lt;double&gt;</c>, <c>IReadOnlyList&lt;bool&gt;</c>, <c>IReadOnlyList&lt;string&gt;</c></description></item>
+        /// <item><description>Another <see cref="DeserializerState"/> or <see cref="SerializerState"/></description></item>
         /// <item><description>Low-level capability object (<see cref="Rpc.ConsumedCapability"/>)</description></item>
         /// <item><description>Proxy object (<see cref="Rpc.Proxy"/>)</description></item>
         /// <item><description>Skeleton object (<see cref="Rpc.Skeleton"/>)</description></item>
         /// <item><description>Capability interface implementation</description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<object>]]></code> whereby each list item is one of the things listed here.</description></item>
+        /// <item><description><c>IReadOnlyList&lt;object&gt;</c>, whereby each list item is one of the things listed here.</description></item>
         /// </list>
         /// </param>
         public void SetObject(object? obj)

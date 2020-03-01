@@ -22,8 +22,7 @@ namespace Capnp
         {
             get
             {
-                if (!IsAllocated)
-                    throw new InvalidOperationException("Not initialized");
+                ListSerializerHelper.EnsureAllocated(this);
 
                 if (index < 0 || index >= Count)
                     throw new IndexOutOfRangeException();
@@ -32,8 +31,7 @@ namespace Capnp
             }
             set
             {
-                if (!IsAllocated)
-                    throw new InvalidOperationException("Not initialized");
+                ListSerializerHelper.EnsureAllocated(this);
 
                 if (index < 0 || index >= Count)
                     throw new IndexOutOfRangeException();
@@ -53,7 +51,7 @@ namespace Capnp
 
             for (int i = 0; i < count; i++)
             {
-                yield return TryGetPointer<SerializerState>(i)?.ListReadAsText();
+                yield return this[i];
             }
         }
 

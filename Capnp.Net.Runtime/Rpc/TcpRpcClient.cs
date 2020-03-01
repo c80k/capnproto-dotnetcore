@@ -19,12 +19,10 @@ namespace Capnp.Rpc
 
         class OutboundTcpEndpoint : IEndpoint
         {
-            readonly TcpRpcClient _client;
             readonly FramePump _pump;
 
-            public OutboundTcpEndpoint(TcpRpcClient client, FramePump pump)
+            public OutboundTcpEndpoint(FramePump pump)
             {
-                _client = client;
                 _pump = pump;
             }
 
@@ -84,7 +82,7 @@ namespace Capnp.Rpc
             var stream = _createLayers(_client.GetStream());
             _pump = new FramePump(stream);
             _attachTracerAction?.Invoke();
-            _outboundEndpoint = new OutboundTcpEndpoint(this, _pump);
+            _outboundEndpoint = new OutboundTcpEndpoint(_pump);
             _inboundEndpoint = _rpcEngine.AddEndpoint(_outboundEndpoint);
             _pumpThread = new Thread(() =>
             {

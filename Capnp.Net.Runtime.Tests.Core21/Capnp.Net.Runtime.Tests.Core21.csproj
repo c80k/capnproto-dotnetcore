@@ -8,6 +8,7 @@
     <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
+
   <ItemGroup>
     <Compile Include="..\Capnp.Net.Runtime.Tests\DeserializationTests.cs" Link="DeserializationTests.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\DynamicSerializerStateTests.cs" Link="DynamicSerializerStateTests.cs" />

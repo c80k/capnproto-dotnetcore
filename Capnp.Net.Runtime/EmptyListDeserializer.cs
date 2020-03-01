@@ -68,7 +68,7 @@ namespace Capnp
         /// <summary>
         /// Returns an empty string.
         /// </summary>
-        public override string CastText() => string.Empty;
+        public override string? CastText() => null;
 
         /// <summary>
         /// Returns an empty <code><![CDATA[IReadOnlyList<uint>]]></code>.

@@ -77,8 +77,6 @@ namespace Capnp
             base(ref state)
         {
             _kind = kind;
-
-            var binCoder = PrimitiveCoder.Get<T>();
         }
 
         /// <summary>

@@ -163,9 +163,8 @@ namespace Capnp
         /// </list>
         /// </typeparam>
         /// <param name="state">deserializer state to construct from</param>
-        /// <returns>The domain object instance. Nullability note: The returned reference will be null if (and only if) <typeparamref name="T"/> is a capability interface and
-        /// <paramref name="state"/> represents the nil object (obtained from a null pointer). For all other types, when the state is nil, 
-        /// the method still constructs a valid but "empty" object instance (such as domain object without any properties set, empty string, empty list etc.)</returns>
+        /// <returns>The domain object instance. Nullability note: The returned reference may be null if
+        /// <paramref name="state"/> represents the nil object.</returns>
         public static T? Create<T>(DeserializerState state)
             where T: class
         {

@@ -26,7 +26,7 @@ namespace Capnp
             GenericCasts<IReadOnlyList<ulong>>.CastFunc = _ => _.CastULong();
             GenericCasts<IReadOnlyList<float>>.CastFunc = _ => _.CastFloat();
             GenericCasts<IReadOnlyList<double>>.CastFunc = _ => _.CastDouble();
-            GenericCasts<string>.CastFunc = _ => _.CastText();
+            GenericCasts<string>.CastFunc = _ => _.CastText()!; // it *may* return null, but how to express this syntactically correct?
         }
 
         /// <summary>
@@ -269,7 +269,7 @@ namespace Capnp
         /// </summary>
         /// <returns>The desired representation</returns>
         /// <exception cref="NotSupportedException">If this list cannot be represented in the desired manner.</exception>
-        public IReadOnlyList<string> CastText2() => CastList().LazyListSelect(ld => ld.CastText());
+        public IReadOnlyList<string?> CastText2() => CastList().LazyListSelect(ld => ld.CastText());
 
         /// <summary>
         /// Represents this list as Text. For representing it as List(Text), use <seealso cref="CastText2"/>.
@@ -285,7 +285,7 @@ namespace Capnp
         /// </remarks>
         /// <returns>The decoded text</returns>
         /// <exception cref="NotSupportedException">If this list cannot be represented in the desired manner.</exception>
-        public virtual string CastText()
+        public virtual string? CastText()
         {
             throw new NotSupportedException("This kind of list does not represent text");
         }

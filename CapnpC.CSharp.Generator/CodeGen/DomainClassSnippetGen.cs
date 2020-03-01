@@ -284,7 +284,8 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     value.Decode();
 
                     return ArrayCreationExpression(ArrayType(
-                        _names.MakeTypeSyntax(value.Type.ElementType, scope, TypeUsage.DomainClass, Nullability.NullableRef))
+                        _names.MakeTypeSyntax(value.Type.ElementType, scope, TypeUsage.DomainClass, 
+                            _names.GetDefaultElementTypeNullability(value.Type.ElementType)))
                         .WithRankSpecifiers(
                             SingletonList<ArrayRankSpecifierSyntax>(
                                 ArrayRankSpecifier(
@@ -619,13 +620,14 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         IdentifierName(nameof(Capnp.ReadOnlyListExtensions.ToReadOnlyList))))
                 .AddArgumentListArguments(Argument(
                     SimpleLambdaExpression(Parameter(Identifier("_")),
-                        InvocationExpression(
-                            MemberAccessExpression(
-                                SyntaxKind.SimpleMemberAccessExpression,
-                                IdentifierName(nameof(Capnp.CapnpSerializable)),
-                                GenericName(nameof(Capnp.CapnpSerializable.Create))
-                                    .AddTypeArgumentListArguments(MakeNonNullableType(elementType))))
-                            .AddArgumentListArguments(Argument(IdentifierName("_")))))));
+                        _names.SuppressNullableWarning(
+                            InvocationExpression(
+                                MemberAccessExpression(
+                                    SyntaxKind.SimpleMemberAccessExpression,
+                                    IdentifierName(nameof(Capnp.CapnpSerializable)),
+                                    GenericName(nameof(Capnp.CapnpSerializable.Create))
+                                        .AddTypeArgumentListArguments(MakeNonNullableType(elementType))))
+                                .AddArgumentListArguments(Argument(IdentifierName("_"))))))));
         }
 
         ExpressionSyntax MakeStructListConversion(ExpressionSyntax context, TypeSyntax elementType, int rank)

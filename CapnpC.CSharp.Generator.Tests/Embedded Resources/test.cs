@@ -321,7 +321,7 @@ namespace Capnproto_test.Capnp.Test
             public ulong UInt64Field => ctx.ReadDataULong(192UL, 0UL);
             public float Float32Field => ctx.ReadDataFloat(256UL, 0F);
             public double Float64Field => ctx.ReadDataDouble(320UL, 0);
-            public string TextField => ctx.ReadText(0, "");
+            public string TextField => ctx.ReadText(0, null);
             public IReadOnlyList<byte> DataField => ctx.ReadList(1).CastByte();
             public Capnproto_test.Capnp.Test.TestAllTypes.READER StructField => ctx.ReadStruct(2, Capnproto_test.Capnp.Test.TestAllTypes.READER.create);
             public Capnproto_test.Capnp.Test.TestEnum EnumField => (Capnproto_test.Capnp.Test.TestEnum)ctx.ReadDataUShort(288UL, (ushort)0);
@@ -419,8 +419,8 @@ namespace Capnproto_test.Capnp.Test
 
             public string TextField
             {
-                get => this.ReadText(0, "");
-                set => this.WriteText(0, value, "");
+                get => this.ReadText(0, null);
+                set => this.WriteText(0, value, null);
             }
 
             public ListOfPrimitivesSerializer<byte> DataField
@@ -1373,15 +1373,15 @@ namespace Capnproto_test.Capnp.Test
             public static READER create(DeserializerState ctx) => new READER(ctx);
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-            public string Qux => ctx.ReadText(0, "");
-            public string Grault => ctx.ReadText(1, "");
-            public string Bar => ctx.ReadText(2, "");
-            public string Foo => ctx.ReadText(3, "");
-            public string Corge => ctx.ReadText(4, "");
-            public string Waldo => ctx.ReadText(5, "");
-            public string Quux => ctx.ReadText(6, "");
-            public string Garply => ctx.ReadText(7, "");
-            public string Baz => ctx.ReadText(8, "");
+            public string Qux => ctx.ReadText(0, null);
+            public string Grault => ctx.ReadText(1, null);
+            public string Bar => ctx.ReadText(2, null);
+            public string Foo => ctx.ReadText(3, null);
+            public string Corge => ctx.ReadText(4, null);
+            public string Waldo => ctx.ReadText(5, null);
+            public string Quux => ctx.ReadText(6, null);
+            public string Garply => ctx.ReadText(7, null);
+            public string Baz => ctx.ReadText(8, null);
         }
 
         public class WRITER : SerializerState
@@ -1393,56 +1393,56 @@ namespace Capnproto_test.Capnp.Test
 
             public string Qux
             {
-                get => this.ReadText(0, "");
-                set => this.WriteText(0, value, "");
+                get => this.ReadText(0, null);
+                set => this.WriteText(0, value, null);
             }
 
             public string Grault
             {
-                get => this.ReadText(1, "");
-                set => this.WriteText(1, value, "");
+                get => this.ReadText(1, null);
+                set => this.WriteText(1, value, null);
             }
 
             public string Bar
             {
-                get => this.ReadText(2, "");
-                set => this.WriteText(2, value, "");
+                get => this.ReadText(2, null);
+                set => this.WriteText(2, value, null);
             }
 
             public string Foo
             {
-                get => this.ReadText(3, "");
-                set => this.WriteText(3, value, "");
+                get => this.ReadText(3, null);
+                set => this.WriteText(3, value, null);
             }
 
             public string Corge
             {
-                get => this.ReadText(4, "");
-                set => this.WriteText(4, value, "");
+                get => this.ReadText(4, null);
+                set => this.WriteText(4, value, null);
             }
 
             public string Waldo
             {
-                get => this.ReadText(5, "");
-                set => this.WriteText(5, value, "");
+                get => this.ReadText(5, null);
+                set => this.WriteText(5, value, null);
             }
 
             public string Quux
             {
-                get => this.ReadText(6, "");
-                set => this.WriteText(6, value, "");
+                get => this.ReadText(6, null);
+                set => this.WriteText(6, value, null);
             }
 
             public string Garply
             {
-                get => this.ReadText(7, "");
-                set => this.WriteText(7, value, "");
+                get => this.ReadText(7, null);
+                set => this.WriteText(7, value, null);
             }
 
             public string Baz
             {
-                get => this.ReadText(8, "");
-                set => this.WriteText(8, value, "");
+                get => this.ReadText(8, null);
+                set => this.WriteText(8, value, null);
             }
         }
     }
@@ -1992,13 +1992,13 @@ namespace Capnproto_test.Capnp.Test
                 public short U0f0s16 => which == WHICH.U0f0s16 ? ctx.ReadDataShort(64UL, (short)0) : default;
                 public int U0f0s32 => which == WHICH.U0f0s32 ? ctx.ReadDataInt(64UL, 0) : default;
                 public long U0f0s64 => which == WHICH.U0f0s64 ? ctx.ReadDataLong(64UL, 0L) : default;
-                public string U0f0sp => which == WHICH.U0f0sp ? ctx.ReadText(0, "") : default;
+                public string U0f0sp => which == WHICH.U0f0sp ? ctx.ReadText(0, null) : default;
                 public bool U0f1s1 => which == WHICH.U0f1s1 ? ctx.ReadDataBool(64UL, false) : default;
                 public sbyte U0f1s8 => which == WHICH.U0f1s8 ? ctx.ReadDataSByte(64UL, (sbyte)0) : default;
                 public short U0f1s16 => which == WHICH.U0f1s16 ? ctx.ReadDataShort(64UL, (short)0) : default;
                 public int U0f1s32 => which == WHICH.U0f1s32 ? ctx.ReadDataInt(64UL, 0) : default;
                 public long U0f1s64 => which == WHICH.U0f1s64 ? ctx.ReadDataLong(64UL, 0L) : default;
-                public string U0f1sp => which == WHICH.U0f1sp ? ctx.ReadText(0, "") : default;
+                public string U0f1sp => which == WHICH.U0f1sp ? ctx.ReadText(0, null) : default;
             }
 
             public class WRITER : SerializerState
@@ -2045,8 +2045,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string U0f0sp
                 {
-                    get => which == WHICH.U0f0sp ? this.ReadText(0, "") : default;
-                    set => this.WriteText(0, value, "");
+                    get => which == WHICH.U0f0sp ? this.ReadText(0, null) : default;
+                    set => this.WriteText(0, value, null);
                 }
 
                 public bool U0f1s1
@@ -2081,8 +2081,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string U0f1sp
                 {
-                    get => which == WHICH.U0f1sp ? this.ReadText(0, "") : default;
-                    set => this.WriteText(0, value, "");
+                    get => which == WHICH.U0f1sp ? this.ReadText(0, null) : default;
+                    set => this.WriteText(0, value, null);
                 }
             }
         }
@@ -2537,14 +2537,14 @@ namespace Capnproto_test.Capnp.Test
                 public int U1f1s32 => which == WHICH.U1f1s32 ? ctx.ReadDataInt(160UL, 0) : default;
                 public long U1f0s64 => which == WHICH.U1f0s64 ? ctx.ReadDataLong(192UL, 0L) : default;
                 public long U1f1s64 => which == WHICH.U1f1s64 ? ctx.ReadDataLong(192UL, 0L) : default;
-                public string U1f0sp => which == WHICH.U1f0sp ? ctx.ReadText(1, "") : default;
-                public string U1f1sp => which == WHICH.U1f1sp ? ctx.ReadText(1, "") : default;
+                public string U1f0sp => which == WHICH.U1f0sp ? ctx.ReadText(1, null) : default;
+                public string U1f1sp => which == WHICH.U1f1sp ? ctx.ReadText(1, null) : default;
                 public bool U1f2s1 => which == WHICH.U1f2s1 ? ctx.ReadDataBool(129UL, false) : default;
                 public sbyte U1f2s8 => which == WHICH.U1f2s8 ? ctx.ReadDataSByte(136UL, (sbyte)0) : default;
                 public short U1f2s16 => which == WHICH.U1f2s16 ? ctx.ReadDataShort(144UL, (short)0) : default;
                 public int U1f2s32 => which == WHICH.U1f2s32 ? ctx.ReadDataInt(160UL, 0) : default;
                 public long U1f2s64 => which == WHICH.U1f2s64 ? ctx.ReadDataLong(192UL, 0L) : default;
-                public string U1f2sp => which == WHICH.U1f2sp ? ctx.ReadText(1, "") : default;
+                public string U1f2sp => which == WHICH.U1f2sp ? ctx.ReadText(1, null) : default;
             }
 
             public class WRITER : SerializerState
@@ -2621,14 +2621,14 @@ namespace Capnproto_test.Capnp.Test
 
                 public string U1f0sp
                 {
-                    get => which == WHICH.U1f0sp ? this.ReadText(1, "") : default;
-                    set => this.WriteText(1, value, "");
+                    get => which == WHICH.U1f0sp ? this.ReadText(1, null) : default;
+                    set => this.WriteText(1, value, null);
                 }
 
                 public string U1f1sp
                 {
-                    get => which == WHICH.U1f1sp ? this.ReadText(1, "") : default;
-                    set => this.WriteText(1, value, "");
+                    get => which == WHICH.U1f1sp ? this.ReadText(1, null) : default;
+                    set => this.WriteText(1, value, null);
                 }
 
                 public bool U1f2s1
@@ -2663,8 +2663,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string U1f2sp
                 {
-                    get => which == WHICH.U1f2sp ? this.ReadText(1, "") : default;
-                    set => this.WriteText(1, value, "");
+                    get => which == WHICH.U1f2sp ? this.ReadText(1, null) : default;
+                    set => this.WriteText(1, value, null);
                 }
             }
         }
@@ -3229,11 +3229,11 @@ namespace Capnproto_test.Capnp.Test
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
             public WHICH which => (WHICH)ctx.ReadDataUShort(32U, (ushort)0);
-            public string Before => ctx.ReadText(0, "");
+            public string Before => ctx.ReadText(0, null);
             public ushort Foo => which == WHICH.Foo ? ctx.ReadDataUShort(0UL, (ushort)0) : default;
             public ushort Middle => ctx.ReadDataUShort(16UL, (ushort)0);
             public uint Bar => which == WHICH.Bar ? ctx.ReadDataUInt(64UL, 0U) : default;
-            public string After => ctx.ReadText(1, "");
+            public string After => ctx.ReadText(1, null);
         }
 
         public class WRITER : SerializerState
@@ -3251,8 +3251,8 @@ namespace Capnproto_test.Capnp.Test
 
             public string Before
             {
-                get => this.ReadText(0, "");
-                set => this.WriteText(0, value, "");
+                get => this.ReadText(0, null);
+                set => this.WriteText(0, value, null);
             }
 
             public ushort Foo
@@ -3275,8 +3275,8 @@ namespace Capnproto_test.Capnp.Test
 
             public string After
             {
-                get => this.ReadText(1, "");
-                set => this.WriteText(1, value, "");
+                get => this.ReadText(1, null);
+                set => this.WriteText(1, value, null);
             }
         }
     }
@@ -3882,7 +3882,7 @@ namespace Capnproto_test.Capnp.Test
                     public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                     public int Corge => ctx.ReadDataInt(0UL, 0);
                     public long Grault => ctx.ReadDataLong(64UL, 0L);
-                    public string Garply => ctx.ReadText(0, "");
+                    public string Garply => ctx.ReadText(0, null);
                 }
 
                 public class WRITER : SerializerState
@@ -3905,8 +3905,8 @@ namespace Capnproto_test.Capnp.Test
 
                     public string Garply
                     {
-                        get => this.ReadText(0, "");
-                        set => this.WriteText(0, value, "");
+                        get => this.ReadText(0, null);
+                        set => this.WriteText(0, value, null);
                     }
                 }
             }
@@ -3970,8 +3970,8 @@ namespace Capnproto_test.Capnp.Test
                     public static implicit operator DeserializerState(READER reader) => reader.ctx;
                     public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                     public int Corge => ctx.ReadDataInt(0UL, 0);
-                    public string Grault => ctx.ReadText(0, "");
-                    public string Garply => ctx.ReadText(1, "");
+                    public string Grault => ctx.ReadText(0, null);
+                    public string Garply => ctx.ReadText(1, null);
                 }
 
                 public class WRITER : SerializerState
@@ -3988,14 +3988,14 @@ namespace Capnproto_test.Capnp.Test
 
                     public string Grault
                     {
-                        get => this.ReadText(0, "");
-                        set => this.WriteText(0, value, "");
+                        get => this.ReadText(0, null);
+                        set => this.WriteText(0, value, null);
                     }
 
                     public string Garply
                     {
-                        get => this.ReadText(1, "");
-                        set => this.WriteText(1, value, "");
+                        get => this.ReadText(1, null);
+                        set => this.WriteText(1, value, null);
                     }
                 }
             }
@@ -4059,7 +4059,7 @@ namespace Capnproto_test.Capnp.Test
                     public static implicit operator DeserializerState(READER reader) => reader.ctx;
                     public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                     public int Corge => ctx.ReadDataInt(0UL, 0);
-                    public string Grault => ctx.ReadText(0, "");
+                    public string Grault => ctx.ReadText(0, null);
                     public long Garply => ctx.ReadDataLong(64UL, 0L);
                 }
 
@@ -4077,8 +4077,8 @@ namespace Capnproto_test.Capnp.Test
 
                     public string Grault
                     {
-                        get => this.ReadText(0, "");
-                        set => this.WriteText(0, value, "");
+                        get => this.ReadText(0, null);
+                        set => this.WriteText(0, value, null);
                     }
 
                     public long Garply
@@ -4316,8 +4316,8 @@ namespace Capnproto_test.Capnp.Test
                 public ulong Bar => ctx.ReadDataULong(64UL, 0UL);
                 public ushort Qux => which == WHICH.Qux ? ctx.ReadDataUShort(192UL, (ushort)0) : default;
                 public corge.READER Corge => which == WHICH.Corge ? new corge.READER(ctx) : default;
-                public string Waldo => ctx.ReadText(0, "");
-                public string Fred => which == WHICH.Fred ? ctx.ReadText(2, "") : default;
+                public string Waldo => ctx.ReadText(0, null);
+                public string Fred => which == WHICH.Fred ? ctx.ReadText(2, null) : default;
             }
 
             public class WRITER : SerializerState
@@ -4357,14 +4357,14 @@ namespace Capnproto_test.Capnp.Test
 
                 public string Waldo
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
 
                 public string Fred
                 {
-                    get => which == WHICH.Fred ? this.ReadText(2, "") : default;
-                    set => this.WriteText(2, value, "");
+                    get => which == WHICH.Fred ? this.ReadText(2, null) : default;
+                    set => this.WriteText(2, value, null);
                 }
             }
 
@@ -4436,8 +4436,8 @@ namespace Capnproto_test.Capnp.Test
                     public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                     public ulong Grault => ctx.ReadDataULong(256UL, 0UL);
                     public ushort Garply => ctx.ReadDataUShort(192UL, (ushort)0);
-                    public string Plugh => ctx.ReadText(2, "");
-                    public string Xyzzy => ctx.ReadText(4, "");
+                    public string Plugh => ctx.ReadText(2, null);
+                    public string Xyzzy => ctx.ReadText(4, null);
                 }
 
                 public class WRITER : SerializerState
@@ -4460,14 +4460,14 @@ namespace Capnproto_test.Capnp.Test
 
                     public string Plugh
                     {
-                        get => this.ReadText(2, "");
-                        set => this.WriteText(2, value, "");
+                        get => this.ReadText(2, null);
+                        set => this.WriteText(2, value, null);
                     }
 
                     public string Xyzzy
                     {
-                        get => this.ReadText(4, "");
-                        set => this.WriteText(4, value, "");
+                        get => this.ReadText(4, null);
+                        set => this.WriteText(4, value, null);
                     }
                 }
             }
@@ -4626,8 +4626,8 @@ namespace Capnproto_test.Capnp.Test
                 public ulong Bar => ctx.ReadDataULong(128UL, 0UL);
                 public ushort Qux => which == WHICH.Qux ? ctx.ReadDataUShort(208UL, (ushort)0) : default;
                 public corge.READER Corge => which == WHICH.Corge ? new corge.READER(ctx) : default;
-                public string Waldo => ctx.ReadText(1, "");
-                public string Fred => which == WHICH.Fred ? ctx.ReadText(3, "") : default;
+                public string Waldo => ctx.ReadText(1, null);
+                public string Fred => which == WHICH.Fred ? ctx.ReadText(3, null) : default;
             }
 
             public class WRITER : SerializerState
@@ -4667,14 +4667,14 @@ namespace Capnproto_test.Capnp.Test
 
                 public string Waldo
                 {
-                    get => this.ReadText(1, "");
-                    set => this.WriteText(1, value, "");
+                    get => this.ReadText(1, null);
+                    set => this.WriteText(1, value, null);
                 }
 
                 public string Fred
                 {
-                    get => which == WHICH.Fred ? this.ReadText(3, "") : default;
-                    set => this.WriteText(3, value, "");
+                    get => which == WHICH.Fred ? this.ReadText(3, null) : default;
+                    set => this.WriteText(3, value, null);
                 }
             }
 
@@ -4746,8 +4746,8 @@ namespace Capnproto_test.Capnp.Test
                     public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                     public ulong Grault => ctx.ReadDataULong(320UL, 0UL);
                     public ushort Garply => ctx.ReadDataUShort(208UL, (ushort)0);
-                    public string Plugh => ctx.ReadText(3, "");
-                    public string Xyzzy => ctx.ReadText(5, "");
+                    public string Plugh => ctx.ReadText(3, null);
+                    public string Xyzzy => ctx.ReadText(5, null);
                 }
 
                 public class WRITER : SerializerState
@@ -4770,14 +4770,14 @@ namespace Capnproto_test.Capnp.Test
 
                     public string Plugh
                     {
-                        get => this.ReadText(3, "");
-                        set => this.WriteText(3, value, "");
+                        get => this.ReadText(3, null);
+                        set => this.WriteText(3, value, null);
                     }
 
                     public string Xyzzy
                     {
-                        get => this.ReadText(5, "");
-                        set => this.WriteText(5, value, "");
+                        get => this.ReadText(5, null);
+                        set => this.WriteText(5, value, null);
                     }
                 }
             }
@@ -5747,7 +5747,7 @@ namespace Capnproto_test.Capnp.Test
                 public static READER create(DeserializerState ctx) => new READER(ctx);
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-                public string F => ctx.ReadText(0, "");
+                public string F => ctx.ReadText(0, null);
             }
 
             public class WRITER : SerializerState
@@ -5759,8 +5759,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string F
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
             }
         }
@@ -5807,7 +5807,7 @@ namespace Capnproto_test.Capnp.Test
                 public static READER create(DeserializerState ctx) => new READER(ctx);
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-                public string Pad => ctx.ReadText(0, "");
+                public string Pad => ctx.ReadText(0, null);
             }
 
             public class WRITER : SerializerState
@@ -5819,8 +5819,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string Pad
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
             }
         }
@@ -5876,7 +5876,7 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public bool F => ctx.ReadDataBool(0UL, false);
-                public string Pad => ctx.ReadText(0, "");
+                public string Pad => ctx.ReadText(0, null);
             }
 
             public class WRITER : SerializerState
@@ -5894,8 +5894,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string Pad
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
             }
         }
@@ -5951,7 +5951,7 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public byte F => ctx.ReadDataByte(0UL, (byte)0);
-                public string Pad => ctx.ReadText(0, "");
+                public string Pad => ctx.ReadText(0, null);
             }
 
             public class WRITER : SerializerState
@@ -5969,8 +5969,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string Pad
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
             }
         }
@@ -6026,7 +6026,7 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public ushort F => ctx.ReadDataUShort(0UL, (ushort)0);
-                public string Pad => ctx.ReadText(0, "");
+                public string Pad => ctx.ReadText(0, null);
             }
 
             public class WRITER : SerializerState
@@ -6044,8 +6044,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string Pad
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
             }
         }
@@ -6101,7 +6101,7 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public uint F => ctx.ReadDataUInt(0UL, 0U);
-                public string Pad => ctx.ReadText(0, "");
+                public string Pad => ctx.ReadText(0, null);
             }
 
             public class WRITER : SerializerState
@@ -6119,8 +6119,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string Pad
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
             }
         }
@@ -6176,7 +6176,7 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public ulong F => ctx.ReadDataULong(0UL, 0UL);
-                public string Pad => ctx.ReadText(0, "");
+                public string Pad => ctx.ReadText(0, null);
             }
 
             public class WRITER : SerializerState
@@ -6194,8 +6194,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string Pad
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
             }
         }
@@ -6250,7 +6250,7 @@ namespace Capnproto_test.Capnp.Test
                 public static READER create(DeserializerState ctx) => new READER(ctx);
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-                public string F => ctx.ReadText(0, "");
+                public string F => ctx.ReadText(0, null);
                 public ulong Pad => ctx.ReadDataULong(0UL, 0UL);
             }
 
@@ -6263,8 +6263,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string F
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
 
                 public ulong Pad
@@ -6527,7 +6527,7 @@ namespace Capnproto_test.Capnp.Test
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
             public int Foo => ctx.ReadDataInt(0UL, 0);
-            public string Bar => ctx.ReadText(0, "");
+            public string Bar => ctx.ReadText(0, null);
             public short Baz => ctx.ReadDataShort(32UL, (short)0);
             public theUnion.READER TheUnion => new theUnion.READER(ctx);
             public anotherUnion.READER AnotherUnion => new anotherUnion.READER(ctx);
@@ -6548,8 +6548,8 @@ namespace Capnproto_test.Capnp.Test
 
             public string Bar
             {
-                get => this.ReadText(0, "");
-                set => this.WriteText(0, value, "");
+                get => this.ReadText(0, null);
+                set => this.WriteText(0, value, null);
             }
 
             public short Baz
@@ -6693,7 +6693,7 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public WHICH which => (WHICH)ctx.ReadDataUShort(48U, (ushort)0);
-                public string Qux => which == WHICH.Qux ? ctx.ReadText(1, "") : default;
+                public string Qux => which == WHICH.Qux ? ctx.ReadText(1, null) : default;
                 public IReadOnlyList<int> Corge => which == WHICH.Corge ? ctx.ReadList(1).CastInt() : default;
                 public float Grault => which == WHICH.Grault ? ctx.ReadDataFloat(64UL, 0F) : default;
             }
@@ -6712,8 +6712,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string Qux
                 {
-                    get => which == WHICH.Qux ? this.ReadText(1, "") : default;
-                    set => this.WriteText(1, value, "");
+                    get => which == WHICH.Qux ? this.ReadText(1, null) : default;
+                    set => this.WriteText(1, value, null);
                 }
 
                 public ListOfPrimitivesSerializer<int> Corge
@@ -6854,7 +6854,7 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public WHICH which => (WHICH)ctx.ReadDataUShort(96U, (ushort)0);
-                public string Qux => which == WHICH.Qux ? ctx.ReadText(2, "") : default;
+                public string Qux => which == WHICH.Qux ? ctx.ReadText(2, null) : default;
                 public IReadOnlyList<int> Corge => which == WHICH.Corge ? ctx.ReadList(2).CastInt() : default;
                 public float Grault => which == WHICH.Grault ? ctx.ReadDataFloat(128UL, 0F) : default;
             }
@@ -6873,8 +6873,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string Qux
                 {
-                    get => which == WHICH.Qux ? this.ReadText(2, "") : default;
-                    set => this.WriteText(2, value, "");
+                    get => which == WHICH.Qux ? this.ReadText(2, null) : default;
+                    set => this.WriteText(2, value, null);
                 }
 
                 public ListOfPrimitivesSerializer<int> Corge
@@ -6951,7 +6951,7 @@ namespace Capnproto_test.Capnp.Test
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
             public long Old1 => ctx.ReadDataLong(0UL, 0L);
-            public string Old2 => ctx.ReadText(0, "");
+            public string Old2 => ctx.ReadText(0, null);
             public Capnproto_test.Capnp.Test.TestOldVersion.READER Old3 => ctx.ReadStruct(1, Capnproto_test.Capnp.Test.TestOldVersion.READER.create);
         }
 
@@ -6970,8 +6970,8 @@ namespace Capnproto_test.Capnp.Test
 
             public string Old2
             {
-                get => this.ReadText(0, "");
-                set => this.WriteText(0, value, "");
+                get => this.ReadText(0, null);
+                set => this.WriteText(0, value, null);
             }
 
             public Capnproto_test.Capnp.Test.TestOldVersion.WRITER Old3
@@ -7059,7 +7059,7 @@ namespace Capnproto_test.Capnp.Test
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
             public long Old1 => ctx.ReadDataLong(0UL, 0L);
-            public string Old2 => ctx.ReadText(0, "");
+            public string Old2 => ctx.ReadText(0, null);
             public Capnproto_test.Capnp.Test.TestNewVersion.READER Old3 => ctx.ReadStruct(1, Capnproto_test.Capnp.Test.TestNewVersion.READER.create);
             public long New1 => ctx.ReadDataLong(64UL, 987L);
             public string New2 => ctx.ReadText(2, "baz");
@@ -7080,8 +7080,8 @@ namespace Capnproto_test.Capnp.Test
 
             public string Old2
             {
-                get => this.ReadText(0, "");
-                set => this.WriteText(0, value, "");
+                get => this.ReadText(0, null);
+                set => this.WriteText(0, value, null);
             }
 
             public Capnproto_test.Capnp.Test.TestNewVersion.WRITER Old3
@@ -7711,8 +7711,8 @@ namespace Capnproto_test.Capnp.Test
                 public static READER create(DeserializerState ctx) => new READER(ctx);
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-                public string SomeText => ctx.ReadText(0, "");
-                public string MoreText => ctx.ReadText(1, "");
+                public string SomeText => ctx.ReadText(0, null);
+                public string MoreText => ctx.ReadText(1, null);
             }
 
             public class WRITER : SerializerState
@@ -7724,14 +7724,14 @@ namespace Capnproto_test.Capnp.Test
 
                 public string SomeText
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
 
                 public string MoreText
                 {
-                    get => this.ReadText(1, "");
-                    set => this.WriteText(1, value, "");
+                    get => this.ReadText(1, null);
+                    set => this.WriteText(1, value, null);
                 }
             }
         }
@@ -7787,7 +7787,7 @@ namespace Capnproto_test.Capnp.Test
             public static READER create(DeserializerState ctx) => new READER(ctx);
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-            public string SomeText => ctx.ReadText(0, "");
+            public string SomeText => ctx.ReadText(0, null);
             public IReadOnlyList<Capnproto_test.Capnp.Test.TestPrintInlineStructs.InlineStruct.READER> StructList => ctx.ReadList(1).Cast(Capnproto_test.Capnp.Test.TestPrintInlineStructs.InlineStruct.READER.create);
         }
 
@@ -7800,8 +7800,8 @@ namespace Capnproto_test.Capnp.Test
 
             public string SomeText
             {
-                get => this.ReadText(0, "");
-                set => this.WriteText(0, value, "");
+                get => this.ReadText(0, null);
+                set => this.WriteText(0, value, null);
             }
 
             public ListOfStructsSerializer<Capnproto_test.Capnp.Test.TestPrintInlineStructs.InlineStruct.WRITER> StructList
@@ -7862,7 +7862,7 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public int Int32Field => ctx.ReadDataInt(0UL, 0);
-                public string TextField => ctx.ReadText(0, "");
+                public string TextField => ctx.ReadText(0, null);
             }
 
             public class WRITER : SerializerState
@@ -7880,8 +7880,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string TextField
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
             }
         }
@@ -10214,7 +10214,7 @@ namespace Capnproto_test.Capnp.Test
                 public static READER create(DeserializerState ctx) => new READER(ctx);
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-                public string X => ctx.ReadText(0, "");
+                public string X => ctx.ReadText(0, null);
             }
 
             public class WRITER : SerializerState
@@ -10226,8 +10226,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string X
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
             }
         }
@@ -11147,7 +11147,7 @@ namespace Capnproto_test.Capnp.Test
                 public static READER create(DeserializerState ctx) => new READER(ctx);
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-                public string S => ctx.ReadText(0, "");
+                public string S => ctx.ReadText(0, null);
                 public Capnproto_test.Capnp.Test.TestPipeline.Box.READER OutBox => ctx.ReadStruct(1, Capnproto_test.Capnp.Test.TestPipeline.Box.READER.create);
             }
 
@@ -11160,8 +11160,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string S
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
 
                 public Capnproto_test.Capnp.Test.TestPipeline.Box.WRITER OutBox
@@ -11432,7 +11432,7 @@ namespace Capnproto_test.Capnp.Test
                 public static READER create(DeserializerState ctx) => new READER(ctx);
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-                public string S => ctx.ReadText(0, "");
+                public string S => ctx.ReadText(0, null);
                 public Capnproto_test.Capnp.Test.TestPipeline.AnyBox.READER OutBox => ctx.ReadStruct(1, Capnproto_test.Capnp.Test.TestPipeline.AnyBox.READER.create);
             }
 
@@ -11445,8 +11445,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string S
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
 
                 public Capnproto_test.Capnp.Test.TestPipeline.AnyBox.WRITER OutBox
@@ -11731,7 +11731,7 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public uint I => ctx.ReadDataUInt(0UL, 0U);
-                public string T => ctx.ReadText(0, "");
+                public string T => ctx.ReadText(0, null);
                 public Capnproto_test.Capnp.Test.ITestCallOrder C => ctx.ReadCap<Capnproto_test.Capnp.Test.ITestCallOrder>(1);
             }
 
@@ -11750,8 +11750,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string T
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
 
                 public Capnproto_test.Capnp.Test.ITestCallOrder C
@@ -11813,7 +11813,7 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public int I => ctx.ReadDataInt(0UL, 0);
-                public string T => ctx.ReadText(0, "");
+                public string T => ctx.ReadText(0, null);
             }
 
             public class WRITER : SerializerState
@@ -11831,8 +11831,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string T
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
             }
         }
@@ -12448,7 +12448,7 @@ namespace Capnproto_test.Capnp.Test
                 public static READER create(DeserializerState ctx) => new READER(ctx);
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-                public string S => ctx.ReadText(0, "");
+                public string S => ctx.ReadText(0, null);
             }
 
             public class WRITER : SerializerState
@@ -12460,8 +12460,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string S
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
             }
         }
@@ -12568,7 +12568,7 @@ namespace Capnproto_test.Capnp.Test
                 public static READER create(DeserializerState ctx) => new READER(ctx);
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-                public string S => ctx.ReadText(0, "");
+                public string S => ctx.ReadText(0, null);
             }
 
             public class WRITER : SerializerState
@@ -12580,8 +12580,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string S
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
             }
         }
@@ -12898,7 +12898,7 @@ namespace Capnproto_test.Capnp.Test
                 public static READER create(DeserializerState ctx) => new READER(ctx);
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-                public string S => ctx.ReadText(0, "");
+                public string S => ctx.ReadText(0, null);
             }
 
             public class WRITER : SerializerState
@@ -12910,8 +12910,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string S
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
             }
         }
@@ -13306,7 +13306,7 @@ namespace Capnproto_test.Capnp.Test
                 public static READER create(DeserializerState ctx) => new READER(ctx);
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-                public string A => ctx.ReadText(0, "");
+                public string A => ctx.ReadText(0, null);
                 public uint B => ctx.ReadDataUInt(0UL, 123U);
                 public string C => ctx.ReadText(1, "foo");
             }
@@ -13320,8 +13320,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string A
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
 
                 public uint B
@@ -13389,7 +13389,7 @@ namespace Capnproto_test.Capnp.Test
                 public static READER create(DeserializerState ctx) => new READER(ctx);
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-                public string D => ctx.ReadText(0, "");
+                public string D => ctx.ReadText(0, null);
                 public string E => ctx.ReadText(1, "bar");
             }
 
@@ -13402,8 +13402,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string D
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
 
                 public string E
@@ -13711,7 +13711,7 @@ namespace Capnproto_test.Capnp.Test
                 public static READER create(DeserializerState ctx) => new READER(ctx);
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-                public string Str => ctx.ReadText(0, "");
+                public string Str => ctx.ReadText(0, null);
             }
 
             public class WRITER : SerializerState
@@ -13723,8 +13723,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string Str
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
             }
         }
@@ -13779,7 +13779,7 @@ namespace Capnproto_test.Capnp.Test
                 public static READER create(DeserializerState ctx) => new READER(ctx);
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-                public string A => ctx.ReadText(0, "");
+                public string A => ctx.ReadText(0, null);
                 public Capnproto_test.Capnp.Test.ITestInterface B => ctx.ReadCap<Capnproto_test.Capnp.Test.ITestInterface>(1);
             }
 
@@ -13792,8 +13792,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string A
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
 
                 public Capnproto_test.Capnp.Test.ITestInterface B
@@ -14197,7 +14197,7 @@ namespace Capnproto_test.Capnp.Test
                 public static READER create(DeserializerState ctx) => new READER(ctx);
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-                public string Text => ctx.ReadText(0, "");
+                public string Text => ctx.ReadText(0, null);
             }
 
             public class WRITER : SerializerState
@@ -14209,8 +14209,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string Text
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
             }
         }
@@ -14865,7 +14865,7 @@ namespace Capnproto_test.Capnp.Test
                 public static READER create(DeserializerState ctx) => new READER(ctx);
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-                public string Text => ctx.ReadText(0, "");
+                public string Text => ctx.ReadText(0, null);
                 public Capnproto_test.Capnp.Test.ITestInterface Cap => ctx.ReadCap<Capnproto_test.Capnp.Test.ITestInterface>(1);
             }
 
@@ -14878,8 +14878,8 @@ namespace Capnproto_test.Capnp.Test
 
                 public string Text
                 {
-                    get => this.ReadText(0, "");
-                    set => this.WriteText(0, value, "");
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
                 }
 
                 public Capnproto_test.Capnp.Test.ITestInterface Cap
@@ -15619,7 +15619,7 @@ namespace Capnproto_test.Capnp.Test
             public static READER create(DeserializerState ctx) => new READER(ctx);
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
-            public string Host => ctx.ReadText(0, "");
+            public string Host => ctx.ReadText(0, null);
         }
 
         public class WRITER : SerializerState
@@ -15631,8 +15631,8 @@ namespace Capnproto_test.Capnp.Test
 
             public string Host
             {
-                get => this.ReadText(0, "");
-                set => this.WriteText(0, value, "");
+                get => this.ReadText(0, null);
+                set => this.WriteText(0, value, null);
             }
         }
     }

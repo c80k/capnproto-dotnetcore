@@ -39,7 +39,6 @@ namespace Capnp
         internal int ListElementCount { get; set; }
         internal ushort StructDataCount { get; set; }
         internal ushort StructPtrCount { get; set; }
-        internal ObjectKind Kind { get; set; }
         internal uint CapabilityIndex { get; set; }
 
         SerializerState[]? _linkedStates;
@@ -93,7 +92,7 @@ namespace Capnp
 
             if (Kind != ObjectKind.Nil)
             {
-                InvalidOperationException InvalidWrap() =>
+                static InvalidOperationException InvalidWrap() =>
                     new InvalidOperationException("Incompatible cast");
 
                 switch (ts.Kind)
@@ -164,6 +163,11 @@ namespace Capnp
         /// non-symmetric to <code>DeserializerState.RawData</code>. Never mind: You should not use it directly, anyway.
         /// </summary>
         public Span<ulong> RawData => SegmentSpan.Slice(Offset, (int)WordsAllocated);
+
+        /// <summary>
+        /// The kind of object this state currently represents.
+        /// </summary>
+        public ObjectKind Kind { get; internal set; }
 
         void AllocateWords(uint count)
         {
@@ -286,7 +290,7 @@ namespace Capnp
                 Allocate();
             }
 
-            WirePointer targetPtr = default(WirePointer);
+            WirePointer targetPtr = default;
 
             switch (target.Kind)
             {
@@ -539,38 +543,16 @@ namespace Capnp
         /// <paramref name="totalCount"/> negative or exceeding 2^29-1</exception>
         protected void SetListOfValues(byte bitsPerElement, int totalCount)
         {
-            ObjectKind kind;
-
-            switch (bitsPerElement)
+            var kind = bitsPerElement switch
             {
-                case 0:
-                    kind = ObjectKind.ListOfEmpty;
-                    break;
-
-                case 1:
-                    kind = ObjectKind.ListOfBits;
-                    break;
-
-                case 8:
-                    kind = ObjectKind.ListOfBytes;
-                    break;
-
-                case 16:
-                    kind = ObjectKind.ListOfShorts;
-                    break;
-
-                case 32:
-                    kind = ObjectKind.ListOfInts;
-                    break;
-
-                case 64:
-                    kind = ObjectKind.ListOfLongs;
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(bitsPerElement));
-            }
-
+                0 => ObjectKind.ListOfEmpty,
+                1 => ObjectKind.ListOfBits,
+                8 => ObjectKind.ListOfBytes,
+                16 => ObjectKind.ListOfShorts,
+                32 => ObjectKind.ListOfInts,
+                64 => ObjectKind.ListOfLongs,
+                _ => throw new ArgumentOutOfRangeException(nameof(bitsPerElement)),
+            };
             if (Kind == ObjectKind.Nil)
             {
                 if (totalCount < 0)
@@ -701,8 +683,6 @@ namespace Capnp
 
             if (relBitOffset + bitCount > 64)
                 throw new ArgumentOutOfRangeException(nameof(bitCount));
-
-            ulong word = data[index];
 
             if (bitCount == 64)
             {
@@ -875,14 +855,14 @@ namespace Capnp
         /// <param name="index">If the underlying object is a struct: index into the struct's pointer section.
         /// If the underlying object is a list of pointers: Element index</param>
         /// <param name="text">Text to encode</param>
-        /// <param name="defaultText">Default text of <paramref name="text"/>> is null</param>
+        /// <param name="defaultText">Default text if <paramref name="text"/>> is null</param>
         /// <exception cref="ArgumentNullException">Both <paramref name="text"/> and <paramref name="defaultText"/> are null</exception>
         /// <exception cref="InvalidOperationException"><list type="bullet">
         /// <item><description>The underlying object was not determined to be a struct or list of pointers.</description></item>
         /// <item><description>Object at given position was already set.</description></item>
         /// </list></exception>
         /// <exception cref="IndexOutOfRangeException"><paramref name="index"/> is out of bounds.</exception>
-        public void WriteText(int index, string? text, string defaultText)
+        public void WriteText(int index, string? text, string? defaultText)
         {
             BuildPointer(index).WriteText(text ?? defaultText);
         }

@@ -37,8 +37,16 @@ namespace Capnp
         /// <returns>Element value</returns>
         public T this[int index]
         {
-            get => Data[index];
-            set => Data[index] = value;
+            get
+            {
+                ListSerializerHelper.EnsureAllocated(this);
+                return Data[index];
+            }
+            set
+            {
+                ListSerializerHelper.EnsureAllocated(this);
+                Data[index] = value;
+            }
         }
 
         /// <summary>
@@ -84,11 +92,17 @@ namespace Capnp
             }
         }
 
+        IEnumerable<T> Enumerate()
+        {
+            for (int i = 0; i < Data.Length; i++)
+                yield return Data[i];
+        }
+
         /// <summary>
         /// Implements <see cref="IEnumerable{T}"/>.
         /// </summary>
         /// <returns></returns>
-        public IEnumerator<T> GetEnumerator() => (IEnumerator<T>)Data.ToArray().GetEnumerator();
+        public IEnumerator<T> GetEnumerator() => Enumerate().GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => Data.ToArray().GetEnumerator();
     }

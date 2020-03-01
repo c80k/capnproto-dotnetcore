@@ -387,6 +387,23 @@ namespace CapnpC.CSharp.Generator.CodeGen
             }
         }
 
+        public Nullability GetDefaultElementTypeNullability(Model.Type type)
+        {
+            switch (type.Tag)
+            {
+                case TypeTag.Data:
+                case TypeTag.Text:
+                case TypeTag.Interface:
+                case TypeTag.List:
+                case TypeTag.ListPointer:
+                case TypeTag.StructPointer:
+                    return Nullability.NullableRef;
+
+                default:
+                    return Nullability.NonNullable;
+            }
+        }
+
         public TypeSyntax MakeTypeSyntax(Model.Type type, TypeDefinition scope, TypeUsage usage, Nullability nullability)
         {
             switch (type.Tag)
@@ -483,11 +500,13 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
                         case TypeUsage.Reader:
                             return MaybeNullableRefType(GenericName(Identifier("IReadOnlyList"))
-                                .AddTypeArgumentListArguments(MakeTypeSyntax(type.ElementType, scope, TypeUsage.Reader, Nullability.NonNullable)), nullability);
+                                .AddTypeArgumentListArguments(MakeTypeSyntax(type.ElementType, scope, TypeUsage.Reader,
+                                    GetDefaultElementTypeNullability(type.ElementType))), nullability);
 
                         case TypeUsage.DomainClass:
                             return MaybeNullableRefType(GenericName(Identifier("IReadOnlyList"))
-                                .AddTypeArgumentListArguments(MakeTypeSyntax(type.ElementType, scope, TypeUsage.DomainClass, Nullability.NullableRef)), nullability);
+                                .AddTypeArgumentListArguments(MakeTypeSyntax(type.ElementType, scope, TypeUsage.DomainClass,
+                                    GetDefaultElementTypeNullability(type.ElementType))), nullability);
 
                         default:
                             throw new NotImplementedException();
