@@ -79,6 +79,8 @@ namespace Capnp.Net.Runtime.Tests
             Assert.ThrowsException<InvalidOperationException>(() => { list[0] = null; });
             list.Init(5);
             Assert.ThrowsException<InvalidOperationException>(() => list.Init(1));
+            Assert.ThrowsException<IndexOutOfRangeException>(() => { var _ = list[5]; });
+            Assert.ThrowsException<IndexOutOfRangeException>(() => { list[-1] = null; });
             var c1 = new Counters();
             var cap1 = new TestInterfaceImpl(c1);
             var c2 = new Counters();
@@ -152,6 +154,8 @@ namespace Capnp.Net.Runtime.Tests
             list.Init(7);
             Assert.ThrowsException<InvalidOperationException>(() => list.Init(1));
             Assert.AreEqual(7, list.Count);
+            Assert.ThrowsException<IndexOutOfRangeException>(() => { var _ = list[-1]; });
+            Assert.ThrowsException<IndexOutOfRangeException>(() => { list[7] = null; });
             var c1 = new Counters();
             var cap1 = new TestInterfaceImpl(c1);
             var obj1 = b.CreateObject<DynamicSerializerState>();
@@ -234,6 +238,7 @@ namespace Capnp.Net.Runtime.Tests
             list.Init(4);
             Assert.ThrowsException<InvalidOperationException>(() => list.Init(1));
             Assert.AreEqual(4, list.Count);
+            Assert.ThrowsException<IndexOutOfRangeException>(() => { var _ = list[5]; });
             list[0].SomeText = "0";
             list[1].SomeText = "1";
             list[2].SomeText = "2";
@@ -265,6 +270,8 @@ namespace Capnp.Net.Runtime.Tests
             list.Init(4);
             Assert.ThrowsException<InvalidOperationException>(() => list.Init(1));
             Assert.AreEqual(4, list.Count);
+            Assert.ThrowsException<IndexOutOfRangeException>(() => { var _ = list[5]; });
+            Assert.ThrowsException<IndexOutOfRangeException>(() => { list[-1] = null; });
             list[0] = "0";
             list[2] = null;
             list[3] = "3";
@@ -723,6 +730,16 @@ namespace Capnp.Net.Runtime.Tests
             dss.SetObject(lots);
             DeserializerState d2 = dss;
             CollectionAssert.AreEqual(expected, d2.RequireList().CastText2().ToArray());
+        }
+
+        [TestMethod]
+        public void EmptyListContract()
+        {
+            var list = new EmptyList<string>();
+            Assert.AreEqual(0, list.Count);
+            Assert.ThrowsException<IndexOutOfRangeException>(() => { var _ = list[-1]; });
+            Assert.ThrowsException<IndexOutOfRangeException>(() => { var _ = list[0]; });
+            Assert.AreEqual(0, list.ToArray().Length);
         }
     }
 }

@@ -8,14 +8,14 @@ namespace Capnp
     /// <summary>
     /// Implements an empty <see cref="IReadOnlyList{T}"/>.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">list element type</typeparam>
     public class EmptyList<T> : IReadOnlyList<T>
     {
         /// <summary>
-        /// Always throws an <see cref="ArgumentOutOfRangeException"/>.
+        /// Always throws an <see cref="IndexOutOfRangeException"/>.
         /// </summary>
         /// <param name="index">Ignored</param>
-        public T this[int index] => throw new ArgumentOutOfRangeException(nameof(index));
+        public T this[int index] => throw new IndexOutOfRangeException(nameof(index));
 
         /// <summary>
         /// Always 0.

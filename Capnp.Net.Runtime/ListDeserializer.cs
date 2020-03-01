@@ -11,6 +11,9 @@ namespace Capnp
         static class GenericCasts<T>
         {
             public static Func<ListDeserializer, T>? CastFunc;
+
+            public static Func<ListDeserializer, T> GetCastFunc() => CastFunc ??
+                throw new NotSupportedException("Requested cast is not supported");
         }
 
         static ListDeserializer()
@@ -45,12 +48,7 @@ namespace Capnp
 
         T Cast<T>()
         {
-            var func = GenericCasts<T>.CastFunc;
-
-            if (func == null)
-                throw new NotSupportedException("Requested cast is not supported");
-
-            return func(this);
+            return GenericCasts<T>.GetCastFunc()(this);
         }
 
         /// <summary>
@@ -91,7 +89,7 @@ namespace Capnp
         /// <exception cref="Rpc.InvalidCapabilityInterfaceException">If <typeparamref name="T"/> does not qualify as capability interface.</exception>
         public virtual IReadOnlyList<T> CastCapList<T>() where T: class
         {
-            throw new NotSupportedException("This kind of list does not contain nested lists");
+            throw new NotSupportedException("This kind of list cannot be represented as list of capabilities");
         }
 
         object CastND(int n, Func<ListDeserializer, object> func)
@@ -158,6 +156,7 @@ namespace Capnp
         /// <exception cref="NotSupportedException">If this list cannot be represented in the desired manner.</exception>
         public IReadOnlyList<IReadOnlyList<T>> Cast2D<T>()
         {
+            GenericCasts<IReadOnlyList<T>>.GetCastFunc(); // Probe to avoid lazy NotSupportedException
             return CastList().LazyListSelect(ld => ld.Cast<IReadOnlyList<T>>());
         }
 

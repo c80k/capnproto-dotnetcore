@@ -1,4 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Capnproto_test.Capnp.Test;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Linq;
 
 namespace Capnp.Net.Runtime.Tests
 {
@@ -353,6 +356,41 @@ namespace Capnp.Net.Runtime.Tests
             Assert.AreEqual(2, asListOfDoubles.Count);
             Assert.AreEqual(double.NegativeInfinity, asListOfDoubles[0]);
             Assert.AreEqual(double.MaxValue, asListOfDoubles[1]);
+        }
+
+        [TestMethod]
+        public void NestedLists()
+        {
+            var expected = new int[][] {
+                new int[] { 1, 2, 3 },
+                new int[] { 4, 5 },
+                new int[] { 6 } };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            var result = ld.Cast2D<int>();
+            Assert.AreEqual(3, result.Count);
+            for (int i = 0; i < result.Count; i++)
+            {
+                CollectionAssert.AreEqual(expected[i], result[i].ToArray());
+            }
+
+            Assert.ThrowsException<NotSupportedException>(() => ld.Cast2D<decimal>());
+        }
+
+        [TestMethod]
+        public void LinearListWrongUse()
+        {
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(new int[] { 1, 2, 3 });
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            Assert.ThrowsException<NotSupportedException>(() => ld.CastList());
+            Assert.ThrowsException<NotSupportedException>(() => ld.CastCapList<ITestInterface>());
         }
     }
 }
