@@ -1,6 +1,7 @@
 ﻿using Capnproto_test.Capnp.Test;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Capnp.Net.Runtime.Tests
@@ -391,6 +392,44 @@ namespace Capnp.Net.Runtime.Tests
             var ld = d.RequireList();
             Assert.ThrowsException<NotSupportedException>(() => ld.CastList());
             Assert.ThrowsException<NotSupportedException>(() => ld.CastCapList<ITestInterface>());
+        }
+
+        [TestMethod]
+        public void NestedListsND()
+        {
+            var expected = new int[][][] {
+                new int[][]
+                {
+                    new int[] { 1, 2, 3 },
+                    new int[] { 4, 5 },
+                    new int[] { 6 } 
+                },
+                new int[][]
+                {
+                    new int[] { 1, 2, 3 },
+                    new int[0]
+                },
+                new int[0][] 
+            };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();            
+            var result = (IReadOnlyList<object>)ld.CastND<int>(3);
+            Assert.AreEqual(3, result.Count);
+            for (int i = 0; i < result.Count; i++)
+            {
+                var inner = (IReadOnlyList<object>)result[i];
+                Assert.AreEqual(expected[i].Length, inner.Count);
+
+                for (int j = 0; j < expected[i].Length; i++)
+                {
+                    var inner2 = (IReadOnlyList<int>)inner[j];
+                    CollectionAssert.AreEqual(expected[i][j], inner2.ToArray());
+                }
+            }
         }
     }
 }
