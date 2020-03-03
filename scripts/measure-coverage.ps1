@@ -40,7 +40,7 @@ If(!(test-path $coverageReportDir))
 
 & $openCover -target:"$vsTestConsole" `
   -targetArgs:"/inIsolation $generatorTests" `
-  -filter:"+[CapnpC.CSharp.Generator]*" `
+  -filter:"+[CapnpC.CSharp.Generator]CapnpC.CSharp.Generator.* -[CapnpC.CSharp.Generator]CapnpC.CSharp.Generator.Schema.*" `
   -excludebyattribute:"System.CodeDom.Compiler.GeneratedCodeAttribute" `
   -output:"$coverageOutputGenerator" `
   -mergebyhash -register:user -oldStyle
