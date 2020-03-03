@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Capnproto_test.Capnp.Test.TestStructUnion;
 
 namespace Capnp.Net.Runtime.Tests
 {
@@ -213,6 +214,22 @@ namespace Capnp.Net.Runtime.Tests
         }
 
         [TestMethod]
+        public void ListOfStructsAsListOfBools()
+        {
+            var ds = new DynamicSerializerState(MessageBuilder.Create(128));
+            ds.SetListOfStructs(3, 1, 0);
+            ds.ListBuildStruct(1).WriteData(0, false);
+            ds.ListBuildStruct(2).WriteData(0, true);
+
+            DeserializerState d = ds;
+            var asListOfBools = d.RequireList().CastBool();
+            Assert.AreEqual(3, asListOfBools.Count);
+            Assert.AreEqual(false, asListOfBools[0]);
+            Assert.AreEqual(false, asListOfBools[1]);
+            Assert.AreEqual(true, asListOfBools[2]);
+        }
+
+        [TestMethod]
         public void ListOfStructsAsListOfBytes()
         {
             var ds = new DynamicSerializerState(MessageBuilder.Create(128));
@@ -372,6 +389,7 @@ namespace Capnp.Net.Runtime.Tests
             dss.SetObject(expected);
             DeserializerState d = dss;
             var ld = d.RequireList();
+            Assert.ThrowsException<NotSupportedException>(() => ld.CastText());
             var result = ld.Cast2D<int>();
             Assert.AreEqual(3, result.Count);
             for (int i = 0; i < result.Count; i++)
@@ -392,6 +410,44 @@ namespace Capnp.Net.Runtime.Tests
             var ld = d.RequireList();
             Assert.ThrowsException<NotSupportedException>(() => ld.CastList());
             Assert.ThrowsException<NotSupportedException>(() => ld.CastCapList<ITestInterface>());
+        }
+
+        [TestMethod]
+        public void NestedLists3D()
+        {
+            var expected = new int[][][] {
+                new int[][]
+                {
+                    new int[] { 1, 2, 3 },
+                    new int[] { 4, 5 },
+                    new int[] { 6 }
+                },
+                new int[][]
+                {
+                    new int[] { 1, 2, 3 },
+                    new int[0]
+                },
+                new int[0][]
+            };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            var result = ld.Cast3D<int>();
+            Assert.AreEqual(3, result.Count);
+            for (int i = 0; i < result.Count; i++)
+            {
+                var inner = result[i];
+                Assert.AreEqual(expected[i].Length, inner.Count);
+
+                for (int j = 0; j < expected[i].Length; j++)
+                {
+                    var inner2 = inner[j];
+                    CollectionAssert.AreEqual(expected[i][j], inner2.ToArray());
+                }
+            }
         }
 
         [TestMethod]
@@ -424,11 +480,291 @@ namespace Capnp.Net.Runtime.Tests
                 var inner = (IReadOnlyList<object>)result[i];
                 Assert.AreEqual(expected[i].Length, inner.Count);
 
-                for (int j = 0; j < expected[i].Length; i++)
+                for (int j = 0; j < expected[i].Length; j++)
                 {
                     var inner2 = (IReadOnlyList<int>)inner[j];
                     CollectionAssert.AreEqual(expected[i][j], inner2.ToArray());
                 }
+            }
+        }
+
+        [TestMethod]
+        public void NestedLists3DStruct()
+        {
+            var expected = new List<List<List<SomeStruct.WRITER>>>();
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            for (int i = 0; i < 3; i++)
+            {
+                expected.Add(new List<List<SomeStruct.WRITER>>());
+
+                for (int j = 0; j <= i; j++)
+                {
+                    expected[i].Add(new List<SomeStruct.WRITER>());
+
+                    for (int k = 0; k <= j; k++)
+                    {
+                        var x = b.CreateObject<SomeStruct.WRITER>();
+                        x.SomeText = $"{i}, {j}, {k}";
+                        expected[i][j].Add(x);
+                    }
+                }
+            }
+
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            var result = ld.Cast3D<SomeStruct.READER>(_ => new SomeStruct.READER(_));
+            Assert.AreEqual(3, result.Count);
+            for (int i = 0; i < result.Count; i++)
+            {
+                var inner = result[i];
+                Assert.AreEqual(i + 1, inner.Count);
+
+                for (int j = 0; j < inner.Count; j++)
+                {
+                    var inner2 = inner[j];
+                    Assert.AreEqual(j + 1, inner2.Count);
+
+                    for (int k = 0; k < inner2.Count; k++)
+                    {
+                        Assert.AreEqual($"{i}, {j}, {k}", inner2[k].SomeText);
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void NestedListsNDStruct()
+        {
+            var expected = new List<List<List<SomeStruct.WRITER>>>();
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            for (int i = 0; i < 3; i++)
+            {
+                expected.Add(new List<List<SomeStruct.WRITER>>());
+
+                for (int j = 0; j <= i; j++)
+                {
+                    expected[i].Add(new List<SomeStruct.WRITER>());
+
+                    for (int k = 0; k <= j; k++)
+                    {
+                        var x = b.CreateObject<SomeStruct.WRITER>();
+                        x.SomeText = $"{i}, {j}, {k}";
+                        expected[i][j].Add(x);
+                    }
+                }
+            }
+
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            var result = (IReadOnlyList<object>)ld.CastND<SomeStruct.READER>(3, _ => new SomeStruct.READER(_));
+            Assert.AreEqual(3, result.Count);
+            for (int i = 0; i < result.Count; i++)
+            {
+                var inner = (IReadOnlyList<object>)result[i];
+                Assert.AreEqual(i + 1, inner.Count);
+
+                for (int j = 0; j < inner.Count; j++)
+                {
+                    var inner2 = (IReadOnlyList<SomeStruct.READER>)inner[j];
+                    Assert.AreEqual(j + 1, inner2.Count);
+
+                    for (int k = 0; k < inner2.Count; k++)
+                    {
+                        Assert.AreEqual($"{i}, {j}, {k}", inner2[k].SomeText);
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void NestedLists2DStruct()
+        {
+            var expected = new List<List<SomeStruct.WRITER>>();
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            for (int i = 0; i < 3; i++)
+            {
+                expected.Add(new List<SomeStruct.WRITER>());
+
+                for (int j = 0; j <= i; j++)
+                {
+                    var x = b.CreateObject<SomeStruct.WRITER>();
+                    x.SomeText = $"{i}, {j}";
+                    expected[i].Add(x);
+                }
+            }
+
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            var result = ld.Cast2D(_ => new SomeStruct.READER(_));
+            Assert.AreEqual(3, result.Count);
+            for (int i = 0; i < result.Count; i++)
+            {
+                var inner = result[i];
+                Assert.AreEqual(i + 1, inner.Count);
+
+                for (int j = 0; j < inner.Count; j++)
+                {
+                    Assert.AreEqual($"{i}, {j}", inner[j].SomeText);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void ListOfEnums()
+        {
+            var expected = new TestEnum[] { TestEnum.bar, TestEnum.baz, TestEnum.corge };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            var result = ld.CastEnums(_ => (TestEnum)_);
+            CollectionAssert.AreEqual(expected, result.ToArray());
+        }
+
+        [TestMethod]
+        public void NestedLists2DEnum()
+        {
+            var expected = new TestEnum[][]
+            {
+                new TestEnum[] { TestEnum.bar, TestEnum.baz, TestEnum.corge },
+                new TestEnum[] { TestEnum.corge, TestEnum.foo, TestEnum.garply }
+            };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            var result = ld.CastEnums2D(_ => (TestEnum)_);
+            Assert.AreEqual(expected.Length, result.Count);
+            for (int i = 0; i < result.Count; i++)
+            {
+                CollectionAssert.AreEqual(expected[i], result[i].ToArray());
+            }
+        }
+
+        [TestMethod]
+        public void NestedLists3DEnum()
+        {
+            var expected = new TestEnum[][][] {
+                new TestEnum[][]
+                {
+                    new TestEnum[] { TestEnum.qux, TestEnum.quux, TestEnum.grault },
+                    new TestEnum[] { TestEnum.garply, TestEnum.foo },
+                    new TestEnum[] { TestEnum.corge }
+                },
+                new TestEnum[][]
+                {
+                    new TestEnum[] { TestEnum.baz, TestEnum.bar },
+                    new TestEnum[0]
+                },
+                new TestEnum[0][]
+            };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            var result = ld.CastEnums3D(_ => (TestEnum)_);
+            Assert.AreEqual(3, result.Count);
+            for (int i = 0; i < result.Count; i++)
+            {
+                var inner = result[i];
+                Assert.AreEqual(expected[i].Length, inner.Count);
+
+                for (int j = 0; j < expected[i].Length; j++)
+                {
+                    var inner2 = inner[j];
+                    CollectionAssert.AreEqual(expected[i][j], inner2.ToArray());
+                }
+            }
+        }
+
+        [TestMethod]
+        public void NestedListsNDEnum()
+        {
+            var expected = new TestEnum[][][] {
+                new TestEnum[][]
+                {
+                    new TestEnum[] { TestEnum.qux, TestEnum.quux, TestEnum.grault },
+                    new TestEnum[] { TestEnum.garply, TestEnum.foo },
+                    new TestEnum[] { TestEnum.corge }
+                },
+                new TestEnum[][]
+                {
+                    new TestEnum[] { TestEnum.baz, TestEnum.bar },
+                    new TestEnum[0]
+                },
+                new TestEnum[0][]
+            };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            var result = (IReadOnlyList<object>)ld.CastEnumsND(3, _ => (TestEnum)_);
+            Assert.AreEqual(3, result.Count);
+            for (int i = 0; i < result.Count; i++)
+            {
+                var inner = (IReadOnlyList<object>)result[i];
+                Assert.AreEqual(expected[i].Length, inner.Count);
+
+                for (int j = 0; j < expected[i].Length; j++)
+                {
+                    var inner2 = (IReadOnlyList<TestEnum>)inner[j];
+                    CollectionAssert.AreEqual(expected[i][j], inner2.ToArray());
+                }
+            }
+        }
+
+        [TestMethod]
+        public void NestedLists2DVoid()
+        {
+            var b = MessageBuilder.Create();
+            var s = b.CreateObject<ListOfPointersSerializer<ListOfEmptySerializer>>();
+            s.Init(3);
+            s[0].Init(4);
+            s[1].Init(5);
+            s[2].Init(6);
+            DeserializerState d = s;
+            var voids = d.RequireList().CastVoid2D();
+            CollectionAssert.AreEqual(new int[] { 4, 5, 6 }, voids.ToArray());
+        }
+
+        [TestMethod]
+        public void NestedLists3DVoid()
+        {
+            var expected = new int[][] {
+                new int[] { 1, 2, 3 },
+                new int[] { 4, 5 },
+                new int[] { 6 } };
+
+            var b = MessageBuilder.Create();
+            var s = b.CreateObject<ListOfPointersSerializer<ListOfPointersSerializer<ListOfEmptySerializer>>>();
+            s.Init(expected.Length);
+            for (int i = 0; i < expected.Length; i++)
+            {
+                s[i].Init(expected[i], (l, j) => l.Init(j));
+            }
+            DeserializerState d = s;
+            var voids = d.RequireList().CastVoid3D();
+            Assert.AreEqual(expected.Length, voids.Count);
+            for (int i = 0; i < expected.Length; i++)
+            {
+                CollectionAssert.AreEqual(expected[i], voids[i].ToArray());
             }
         }
     }
