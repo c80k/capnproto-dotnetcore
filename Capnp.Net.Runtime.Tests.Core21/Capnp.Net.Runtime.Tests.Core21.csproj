@@ -19,6 +19,7 @@
     <Compile Include="..\Capnp.Net.Runtime.Tests\Issue20.cs" Link="Issue20.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\Issue25.cs" Link="Issue25.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\JobUtil.cs" Link="JobUtil.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\LocalRpc.cs" Link="LocalRpc.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\MessageBuilderTests.cs" Link="MessageBuilderTests.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\ProvidedCapabilityMock.cs" Link="ProvidedCapabilityMock.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\ProvidedCapabilityMultiCallMock.cs" Link="ProvidedCapabilityMultiCallMock.cs" />
@@ -28,6 +29,7 @@
     <Compile Include="..\Capnp.Net.Runtime.Tests\SerializationTests.cs" Link="SerializationTests.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\TcpRpc.cs" Link="TcpRpc.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\TcpRpcAdvancedStuff.cs" Link="TcpRpcAdvancedStuff.cs" />
+    <Compile Include="..\Capnp.Net.Runtime.Tests\TcpRpcErrorHandling.cs" Link="TcpRpcErrorHandling.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\TcpRpcInterop.cs" Link="TcpRpcInterop.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\TcpRpcPorted.cs" Link="TcpRpcPorted.cs" />
     <Compile Include="..\Capnp.Net.Runtime.Tests\TcpRpcStress.cs" Link="TcpRpcStress.cs" />
@@ -44,6 +46,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.4.0" />
     <PackageReference Include="MSTest.TestFramework" Version="1.4.0" />
+    <PackageReference Include="System.IO.Pipelines" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup>

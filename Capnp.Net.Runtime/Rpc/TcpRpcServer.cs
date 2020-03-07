@@ -325,7 +325,7 @@ namespace Capnp.Rpc
         /// </summary>
         public object Main
         {
-            set { _rpcEngine.BootstrapCap = Skeleton.GetOrCreateSkeleton(value, false); }
+            set { _rpcEngine.Main = value; }
         }
 
         /// <summary>

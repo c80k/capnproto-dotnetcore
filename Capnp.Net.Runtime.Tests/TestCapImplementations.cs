@@ -432,6 +432,33 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
         }
     }
 
+    class TestInterfaceImpl2 : ITestInterface
+    {
+        public Task Bar(CancellationToken cancellationToken_ = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Baz(TestAllTypes s, CancellationToken cancellationToken_ = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Dispose()
+        {
+            IsDisposed = true;
+        }
+
+        public bool IsDisposed { get; private set; }
+
+        public Task<string> Foo(uint i, bool j, CancellationToken cancellationToken_ = default)
+        {
+            Assert.AreEqual(123u, i);
+            Assert.IsTrue(j);
+            return Task.FromResult("bar");
+        }
+    }
+
     #endregion TestInterface
 
     #region TestExtends
@@ -506,6 +533,41 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
             throw new NotImplementedException();
         }
     }
+
+    class TestPipelineImpl2 : ITestPipeline
+    {
+        readonly Task _deblock;
+        readonly TestInterfaceImpl2 _timpl2;
+
+        public TestPipelineImpl2(Task deblock)
+        {
+            _deblock = deblock;
+            _timpl2 = new TestInterfaceImpl2();
+        }
+
+        public void Dispose()
+        {
+        }
+
+        public bool IsChildCapDisposed => _timpl2.IsDisposed;
+
+        public Task<(string, TestPipeline.AnyBox)> GetAnyCap(uint n, BareProxy inCap, CancellationToken cancellationToken_ = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<(string, TestPipeline.Box)> GetCap(uint n, ITestInterface inCap, CancellationToken cancellationToken_ = default)
+        {
+            await _deblock;
+            return ("hello", new TestPipeline.Box() { Cap = _timpl2 });
+        }
+
+        public Task TestPointers(ITestInterface cap, object obj, IReadOnlyList<ITestInterface> list, CancellationToken cancellationToken_ = default)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     #endregion TestPipeline
 
     #region TestCallOrder

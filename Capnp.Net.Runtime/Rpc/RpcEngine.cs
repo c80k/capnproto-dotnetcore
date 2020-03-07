@@ -60,8 +60,14 @@ namespace Capnp.Rpc
             }
         }
 
-        internal class RpcEndpoint : IEndpoint, IRpcEndpoint
+        public class RpcEndpoint : IEndpoint, IRpcEndpoint
         {
+            public enum EndpointState
+            {
+                Active,
+                Dismissed
+            }
+
             static readonly ThreadLocal<Action?> _exportCapTablePostActions = new ThreadLocal<Action?>();
             static readonly ThreadLocal<PendingQuestion?> _tailCall = new ThreadLocal<PendingQuestion?>();
             static readonly ThreadLocal<bool> _canDeferCalls = new ThreadLocal<bool>();
@@ -87,7 +93,10 @@ namespace Capnp.Rpc
             {
                 _host = host;
                 _tx = tx;
+                State = EndpointState.Active;
             }
+
+            public EndpointState State { get; private set; }
 
             public void Dismiss()
             {
@@ -105,6 +114,8 @@ namespace Capnp.Rpc
 
                     _answerTable.Clear();
                     _pendingDisembargos.Clear();
+
+                    State = EndpointState.Dismissed;
                 }
 
                 _tx.Dismiss();
@@ -112,6 +123,9 @@ namespace Capnp.Rpc
 
             public void Forward(WireFrame frame)
             {
+                if (State == EndpointState.Dismissed)
+                    throw new InvalidOperationException("Endpoint is in dismissed state and doesn't accept frames anymore");
+
                 Interlocked.Increment(ref _recvCount);
                 ProcessFrame(frame);
             }
@@ -327,6 +341,7 @@ namespace Capnp.Rpc
                 if (!added)
                 {
                     Logger.LogWarning("Incoming bootstrap request: Peer specified duplicate (not yet released?) answer ID.");
+                    throw new RpcProtocolErrorException("Duplicate question ID");
                 }
 
 
@@ -390,9 +405,7 @@ namespace Capnp.Rpc
                         pendingAnswer.Cancel();
                         pendingAnswer.Dispose();
 
-                        SendAbort($"There is another pending answer for the same question ID {req.QuestionId}.");
-
-                        return;
+                        throw new RpcProtocolErrorException($"There is another pending answer for the same question ID {req.QuestionId}.");
                     }
 
                     switch (req.SendResultsTo.which)
@@ -553,8 +566,7 @@ namespace Capnp.Rpc
                                 {
                                     Logger.LogWarning("Incoming RPC call: Peer asked for invalid (already released?) capability ID.");
 
-                                    SendAbort($"Requested capability with ID {req.Target.ImportedCap} does not exist.");
-                                    return;
+                                    throw new RpcProtocolErrorException($"Requested capability with ID {req.Target.ImportedCap} does not exist.");
                                 }
                             }
 
@@ -606,8 +618,7 @@ namespace Capnp.Rpc
                                 else
                                 {
                                     Logger.LogWarning("Incoming RPC call: Peer asked for non-existing answer ID.");
-                                    SendAbort($"Did not find a promised answer for given ID {req.Target.PromisedAnswer.QuestionId}");
-                                    return;
+                                    throw new RpcProtocolErrorException($"Did not find a promised answer for given ID {req.Target.PromisedAnswer.QuestionId}");
                                 }
                             }
                             break;
@@ -637,7 +648,7 @@ namespace Capnp.Rpc
                     {
                         Logger.LogWarning("Incoming RPC return: Unknown answer ID.");
 
-                        return;
+                        throw new RpcProtocolErrorException("Unknown answer ID");
                     }
                 }
 
@@ -722,7 +733,7 @@ namespace Capnp.Rpc
                 if (!_importTable.TryGetValue(resolve.PromiseId, out var rcw))
                 {
                     Logger.LogWarning("Received a resolve message with invalid ID");
-                    return;
+                    throw new RpcProtocolErrorException($"Invalid ID {resolve.PromiseId}");
                 }
 
                 if (!rcw.Cap.TryGetTarget(out var cap))
@@ -734,28 +745,33 @@ namespace Capnp.Rpc
                 if (!(cap is PromisedCapability resolvableCap))
                 {
                     Logger.LogWarning("Received a resolve message for a capability which is not a promise");
-                    return;
+                    throw new RpcProtocolErrorException($"Not a promise {resolve.PromiseId}");
                 }
 
-                switch (resolve.which)
+                try
                 {
-                    case Resolve.WHICH.Cap:
-                        lock (_reentrancyBlocker)
-                        {
-                            var resolvedCap = ImportCap(resolve.Cap);
-                            if (resolvedCap == null)
-                                resolvedCap = LazyCapability.CreateBrokenCap("Failed to resolve this capability");
-                            resolvableCap.ResolveTo(resolvedCap);
-                        }
-                        break;
+                    switch (resolve.which)
+                    {
+                        case Resolve.WHICH.Cap:
+                            lock (_reentrancyBlocker)
+                            {
+                                var resolvedCap = ImportCap(resolve.Cap);
+                                resolvableCap.ResolveTo(resolvedCap);
+                            }
+                            break;
 
-                    case Resolve.WHICH.Exception:
-                        resolvableCap.Break(resolve.Exception.Reason);
-                        break;
+                        case Resolve.WHICH.Exception:
+                            resolvableCap.Break(resolve.Exception.Reason);
+                            break;
 
-                    default:
-                        Logger.LogWarning("Received a resolve message with unknown category.");
-                        throw new RpcUnimplementedException();
+                        default:
+                            Logger.LogWarning("Received a resolve message with unknown category.");
+                            throw new RpcUnimplementedException();
+                    }
+                }
+                catch (InvalidOperationException)
+                {
+                    throw new RpcProtocolErrorException($"Capability {resolve.PromiseId} was already resolved");
                 }
             }
 
@@ -777,10 +793,7 @@ namespace Capnp.Rpc
                         {
                             Logger.LogWarning("Sender loopback request: Peer asked for invalid (already released?) capability ID.");
 
-                            SendAbort("'Disembargo': Invalid capability ID");
-                            Dismiss();
-
-                            return;
+                            throw new RpcProtocolErrorException("'Disembargo': Invalid capability ID");
                         }
 
                         reply.Target.which = MessageTarget.WHICH.ImportedCap;
@@ -830,8 +843,7 @@ namespace Capnp.Rpc
                                                 {
                                                     Logger.LogWarning("Sender loopback request: Peer asked for disembargoing an answer which does not resolve back to the sender.");
 
-                                                    SendAbort("'Disembargo': Answer does not resolve back to me");
-                                                    Dismiss();
+                                                    throw new RpcProtocolErrorException("'Disembargo': Answer does not resolve back to me");
                                                 }
                                             }
                                             finally
@@ -844,9 +856,7 @@ namespace Capnp.Rpc
                                     {
                                         Logger.LogWarning($"Sender loopback request: Peer asked for disembargoing an answer which either has not yet returned, was canceled, or faulted: {exception.Message}");
 
-                                        SendAbort($"'Disembargo' failure: {exception}");
-                                        Dismiss();
-
+                                        throw new RpcProtocolErrorException($"'Disembargo' failure: {exception}");
                                     }
                                 });
                         }
@@ -854,10 +864,7 @@ namespace Capnp.Rpc
                         {
                             Logger.LogWarning("Sender loopback request: Peer asked for non-existing answer ID.");
 
-                            SendAbort("'Disembargo': Invalid answer ID");
-                            Dismiss();
-
-                            return;
+                            throw new RpcProtocolErrorException("'Disembargo': Invalid answer ID");
                         }
 
                         break;
@@ -966,6 +973,8 @@ namespace Capnp.Rpc
                 else
                 {
                     Logger.LogWarning("Peer sent 'finish' message with unknown question ID");
+
+                    throw new RpcProtocolErrorException("unknown question ID");
                 }
             }
 
@@ -994,6 +1003,8 @@ namespace Capnp.Rpc
                         catch (System.Exception exception)
                         {
                             Logger.LogWarning($"Attempting to release capability with invalid reference count: {exception.Message}");
+
+                            throw new RpcProtocolErrorException("Invalid reference count");
                         }
                     }
                 }
@@ -1001,6 +1012,8 @@ namespace Capnp.Rpc
                 if (!exists)
                 {
                     Logger.LogWarning("Attempting to release unknown capability ID");
+
+                    throw new RpcProtocolErrorException("Invalid export ID");
                 }
             }
 
@@ -1056,9 +1069,7 @@ namespace Capnp.Rpc
                         //# In cases where there is no sensible way to react to an `unimplemented` message (without
                         //# resource leaks or other serious problems), the connection may need to be aborted.  This is
                         //# a gray area; different implementations may take different approaches.
-                        SendAbort("It's hopeless if you don't implement the bootstrap message");
-                        Dismiss();
-                        break;
+                        throw new RpcProtocolErrorException("It's hopeless if you don't implement the bootstrap message");
 
                     default:
                         // Looking at the various message types it feels OK to just not care about other 'unimplemented'
@@ -1156,6 +1167,11 @@ namespace Capnp.Rpc
 
                     Tx(mb.Frame);
                 }
+                catch (RpcProtocolErrorException error)
+                {
+                    SendAbort(error.Message);
+                    Dismiss();
+                }
                 catch (System.Exception exception)
                 {
                     Logger.LogError(exception, "Uncaught exception during message processing.");
@@ -1164,12 +1180,11 @@ namespace Capnp.Rpc
                     // First, we send implementation specific details of a - maybe internal - error, not very valuable for the
                     // receiver. But worse: From a security point of view, we might even reveil a secret here.
                     SendAbort("Uncaught exception during RPC processing. This may also happen due to invalid input.");
-
                     Dismiss();
                 }
             }
 
-            ConsumedCapability? ImportCap(CapDescriptor.READER capDesc)
+            ConsumedCapability ImportCap(CapDescriptor.READER capDesc)
             {
                 lock (_reentrancyBlocker)
                 {
@@ -1198,7 +1213,6 @@ namespace Capnp.Rpc
                                 rcw = new RefCounted<WeakReference<RemoteCapability>>(
                                     new WeakReference<RemoteCapability>(newCap));
                                 _importTable.Add(capDesc.SenderHosted, rcw);
-                                Debug.Assert(newCap != null);
                                 return newCap;
                             }
 
@@ -1217,7 +1231,6 @@ namespace Capnp.Rpc
                                     rcwp.Cap.SetTarget(impCap);
                                 }
 
-                                Debug.Assert(impCap != null);
                                 return impCap;
                             }
                             else
@@ -1226,7 +1239,6 @@ namespace Capnp.Rpc
                                 rcw = new RefCounted<WeakReference<RemoteCapability>>(
                                     new WeakReference<RemoteCapability>(newCap));
                                 _importTable.Add(capDesc.SenderPromise, rcw);
-                                Debug.Assert(newCap != null);
                                 return newCap;
                             }
 
@@ -1238,7 +1250,7 @@ namespace Capnp.Rpc
                             else
                             {
                                 Logger.LogWarning("Peer refers to receiver-hosted capability which does not exist.");
-                                return null;
+                                throw new RpcProtocolErrorException($"Receiver-hosted capability {capDesc.ReceiverHosted} does not exist.");
                             }
 
                         case CapDescriptor.WHICH.ReceiverAnswer:
@@ -1270,7 +1282,7 @@ namespace Capnp.Rpc
                             else
                             {
                                 Logger.LogWarning("Peer refers to pending answer which does not exist.");
-                                return null;
+                                throw new RpcProtocolErrorException($"Invalid question ID {capDesc.ReceiverAnswer.QuestionId}");
                             }
 
                         case CapDescriptor.WHICH.ThirdPartyHosted:
@@ -1288,7 +1300,6 @@ namespace Capnp.Rpc
                                     rcv.Cap.SetTarget(impCap);
                                 }
 
-                                Debug.Assert(impCap != null);
                                 return impCap;
                             }
                             else
@@ -1296,7 +1307,6 @@ namespace Capnp.Rpc
                                 var newCap = new ImportedCapability(this, capDesc.ThirdPartyHosted.VineId);
                                 rcv = new RefCounted<WeakReference<RemoteCapability>>(
                                     new WeakReference<RemoteCapability>(newCap));
-                                Debug.Assert(newCap != null);
                                 return newCap;
                             }
 
@@ -1307,7 +1317,7 @@ namespace Capnp.Rpc
                 }
             }
 
-            public IList<ConsumedCapability?> ImportCapTable(Payload.READER payload)
+            internal IList<ConsumedCapability?> ImportCapTable(Payload.READER payload)
             {
                 var list = new List<ConsumedCapability?>();
 
@@ -1481,7 +1491,7 @@ namespace Capnp.Rpc
 
         readonly ConcurrentBag<RpcEndpoint> _inboundEndpoints = new ConcurrentBag<RpcEndpoint>();
 
-        internal RpcEndpoint AddEndpoint(IEndpoint outboundEndpoint)
+        public RpcEndpoint AddEndpoint(IEndpoint outboundEndpoint)
         {
             var inboundEndpoint = new RpcEndpoint(this, outboundEndpoint);
             _inboundEndpoints.Add(inboundEndpoint);
@@ -1502,6 +1512,15 @@ namespace Capnp.Rpc
                 _bootstrapCap?.Relinquish();
                 _bootstrapCap = value;
             }
+        }
+
+        /// <summary>
+        /// Sets the bootstrap capability. It must be an object which implements a valid capability interface
+        /// (<see cref="SkeletonAttribute"/>).
+        /// </summary>
+        public object Main
+        {
+            set { BootstrapCap = Skeleton.GetOrCreateSkeleton(value, false); }
         }
     }
 }
