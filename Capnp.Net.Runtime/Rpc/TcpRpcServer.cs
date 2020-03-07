@@ -32,7 +32,7 @@ namespace Capnp.Rpc
     /// <summary>
     /// Cap'n Proto RPC TCP server.
     /// </summary>
-    public class TcpRpcServer: IDisposable
+    public class TcpRpcServer: ISupportsMidlayers, IDisposable
     {
         ILogger Logger { get; } = Logging.CreateLogger<TcpRpcServer>();
 
@@ -161,17 +161,17 @@ namespace Capnp.Rpc
         }
 
         readonly RpcEngine _rpcEngine;
-        readonly TcpListener _listener;
         readonly object _reentrancyBlocker = new object();
-        readonly Thread _acceptorThread;
         readonly List<Connection> _connections = new List<Connection>();
+        Thread? _acceptorThread;
+        TcpListener? _listener;
 
         /// <summary>
         /// Gets the number of currently active inbound TCP connections.
         /// </summary>
         public int ConnectionCount { get; private set; }
 
-        void AcceptClients()
+        void AcceptClients(TcpListener listener)
         {
             try
             {
@@ -180,7 +180,7 @@ namespace Capnp.Rpc
 
                 while (true)
                 {
-                    var client = _listener.AcceptTcpClient();
+                    var client = listener.AcceptTcpClient();
                     var connection = new Connection(this, client);
 
                     lock (_reentrancyBlocker)
@@ -244,7 +244,10 @@ namespace Capnp.Rpc
         /// </summary>
         public void Dispose()
         {
-            StopListening();
+            if (_listener != null)
+            {
+                StopListening();
+            }
 
             var connections = new List<Connection>();
 
@@ -260,8 +263,6 @@ namespace Capnp.Rpc
                 SafeJoin(connection.PumpRunner);
             }
 
-            SafeJoin(_acceptorThread);
-
             GC.SuppressFinalize(this);
         }
 
@@ -270,6 +271,9 @@ namespace Capnp.Rpc
         /// </summary>
         public void StopListening()
         {
+            if (_listener == null)
+                throw new InvalidOperationException("Listening was never started");
+
             try
             {
                 _listener.Stop();
@@ -277,47 +281,109 @@ namespace Capnp.Rpc
             catch (SocketException)
             {
             }
+            finally
+            {
+                _listener = null;
+                SafeJoin(_acceptorThread);
+                _acceptorThread = null;
+            }
+        }
+
+        /// <summary>
+        /// Installs a midlayer.
+        /// A midlayer is a protocal layer that resides somewhere between capnp serialization and the raw TCP stream.
+        /// Thus, we have a hook mechanism for transforming data before it is sent to the TCP connection or after it was received
+        /// by the TCP connection, respectively. This mechanism can be used for buffering, various (de-)compression algorithms, and more.
+        /// </summary>
+        /// <param name="createFunc"></param>
+        public void InjectMidlayer(Func<Stream, Stream> createFunc)
+        {
+            OnConnectionChanged += (_, e) =>
+            {
+                if (e.Connection.State == ConnectionState.Initializing)
+                {
+                    e.Connection.InjectMidlayer(createFunc);
+                }
+            };
         }
 
         /// <summary>
         /// Constructs an instance.
         /// </summary>
+        public TcpRpcServer()
+        {
+            _rpcEngine = new RpcEngine();
+
+        }
+
+        /// <summary>
+        /// Constructs an instance, starts listening to the specified TCP/IP endpoint and accepting clients.
+        /// If you intend configuring a midlayer or consuming the <see cref="OnConnectionChanged"/> event, 
+        /// you should not use this constructor, since it may lead to an early-client race condition.
+        /// Instead, use the parameterless constructor, configure, then call <see cref="StartAccepting(IPAddress, int)"/>.
+        /// </summary>
         /// <param name="localAddr">An System.Net.IPAddress that represents the local IP address.</param>
         /// <param name="port">The port on which to listen for incoming connection attempts.</param>
         /// <exception cref="ArgumentNullException"><paramref name="localAddr"/> is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="port"/> is not between System.Net.IPEndPoint.MinPort and System.Net.IPEndPoint.MaxPort.</exception>
-        public TcpRpcServer(IPAddress localAddr, int port)
+        /// <exception cref="SocketException">The underlying <see cref="TcpListener"/> detected an error condition, such as the desired endpoint is already occupied.</exception>
+        public TcpRpcServer(IPAddress localAddr, int port): this()
         {
-            _rpcEngine = new RpcEngine();
-            _listener = new TcpListener(localAddr, port);
-            _listener.ExclusiveAddressUse = false;
+            StartAccepting(localAddr, port);
+        }
 
-            for (int retry = 0; retry < 5; retry++)
+        /// <summary>
+        /// Starts listening to the specified TCP/IP endpoint and accepting clients. 
+        /// </summary>
+        /// <param name="localAddr">An System.Net.IPAddress that represents the local IP address.</param>
+        /// <param name="port">The port on which to listen for incoming connection attempts.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="localAddr"/> is null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="port"/> is not between System.Net.IPEndPoint.MinPort and System.Net.IPEndPoint.MaxPort.</exception>
+        /// <exception cref="InvalidOperationException">Listening activity was already started</exception>
+        /// <exception cref="SocketException">The underlying <see cref="TcpListener"/> detected an error condition, such as the desired endpoint is already occupied.</exception>
+        public void StartAccepting(IPAddress localAddr, int port)
+        {
+            if (_listener != null)
+                throw new InvalidOperationException("Listening activity was already started");
+
+            var listener = new TcpListener(localAddr, port)
+            {
+                ExclusiveAddressUse = false
+            };
+
+            int attempt = 0;
+
+            while (true)
             {
                 try
                 {
-                    _listener.Start();
+                    listener.Start();
                     break;
                 }
                 catch (SocketException socketException)
                 {
-                    Logger.LogWarning($"Failed to listen on port {port}, attempt {retry}: {socketException}");
-                    Thread.Sleep(10);
+                    if (attempt == 5)
+                        throw;
+
+                    Logger.LogWarning($"Failed to listen on port {port}, attempt {attempt}: {socketException}");
                 }
+
+                ++attempt;
+                Thread.Sleep(10);
             }
 
-            _acceptorThread = new Thread(AcceptClients);
-
+            _acceptorThread = new Thread(() => AcceptClients(listener));
+            _listener = listener;
             _acceptorThread.Start();
         }
 
         /// <summary>
         /// Whether the thread which is responsible for acception incoming attempts is still alive.
-        /// The thread will die upon disposal, but also in case of a socket error condition.
+        /// The thread will die after calling <see cref="StopListening"/>, upon disposal, but also in case of a socket error condition.
         /// Errors which occur on a particular connection will just close that connection and won't interfere
         /// with the acceptor thread.
         /// </summary>
-        public bool IsAlive => _acceptorThread.IsAlive;
+        public bool IsAlive => _acceptorThread?.IsAlive ?? false;
 
         /// <summary>
         /// Sets the bootstrap capability. It must be an object which implements a valid capability interface

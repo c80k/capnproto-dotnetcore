@@ -36,7 +36,7 @@ namespace Capnp.Net.Runtime.Tests
 
         Process _currentProcess;
 
-        void LaunchCompatTestProcess(string whichTest, Action<StreamReader> test)
+        bool TryLaunchCompatTestProcess(string whichTest, Action<StreamReader> test)
         {
             string myPath = Path.GetDirectoryName(typeof(TcpRpcInterop).Assembly.Location);
             string config;
@@ -71,6 +71,12 @@ namespace Capnp.Net.Runtime.Tests
                         "Problem after launching test process");
 
                     test(_currentProcess.StandardOutput);
+
+                    return true;
+                }
+                catch (AssertFailedException)
+                {
+                    return false;
                 }
                 finally
                 {
@@ -83,6 +89,20 @@ namespace Capnp.Net.Runtime.Tests
                     }
                 }
             }
+        }
+
+        void LaunchCompatTestProcess(string whichTest, Action<StreamReader> test)
+        {
+            for (int retry = 0; retry < 5; retry++)
+            {
+                if (TryLaunchCompatTestProcess(whichTest, test))
+                    return;
+
+                if (whichTest.StartsWith("server:"))
+                    PrepareNextTest();
+            }
+
+            Assert.Fail("Problem after launching test process");
         }
 
         void SendInput(string line)

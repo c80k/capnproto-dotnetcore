@@ -398,7 +398,7 @@ namespace Capnp.Rpc
                     switch (req.SendResultsTo.which)
                     {
                         case Call.sendResultsTo.WHICH.Caller:
-                            pendingAnswer.Chain(false, async t =>
+                            pendingAnswer.Chain(async t =>
                             {
                                 try
                                 {
@@ -466,7 +466,7 @@ namespace Capnp.Rpc
                             break;
 
                         case Call.sendResultsTo.WHICH.Yourself:
-                            pendingAnswer.Chain(false, async t =>
+                            pendingAnswer.Chain(async t =>
                             {
                                 try
                                 {
@@ -575,7 +575,6 @@ namespace Capnp.Rpc
                                 if (exists)
                                 {
                                     previousAnswer!.Chain(
-                                        false,
                                         req.Target.PromisedAnswer,
                                         async t =>
                                         {
@@ -679,7 +678,7 @@ namespace Capnp.Rpc
 
                             if (exists)
                             {
-                                pendingAnswer!.Chain(false, async t =>
+                                pendingAnswer!.Chain(async t =>
                                 {
                                     try
                                     {
@@ -807,7 +806,7 @@ namespace Capnp.Rpc
 
                         if (_answerTable.TryGetValue(promisedAnswer.QuestionId, out var previousAnswer))
                         {
-                            previousAnswer.Chain(true,
+                            previousAnswer.Chain(
                                 disembargo.Target.PromisedAnswer,
                                 async t =>
                                 {
@@ -922,9 +921,9 @@ namespace Capnp.Rpc
 
             void ReleaseResultCaps(PendingAnswer answer)
             {
-                try
+                answer.Chain(async t =>
                 {
-                    answer.Chain(false, async t =>
+                    try
                     {
                         var aorcq = await t;
                         var results = aorcq.Answer;
@@ -936,11 +935,11 @@ namespace Capnp.Rpc
                                 cap?.Release();
                             }
                         }
-                    });
-                }
-                catch
-                {
-                }
+                    }
+                    catch
+                    {
+                    }
+                });
             }
 
             void ProcessFinish(Finish.READER finish)
@@ -1246,7 +1245,7 @@ namespace Capnp.Rpc
                             {
                                 var tcs = new TaskCompletionSource<Proxy>();
 
-                                pendingAnswer.Chain(false,
+                                pendingAnswer.Chain(
                                     capDesc.ReceiverAnswer,
                                     async t =>
                                     {

@@ -13,6 +13,9 @@ namespace Benchmark
         [Params(20, 200, 2000, 20000, 200000, 2000000)]
         public int PayloadBytes;
 
+        [Params(0, 256, 1024, 4096)]
+        public int BufferSize;
+
         TcpRpcClient _client;
         IEchoer _echoer;
         byte[] _payload;
@@ -21,6 +24,8 @@ namespace Benchmark
         public void Setup()
         {
             _client = new TcpRpcClient("localhost", 5002);
+            if (BufferSize > 0)
+                _client.AddBuffering(BufferSize);
             _client.WhenConnected.Wait();
             _echoer = _client.GetMain<IEchoer>();
             _payload = new byte[PayloadBytes];

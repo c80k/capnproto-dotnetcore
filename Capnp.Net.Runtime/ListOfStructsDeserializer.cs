@@ -9,8 +9,8 @@ namespace Capnp
     /// </summary>
     public class ListOfStructsDeserializer: ListDeserializer, IReadOnlyList<DeserializerState>
     {
-        internal ListOfStructsDeserializer(ref DeserializerState context):
-            base(ref context)
+        internal ListOfStructsDeserializer(in DeserializerState context):
+            base(context)
         {
         }
 

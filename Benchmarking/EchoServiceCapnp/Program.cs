@@ -9,9 +9,11 @@ namespace EchoServiceCapnp
     {
         static void Main(string[] args)
         {
-            using (var server = new TcpRpcServer(IPAddress.Any, 5002))
+            using (var server = new TcpRpcServer())
             {
+                server.AddBuffering();
                 server.Main = new CapnpEchoService();
+                server.StartAccepting(IPAddress.Any, 5002);
                 Console.WriteLine("Press RETURN to stop listening");
                 Console.ReadLine();
             }

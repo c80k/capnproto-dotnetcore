@@ -98,14 +98,7 @@ namespace Capnp.Net.Runtime.Tests
             using (var server = new TcpRpcServer(IPAddress.Any, TcpPort))
             using (var client = new TcpRpcClient())
             {
-                server.OnConnectionChanged += (_, e) =>
-                {
-                    if (e.Connection.State == ConnectionState.Initializing)
-                    {
-                        e.Connection.InjectMidlayer(s => new ScatteringStream(s, 7));
-                    }
-                };
-
+                server.InjectMidlayer(s => new ScatteringStream(s, 7));
                 client.InjectMidlayer(s => new ScatteringStream(s, 10));
                 client.Connect("localhost", TcpPort);
                 client.WhenConnected.Wait();
