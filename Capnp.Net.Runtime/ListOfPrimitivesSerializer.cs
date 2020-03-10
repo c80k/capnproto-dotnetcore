@@ -6,13 +6,13 @@ using System.Runtime.InteropServices;
 namespace Capnp
 {
     /// <summary>
-    /// SerializerState specialization for List(Int*), List(UInt*), List(Float*), and List(Enum).
+    /// SerializerState specialization for unmanaged primitive types (including enum).
     /// </summary>
     /// <typeparam name="T">List element type, must be primitive. Static constructor will throw if the type does not work.</typeparam>
     public class ListOfPrimitivesSerializer<T> :
         SerializerState,
         IReadOnlyList<T>
-        where T : struct
+        where T : unmanaged
     {
         static readonly int ElementSize;
 
@@ -88,17 +88,32 @@ namespace Capnp
             }
 
             Init(items.Count);
-            
-            for (int i = 0; i < items.Count; i++)
-            {
-                this[i] = items[i];
-            }
-        }
 
-        IEnumerable<T> Enumerate()
-        {
-            for (int i = 0; i < Data.Length; i++)
-                yield return Data[i];
+            switch (items)
+            {
+                case T[] array:
+                    array.CopyTo(Span);
+                    break;
+
+                case ArraySegment<T> segment:
+                    segment.AsSpan().CopyTo(Span);
+                    break;
+
+                case ListOfPrimitivesDeserializer<T> deser:
+                    deser.Span.CopyTo(Span);
+                    break;
+
+                case ListOfPrimitivesSerializer<T> ser:
+                    ser.Span.CopyTo(Span);
+                    break;
+
+                default:
+                    for (int i = 0; i < items.Count; i++)
+                    {
+                        this[i] = items[i];
+                    }
+                    break;
+            }
         }
 
         /// <summary>
@@ -107,6 +122,6 @@ namespace Capnp
         /// <returns></returns>
         public IEnumerator<T> GetEnumerator() => Enumerate().GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() => Data.ToArray().GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => Span.ToArray().GetEnumerator();
     }
 }

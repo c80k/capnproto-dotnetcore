@@ -11,8 +11,8 @@ namespace Capnp
     {
         readonly bool _defaultValue;
 
-        internal ListOfBitsDeserializer(ref DeserializerState context, bool defaultValue) : 
-            base(ref context)
+        internal ListOfBitsDeserializer(in DeserializerState context, bool defaultValue) : 
+            base(context)
         {
             _defaultValue = defaultValue;
         }

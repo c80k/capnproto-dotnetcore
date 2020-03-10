@@ -11,7 +11,7 @@ namespace Capnp
     public class ListOfCapsDeserializer<T> : ListDeserializer, IReadOnlyList<T>
         where T: class
     {
-        internal ListOfCapsDeserializer(ref DeserializerState state) : base(ref state)
+        internal ListOfCapsDeserializer(in DeserializerState state) : base(state)
         {
             Rpc.CapabilityReflection.ValidateCapabilityInterface(typeof(T));
         }

@@ -501,19 +501,38 @@ namespace Capnp
         /// <exception cref="DeserializationException">state does not represent a list</exception>
         public ListDeserializer RequireList()
         {
-            return Kind switch
+            switch (Kind)
             {
-                ObjectKind.ListOfBits => new ListOfBitsDeserializer(ref this, false),
-                ObjectKind.ListOfBytes => new ListOfPrimitivesDeserializer<byte>(ref this, ListKind.ListOfBytes),
-                ObjectKind.ListOfEmpty => new ListOfEmptyDeserializer(ref this),
-                ObjectKind.ListOfInts => new ListOfPrimitivesDeserializer<int>(ref this, ListKind.ListOfInts),
-                ObjectKind.ListOfLongs => new ListOfPrimitivesDeserializer<long>(ref this, ListKind.ListOfLongs),
-                ObjectKind.ListOfPointers => new ListOfPointersDeserializer(ref this),
-                ObjectKind.ListOfShorts => new ListOfPrimitivesDeserializer<short>(ref this, ListKind.ListOfShorts),
-                ObjectKind.ListOfStructs => new ListOfStructsDeserializer(ref this),
-                ObjectKind.Nil => new EmptyListDeserializer(),
-                _ => throw new DeserializationException("Cannot deserialize this object as list"),
-            };
+                case ObjectKind.ListOfBits:
+                    return new ListOfBitsDeserializer(this, false);
+
+                case ObjectKind.ListOfBytes:
+                    return new ListOfPrimitivesDeserializer<byte>(this, ListKind.ListOfBytes);
+
+                case ObjectKind.ListOfEmpty:
+                    return new ListOfEmptyDeserializer(this);
+
+                case ObjectKind.ListOfInts:
+                    return new ListOfPrimitivesDeserializer<int>(this, ListKind.ListOfInts);
+
+                case ObjectKind.ListOfLongs:
+                    return new ListOfPrimitivesDeserializer<long>(this, ListKind.ListOfLongs);
+
+                case ObjectKind.ListOfPointers:
+                    return new ListOfPointersDeserializer(this);
+
+                case ObjectKind.ListOfShorts:
+                    return new ListOfPrimitivesDeserializer<short>(this, ListKind.ListOfShorts);
+
+                case ObjectKind.ListOfStructs:
+                    return new ListOfStructsDeserializer(this);
+
+                case ObjectKind.Nil:
+                    return new EmptyListDeserializer();
+
+                default:
+                    throw new DeserializationException("Cannot deserialize this object as list");
+            }
         }
 
         /// <summary>
@@ -523,11 +542,14 @@ namespace Capnp
         /// <exception cref="DeserializationException">state does not represent a list of pointers</exception>
         public ListOfCapsDeserializer<T> RequireCapList<T>() where T: class
         {
-            return Kind switch
+            switch (Kind)
             {
-                ObjectKind.ListOfPointers => new ListOfCapsDeserializer<T>(ref this),
-                _ => throw new DeserializationException("Cannot deserialize this object as capability list"),
-            };
+                case ObjectKind.ListOfPointers:
+                    return new ListOfCapsDeserializer<T>(this);
+
+                default:
+                    throw new DeserializationException("Cannot deserialize this object as capability list");
+            }
         }
 
         /// <summary>

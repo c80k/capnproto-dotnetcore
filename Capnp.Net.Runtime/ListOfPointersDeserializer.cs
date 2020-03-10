@@ -9,8 +9,8 @@ namespace Capnp
     /// </summary>
     public class ListOfPointersDeserializer: ListDeserializer, IReadOnlyList<DeserializerState>
     {
-        internal ListOfPointersDeserializer(ref DeserializerState state) : 
-            base(ref state)
+        internal ListOfPointersDeserializer(in DeserializerState state) : 
+            base(state)
         {
         }
 

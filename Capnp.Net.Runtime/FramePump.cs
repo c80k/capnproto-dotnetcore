@@ -116,6 +116,8 @@ namespace Capnp
 #endif
                     _writer.Write(bytes);
                 }
+
+                _writer.Flush();
             }
         }
 
