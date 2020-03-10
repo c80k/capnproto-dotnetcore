@@ -106,6 +106,11 @@ namespace Capnp
                 case ObjectKind.ListOfStructs:
                 case ObjectKind.Nil:
                 case ObjectKind.Struct:
+                    if (state.Caps != null)
+                    {
+                        foreach (var cap in state.Caps)
+                            cap?.Release(true);
+                    }
                     return new DeserializerState(state.Allocator!.Segments)
                     {
                         CurrentSegmentIndex = state.SegmentIndex,

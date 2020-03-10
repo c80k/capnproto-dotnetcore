@@ -1259,7 +1259,8 @@ namespace Capnp
         /// </summary>
         /// <param name="obj">The capability, in one of the following forms:<list type="bullet">
         /// <item><description>Low-level capability object (<code>Rpc.ConsumedCapability</code>)</description></item>
-        /// <item><description>Proxy object (<code>Rpc.Proxy</code>)</description></item>
+        /// <item><description>Proxy object (<code>Rpc.Proxy</code>). Note that the provision has "move semantics": SerializerState
+        /// takes ownership, so the Proxy object will be disposed.</description></item>
         /// <item><description>Skeleton object (<code>Rpc.Skeleton</code>)</description></item>
         /// <item><description>Capability interface implementation</description></item>
         /// </list></param>
@@ -1267,16 +1268,19 @@ namespace Capnp
         /// <exception cref="InvalidOperationException">The underlying message builder was not configured for capability table support.</exception>
         public uint ProvideCapability(object? obj)
         {
-            if (obj == null)
-                return ProvideCapability(default(Rpc.ConsumedCapability));
-            else if (obj is Rpc.Proxy proxy)
-                return ProvideCapability(proxy.ConsumedCap);
-            else if (obj is Rpc.ConsumedCapability consumedCapability)
-                return ProvideCapability(consumedCapability);
-            else if (obj is Rpc.Skeleton providedCapability)
-                return ProvideCapability(providedCapability);
-            else
-                return ProvideCapability(Rpc.Skeleton.GetOrCreateSkeleton(obj, false));
+            switch (obj)
+            {
+                case null:
+                    return ProvideCapability(default(Rpc.ConsumedCapability));
+                case Rpc.Proxy proxy: using (proxy)
+                    return ProvideCapability(proxy.ConsumedCap);
+                case Rpc.ConsumedCapability consumedCapability:
+                    return ProvideCapability(consumedCapability);
+                case Rpc.Skeleton providedCapability:
+                    return ProvideCapability(providedCapability);
+                default:
+                    return ProvideCapability(Rpc.Skeleton.GetOrCreateSkeleton(obj, false));
+            }
         }
 
         /// <summary>

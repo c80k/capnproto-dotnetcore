@@ -433,6 +433,7 @@ namespace Capnp.Rpc
                                                 ret.Results.Content = results.Rewrap<DynamicSerializerState>();
                                                 ret.ReleaseParamCaps = releaseParamCaps;
                                                 ExportCapTableAndSend(results, ret.Results);
+                                                pendingAnswer.CapTable = ret.Results.CapTable;
                                                 break;
 
                                             case Call.sendResultsTo.WHICH.Yourself:
@@ -592,11 +593,9 @@ namespace Capnp.Rpc
                                         {
                                             try
                                             {
-                                                using (var proxy = await t)
-                                                {
-                                                    cap = proxy?.GetProvider();
-                                                    CreateAnswerAwaitItAndReply();
-                                                }
+                                                using var proxy = await t;
+                                                cap = proxy?.GetProvider();
+                                                CreateAnswerAwaitItAndReply();
                                             }
                                             catch (TaskCanceledException)
                                             {
@@ -825,30 +824,28 @@ namespace Capnp.Rpc
                                 {
                                     try
                                     {
-                                        using (var proxy = await t)
-                                        {
-                                            proxy.Freeze(out var boundEndpoint);
+                                        using var proxy = await t;
+                                        proxy.Freeze(out var boundEndpoint);
 
-                                            try
+                                        try
+                                        {
+                                            if (boundEndpoint == this)
                                             {
-                                                if (boundEndpoint == this)
-                                                {
 #if DebugEmbargos
                                             Logger.LogDebug($"Sender loopback disembargo. Thread = {Thread.CurrentThread.Name}");
 #endif
-                                                    Tx(mb.Frame);
-                                                }
-                                                else
-                                                {
-                                                    Logger.LogWarning("Sender loopback request: Peer asked for disembargoing an answer which does not resolve back to the sender.");
-
-                                                    throw new RpcProtocolErrorException("'Disembargo': Answer does not resolve back to me");
-                                                }
+                                                Tx(mb.Frame);
                                             }
-                                            finally
+                                            else
                                             {
-                                                proxy.Unfreeze();
+                                                Logger.LogWarning("Sender loopback request: Peer asked for disembargoing an answer which does not resolve back to the sender.");
+
+                                                throw new RpcProtocolErrorException("'Disembargo': Answer does not resolve back to me");
                                             }
+                                        }
+                                        finally
+                                        {
+                                            proxy.Unfreeze();
                                         }
                                     }
                                     catch (System.Exception exception)
@@ -933,15 +930,32 @@ namespace Capnp.Rpc
                     try
                     {
                         var aorcq = await t;
-                        var results = aorcq.Answer;
+                        var caps = answer.CapTable;
 
-                        if (results != null && results.Caps != null)
+                        if (caps != null)
                         {
-                            foreach (var cap in results.Caps)
+                            foreach (var capDesc in caps)
                             {
-                                cap?.Release();
+                                switch (capDesc.which)
+                                {
+                                    case CapDescriptor.WHICH.SenderHosted:
+                                        ReleaseExport(capDesc.SenderHosted, 1);
+                                        break;
+
+                                    case CapDescriptor.WHICH.SenderPromise:
+                                        ReleaseExport(capDesc.SenderPromise, 1);
+                                        break;
+                                }
                             }
                         }
+
+                        //if (results != null && results.Caps != null)
+                        //{
+                        //    foreach (var cap in results.Caps)
+                        //    {
+                        //        cap?.Release();
+                        //    }
+                        //}
                     }
                     catch
                     {
@@ -1091,7 +1105,7 @@ namespace Capnp.Rpc
 
                 Tx(mb.Frame);
 
-                var main = new RemoteAnswerCapability(
+                var main = new RemoteAnswerCapabilityDeprecated(
                     pendingBootstrap,
                     MemberAccessPath.BootstrapAccess);
 
@@ -1360,7 +1374,7 @@ namespace Capnp.Rpc
                     else
                     {
                         cap.Export(this, capDesc);
-                        cap.Release();
+                        cap.Release(false);
                     }
                 }
 

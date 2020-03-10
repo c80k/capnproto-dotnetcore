@@ -252,7 +252,39 @@ namespace Capnp.Rpc
                 }
                 else
                 {
-                    return new RemoteAnswerCapability(this, access);
+                    return new RemoteAnswerCapabilityDeprecated(this, access);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Refer to a (possibly nested) member of this question's (possibly future) result and return
+        /// it as a capability.
+        /// </summary>
+        /// <param name="task">promises the cap whose ownership is transferred to this object</param>
+        /// <returns>Low-level capability</returns>
+        /// <exception cref="DeserializationException">The referenced member does not exist or does not resolve to a capability pointer.</exception>
+        public ConsumedCapability? Access(MemberAccessPath access, Task<IDisposable> task)
+        {
+            var proxyTask = task.AsProxyTask();
+
+            lock (ReentrancyBlocker)
+            {
+                if (proxyTask.IsCompleted && !StateFlags.HasFlag(State.TailCall))
+                {
+                    try
+                    {
+                        using var proxy = proxyTask.Result;
+                        return proxy.ConsumedCap;
+                    }
+                    catch (AggregateException exception)
+                    {
+                        throw exception.InnerException!;
+                    }
+                }
+                else
+                {
+                    return new RemoteAnswerCapabilityDeprecated(this, access);
                 }
             }
         }
@@ -263,13 +295,13 @@ namespace Capnp.Rpc
             {
                 foreach (var cap in inParams.Caps!)
                 {
-                    cap?.Release();
+                    cap?.Release(false);
                 }
             }
 
             if (target != null)
             {
-                target.Release();
+                target.Release(false);
             }
         }
 
@@ -277,7 +309,7 @@ namespace Capnp.Rpc
         {
             foreach (var cap in outParams.Caps!)
             {
-                cap?.Release();
+                cap?.Release(false);
             }
         }
 

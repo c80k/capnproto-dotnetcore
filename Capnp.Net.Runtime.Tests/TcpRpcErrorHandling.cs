@@ -563,7 +563,7 @@ namespace Capnp.Net.Runtime.Tests
                 _.Call.QuestionId = 42;
                 _.Call.Target.which = MessageTarget.WHICH.ImportedCap;
                 _.Call.Target.ImportedCap = bootCapId;
-                _.Call.InterfaceId = ((TypeIdAttribute)typeof(ITestPipeline).GetCustomAttributes(typeof(TypeIdAttribute), false)[0]).Id;
+                _.Call.InterfaceId = new TestPipeline_Skeleton().InterfaceId;
                 _.Call.MethodId = 0;
                 var wr = _.Call.Params.Content.Rewrap<TestPipeline.Params_getCap.WRITER>();
                 wr.InCap = null;
@@ -588,7 +588,7 @@ namespace Capnp.Net.Runtime.Tests
                 {
                     _1.which = Message.WHICH.Unimplemented;
                     _1.Unimplemented.which = Message.WHICH.Resolve;
-                    Reserializing.DeepCopy(_, _1.Unimplemented.Resolve);
+                    Reserializing.DeepCopy(_.Resolve, _1.Unimplemented.Resolve);
                 });
 
                 Assert.IsFalse(impl.IsGrandsonCapDisposed);

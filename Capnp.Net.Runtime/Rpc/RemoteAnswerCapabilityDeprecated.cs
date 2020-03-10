@@ -3,7 +3,8 @@ using System.Threading.Tasks;
 
 namespace Capnp.Rpc
 {
-    class RemoteAnswerCapability : RemoteResolvingCapability
+
+    class RemoteAnswerCapabilityDeprecated : RemoteResolvingCapability
     {
         // Set DebugEmbargos to true to get logging output for calls. RPC calls are expected to
         // be on the critical path, hence very relevant for performance. We just can't afford
@@ -17,24 +18,27 @@ namespace Capnp.Rpc
         readonly PendingQuestion _question;
         readonly MemberAccessPath _access;
         readonly Task<Proxy> _whenResolvedProxy;
+        ConsumedCapability? _resolvedCap;
 
-        public RemoteAnswerCapability(PendingQuestion question, MemberAccessPath access, Task<Proxy> proxyTask) : base(question.RpcEndpoint)
+        public RemoteAnswerCapabilityDeprecated(PendingQuestion question, MemberAccessPath access): base(question.RpcEndpoint)
         {
             _question = question ?? throw new ArgumentNullException(nameof(question));
             _access = access ?? throw new ArgumentNullException(nameof(access));
-            _whenResolvedProxy = proxyTask ?? throw new ArgumentNullException(nameof(proxyTask));
 
             async Task<ConsumedCapability?> AwaitWhenResolved()
             {
-                var proxy = await _whenResolvedProxy;
+                await _question.WhenReturned;
 
                 if (_question.IsTailCall)
                     throw new InvalidOperationException("Question is a tail call, so won't resolve back.");
 
-                return proxy.ConsumedCap;
+                return ResolvedCap!;
             }
 
             WhenResolved = AwaitWhenResolved();
+
+            async Task<Proxy> AwaitProxy() => new Proxy(await WhenResolved);
+            _whenResolvedProxy = AwaitProxy();
         }
 
         async void ReAllowFinishWhenDone(Task task)
@@ -58,27 +62,37 @@ namespace Capnp.Rpc
             }
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            lock (_question.ReentrancyBlocker)
+            {
+                using var _ = new Proxy(_resolvedCap);
+            }
+        }
+
         protected override ConsumedCapability? ResolvedCap
         {
             get
             {
                 lock (_question.ReentrancyBlocker)
                 {
-                    if (!_question.IsTailCall && WhenResolved.IsCompleted)
+                    if (_resolvedCap == null && !_question.IsTailCall && _question.IsReturned)
                     {
+                        DeserializerState result;
                         try
                         {
-                            return WhenResolved.Result;
+                            result = _question.WhenReturned.Result;
                         }
                         catch (AggregateException exception)
                         {
                             throw exception.InnerException!;
                         }
+
+                        _resolvedCap = _access.Eval(result);
                     }
-                    else
-                    {
-                        return null;
-                    }
+                    return _resolvedCap;
                 }
             }
         }

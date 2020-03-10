@@ -16,7 +16,7 @@
 
         protected override void ReleaseRemotely()
         {
-            InterceptedCapability.Release();
+            InterceptedCapability.Release(false);
         }
 
         internal override IPromisedAnswer DoCall(ulong interfaceId, ushort methodId, DynamicSerializerState args)

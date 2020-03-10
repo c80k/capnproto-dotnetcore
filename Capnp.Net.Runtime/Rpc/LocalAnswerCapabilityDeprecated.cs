@@ -4,16 +4,17 @@ using System.Threading.Tasks;
 
 namespace Capnp.Rpc
 {
-
-    class LocalAnswerCapability : RefCountingCapability, IResolvingCapability
+    class LocalAnswerCapabilityDeprecated : RefCountingCapability, IResolvingCapability
     {
-        readonly Task<Proxy> _whenResolvedProxy;
+        readonly Task<DeserializerState> _answer;
+        readonly MemberAccessPath _access;
 
-        public LocalAnswerCapability(Task<Proxy> proxyTask)
+        public LocalAnswerCapabilityDeprecated(Task<DeserializerState> answer, MemberAccessPath access)
         {
-            _whenResolvedProxy = proxyTask;
+            _answer = answer;
+            _access = access;
 
-            async Task<ConsumedCapability?> AwaitResolved() => (await _whenResolvedProxy).ConsumedCap;
+            async Task<ConsumedCapability?> AwaitResolved() => access.Eval(await _answer);
             WhenResolved = AwaitResolved();
         }
 
@@ -31,16 +32,20 @@ namespace Capnp.Rpc
 
         internal override void Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {
-            if (_whenResolvedProxy.IsCompleted)
+            if (_answer.IsCompleted)
             {
+                DeserializerState result;
                 try
                 {
-                    _whenResolvedProxy.Result.Export(endpoint, writer);
+                    result = _answer.Result;
                 }
                 catch (AggregateException exception)
                 {
-                    throw exception.InnerException;
+                    throw exception.InnerException!;
                 }
+
+                using var proxy = new Proxy(_access.Eval(result));
+                proxy.Export(endpoint, writer);
             }
             else
             {
@@ -50,13 +55,14 @@ namespace Capnp.Rpc
 
         async Task<DeserializerState> CallImpl(ulong interfaceId, ushort methodId, DynamicSerializerState args, CancellationToken cancellationToken)
         {
-            var proxy = await _whenResolvedProxy;
+            var cap = await WhenResolved;
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (proxy.IsNull)
+            if (cap == null)
                 throw new RpcException("Broken capability");
 
+            using var proxy = new Proxy(cap);
             var call = proxy.Call(interfaceId, methodId, args, default);
             var whenReturned = call.WhenReturned;
 
@@ -70,10 +76,8 @@ namespace Capnp.Rpc
             return new LocalAnswer(cts, CallImpl(interfaceId, methodId, args, cts.Token));
         }
 
-        protected async override void ReleaseRemotely()
+        protected override void ReleaseRemotely()
         {
-            try { using var _ = await _whenResolvedProxy; }
-            catch { }
         }
     }
 }

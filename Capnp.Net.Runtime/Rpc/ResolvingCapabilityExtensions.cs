@@ -1,4 +1,7 @@
-﻿namespace Capnp.Rpc
+﻿using System;
+using System.Threading.Tasks;
+
+namespace Capnp.Rpc
 {
     static class ResolvingCapabilityExtensions
     {
@@ -18,8 +21,7 @@
                     try
                     {
                         var resolvedCap = await cap.WhenResolved;
-
-                        endpoint.Resolve(preliminaryId, vine, () => resolvedCap.ConsumedCap!);
+                        endpoint.Resolve(preliminaryId, vine, () => resolvedCap!);
                     }
                     catch (System.Exception exception)
                     {
@@ -30,15 +32,10 @@
             }
         }
 
-        public static async void DisposeWhenResolved(this IResolvingCapability cap)
+        public static async Task<Proxy> AsProxyTask(this Task<IDisposable> task)
         {
-            try
-            {
-                (await cap.WhenResolved)?.Dispose();
-            }
-            catch
-            {
-            }
+            var obj = await task;
+            return obj is Proxy proxy ? proxy : BareProxy.FromImpl(obj);
         }
     }
 }

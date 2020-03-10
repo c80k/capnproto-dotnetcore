@@ -46,13 +46,8 @@ namespace Capnp.Rpc
         {
             if (disposing)
             {
-                try
-                {
-                    ReleaseRemotely();
-                }
-                catch
-                {
-                }
+                try { ReleaseRemotely(); }
+                catch { }
             }
             else
             {
@@ -60,13 +55,8 @@ namespace Capnp.Rpc
                 {
                     Task.Run(() =>
                     {
-                        try
-                        {
-                            ReleaseRemotely();
-                        }
-                        catch
-                        {
-                        }
+                        try { ReleaseRemotely(); }
+                        catch { }
                     });
                 }
             }
@@ -76,7 +66,11 @@ namespace Capnp.Rpc
         {
             lock (_reentrancyBlocker)
             {
-                if (++_refCount <= 1)
+                if (_refCount == int.MinValue)
+                {
+                    _refCount = 2;
+                }
+                else if (++_refCount <= 1)
                 {
                     --_refCount;
 
@@ -91,6 +85,7 @@ namespace Capnp.Rpc
         }
 
         internal sealed override void Release(
+            bool keepAlive,
             [System.Runtime.CompilerServices.CallerMemberName] string methodName = "",
             [System.Runtime.CompilerServices.CallerFilePath] string filePath = "",
             [System.Runtime.CompilerServices.CallerLineNumber] int lineNumber = 0)
@@ -99,6 +94,10 @@ namespace Capnp.Rpc
             {
                 switch (_refCount)
                 {
+                    case 2 when keepAlive:
+                        _refCount = int.MinValue;
+                        break;
+
                     case 1: // initial state, actually ref. count 0
                     case 2: // actually ref. count 1
                         _refCount = 0;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,6 +27,8 @@ namespace Capnp.Rpc
         }
 
         public CancellationToken CancellationToken => _cts?.Token ?? CancellationToken.None;
+
+        public IReadOnlyList<CapDescriptor.WRITER> CapTable { get; set; }
 
         public void Cancel()
         {
@@ -96,7 +99,7 @@ namespace Capnp.Rpc
                     else
                     {
                         var path = MemberAccessPath.Deserialize(rd);
-                        var cap = new RemoteAnswerCapability(aorcq.Counterquestion!, path);
+                        var cap = new RemoteAnswerCapabilityDeprecated(aorcq.Counterquestion!, path);
                         return new Proxy(cap);
                     }
                 }

@@ -7,15 +7,12 @@ namespace Capnp.Rpc
 {
     class LocalCapability : ConsumedCapability
     {
-        static readonly ConditionalWeakTable<Skeleton, LocalCapability> _localCaps =
-            new ConditionalWeakTable<Skeleton, LocalCapability>();
-
         public static ConsumedCapability Create(Skeleton skeleton)
         {
             if (skeleton is Vine vine)
                 return vine.Proxy.ConsumedCap!;
             else
-                return _localCaps.GetValue(skeleton, _ => new LocalCapability(_));
+                return new LocalCapability(skeleton);
         }
 
         static async Task<DeserializerState> AwaitAnswer(Task<AnswerOrCounterquestion> call)
@@ -25,6 +22,7 @@ namespace Capnp.Rpc
         }
 
         public Skeleton ProvidedCap { get; }
+        int _releaseFlag;
 
         LocalCapability(Skeleton providedCap)
         {
@@ -33,15 +31,20 @@ namespace Capnp.Rpc
 
         internal override void AddRef()
         {
-            ProvidedCap.Claim();
+            if (0 == Interlocked.CompareExchange(ref _releaseFlag, 0, 1))
+                ProvidedCap.Claim();
         }
 
         internal override void Release(
+            bool keepAlive,
             [System.Runtime.CompilerServices.CallerMemberName] string methodName = "",
             [System.Runtime.CompilerServices.CallerFilePath] string filePath = "",
             [System.Runtime.CompilerServices.CallerLineNumber] int lineNumber = 0)
         {
-            ProvidedCap.Relinquish();
+            if (keepAlive)
+                Interlocked.Exchange(ref _releaseFlag, 1);
+            else
+                ProvidedCap.Relinquish();
         }
 
         internal override IPromisedAnswer DoCall(ulong interfaceId, ushort methodId, DynamicSerializerState args)

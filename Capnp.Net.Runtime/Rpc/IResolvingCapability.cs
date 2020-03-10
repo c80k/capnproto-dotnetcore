@@ -10,6 +10,6 @@ namespace Capnp.Rpc
         /// <summary>
         /// Will eventually give the resolved capability.
         /// </summary>
-        Task<Proxy> WhenResolved { get; }
+        Task<ConsumedCapability?> WhenResolved { get; }
     }
 }

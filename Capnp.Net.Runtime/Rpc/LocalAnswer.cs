@@ -18,35 +18,27 @@ namespace Capnp.Rpc
 
         async void CleanupAfterReturn()
         {
-            try
-            {
-                await WhenReturned;
-            }
-            catch
-            {
-            }
-            finally
-            {
-                _cts.Dispose();
-            }
+            try { await WhenReturned; }
+            catch { }
+            finally { _cts.Dispose(); }
         }
 
         public Task<DeserializerState> WhenReturned { get; }
 
         public ConsumedCapability Access(MemberAccessPath access)
         {
-            return new LocalAnswerCapability(WhenReturned, access);
+            return new LocalAnswerCapabilityDeprecated(WhenReturned, access);
+        }
+
+        public ConsumedCapability Access(MemberAccessPath _, Task<IDisposable> task)
+        {
+            return new LocalAnswerCapability(task.AsProxyTask());
         }
 
         public void Dispose()
         {
-            try
-            {
-                _cts.Cancel();
-            }
-            catch (ObjectDisposedException)
-            {
-            }
+            try { _cts.Cancel(); }
+            catch (ObjectDisposedException) { }
         }
     }
 }

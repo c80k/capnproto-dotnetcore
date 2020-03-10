@@ -23,5 +23,7 @@ namespace Capnp.Rpc
         /// <param name="access">Path to the desired capability inside the result struct.</param>
         /// <returns>Pipelined low-level capability</returns>
         ConsumedCapability? Access(MemberAccessPath access);
+
+        ConsumedCapability? Access(MemberAccessPath access, Task<IDisposable> proxyTask);
     }
 }

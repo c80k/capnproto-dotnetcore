@@ -42,7 +42,11 @@ namespace Capnp
         {
             var mb = MessageBuilder.Create();
             if (state.Caps != null)
+            {
                 mb.InitCapTable();
+                foreach (var cap in state.Caps)
+                    cap?.AddRef();
+            }
             var sstate = mb.CreateObject<DynamicSerializerState>();
             Reserializing.DeepCopy(state, sstate);
 

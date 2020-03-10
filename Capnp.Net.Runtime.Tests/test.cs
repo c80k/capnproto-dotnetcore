@@ -17255,7 +17255,11 @@ namespace Capnproto_test.Capnp.Test
         static readonly MemberAccessPath Path_capnproto_test_capnp_test_TestPipeline_getCap_OutBox_Cap = new MemberAccessPath(1U, 0U);
         public static Capnproto_test.Capnp.Test.ITestInterface OutBox_Cap(this Task<(string, Capnproto_test.Capnp.Test.TestPipeline.Box)> task)
         {
-            return (Capnproto_test.Capnp.Test.ITestInterface)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestInterface>(Impatient.GetAnswer(task).Access(Path_capnproto_test_capnp_test_TestPipeline_getCap_OutBox_Cap));
+            async Task<IDisposable> AwaitProxy() => (await task).Item2.Cap;
+
+            return (Capnproto_test.Capnp.Test.ITestInterface)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestInterface>(Impatient.GetAnswer(task).Access(
+                Path_capnproto_test_capnp_test_TestPipeline_getCap_OutBox_Cap,
+                AwaitProxy()));
         }
 
         static readonly MemberAccessPath Path_capnproto_test_capnp_test_TestPipeline_getAnyCap_OutBox_Cap = new MemberAccessPath(1U, 0U);

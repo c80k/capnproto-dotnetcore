@@ -8,15 +8,19 @@ namespace Capnp.Rpc
     {
         readonly uint _remoteId;
         readonly object _reentrancyBlocker = new object();
-        readonly TaskCompletionSource<Proxy> _resolvedCap = new TaskCompletionSource<Proxy>();
+        readonly TaskCompletionSource<ConsumedCapability?> _resolvedCap = new TaskCompletionSource<ConsumedCapability?>();
+        readonly Task<Proxy> _whenResolvedProxy;
         bool _released;
 
         public PromisedCapability(IRpcEndpoint ep, uint remoteId): base(ep)
         {
             _remoteId = remoteId;
+
+            async Task<Proxy> AwaitProxy() => new Proxy(await WhenResolved);
+            _whenResolvedProxy = AwaitProxy();
         }
 
-        public override Task<Proxy> WhenResolved => _resolvedCap.Task;
+        public override Task<ConsumedCapability?> WhenResolved => _resolvedCap.Task;
 
         internal override void Freeze(out IRpcEndpoint? boundEndpoint)
         {
@@ -24,9 +28,11 @@ namespace Capnp.Rpc
             {
                 if (_resolvedCap.Task.IsCompleted && _pendingCallsOnPromise == 0)
                 {
+                    boundEndpoint = null;
+
                     try
                     {
-                        _resolvedCap.Task.Result.Freeze(out boundEndpoint);
+                        _resolvedCap.Task.Result?.Freeze(out boundEndpoint);
                     }
                     catch (AggregateException exception)
                     {
@@ -51,7 +57,7 @@ namespace Capnp.Rpc
             {
                 if (_pendingCallsOnPromise == 0)
                 {
-                    _resolvedCap.Task.Result.Unfreeze();
+                    _resolvedCap.Task.Result?.Unfreeze();
                 }
                 else
                 {
@@ -79,7 +85,8 @@ namespace Capnp.Rpc
                 
                 if (_resolvedCap.Task.ReplacementTaskIsCompletedSuccessfully())
                 {
-                    _resolvedCap.Task.Result.Export(endpoint, writer);
+                    using var proxy = new Proxy(_resolvedCap.Task.Result);
+                    proxy.Export(endpoint, writer);
                 }
                 else
                 {
@@ -147,7 +154,7 @@ namespace Capnp.Rpc
             }
         }
 
-        protected override Proxy? ResolvedCap
+        protected override ConsumedCapability? ResolvedCap
         {
             get
             {
@@ -194,7 +201,7 @@ namespace Capnp.Rpc
 
             lock (_reentrancyBlocker)
             {
-                _resolvedCap.SetResult(new Proxy(resolvedCap));
+                _resolvedCap.SetResult(resolvedCap);
 
                 if (_pendingCallsOnPromise == 0)
                 {
@@ -218,7 +225,7 @@ namespace Capnp.Rpc
 #if false
                 _resolvedCap.SetException(new RpcException(message));
 #else
-                _resolvedCap.SetResult(new Proxy(LazyCapability.CreateBrokenCap(message)));
+                _resolvedCap.SetResult(LazyCapability.CreateBrokenCap(message));
 #endif
 
                 if (_pendingCallsOnPromise == 0)
@@ -234,7 +241,7 @@ namespace Capnp.Rpc
             }
         }
 
-        protected override void ReleaseRemotely()
+        protected async override void ReleaseRemotely()
         {
             if (!_released)
             {
@@ -243,7 +250,8 @@ namespace Capnp.Rpc
 
             _ep.ReleaseImport(_remoteId);
 
-            this.DisposeWhenResolved();
+            try { using var _ = await _whenResolvedProxy; }
+            catch { }
         }
 
         protected override Call.WRITER SetupMessage(DynamicSerializerState args, ulong interfaceId, ushort methodId)

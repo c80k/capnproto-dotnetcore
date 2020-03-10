@@ -10,6 +10,14 @@ namespace Capnp.Rpc
     /// </summary>
     public class Proxy : IDisposable, IResolvingCapability
     {
+        public static T Share<T>(T obj) where T: class
+        {
+            if (obj is Proxy proxy)
+                return proxy.Cast<T>(false);
+            else
+                return BareProxy.FromImpl(obj).Cast<T>(true);
+        }
+
 #if DebugFinalizers
         ILogger Logger { get; } = Logging.CreateLogger<Proxy>();
 #endif
@@ -19,18 +27,13 @@ namespace Capnp.Rpc
         /// <summary>
         /// Will eventually give the resolved capability, if this is a promised capability.
         /// </summary>
-        public Task<Proxy> WhenResolved
+        public Task<ConsumedCapability?> WhenResolved
         {
             get
             {
-                if (ConsumedCap is IResolvingCapability resolving)
-                {
-                    return resolving.WhenResolved;
-                }
-                else
-                {
-                    return Task.FromResult(this);
-                }
+                return ConsumedCap is IResolvingCapability resolving ? 
+                    resolving.WhenResolved : 
+                    Task.FromResult(ConsumedCap);
             }
         }
 
@@ -139,20 +142,15 @@ namespace Capnp.Rpc
             {
                 if (disposing)
                 {
-                    ConsumedCap?.Release();
+                    ConsumedCap?.Release(false);
                 }
                 else
                 {
                     // When called from the Finalizer, we must not throw.
                     // But when reference counting goes wrong, ConsumedCapability.Release() will throw an InvalidOperationException.
                     // The only option here is to suppress that exception.
-                    try
-                    {
-                        ConsumedCap?.Release();
-                    }
-                    catch
-                    {
-                    }
+                    try { ConsumedCap?.Release(false); }
+                    catch { }
                 }
 
                 _disposedValue = true;

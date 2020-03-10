@@ -92,19 +92,19 @@ namespace Capnp
             switch (items)
             {
                 case T[] array:
-                    array.CopyTo(Span);
+                    array.CopyTo(Data);
                     break;
 
                 case ArraySegment<T> segment:
-                    segment.AsSpan().CopyTo(Span);
+                    segment.AsSpan().CopyTo(Data);
                     break;
 
                 case ListOfPrimitivesDeserializer<T> deser:
-                    deser.Span.CopyTo(Span);
+                    deser.Span.CopyTo(Data);
                     break;
 
                 case ListOfPrimitivesSerializer<T> ser:
-                    ser.Span.CopyTo(Span);
+                    ser.Data.CopyTo(Data);
                     break;
 
                 default:
@@ -116,12 +116,18 @@ namespace Capnp
             }
         }
 
+        IEnumerable<T> Enumerate()
+        {
+            for (int i = 0; i < Data.Length; i++)
+                yield return Data[i];
+        }
+
         /// <summary>
         /// Implements <see cref="IEnumerable{T}"/>.
         /// </summary>
         /// <returns></returns>
         public IEnumerator<T> GetEnumerator() => Enumerate().GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() => Span.ToArray().GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

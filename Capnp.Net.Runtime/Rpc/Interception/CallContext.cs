@@ -25,10 +25,10 @@ namespace Capnp.Rpc.Interception
             public Task<DeserializerState> WhenReturned => _futureResult.Task;
             public CancellationToken CancelFromAlice => _cancelFromAlice.Token;
 
-            async Task<Proxy> AccessWhenReturned(MemberAccessPath access)
+            async Task<ConsumedCapability?> AccessWhenReturned(MemberAccessPath access)
             {
                 await WhenReturned;
-                return new Proxy(Access(access));
+                return Access(access);
             }
 
             public ConsumedCapability? Access(MemberAccessPath access)
@@ -47,6 +47,27 @@ namespace Capnp.Rpc.Interception
                 else
                 {
                     return new LazyCapability(AccessWhenReturned(access));
+                }
+            }
+
+            public ConsumedCapability? Access(MemberAccessPath _, Task<IDisposable> task)
+            {
+                var proxyTask = task.AsProxyTask();
+
+                if (proxyTask.IsCompleted)
+                {
+                    try
+                    {
+                        return proxyTask.Result?.ConsumedCap;
+                    }
+                    catch (AggregateException exception)
+                    {
+                        throw exception.InnerException!;
+                    }
+                }
+                else
+                {
+                    return new LazyCapability(proxyTask);
                 }
             }
 

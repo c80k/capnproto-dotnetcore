@@ -16,7 +16,7 @@ namespace Capnp.Rpc
         ILogger Logger { get; } = Logging.CreateLogger<RemoteResolvingCapability>();
 #endif
 
-        public abstract Task<Proxy> WhenResolved { get; }
+        public abstract Task<ConsumedCapability?> WhenResolved { get; }
 
         protected RemoteResolvingCapability(IRpcEndpoint ep) : base(ep)
         {
@@ -25,7 +25,7 @@ namespace Capnp.Rpc
         protected int _pendingCallsOnPromise;
         Task? _disembargo;
 
-        protected abstract Proxy? ResolvedCap { get; }
+        protected abstract ConsumedCapability? ResolvedCap { get; }
 
         protected abstract void GetMessageTarget(MessageTarget.WRITER wr);
 
@@ -46,7 +46,7 @@ namespace Capnp.Rpc
                         throw new NotImplementedException("Sorry, level 3 RPC is not yet supported.");
                     }
 
-                    if (ResolvedCap.IsNull ||
+                    if (ResolvedCap == null ||
                         // If the capability resolves to null, disembargo must not be requested.
                         // Take the direct path, well-knowing that the call will result in an exception.
 
@@ -65,7 +65,8 @@ namespace Capnp.Rpc
 #if DebugEmbargos
                 Logger.LogDebug("Direct call");
 #endif
-                        return ResolvedCap.Call(interfaceId, methodId, args, default);
+                        using var proxy = new Proxy(ResolvedCap);
+                        return proxy.Call(interfaceId, methodId, args, default);
                     }
                     else
                     {
@@ -93,7 +94,8 @@ namespace Capnp.Rpc
 
                             cancellationTokenSource.Token.ThrowIfCancellationRequested();
 
-                            return ResolvedCap.Call(interfaceId, methodId, args, default);
+                            using var proxy = new Proxy(ResolvedCap);
+                            return proxy.Call(interfaceId, methodId, args, default);
 
                         }, TaskContinuationOptions.ExecuteSynchronously);
 

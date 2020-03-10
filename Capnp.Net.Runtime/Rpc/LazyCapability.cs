@@ -8,32 +8,45 @@ namespace Capnp.Rpc
     {
         public static LazyCapability CreateBrokenCap(string message)
         {
-            var cap = new LazyCapability(Task.FromException<Proxy>(new RpcException(message)));
+            var cap = new LazyCapability(Task.FromException<ConsumedCapability?>(new RpcException(message)));
             cap.AddRef(); // Instance shall be persistent
             return cap;
         }
 
         public static LazyCapability CreateCanceledCap(CancellationToken token)
         {
-            var cap = new LazyCapability(Task.FromCanceled<Proxy>(token));
+            var cap = new LazyCapability(Task.FromCanceled<ConsumedCapability?>(token));
             cap.AddRef(); // Instance shall be persistent
             return cap;
         }
 
         public static LazyCapability Null { get; } = CreateBrokenCap("Null capability");
 
-        public LazyCapability(Task<Proxy> capabilityTask)
+        readonly Task<Proxy>? _proxyTask;
+
+        public LazyCapability(Task<ConsumedCapability?> capabilityTask)
         {
             WhenResolved = capabilityTask;
+        }
+
+        public LazyCapability(Task<Proxy> proxyTask)
+        {
+            _proxyTask = proxyTask;
+
+            async Task<ConsumedCapability?> AwaitCap() => (await _proxyTask!).ConsumedCap;
+
+            WhenResolved = AwaitCap();
         }
 
         internal override void Freeze(out IRpcEndpoint? boundEndpoint)
         {
             if (WhenResolved.IsCompleted)
             {
+                boundEndpoint = null;
+
                 try
                 {
-                    WhenResolved.Result.Freeze(out boundEndpoint);
+                    WhenResolved.Result?.Freeze(out boundEndpoint);
                 }
                 catch (AggregateException exception)
                 {
@@ -54,7 +67,8 @@ namespace Capnp.Rpc
         {
             if (WhenResolved.ReplacementTaskIsCompletedSuccessfully())
             {
-                WhenResolved.Result.Export(endpoint, writer);
+                using var proxy = new Proxy(WhenResolved.Result);
+                proxy.Export(endpoint, writer);
             }
             else
             {
@@ -62,24 +76,21 @@ namespace Capnp.Rpc
             }
         }
 
-        async void DisposeProxyWhenResolved()
-        {
-            try
-            {
-                var cap = await WhenResolved;
-                if (cap != null) cap.Dispose();
-            }
-            catch
-            {
-            }
-        }
-
         protected override void ReleaseRemotely()
         {
-            DisposeProxyWhenResolved();
+            if (_proxyTask != null)
+            {
+                async void DisposeProxyWhenResolved()
+                {
+                    try { using var _ = await _proxyTask!; }
+                    catch { }
+                }
+
+                DisposeProxyWhenResolved();
+            }
         }
 
-        public Task<Proxy> WhenResolved { get; }
+        public Task<ConsumedCapability?> WhenResolved { get; }
 
         async Task<DeserializerState> CallImpl(ulong interfaceId, ushort methodId, DynamicSerializerState args, CancellationToken cancellationToken)
         {
@@ -90,7 +101,8 @@ namespace Capnp.Rpc
             if (cap == null)
                 throw new RpcException("Broken capability");
 
-            var call = cap.Call(interfaceId, methodId, args, default);
+            using var proxy = new Proxy(cap);
+            var call = proxy.Call(interfaceId, methodId, args, default);
             var whenReturned = call.WhenReturned;
 
             using (var registration = cancellationToken.Register(call.Dispose))

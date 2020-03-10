@@ -38,10 +38,8 @@ namespace Capnp.Rpc
                 {
                     try
                     {
-                        using (var registration = cancellationToken.Register(promisedAnswer.Dispose))
-                        {
-                            await promisedAnswer.WhenReturned;
-                        }
+                        using var registration = cancellationToken.Register(promisedAnswer.Dispose);
+                        await promisedAnswer.WhenReturned;
                     }
                     catch
                     {
@@ -54,10 +52,8 @@ namespace Capnp.Rpc
             }
             else
             {
-                using (var registration = cancellationToken.Register(promisedAnswer.Dispose))
-                {
-                    return (DynamicSerializerState)await promisedAnswer.WhenReturned;
-                }
+                using var registration = cancellationToken.Register(promisedAnswer.Dispose);
+                return (DynamicSerializerState)await promisedAnswer.WhenReturned;
             }
         }
 
