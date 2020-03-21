@@ -132,6 +132,9 @@ namespace Capnp.Rpc
             public long SendCount => Interlocked.Read(ref _sendCount);
             public long RecvCount => Interlocked.Read(ref _recvCount);
 
+            public int ImportedCapabilityCount => _importTable.Count;
+            public int ExportedCapabilityCount => _exportTable.Count;
+
             void Tx(WireFrame frame)
             {
                 try

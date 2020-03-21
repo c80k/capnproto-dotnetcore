@@ -25,5 +25,10 @@ namespace Capnp.Rpc
             [System.Runtime.CompilerServices.CallerMemberName] string methodName = "", 
             [System.Runtime.CompilerServices.CallerFilePath] string filePath = "", 
             [System.Runtime.CompilerServices.CallerLineNumber] int lineNumber = 0);
+
+#if DebugFinalizers
+        internal Proxy? OwningProxy { get; set; }
+        internal ConsumedCapability? ResolvingCap { get; set; }
+#endif
     }
 }

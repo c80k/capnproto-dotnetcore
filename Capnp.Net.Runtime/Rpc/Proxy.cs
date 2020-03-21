@@ -120,6 +120,11 @@ namespace Capnp.Rpc
 
             ConsumedCap = cap;
             cap.AddRef();
+
+#if DebugFinalizers
+            if (ConsumedCap != null)
+                ConsumedCap.OwningProxy = this;
+#endif
         }
 
         internal Skeleton? GetProvider()

@@ -139,5 +139,32 @@ namespace Capnp.Net.Runtime.Tests
         {
             NewLocalhostTcpTestbed().RunTest(Testsuite.CallBrokenPromise);
         }
+
+        [TestMethod]
+        public void BootstrapReuse()
+        {
+            (var server, var client) = SetupClientServerPair();
+
+            var counters = new Counters();
+            var impl = new TestInterfaceImpl(counters);
+
+            using (server)
+            using (client)
+            {
+                client.WhenConnected.Wait();
+
+                server.Main = impl;
+                for (int i = 0; i < 10; i++)
+                {
+                    using (var main = client.GetMain<ITestMoreStuff>())
+                    {
+                        ((Proxy)main).WhenResolved.Wait(MediumNonDbgTimeout);
+                    }
+                    Assert.IsFalse(impl.IsDisposed);
+                }
+            }
+
+            Assert.IsTrue(impl.IsDisposed);
+        }
     }
 }

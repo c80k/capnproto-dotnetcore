@@ -203,6 +203,9 @@ namespace Capnp.Rpc
 
             lock (_reentrancyBlocker)
             {
+#if DebugFinalizers
+                resolvedCap.ResolvingCap = this;
+#endif
                 _resolvedCap.SetResult(resolvedCap);
 
                 if (_pendingCallsOnPromise == 0)
@@ -247,10 +250,9 @@ namespace Capnp.Rpc
         {
             if (!_released)
             {
+                _released = true;
                 _ep.ReleaseImport(_remoteId);
             }
-
-            _ep.ReleaseImport(_remoteId);
 
             try { using var _ = await _whenResolvedProxy; }
             catch { }

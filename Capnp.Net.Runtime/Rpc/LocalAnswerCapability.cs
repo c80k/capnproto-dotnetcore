@@ -7,6 +7,15 @@ namespace Capnp.Rpc
 
     class LocalAnswerCapability : RefCountingCapability, IResolvingCapability
     {
+        static async Task<Proxy> TransferOwnershipToDummyProxy(Task<DeserializerState> answer, MemberAccessPath access)
+        {
+            var result = await answer;
+            var cap = access.Eval(result);
+            var proxy = new Proxy(cap);
+            cap?.Release(false);
+            return proxy;
+        }
+
         readonly Task<Proxy> _whenResolvedProxy;
 
         public LocalAnswerCapability(Task<Proxy> proxyTask)
@@ -15,6 +24,12 @@ namespace Capnp.Rpc
 
             async Task<ConsumedCapability?> AwaitResolved() => (await _whenResolvedProxy).ConsumedCap;
             WhenResolved = AwaitResolved();
+        }
+
+        public LocalAnswerCapability(Task<DeserializerState> answer, MemberAccessPath access):
+            this(TransferOwnershipToDummyProxy(answer, access))
+        {
+
         }
 
         internal override void Freeze(out IRpcEndpoint? boundEndpoint)

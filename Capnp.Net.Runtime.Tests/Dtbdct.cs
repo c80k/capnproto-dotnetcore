@@ -92,5 +92,11 @@ namespace Capnp.Net.Runtime.Tests
         {
             NewDtbdctTestbed().RunTest(Testsuite.Basic);
         }
+
+        [TestMethod]
+        public void BootstrapReuse()
+        {
+            NewDtbdctTestbed().RunTest(Testsuite.BootstrapReuse);
+        }
     }
 }

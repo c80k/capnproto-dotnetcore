@@ -263,6 +263,8 @@ namespace Capnp.Rpc
                 SafeJoin(connection.PumpRunner);
             }
 
+            _rpcEngine.BootstrapCap = null;
+
             GC.SuppressFinalize(this);
         }
 

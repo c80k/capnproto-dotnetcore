@@ -420,8 +420,11 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
 
         public void Dispose()
         {
-            _tcs?.SetResult(0);
+            _tcs?.TrySetResult(0);
+            IsDisposed = true;
         }
+
+        public bool IsDisposed { get; private set; }
 
         public virtual Task<string> Foo(uint i, bool j, CancellationToken cancellationToken)
         {
@@ -512,20 +515,26 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
 
         public async Task<(string, TestPipeline.AnyBox)> GetAnyCap(uint n, BareProxy inCap, CancellationToken cancellationToken_)
         {
-            Interlocked.Increment(ref _counters.CallCount);
-            Assert.AreEqual(234u, n);
-            var s = await inCap.Cast<ITestInterface>(true).Foo(123, true, cancellationToken_);
-            Assert.AreEqual("foo", s);
-            return ("bar", new TestPipeline.AnyBox() { Cap = BareProxy.FromImpl(new TestExtendsImpl(_counters)) });
+            using (inCap)
+            {
+                Interlocked.Increment(ref _counters.CallCount);
+                Assert.AreEqual(234u, n);
+                var s = await inCap.Cast<ITestInterface>(true).Foo(123, true, cancellationToken_);
+                Assert.AreEqual("foo", s);
+                return ("bar", new TestPipeline.AnyBox() { Cap = BareProxy.FromImpl(new TestExtendsImpl(_counters)) });
+            }
         }
 
         public async Task<(string, TestPipeline.Box)> GetCap(uint n, ITestInterface inCap, CancellationToken cancellationToken_)
         {
-            Interlocked.Increment(ref _counters.CallCount);
-            Assert.AreEqual(234u, n);
-            var s = await inCap.Foo(123, true, cancellationToken_);
-            Assert.AreEqual("foo", s);
-            return ("bar", new TestPipeline.Box() { Cap = new TestExtendsImpl(_counters) });
+            using (inCap)
+            {
+                Interlocked.Increment(ref _counters.CallCount);
+                Assert.AreEqual(234u, n);
+                var s = await inCap.Foo(123, true, cancellationToken_);
+                Assert.AreEqual("foo", s);
+                return ("bar", new TestPipeline.Box() { Cap = new TestExtendsImpl(_counters) });
+            }
         }
 
         public Task TestPointers(ITestInterface cap, object obj, IReadOnlyList<ITestInterface> list, CancellationToken cancellationToken_)
@@ -558,8 +567,11 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
 
         public async Task<(string, TestPipeline.Box)> GetCap(uint n, ITestInterface inCap, CancellationToken cancellationToken_ = default)
         {
-            await _deblock;
-            return ("hello", new TestPipeline.Box() { Cap = _timpl2 });
+            using (inCap)
+            {
+                await _deblock;
+                return ("hello", new TestPipeline.Box() { Cap = _timpl2 });
+            }
         }
 
         public Task TestPointers(ITestInterface cap, object obj, IReadOnlyList<ITestInterface> list, CancellationToken cancellationToken_ = default)
@@ -661,10 +673,15 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
 
         public void Dispose()
         {
+            IsDisposed = true;
         }
+
+        public bool IsDisposed { get; private set; }
 
         public Task<TestTailCallee.TailResult> Foo(int i, string t, CancellationToken cancellationToken_)
         {
+            Assert.IsFalse(IsDisposed);
+
             Interlocked.Increment(ref _counters.CallCount);
 
             var result = new TestTailCallee.TailResult()
@@ -710,9 +727,12 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
         public async Task<string> CallFooWhenResolved(ITestInterface cap, CancellationToken cancellationToken_)
         {
             Interlocked.Increment(ref _counters.CallCount);
-            await ((Proxy)cap).WhenResolved;
-            string s = await cap.Foo(123, true, cancellationToken_);
-            Assert.AreEqual("foo", s);
+            using (cap)
+            {
+                await ((Proxy)cap).WhenResolved;
+                string s = await cap.Foo(123, true, cancellationToken_);
+                Assert.AreEqual("foo", s);
+            }
             return "bar";
         }
 

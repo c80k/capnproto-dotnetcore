@@ -92,35 +92,11 @@ namespace Capnp.Rpc
             return answer;
         }
 
-        static async Task<Proxy> AwaitProxy<T>(Task<T> task) where T: class
+        public static ConsumedCapability? Access(Task task, MemberAccessPath access, Task<IDisposable?> proxyTask)
         {
-            T item;
-
-            try
-            {
-                item = await task;
-            }
-            catch (TaskCanceledException exception)
-            {
-                return new Proxy(LazyCapability.CreateCanceledCap(exception.CancellationToken));
-            }
-            catch (System.Exception exception)
-            {
-                return new Proxy(LazyCapability.CreateBrokenCap(exception.Message));
-            }
-
-            switch (item)
-            {
-                case Proxy proxy:
-                    return proxy;
-
-                case null:
-                    return CapabilityReflection.CreateProxy<T>(null);
-            }
-
-            var skel = Skeleton.GetOrCreateSkeleton(item!, false);
-            var localCap = LocalCapability.Create(skel);
-            return CapabilityReflection.CreateProxy<T>(localCap);
+            var answer = TryGetAnswer(task);
+            if (answer != null) return answer.Access(access, proxyTask);
+            return new LazyCapability(proxyTask.AsProxyTask());
         }
 
         /// <summary>
@@ -138,9 +114,9 @@ namespace Capnp.Rpc
         /// quality as capability interface.</exception>
         [Obsolete("Call Eager<TInterface>(task, true) instead")]
         public static TInterface PseudoEager<TInterface>(this Task<TInterface> task)
-            where TInterface : class
+            where TInterface : class, IDisposable
         {
-            var lazyCap = new LazyCapability(AwaitProxy(task));
+            var lazyCap = new LazyCapability(task.AsProxyTask());
             return (CapabilityReflection.CreateProxy<TInterface>(lazyCap) as TInterface)!;
         }
 
@@ -177,7 +153,7 @@ namespace Capnp.Rpc
                     throw new ArgumentException("The task was not returned from a remote method invocation. See documentation for details.");
                 }
 
-                var lazyCap = new LazyCapability(AwaitProxy(task));
+                var lazyCap = new LazyCapability(task.AsProxyTask());
                 return (CapabilityReflection.CreateProxy<TInterface>(lazyCap) as TInterface)!;
             }
             else

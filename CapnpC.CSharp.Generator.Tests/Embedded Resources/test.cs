@@ -16717,21 +16717,21 @@ namespace Capnproto_test.Capnp.Test
         public static Capnproto_test.Capnp.Test.ITestInterface OutBox_Cap(this Task<(string, Capnproto_test.Capnp.Test.TestPipeline.Box)> task)
         {
             async Task<IDisposable> AwaitProxy() => (await task).Item2?.Cap;
-            return (Capnproto_test.Capnp.Test.ITestInterface)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestInterface>(Impatient.GetAnswer(task).Access(Path_capnproto_test_capnp_test_TestPipeline_getCap_OutBox_Cap, AwaitProxy()));
+            return (Capnproto_test.Capnp.Test.ITestInterface)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestInterface>(Impatient.Access(task, Path_capnproto_test_capnp_test_TestPipeline_getCap_OutBox_Cap, AwaitProxy()));
         }
 
         static readonly MemberAccessPath Path_capnproto_test_capnp_test_TestPipeline_getAnyCap_OutBox_Cap = new MemberAccessPath(1U, 0U);
         public static BareProxy OutBox_Cap(this Task<(string, Capnproto_test.Capnp.Test.TestPipeline.AnyBox)> task)
         {
             async Task<IDisposable> AwaitProxy() => (await task).Item2?.Cap;
-            return (BareProxy)CapabilityReflection.CreateProxy<BareProxy>(Impatient.GetAnswer(task).Access(Path_capnproto_test_capnp_test_TestPipeline_getAnyCap_OutBox_Cap, AwaitProxy()));
+            return (BareProxy)CapabilityReflection.CreateProxy<BareProxy>(Impatient.Access(task, Path_capnproto_test_capnp_test_TestPipeline_getAnyCap_OutBox_Cap, AwaitProxy()));
         }
 
         static readonly MemberAccessPath Path_capnproto_test_capnp_test_TestTailCallee_foo_C = new MemberAccessPath(1U);
         public static Capnproto_test.Capnp.Test.ITestCallOrder C(this Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> task)
         {
             async Task<IDisposable> AwaitProxy() => (await task).C;
-            return (Capnproto_test.Capnp.Test.ITestCallOrder)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestCallOrder>(Impatient.GetAnswer(task).Access(Path_capnproto_test_capnp_test_TestTailCallee_foo_C, AwaitProxy()));
+            return (Capnproto_test.Capnp.Test.ITestCallOrder)CapabilityReflection.CreateProxy<Capnproto_test.Capnp.Test.ITestCallOrder>(Impatient.Access(task, Path_capnproto_test_capnp_test_TestTailCallee_foo_C, AwaitProxy()));
         }
     }
 }

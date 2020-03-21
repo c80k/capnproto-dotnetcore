@@ -34,9 +34,23 @@ namespace Capnp.Rpc
             return null;
         }
 
-        public static async Task<Proxy> AsProxyTask(this Task<IDisposable?> task)
+        public static async Task<Proxy> AsProxyTask<T>(this Task<T> task) 
+            where T: IDisposable?
         {
-            var obj = await task;
+            IDisposable? obj;
+            try
+            {
+                obj = await task;
+            }
+            catch (TaskCanceledException exception)
+            {
+                return new Proxy(LazyCapability.CreateCanceledCap(exception.CancellationToken));
+            }
+            catch (System.Exception exception)
+            {
+                return new Proxy(LazyCapability.CreateBrokenCap(exception.Message));
+            }
+
             switch (obj)
             {
                 case Proxy proxy: return proxy;

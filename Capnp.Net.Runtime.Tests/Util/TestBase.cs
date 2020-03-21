@@ -147,6 +147,35 @@ namespace Capnp.Net.Runtime.Tests
             public int Channel2SendCount => _channel2.FrameCounter;
         }
 
+        protected class LocalTestbed : ITestbed, ITestController
+        {
+            long ITestbed.ClientSendCount => 0;
+
+            public void RunTest(Action<ITestbed> action)
+            {
+                action(this);
+            }
+
+            T ITestbed.ConnectMain<T>(T main)
+            {
+                return main;
+            }
+
+            void ITestbed.FlushCommunication()
+            {
+            }
+
+            void ITestbed.MustComplete(params Task[] tasks)
+            {
+                Assert.IsTrue(Task.WhenAll(tasks).IsCompleted);
+            }
+
+            void ITestbed.MustNotComplete(params Task[] tasks)
+            {
+                Assert.IsFalse(Task.WhenAny(tasks).IsCompleted);
+            }
+        }
+
         protected class DtbdctTestbed : ITestbed, ITestController
         {
             readonly DecisionTree _decisionTree = new DecisionTree();
@@ -154,7 +183,20 @@ namespace Capnp.Net.Runtime.Tests
 
             public void RunTest(Action<ITestbed> action)
             {
-                _decisionTree.Iterate(() => action(this));
+                _decisionTree.Iterate(() => {
+                    
+                    action(this);
+                    _enginePair.FlushChannels(() => false);
+                    
+                    Assert.AreEqual(0, _enginePair.Endpoint1.ExportedCapabilityCount);
+                    Assert.AreEqual(0, _enginePair.Endpoint1.ImportedCapabilityCount);
+                    Assert.AreEqual(0, _enginePair.Endpoint2.ExportedCapabilityCount);
+                    Assert.AreEqual(0, _enginePair.Endpoint2.ImportedCapabilityCount);
+                    
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    GC.Collect();
+                });
             }
 
             T ITestbed.ConnectMain<T>(T main)
@@ -289,6 +331,8 @@ namespace Capnp.Net.Runtime.Tests
 
         protected static DtbdctTestbed NewDtbdctTestbed() => new DtbdctTestbed();
         protected static LocalhostTcpTestbed NewLocalhostTcpTestbed() => new LocalhostTcpTestbed();
+
+        protected static LocalTestbed NewLocalTestbed() => new LocalTestbed();
 
         [TestInitialize]
         public void InitConsoleLogging()

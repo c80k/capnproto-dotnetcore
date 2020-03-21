@@ -767,5 +767,29 @@ namespace Capnp.Net.Runtime.Tests
                 CollectionAssert.AreEqual(expected[i], voids[i].ToArray());
             }
         }
+
+        [TestMethod]
+        public void ListOfEmpty()
+        {
+            var expected = new TestEnum[] { TestEnum.bar, TestEnum.baz, TestEnum.corge };
+
+            var b = MessageBuilder.Create();
+            var loes = b.CreateObject<ListOfEmptySerializer>();
+            loes.Init(12345678);
+            DeserializerState d = loes;
+            var ld = d.RequireList();
+            Assert.AreEqual(ListKind.ListOfEmpty, ld.Kind);
+            if (!(ld is ListOfEmptyDeserializer loed))
+            {
+                Assert.Fail("List did not deserialize back to ListOfEmptyDeserializer");
+                return;
+            }
+            Assert.AreEqual(12345678, loed.Count);
+            Assert.ThrowsException<IndexOutOfRangeException>(() => { var _ = loed[-1]; });
+            Assert.ThrowsException<IndexOutOfRangeException>(() => { var _ = loed[12345678]; });
+            _ = loed[12345677];
+            var kind = loed.Cast(_ => _.Kind).Take(1).Single();
+            Assert.AreEqual(ObjectKind.Nil, kind);
+        }
     }
 }

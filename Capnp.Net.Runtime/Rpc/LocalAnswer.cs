@@ -27,7 +27,7 @@ namespace Capnp.Rpc
 
         public ConsumedCapability Access(MemberAccessPath access)
         {
-            return new LocalAnswerCapabilityDeprecated(WhenReturned, access);
+            return new LocalAnswerCapability(WhenReturned, access);
         }
 
         public ConsumedCapability Access(MemberAccessPath _, Task<IDisposable?> task)

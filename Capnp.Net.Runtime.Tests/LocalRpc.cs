@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Capnp.Net.Runtime.Tests
 {
     [TestClass]
-    public class LocalRpc
+    public class LocalRpc: TestBase
     {
         [TestMethod]
         public void DeferredLocalAnswer()
@@ -28,6 +28,90 @@ namespace Capnp.Net.Runtime.Tests
                 Assert.IsTrue(foo.Wait(TestBase.MediumNonDbgTimeout));
                 Assert.AreEqual("bar", foo.Result);
             }
+        }
+
+        [TestMethod]
+        public void Embargo()
+        {
+            NewLocalTestbed().RunTest(Testsuite.Embargo);
+        }
+
+        [TestMethod]
+        public void EmbargoError()
+        {
+            NewLocalTestbed().RunTest(Testsuite.EmbargoError);
+        }
+
+        [TestMethod]
+        public void EmbargoNull()
+        {
+            NewLocalTestbed().RunTest(Testsuite.EmbargoNull);
+        }
+
+        [TestMethod]
+        public void CallBrokenPromise()
+        {
+            NewLocalTestbed().RunTest(Testsuite.CallBrokenPromise);
+        }
+
+        [TestMethod]
+        public void TailCall()
+        {
+            NewLocalTestbed().RunTest(Testsuite.TailCall);
+        }
+
+        [TestMethod]
+        public void SendTwice()
+        {
+            NewLocalTestbed().RunTest(Testsuite.SendTwice);
+        }
+
+        [TestMethod]
+        public void Cancel()
+        {
+            NewLocalTestbed().RunTest(Testsuite.Cancel);
+        }
+
+        [TestMethod]
+        public void RetainAndRelease()
+        {
+            NewLocalTestbed().RunTest(Testsuite.RetainAndRelease);
+        }
+
+        [TestMethod]
+        public void PromiseResolve()
+        {
+            NewLocalTestbed().RunTest(Testsuite.PromiseResolve);
+        }
+
+        [TestMethod]
+        public void Cancelation()
+        {
+            NewLocalTestbed().RunTest(Testsuite.Cancelation);
+        }
+
+        [TestMethod]
+        public void ReleaseOnCancel()
+        {
+            NewLocalTestbed().RunTest(Testsuite.ReleaseOnCancel);
+        }
+
+        [TestMethod]
+        public void Release()
+        {
+            NewLocalTestbed().RunTest(Testsuite.Release);
+        }
+
+        [TestMethod]
+        public void Pipeline()
+        {
+            NewLocalTestbed().RunTest(Testsuite.Pipeline);
+        }
+
+        [TestMethod]
+        public void Basic()
+        {
+            NewLocalTestbed().RunTest(Testsuite.Basic);
         }
     }
 }

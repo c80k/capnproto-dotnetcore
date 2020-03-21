@@ -2,6 +2,7 @@
 using Capnp.Net.Runtime.Tests.GenImpls;
 using Capnp.Rpc;
 using Capnproto_test.Capnp.Test;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -63,20 +64,24 @@ namespace Capnp.Net.Runtime.Tests
 
                 try
                 {
-                    _currentProcess.StandardError.ReadToEndAsync().ContinueWith(t => Console.Error.WriteLine(t.Result));
-                    var firstLine = _currentProcess.StandardOutput.ReadLineAsync();
-                    Assert.IsTrue(firstLine.Wait(MediumNonDbgTimeout), "Problem after launching test process");
-                    Assert.IsNotNull(firstLine.Result, "Problem after launching test process");
-                    Assert.IsTrue(firstLine.Result.StartsWith("Listening") || firstLine.Result.StartsWith("Connecting"), 
-                        "Problem after launching test process");
+                    try
+                    {
+                        _currentProcess.StandardError.ReadToEndAsync().ContinueWith(t => Console.Error.WriteLine(t.Result));
+                        var firstLine = _currentProcess.StandardOutput.ReadLineAsync();
+                        Assert.IsTrue(firstLine.Wait(MediumNonDbgTimeout), "Problem after launching test process");
+                        Assert.IsNotNull(firstLine.Result, "Problem after launching test process");
+                        Assert.IsTrue(firstLine.Result.StartsWith("Listening") || firstLine.Result.StartsWith("Connecting"),
+                            "Problem after launching test process");
+                    }
+                    catch (AssertFailedException exception)
+                    {
+                        Logger.LogError(exception.Message);
+                        return false;
+                    }
 
                     test(_currentProcess.StandardOutput);
 
                     return true;
-                }
-                catch (AssertFailedException)
-                {
-                    return false;
                 }
                 finally
                 {
@@ -220,6 +225,7 @@ namespace Capnp.Net.Runtime.Tests
                 {
                     AssertOutput(stdout, "Pipelining test start");
                     AssertOutput(stdout, "foo 123 1");
+                    AssertOutput(stdout, "~");
                     AssertOutput(stdout, "Pipelining test end");
                     Assert.AreEqual(3, counters.CallCount);
                 });
@@ -342,17 +348,19 @@ namespace Capnp.Net.Runtime.Tests
                         for (int i = 0; i < iterationCount; i++)
                         {
                             var task = main.GetHandle(default);
-                            taskList.Add(task.ContinueWith(t =>
+                            async Task TerminateAnswer()
                             {
                                 try
                                 {
-                                    t.Result.Dispose();
+                                    using (var proxy = await task)
+                                    {
+                                    }
                                 }
-                                catch (AggregateException ex) when (ex.InnerException is TaskCanceledException)
+                                catch (TaskCanceledException)
                                 {
                                 }
-                            }));
-                            Impatient.GetAnswer(task).Dispose();
+                            }
+                            taskList.Add(TerminateAnswer());
                         }
 
                         // Ensure that all answers return (probably in canceled state)
@@ -558,6 +566,7 @@ namespace Capnp.Net.Runtime.Tests
                     AssertOutput(stdout, "PromiseResolve test start");
                     AssertOutput(stdout, "foo 123 1");
                     AssertOutput(stdout, "foo 123 1");
+                    AssertOutput(stdout, "~");
                     AssertOutput(stdout, "PromiseResolve test end");
                     Assert.AreEqual(3, counters.CallCount);
                 });

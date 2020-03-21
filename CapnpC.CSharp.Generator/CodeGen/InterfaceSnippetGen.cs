@@ -931,21 +931,16 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                             InvocationExpression(
                                                 MemberAccessExpression(
                                                     SyntaxKind.SimpleMemberAccessExpression,
+                                                    IdentifierName(nameof(Capnp.Rpc.Impatient)),
+                                                    IdentifierName(nameof(Capnp.Rpc.Impatient.Access))))
+                                            .AddArgumentListArguments(
+                                                Argument(
+                                                    _names.TaskParameter.IdentifierName),
+                                                Argument(
+                                                    accessPath.IdentifierName),
+                                                Argument(
                                                     InvocationExpression(
-                                                        MemberAccessExpression(
-                                                            SyntaxKind.SimpleMemberAccessExpression,
-                                                            IdentifierName(nameof(Capnp.Rpc.Impatient)),
-                                                            IdentifierName(nameof(Capnp.Rpc.Impatient.GetAnswer))))
-                                                    .AddArgumentListArguments(
-                                                        Argument(
-                                                            _names.TaskParameter.IdentifierName)),
-                                                    IdentifierName(nameof(Capnp.Rpc.IPromisedAnswer.Access))))
-                                                .AddArgumentListArguments(
-                                                    Argument(
-                                                        accessPath.IdentifierName),
-                                                    Argument(
-                                                        InvocationExpression(
-                                                            _names.AwaitProxy.IdentifierName))))))));
+                                                        _names.AwaitProxy.IdentifierName))))))));
 
                     yield return pathDecl;
                     yield return methodDecl;

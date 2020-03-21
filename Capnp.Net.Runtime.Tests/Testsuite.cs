@@ -60,8 +60,8 @@ namespace Capnp.Net.Runtime.Tests
 
             using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
             {
-                var resolving = main as IResolvingCapability;
-                testbed.MustComplete(resolving.WhenResolved);
+                if (main is IResolvingCapability resolving)
+                    testbed.MustComplete(resolving.WhenResolved);
 
                 var cap = new TestCallOrderImpl();
                 cap.CountToDispose = 6;
@@ -70,7 +70,7 @@ namespace Capnp.Net.Runtime.Tests
 
                 var echo = main.Echo(cap, default);
                 testbed.MustComplete(Task.CompletedTask);
-                using (var pipeline = echo.Eager())
+                using (var pipeline = echo.Eager(true))
                 {
                     var call0 = pipeline.GetCallSequence(0, default);
                     var call1 = pipeline.GetCallSequence(1, default);
@@ -120,15 +120,15 @@ namespace Capnp.Net.Runtime.Tests
             var impl = new TestMoreStuffImpl(counters);
             using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
             {
-                var resolving = main as IResolvingCapability;
-                testbed.MustComplete(resolving.WhenResolved);
+                if (main is IResolvingCapability resolving)
+                    testbed.MustComplete(resolving.WhenResolved);
 
                 var cap = new TaskCompletionSource<ITestCallOrder>();
 
                 var earlyCall = main.GetCallSequence(0, default);
                 var echo = main.Echo(cap.Task.Eager(true), default);
 
-                using (var pipeline = echo.Eager())
+                using (var pipeline = echo.Eager(true))
                 {
                     var call0 = pipeline.GetCallSequence(0, default);
                     var call1 = pipeline.GetCallSequence(1, default);
@@ -161,20 +161,21 @@ namespace Capnp.Net.Runtime.Tests
             var impl = new TestMoreStuffImpl(counters);
             using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
             {
-                var resolving = main as IResolvingCapability;
-                testbed.MustComplete(resolving.WhenResolved);
+                if (main is IResolvingCapability resolving)
+                    testbed.MustComplete(resolving.WhenResolved);
 
                 var promise = main.GetNull(default);
 
-                var cap = promise.Eager();
+                using (var cap = promise.Eager(true))
+                {
+                    var call0 = cap.GetCallSequence(0, default);
 
-                var call0 = cap.GetCallSequence(0, default);
+                    testbed.MustComplete(promise);
 
-                testbed.MustComplete(promise);
+                    var call1 = cap.GetCallSequence(1, default);
 
-                var call1 = cap.GetCallSequence(1, default);
-
-                testbed.ExpectPromiseThrows(call0, call1);
+                    testbed.ExpectPromiseThrows(call0, call1);
+                }
 
                 // Verify that we're still connected (there were no protocol errors).
                 testbed.MustComplete(main.GetCallSequence(1, default));
@@ -184,11 +185,11 @@ namespace Capnp.Net.Runtime.Tests
         public static void CallBrokenPromise(ITestbed testbed)
         {
             var counters = new Counters();
-            var impl = new TestMoreStuffImpl(counters);
+            using (var impl = new TestMoreStuffImpl(counters))
             using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
             {
-                var resolving = main as IResolvingCapability;
-                testbed.MustComplete(resolving.WhenResolved);
+                if (main is IResolvingCapability resolving)
+                    testbed.MustComplete(resolving.WhenResolved);
 
                 var tcs = new TaskCompletionSource<ITestInterface>();
 
@@ -231,6 +232,7 @@ namespace Capnp.Net.Runtime.Tests
 
                     testbed.MustComplete(dependentCall0, dependentCall1, dependentCall2);
 
+                    Assert.IsTrue(callee.IsDisposed);
                     Assert.AreEqual(1, counters.CallCount);
                     Assert.AreEqual(1, calleeCallCount.CallCount);
                 }
@@ -313,7 +315,7 @@ namespace Capnp.Net.Runtime.Tests
             var destructionTask = destructionPromise.Task;
 
             var counters = new Counters();
-            var impl = new TestMoreStuffImpl(counters);
+            using (var impl = new TestMoreStuffImpl(counters))
             using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
             {
                 var holdTask = main.Hold(new TestInterfaceImpl(new Counters(), destructionPromise), default);
@@ -366,12 +368,6 @@ namespace Capnp.Net.Runtime.Tests
                     // Can't be destroyed, we haven't released it.
                     Assert.IsFalse(destructionTask.IsCompleted);
                 }
-
-                // In deviation from original test, we have null the held capability on the main interface.
-                // This is because the main interface is the bootstrap capability and, as such, won't be disposed
-                // after disconnect.
-                var holdNullTask = main.Hold(null, default);
-                testbed.MustComplete(holdNullTask);
             }
 
             testbed.MustComplete(destructionTask);
@@ -384,26 +380,27 @@ namespace Capnp.Net.Runtime.Tests
             using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
             {
                 var tcs = new TaskCompletionSource<ITestInterface>();
-                var eager = tcs.Task.Eager(true);
+                using (var eager = tcs.Task.Eager(true))
+                {
+                    var request = main.CallFoo(Proxy.Share(eager), default);
+                    var request2 = main.CallFooWhenResolved(eager, default);
 
-                var request = main.CallFoo(eager, default);
-                var request2 = main.CallFooWhenResolved(eager, default);
+                    var gcs = main.GetCallSequence(0, default);
+                    testbed.MustComplete(gcs);
+                    Assert.AreEqual(2u, gcs.Result);
+                    Assert.AreEqual(3, counters.CallCount);
 
-                var gcs = main.GetCallSequence(0, default);
-                testbed.MustComplete(gcs);
-                Assert.AreEqual(2u, gcs.Result);
-                Assert.AreEqual(3, counters.CallCount);
+                    var chainedCallCount = new Counters();
+                    var tiimpl = new TestInterfaceImpl(chainedCallCount);
+                    tcs.SetResult(tiimpl);
 
-                var chainedCallCount = new Counters();
-                var tiimpl = new TestInterfaceImpl(chainedCallCount);
-                tcs.SetResult(tiimpl);
+                    testbed.MustComplete(request, request2);
 
-                testbed.MustComplete(request, request2);
-
-                Assert.AreEqual("bar", request.Result);
-                Assert.AreEqual("bar", request2.Result);
-                Assert.AreEqual(3, counters.CallCount);
-                Assert.AreEqual(2, chainedCallCount.CallCount);
+                    Assert.AreEqual("bar", request.Result);
+                    Assert.AreEqual("bar", request2.Result);
+                    Assert.AreEqual(3, counters.CallCount);
+                    Assert.AreEqual(2, chainedCallCount.CallCount);
+                }
             }
         }
 
@@ -488,15 +485,18 @@ namespace Capnp.Net.Runtime.Tests
                 using (var outBox = request.OutBox_Cap())
                 {
                     var pipelineRequest = outBox.Foo(321, false, default);
-                    var pipelineRequest2 = ((Proxy)outBox).Cast<ITestExtends>(false).Grault(default);
+                    using (var testx = ((Proxy)outBox).Cast<ITestExtends>(false))
+                    {
+                        var pipelineRequest2 = testx.Grault(default);
 
-                    testbed.MustComplete(pipelineRequest, pipelineRequest2);
+                        testbed.MustComplete(pipelineRequest, pipelineRequest2);
 
-                    Assert.AreEqual("bar", pipelineRequest.Result);
-                    Common.CheckTestMessage(pipelineRequest2.Result);
+                        Assert.AreEqual("bar", pipelineRequest.Result);
+                        Common.CheckTestMessage(pipelineRequest2.Result);
 
-                    Assert.AreEqual(3, counters.CallCount);
-                    Assert.AreEqual(1, chainedCallCount.CallCount);
+                        Assert.AreEqual(3, counters.CallCount);
+                        Assert.AreEqual(1, chainedCallCount.CallCount);
+                    }
                 }
             }
         }
@@ -517,6 +517,19 @@ namespace Capnp.Net.Runtime.Tests
 
                 Assert.AreEqual("foo", request1.Result);
                 Assert.AreEqual(2, counters.CallCount);
+            }
+        }
+
+        public static void BootstrapReuse(ITestbed testbed)
+        {
+            var counters = new Counters();
+            var impl = new TestInterfaceImpl(counters);
+            for (int i = 0; i < 10; i++)
+            {
+                using (var main = testbed.ConnectMain<ITestInterface>(impl))
+                {
+                }
+                Assert.IsFalse(impl.IsDisposed);
             }
         }
     }
