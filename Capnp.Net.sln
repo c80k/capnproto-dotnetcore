@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Capnp.Net.Runtime", "Capnp.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "capnpc-csharp", "capnpc-csharp\capnpc-csharp.csproj", "{D19E5EA7-D35B-4A1F-99CB-ED136316B577}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Capnp.Net.Runtime.Tests.Std20", "Capnp.Net.Runtime.Tests\Capnp.Net.Runtime.Tests.Std20.csproj", "{9ED38750-F83F-4B10-B3A3-4FD6183F9E86}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Capnp.Net.Runtime.Tests", "Capnp.Net.Runtime.Tests\Capnp.Net.Runtime.Tests.csproj", "{9ED38750-F83F-4B10-B3A3-4FD6183F9E86}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapnpC.CSharp.Generator.Tests", "CapnpC.CSharp.Generator.Tests\CapnpC.CSharp.Generator.Tests.csproj", "{B77AC567-E232-4072-85C3-8689566BF3D4}"
 EndProject

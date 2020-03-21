@@ -25,9 +25,7 @@ before_build:
   - cmd: dotnet --version
   - cmd: msbuild -ver
   - cmd: dotnet restore ./Capnp.Net.Runtime/Capnp.Net.Runtime.csproj --verbosity m
-  - cmd: dotnet restore ./Capnp.Net.Runtime.Core21/Capnp.Net.Runtime.Core21.csproj --verbosity m
-  - cmd: dotnet restore ./Capnp.Net.Runtime.Tests/Capnp.Net.Runtime.Tests.Std20.csproj --verbosity m
-  - cmd: dotnet restore ./Capnp.Net.Runtime.Tests.Core21/Capnp.Net.Runtime.Tests.Core21.csproj --verbosity m
+  - cmd: dotnet restore ./Capnp.Net.Runtime.Tests/Capnp.Net.Runtime.Tests.csproj --verbosity m
   - cmd: dotnet restore ./CapnpC.CSharp.Generator/CapnpC.CSharp.Generator.csproj --verbosity m  
   - cmd: dotnet restore ./CapnpC.CSharp.Generator.Tests/CapnpC.CSharp.Generator.Tests.csproj --verbosity m  
   - cmd: dotnet restore ./CapnpC.CSharp.MsBuild.Generation/CapnpC.CSharp.MsBuild.Generation.csproj --verbosity m  
@@ -87,10 +85,10 @@ test_script:
       msbuild ./MsBuildGenerationTest/MsBuildGenerationTest.sln /p:Configuration="Debug" /p:PackageReferenceVersion="%VERSION%"
       vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Debug\net471\Capnp.Net.Runtime.Tests.Std20.dll
       vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\net471\Capnp.Net.Runtime.Tests.Std20.dll
-      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests.Core21\bin\Debug\netcoreapp2.1\Capnp.Net.Runtime.Tests.Core21.dll
-      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests.Core21\bin\Release\netcoreapp2.1\Capnp.Net.Runtime.Tests.Core21.dll
+      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Debug\netcoreapp2.1\Capnp.Net.Runtime.Tests.Core21.dll
+      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\netcoreapp2.1\Capnp.Net.Runtime.Tests.Core21.dll
       powershell -File .\scripts\measure-coverage.ps1
-      csmacnz.Coveralls --multiple -i "opencover=coverage\cov-Capnp.Net.Runtime-dnc21.xml;opencover=coverage\cov-Capnp.Net.Runtime-net471.xml;opencover=coverage\cov-CapnpC.CSharp.Generator.xml" --repoToken %COVERALLS_REPO_TOKEN%
+      csmacnz.Coveralls --multiple -i "opencover=coverage\cov-Capnp.Net.Runtime.xml;opencover=coverage\cov-CapnpC.CSharp.Generator.xml" --repoToken %COVERALLS_REPO_TOKEN%
 on_finish :
   # any cleanup in here
 deploy:
