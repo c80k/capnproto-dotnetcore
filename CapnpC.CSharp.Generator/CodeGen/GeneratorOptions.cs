@@ -37,6 +37,7 @@
         public string TaskParameterName { get; set; } = "task";
         public string EagerMethodName { get; set; } = "Eager";
         public string TypeIdFieldName { get; set; } = "typeId";
+        public string AwaitProxyName { get; set; } = "AwaitProxy";
         public bool NullableEnableDefault { get; set; } = false;
     }
 }

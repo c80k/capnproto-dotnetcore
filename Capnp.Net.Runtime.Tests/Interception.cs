@@ -78,13 +78,13 @@ namespace Capnp.Net.Runtime.Tests
                     Assert.IsTrue(fcc.Wait(MediumNonDbgTimeout));
                     var cc = fcc.Result;
 
-                    var pr = new Capnproto_test.Capnp.Test.TestInterface.Params_foo.READER(cc.InArgs);
+                    var pr = new Capnproto_test.Capnp.Test.TestInterface.Params_Foo.READER(cc.InArgs);
                     Assert.AreEqual(123u, pr.I);
 
                     cc.ForwardToBob();
 
                     Assert.IsTrue(policy.Returns.ReceiveAsync().Wait(MediumNonDbgTimeout));
-                    var rr = new Capnproto_test.Capnp.Test.TestInterface.Result_foo.READER(cc.OutArgs);
+                    var rr = new Capnproto_test.Capnp.Test.TestInterface.Result_Foo.READER(cc.OutArgs);
                     Assert.AreEqual("foo", rr.X);
 
                     cc.ReturnToAlice();
@@ -117,11 +117,11 @@ namespace Capnp.Net.Runtime.Tests
 
                     Assert.AreEqual(InterceptionState.RequestedFromAlice, cc.State);
 
-                    var pr = new Capnproto_test.Capnp.Test.TestInterface.Params_foo.READER(cc.InArgs);
+                    var pr = new Capnproto_test.Capnp.Test.TestInterface.Params_Foo.READER(cc.InArgs);
                     Assert.AreEqual(321u, pr.I);
                     Assert.AreEqual(false, pr.J);
 
-                    var pw = cc.InArgs.Rewrap<Capnproto_test.Capnp.Test.TestInterface.Params_foo.WRITER>();
+                    var pw = cc.InArgs.Rewrap<Capnproto_test.Capnp.Test.TestInterface.Params_Foo.WRITER>();
                     pw.I = 123u;
                     pw.J = true;
 
@@ -133,12 +133,12 @@ namespace Capnp.Net.Runtime.Tests
                     Assert.IsTrue(cc.State == InterceptionState.ForwardedToBob || rx.IsCompleted);
 
                     Assert.IsTrue(rx.Wait(MediumNonDbgTimeout));
-                    var rr = new Capnproto_test.Capnp.Test.TestInterface.Result_foo.READER(cc.OutArgs);
+                    var rr = new Capnproto_test.Capnp.Test.TestInterface.Result_Foo.READER(cc.OutArgs);
                     Assert.AreEqual("foo", rr.X);
 
                     Assert.IsFalse(request1.IsCompleted);
 
-                    var rw = ((DynamicSerializerState)cc.OutArgs).Rewrap<Capnproto_test.Capnp.Test.TestInterface.Result_foo.WRITER>();
+                    var rw = ((DynamicSerializerState)cc.OutArgs).Rewrap<Capnproto_test.Capnp.Test.TestInterface.Result_Foo.WRITER>();
                     rw.X = "bar";
                     cc.OutArgs = rw;
 
@@ -174,7 +174,7 @@ namespace Capnp.Net.Runtime.Tests
                     Assert.IsTrue(policy.Calls.TryReceive(out var cc));
                     Assert.IsFalse(request1.IsCompleted);
 
-                    var rw = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Result_foo.WRITER>();
+                    var rw = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Result_Foo.WRITER>();
                     rw.X = "bar";
                     cc.OutArgs = rw;
 

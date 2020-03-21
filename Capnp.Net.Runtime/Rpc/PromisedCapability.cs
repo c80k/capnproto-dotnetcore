@@ -78,7 +78,7 @@ namespace Capnp.Rpc
             }
         }
 
-        internal override void Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
+        internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {
             lock (_reentrancyBlocker)
             {
@@ -98,7 +98,7 @@ namespace Capnp.Rpc
                         Debug.Assert(!_released);
                         ++_pendingCallsOnPromise;
 
-                        _ep.RequestPostAction(() =>
+                        return () =>
                         {
                             bool release = false;
 
@@ -115,7 +115,7 @@ namespace Capnp.Rpc
                             {
                                 _ep.ReleaseImport(_remoteId);
                             }
-                        });
+                        };
                     }
                     else
                     {
@@ -123,6 +123,8 @@ namespace Capnp.Rpc
                     }
                 }
             }
+
+            return null;
         }
 
         async void TrackCall(Task call)

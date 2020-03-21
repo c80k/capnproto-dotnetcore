@@ -404,8 +404,11 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                 Argument(SimpleLambdaExpression(
                                     Parameter(_names.DeserializerLocal.Identifier),
                                     Block(
-                                        MakeProxyCreateResult(method), 
-                                        MakeProxyReturnResult(method)))));
+                                        UsingStatement(
+                                            Block(  
+                                                MakeProxyCreateResult(method), 
+                                                MakeProxyReturnResult(method)))
+                                        .WithExpression(_names.DeserializerLocal.IdentifierName)))));
 
                     bodyStmts.Add(ReturnStatement(pipelineAwareCall));
                 }
@@ -422,19 +425,18 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         call,
                         IdentifierName(nameof(Capnp.Rpc.IPromisedAnswer.WhenReturned)));
 
-                    var assignAwaited = LocalDeclarationStatement(
-                        VariableDeclaration(
+                    bodyStmts.Add(UsingStatement(
+                        Block(
+                            MakeProxyCreateResult(method),
+                            MakeProxyReturnResult(method)))
+                        .WithDeclaration(VariableDeclaration(
                             IdentifierName("var"))
-                        .AddVariables(
-                            VariableDeclarator(
-                                _names.DeserializerLocal.Identifier)
-                            .WithInitializer(
-                                EqualsValueClause(
-                                    AwaitExpression(whenReturned)))));
-
-                    bodyStmts.Add(assignAwaited);
-                    bodyStmts.Add(MakeProxyCreateResult(method));
-                    bodyStmts.Add(MakeProxyReturnResult(method));
+                                .AddVariables(
+                                    VariableDeclarator(
+                                        _names.DeserializerLocal.Identifier)
+                                    .WithInitializer(
+                                        EqualsValueClause(
+                                            AwaitExpression(whenReturned))))));
                 }
 
                 if (method.GenericParameters.Count > 0)
@@ -703,7 +705,10 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         Parameter(_names.CancellationTokenParameter.Identifier)
                             .WithType(_names.Type<CancellationToken>(Nullability.NonNullable)))
                     .AddBodyStatements(
-                        MakeSkeletonMethodBody(method).ToArray());
+                        UsingStatement(
+                            Block(
+                                MakeSkeletonMethodBody(method).ToArray()))
+                            .WithExpression(_names.DeserializerLocal.IdentifierName));
 
                 if (method.Results.Count == 0)
                 {
@@ -808,6 +813,59 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         readonly HashSet<(string, string)> _existingExtensionMethods = new HashSet<(string, string)>();
 
+        LocalFunctionStatementSyntax MakeLocalAwaitProxyFunction(Method method, IReadOnlyList<Field> path)
+        {
+            var members = new List<Name>();
+            IEnumerable<Field> fields = path;
+
+            if (method.Results.Count >= 2)
+            {
+                int index = Array.IndexOf(method.ResultStruct.Fields.ToArray(), path[0]) + 1;
+                members.Add(new Name($"Item{index}"));
+                fields = path.Skip(1);
+            }
+
+            foreach (var field in fields)
+            {
+                members.Add(_names.GetCodeIdentifier(field));
+            }
+
+            ExpressionSyntax memberAccess = 
+                ParenthesizedExpression(
+                    AwaitExpression(
+                        _names.TaskParameter.IdentifierName));
+
+            memberAccess = MemberAccessExpression(
+                SyntaxKind.SimpleMemberAccessExpression,
+                memberAccess,
+                members.First().IdentifierName);
+
+            foreach (var member in members.Skip(1))
+            {
+                memberAccess = ConditionalAccessExpression(
+                    memberAccess,
+                    MemberBindingExpression(member.IdentifierName));
+            }
+
+            var idisposable = _names.MakeNullableRefType(IdentifierName(nameof(IDisposable)));
+
+            return LocalFunctionStatement(
+                    GenericName(
+                        Identifier(nameof(Task)))
+                    .WithTypeArgumentList(
+                        TypeArgumentList(
+                            SingletonSeparatedList<TypeSyntax>(
+                                idisposable))),
+                    _names.AwaitProxy.Identifier)
+                .WithModifiers(
+                    TokenList(
+                        Token(SyntaxKind.AsyncKeyword)))
+                .WithExpressionBody(
+                    ArrowExpressionClause(memberAccess))
+                .WithSemicolonToken(
+                    Token(SyntaxKind.SemicolonToken));
+        }
+
         public IEnumerable<MemberDeclarationSyntax> MakePipeliningSupport(TypeDefinition type)
         {
             foreach (var method in type.Methods)
@@ -856,6 +914,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                             .AddModifiers(This)
                             .WithType(TransformReturnType(method)))
                         .AddBodyStatements(
+                            MakeLocalAwaitProxyFunction(method, path),
                             ReturnStatement(
                                 CastExpression(
                                     capTypeSyntax,
@@ -883,7 +942,10 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                                     IdentifierName(nameof(Capnp.Rpc.IPromisedAnswer.Access))))
                                                 .AddArgumentListArguments(
                                                     Argument(
-                                                        accessPath.IdentifierName)))))));
+                                                        accessPath.IdentifierName),
+                                                    Argument(
+                                                        InvocationExpression(
+                                                            _names.AwaitProxy.IdentifierName))))))));
 
                     yield return pathDecl;
                     yield return methodDecl;

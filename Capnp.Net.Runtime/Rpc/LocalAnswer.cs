@@ -30,7 +30,7 @@ namespace Capnp.Rpc
             return new LocalAnswerCapabilityDeprecated(WhenReturned, access);
         }
 
-        public ConsumedCapability Access(MemberAccessPath _, Task<IDisposable> task)
+        public ConsumedCapability Access(MemberAccessPath _, Task<IDisposable?> task)
         {
             return new LocalAnswerCapability(task.AsProxyTask());
         }

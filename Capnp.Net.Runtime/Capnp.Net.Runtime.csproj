@@ -29,7 +29,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <DefineConstants>DebugCapabilityLifecycle</DefineConstants>
+    <DefineConstants>DebugFinalizers</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">

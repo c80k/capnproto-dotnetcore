@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,7 +18,23 @@ namespace Capnp.Rpc
         Vine(ConsumedCapability consumedCap)
         {
             Proxy = new Proxy(consumedCap ?? throw new ArgumentNullException(nameof(consumedCap)));
+
+#if DebugFinalizers
+            CreatorStackTrace = Environment.StackTrace;
+#endif
         }
+
+#if DebugFinalizers
+        ~Vine()
+        {
+            Logger.LogWarning($"Caught orphaned Vine, created from here: {CreatorStackTrace}.");
+
+            Dispose(false);
+        }
+
+        ILogger Logger { get; } = Logging.CreateLogger<Vine>();
+        string CreatorStackTrace { get; }
+#endif
 
         internal override void Bind(object impl)
         {

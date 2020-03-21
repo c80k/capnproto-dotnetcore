@@ -37,6 +37,19 @@ namespace Capnp.Rpc
             WhenResolved = AwaitWhenResolved();
         }
 
+        static async Task<Proxy> TransferOwnershipToDummyProxy(PendingQuestion question, MemberAccessPath access)
+        {
+            var result = await question.WhenReturned;
+            var cap = access.Eval(result);
+            var proxy = new Proxy(cap);
+            cap?.Release(false);
+            return proxy;
+        }
+
+        public RemoteAnswerCapability(PendingQuestion question, MemberAccessPath access) : this(question, access, TransferOwnershipToDummyProxy(question, access))
+        {
+        }
+
         async void ReAllowFinishWhenDone(Task task)
         {
             try
@@ -64,7 +77,7 @@ namespace Capnp.Rpc
             {
                 lock (_question.ReentrancyBlocker)
                 {
-                    if (!_question.IsTailCall && WhenResolved.IsCompleted)
+                    if (!_question.IsTailCall && _question.StateFlags.HasFlag(PendingQuestion.State.Returned))
                     {
                         try
                         {
@@ -96,8 +109,8 @@ namespace Capnp.Rpc
         {
             lock (_question.ReentrancyBlocker)
             {
-                if (_question.StateFlags.HasFlag(PendingQuestion.State.Returned) &&
-                    !_question.StateFlags.HasFlag(PendingQuestion.State.TailCall))
+                if (!_question.StateFlags.HasFlag(PendingQuestion.State.TailCall) &&
+                     _question.StateFlags.HasFlag(PendingQuestion.State.Returned))
                 {
                     if (ResolvedCap == null)
                     {
@@ -165,8 +178,9 @@ namespace Capnp.Rpc
         {
             lock (_question.ReentrancyBlocker)
             {
-                if (_question.StateFlags.HasFlag(PendingQuestion.State.Returned) &&
-                    _pendingCallsOnPromise == 0)
+                if ( _question.StateFlags.HasFlag(PendingQuestion.State.Returned) &&
+                    !_question.StateFlags.HasFlag(PendingQuestion.State.TailCall) &&
+                     _pendingCallsOnPromise == 0)
                 {
                     if (ResolvedCap == null)
                     {
@@ -200,7 +214,7 @@ namespace Capnp.Rpc
             }
         }
 
-        internal override void Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
+        internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {
             lock (_question.ReentrancyBlocker)
             {
@@ -236,10 +250,12 @@ namespace Capnp.Rpc
                     }
                     else
                     {
-                        this.ExportAsSenderPromise(endpoint, writer);
+                        return this.ExportAsSenderPromise(endpoint, writer);
                     }
                 }
             }
+
+            return null;
         }
 
         protected async override void ReleaseRemotely()

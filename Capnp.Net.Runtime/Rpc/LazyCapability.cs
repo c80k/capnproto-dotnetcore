@@ -8,19 +8,15 @@ namespace Capnp.Rpc
     {
         public static LazyCapability CreateBrokenCap(string message)
         {
-            var cap = new LazyCapability(Task.FromException<ConsumedCapability?>(new RpcException(message)));
-            cap.AddRef(); // Instance shall be persistent
-            return cap;
+            return new LazyCapability(Task.FromException<ConsumedCapability?>(new RpcException(message)));
         }
 
         public static LazyCapability CreateCanceledCap(CancellationToken token)
         {
-            var cap = new LazyCapability(Task.FromCanceled<ConsumedCapability?>(token));
-            cap.AddRef(); // Instance shall be persistent
-            return cap;
+            return new LazyCapability(Task.FromCanceled<ConsumedCapability?>(token));
         }
 
-        public static LazyCapability Null { get; } = CreateBrokenCap("Null capability");
+        public static LazyCapability Null => CreateBrokenCap("Null capability");
 
         readonly Task<Proxy>? _proxyTask;
 
@@ -63,16 +59,17 @@ namespace Capnp.Rpc
         {
         }
 
-        internal override void Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
+        internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {
             if (WhenResolved.ReplacementTaskIsCompletedSuccessfully())
             {
                 using var proxy = new Proxy(WhenResolved.Result);
                 proxy.Export(endpoint, writer);
+                return null;
             }
             else
             {
-                this.ExportAsSenderPromise(endpoint, writer);
+                return this.ExportAsSenderPromise(endpoint, writer);
             }
         }
 

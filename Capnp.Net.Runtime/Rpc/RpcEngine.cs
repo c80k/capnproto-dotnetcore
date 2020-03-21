@@ -68,7 +68,6 @@ namespace Capnp.Rpc
                 Dismissed
             }
 
-            static readonly ThreadLocal<Action?> _exportCapTablePostActions = new ThreadLocal<Action?>();
             static readonly ThreadLocal<PendingQuestion?> _tailCall = new ThreadLocal<PendingQuestion?>();
             static readonly ThreadLocal<bool> _canDeferCalls = new ThreadLocal<bool>();
 
@@ -386,7 +385,7 @@ namespace Capnp.Rpc
                     }
                 }
 
-                IProvidedCapability? cap;
+                Skeleton? callTargetCap;
                 PendingAnswer pendingAnswer;
                 bool releaseParamCaps = false;
 
@@ -507,7 +506,7 @@ namespace Capnp.Rpc
                     var inParams = req.Params.Content;
                     inParams.Caps = ImportCapTable(req.Params);
 
-                    if (cap == null)
+                    if (callTargetCap == null)
                     {
                         releaseParamCaps = true;
                         pendingAnswer = new PendingAnswer(
@@ -519,7 +518,7 @@ namespace Capnp.Rpc
                         try
                         {
                             var cts = new CancellationTokenSource();
-                            var callTask = cap.Invoke(req.InterfaceId, req.MethodId, inParams, cts.Token);
+                            var callTask = callTargetCap.Invoke(req.InterfaceId, req.MethodId, inParams, cts.Token);
                             pendingAnswer = new PendingAnswer(callTask, cts);
                         }
                         catch (System.Exception exception)
@@ -527,6 +526,10 @@ namespace Capnp.Rpc
                             releaseParamCaps = true;
                             pendingAnswer = new PendingAnswer(
                                 Task.FromException<AnswerOrCounterquestion>(exception), null);
+                        }
+                        finally
+                        {
+                            callTargetCap.Relinquish();
                         }
                     }
 
@@ -561,7 +564,8 @@ namespace Capnp.Rpc
                             {
                                 if (_exportTable.TryGetValue(req.Target.ImportedCap, out var rc))
                                 {
-                                    cap = rc.Cap;
+                                    callTargetCap = rc.Cap;
+                                    callTargetCap.Claim();
                                 }
                                 else
                                 {
@@ -594,7 +598,8 @@ namespace Capnp.Rpc
                                             try
                                             {
                                                 using var proxy = await t;
-                                                cap = proxy?.GetProvider();
+                                                callTargetCap = proxy?.GetProvider();
+                                                callTargetCap?.Claim();
                                                 CreateAnswerAwaitItAndReply();
                                             }
                                             catch (TaskCanceledException)
@@ -631,8 +636,9 @@ namespace Capnp.Rpc
                 {
                     _canDeferCalls.Value = false;
                     Impatient.AskingEndpoint = null;
-                    _tailCall.Value?.Send();
+                    var call = _tailCall.Value;
                     _tailCall.Value = null;
+                    call?.Send();
                 }
             }
 
@@ -948,14 +954,6 @@ namespace Capnp.Rpc
                                 }
                             }
                         }
-
-                        //if (results != null && results.Caps != null)
-                        //{
-                        //    foreach (var cap in results.Caps)
-                        //    {
-                        //        cap?.Release();
-                        //    }
-                        //}
                     }
                     catch
                     {
@@ -1105,7 +1103,7 @@ namespace Capnp.Rpc
 
                 Tx(mb.Frame);
 
-                var main = new RemoteAnswerCapabilityDeprecated(
+                var main = new RemoteAnswerCapability(
                     pendingBootstrap,
                     MemberAccessPath.BootstrapAccess);
 
@@ -1340,7 +1338,9 @@ namespace Capnp.Rpc
                     {
                         foreach (var capDesc in payload.CapTable)
                         {
-                            list.Add(ImportCap(capDesc));
+                            var cap = ImportCap(capDesc);
+                            cap.AddRef();
+                            list.Add(cap);
                         }
                     }
                 }
@@ -1348,20 +1348,13 @@ namespace Capnp.Rpc
                 return list;
             }
 
-            void IRpcEndpoint.RequestPostAction(Action postAction)
-            {
-                _exportCapTablePostActions.Value += postAction;
-            }
-
             void ExportCapTableAndSend(
                 SerializerState state,
                 Payload.WRITER payload)
             {
-                Debug.Assert(_exportCapTablePostActions.Value == null);
-                _exportCapTablePostActions.Value = null;
-
                 payload.CapTable.Init(state.MsgBuilder!.Caps!.Count);
 
+                Action? postAction = null;
                 int i = 0;
                 foreach (var cap in state.MsgBuilder.Caps)
                 {
@@ -1373,7 +1366,7 @@ namespace Capnp.Rpc
                     }
                     else
                     {
-                        cap.Export(this, capDesc);
+                        postAction += cap.Export(this, capDesc);
                         cap.Release(false);
                     }
                 }
@@ -1386,9 +1379,7 @@ namespace Capnp.Rpc
                 // To avoid that situation, calls to "ReExportCapWhenResolved" are queued (and
                 // therefore deferred) to the postAction.
 
-                var pa = _exportCapTablePostActions.Value;
-                _exportCapTablePostActions.Value = null;
-                pa?.Invoke();
+                postAction?.Invoke();
             }
 
             PendingQuestion IRpcEndpoint.BeginQuestion(ConsumedCapability target, SerializerState inParams)

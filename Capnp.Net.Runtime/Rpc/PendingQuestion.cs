@@ -126,17 +126,17 @@ namespace Capnp.Rpc
             lock (ReentrancyBlocker)
             {
                 SetReturned();
-            }
 
-            if (StateFlags.HasFlag(State.TailCall))
-            {
-                _tcs.TrySetException(new RpcException(ReturnDespiteTailCallMessage));
-            }
-            else
-            {
-                if (!_tcs.TrySetResult(results))
+                if (StateFlags.HasFlag(State.TailCall))
                 {
-                    ReleaseOutCaps(results);
+                    _tcs.TrySetException(new RpcException(ReturnDespiteTailCallMessage));
+                }
+                else
+                {
+                    if (!_tcs.TrySetResult(results))
+                    {
+                        ReleaseOutCaps(results);
+                    }
                 }
             }
         }
@@ -146,15 +146,15 @@ namespace Capnp.Rpc
             lock (ReentrancyBlocker)
             {
                 SetReturned();
-            }
 
-            if (!StateFlags.HasFlag(State.TailCall))
-            {
-                _tcs.TrySetException(new RpcException("Peer sent the results of this questions somewhere else. This was not expected and is a protocol error."));
-            }
-            else
-            {
-                _tcs.TrySetResult(default);
+                if (!StateFlags.HasFlag(State.TailCall))
+                {
+                    _tcs.TrySetException(new RpcException("Peer sent the results of this questions somewhere else. This was not expected and is a protocol error."));
+                }
+                else
+                {
+                    _tcs.TrySetResult(default);
+                }
             }
         }
 
@@ -163,9 +163,9 @@ namespace Capnp.Rpc
             lock (ReentrancyBlocker)
             {
                 SetReturned();
-            }
 
-            _tcs.TrySetException(new RpcException(exception.Reason));
+                _tcs.TrySetException(new RpcException(exception.Reason));
+            }
         }
 
         internal void OnException(System.Exception exception)
@@ -173,9 +173,9 @@ namespace Capnp.Rpc
             lock (ReentrancyBlocker)
             {
                 SetReturned();
-            }
 
-            _tcs.TrySetException(exception);
+                _tcs.TrySetException(exception);
+            }
         }
 
         internal void OnCanceled()
@@ -183,9 +183,9 @@ namespace Capnp.Rpc
             lock (ReentrancyBlocker)
             {
                 SetReturned();
-            }
 
-            _tcs.TrySetCanceled();
+                _tcs.TrySetCanceled();
+            }
         }
 
         void DeleteMyQuestion()
@@ -234,6 +234,7 @@ namespace Capnp.Rpc
         /// <param name="access">Access path</param>
         /// <returns>Low-level capability</returns>
         /// <exception cref="DeserializationException">The referenced member does not exist or does not resolve to a capability pointer.</exception>
+        [Obsolete("Please re-generate. Replaced by Access(MemberAccessPath access, Task<IDisposable> task)")]
         public ConsumedCapability? Access(MemberAccessPath access)
         {
             lock (ReentrancyBlocker)
@@ -252,7 +253,7 @@ namespace Capnp.Rpc
                 }
                 else
                 {
-                    return new RemoteAnswerCapabilityDeprecated(this, access);
+                    return new RemoteAnswerCapability(this, access);
                 }
             }
         }
@@ -261,32 +262,14 @@ namespace Capnp.Rpc
         /// Refer to a (possibly nested) member of this question's (possibly future) result and return
         /// it as a capability.
         /// </summary>
+        /// <param name="access">Access path</param>
         /// <param name="task">promises the cap whose ownership is transferred to this object</param>
         /// <returns>Low-level capability</returns>
         /// <exception cref="DeserializationException">The referenced member does not exist or does not resolve to a capability pointer.</exception>
-        public ConsumedCapability? Access(MemberAccessPath access, Task<IDisposable> task)
+        public ConsumedCapability? Access(MemberAccessPath access, Task<IDisposable?> task)
         {
             var proxyTask = task.AsProxyTask();
-
-            lock (ReentrancyBlocker)
-            {
-                if (proxyTask.IsCompleted && !StateFlags.HasFlag(State.TailCall))
-                {
-                    try
-                    {
-                        using var proxy = proxyTask.Result;
-                        return proxy.ConsumedCap;
-                    }
-                    catch (AggregateException exception)
-                    {
-                        throw exception.InnerException!;
-                    }
-                }
-                else
-                {
-                    return new RemoteAnswerCapabilityDeprecated(this, access);
-                }
-            }
+            return new RemoteAnswerCapability(this, access, proxyTask);
         }
 
         static void ReleaseCaps(ConsumedCapability? target, SerializerState? inParams)

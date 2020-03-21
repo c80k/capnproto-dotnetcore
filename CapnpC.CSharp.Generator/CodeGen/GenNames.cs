@@ -72,6 +72,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
         public string PipeliningExtensionsClassFormat { get; }
         public string ProxyClassFormat { get; }
         public string SkeletonClassFormat { get; }
+        public Name AwaitProxy { get; }
         public bool NullableEnable { get; set; }
         public GenNames(GeneratorOptions options)
         {
@@ -110,6 +111,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
             PipeliningExtensionsClassFormat = options.PipeliningExtensionsClassFormat;
             ProxyClassFormat = options.ProxyClassFormat;
             SkeletonClassFormat = options.SkeletonClassFormat;
+            AwaitProxy = new Name(options.AwaitProxyName);
         }
 
         public Name MakeTypeName(TypeDefinition def, NameUsage usage = NameUsage.Default)

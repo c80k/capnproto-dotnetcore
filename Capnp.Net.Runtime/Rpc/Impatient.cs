@@ -94,7 +94,20 @@ namespace Capnp.Rpc
 
         static async Task<Proxy> AwaitProxy<T>(Task<T> task) where T: class
         {
-            var item = await task;
+            T item;
+
+            try
+            {
+                item = await task;
+            }
+            catch (TaskCanceledException exception)
+            {
+                return new Proxy(LazyCapability.CreateCanceledCap(exception.CancellationToken));
+            }
+            catch (System.Exception exception)
+            {
+                return new Proxy(LazyCapability.CreateBrokenCap(exception.Message));
+            }
 
             switch (item)
             {
@@ -124,14 +137,11 @@ namespace Capnp.Rpc
         /// <exception cref="InvalidCapabilityInterfaceException"><typeparamref name="TInterface"/> did not
         /// quality as capability interface.</exception>
         [Obsolete("Call Eager<TInterface>(task, true) instead")]
-        public static TInterface PseudoEager<TInterface>(this Task<TInterface> task,
-            [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0)
+        public static TInterface PseudoEager<TInterface>(this Task<TInterface> task)
             where TInterface : class
         {
             var lazyCap = new LazyCapability(AwaitProxy(task));
-            return (CapabilityReflection.CreateProxy<TInterface>(lazyCap, memberName, sourceFilePath, sourceLineNumber) as TInterface)!;
+            return (CapabilityReflection.CreateProxy<TInterface>(lazyCap) as TInterface)!;
         }
 
         static readonly MemberAccessPath Path_OneAndOnly = new MemberAccessPath(0U);
@@ -157,7 +167,7 @@ namespace Capnp.Rpc
         /// <exception cref="MemberAccessException">Caller does not have permission to invoke the Proxy constructor.</exception>
         /// <exception cref="TypeLoadException">Problem with building the Proxy type, or problem with loading some dependent class.</exception>
         public static TInterface Eager<TInterface>(this Task<TInterface> task, bool allowNoPipeliningFallback = false)
-            where TInterface : class
+            where TInterface : class, IDisposable
         {
             var answer = TryGetAnswer(task);
             if (answer == null)
@@ -172,7 +182,12 @@ namespace Capnp.Rpc
             }
             else
             {
-                return (CapabilityReflection.CreateProxy<TInterface>(answer.Access(Path_OneAndOnly)) as TInterface)!;
+                async Task<IDisposable?> AsDisposableTask()
+                {
+                    return await task;
+                }
+
+                return (CapabilityReflection.CreateProxy<TInterface>(answer.Access(Path_OneAndOnly, AsDisposableTask())) as TInterface)!;
             }
         }
 

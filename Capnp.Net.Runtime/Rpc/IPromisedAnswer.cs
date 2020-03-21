@@ -24,6 +24,6 @@ namespace Capnp.Rpc
         /// <returns>Pipelined low-level capability</returns>
         ConsumedCapability? Access(MemberAccessPath access);
 
-        ConsumedCapability? Access(MemberAccessPath access, Task<IDisposable> proxyTask);
+        ConsumedCapability? Access(MemberAccessPath access, Task<IDisposable?> proxyTask);
     }
 }

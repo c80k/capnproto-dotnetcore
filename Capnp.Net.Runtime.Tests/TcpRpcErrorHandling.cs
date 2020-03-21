@@ -127,7 +127,7 @@ namespace Capnp.Net.Runtime.Tests
                 _.Call.Target.ImportedCap = bootCapId;
                 _.Call.InterfaceId = ((TypeIdAttribute)typeof(ITestInterface).GetCustomAttributes(typeof(TypeIdAttribute), false)[0]).Id;
                 _.Call.MethodId = 0;
-                _.Call.Params.Content.Rewrap<TestInterface.Params_foo.WRITER>();
+                _.Call.Params.Content.Rewrap<TestInterface.Params_Foo.WRITER>();
             });
             tester.ExpectAbort();
         }
@@ -154,7 +154,7 @@ namespace Capnp.Net.Runtime.Tests
                 _.Call.Target.ImportedCap = bootCapId;
                 _.Call.InterfaceId = ((TypeIdAttribute)typeof(ITestInterface).GetCustomAttributes(typeof(TypeIdAttribute), false)[0]).Id;
                 _.Call.MethodId = 0;
-                var wr = _.Call.Params.Content.Rewrap<TestInterface.Params_foo.WRITER>();
+                var wr = _.Call.Params.Content.Rewrap<TestInterface.Params_Foo.WRITER>();
                 wr.I = 123u;
                 wr.J = true;
             });
@@ -168,7 +168,7 @@ namespace Capnp.Net.Runtime.Tests
                 _.Call.Target.ImportedCap = bootCapId;
                 _.Call.InterfaceId = ((TypeIdAttribute)typeof(ITestInterface).GetCustomAttributes(typeof(TypeIdAttribute), false)[0]).Id;
                 _.Call.MethodId = 0;
-                _.Call.Params.Content.Rewrap<TestInterface.Params_foo.WRITER>();
+                _.Call.Params.Content.Rewrap<TestInterface.Params_Foo.WRITER>();
             });
             tester.ExpectAbort();
         }
@@ -565,7 +565,7 @@ namespace Capnp.Net.Runtime.Tests
                 _.Call.Target.ImportedCap = bootCapId;
                 _.Call.InterfaceId = new TestPipeline_Skeleton().InterfaceId;
                 _.Call.MethodId = 0;
-                var wr = _.Call.Params.Content.Rewrap<TestPipeline.Params_getCap.WRITER>();
+                var wr = _.Call.Params.Content.Rewrap<TestPipeline.Params_GetCap.WRITER>();
                 wr.InCap = null;
                 _.Call.Params.CapTable.Init(1);
                 _.Call.Params.CapTable[0].which = CapDescriptor.WHICH.ReceiverHosted;

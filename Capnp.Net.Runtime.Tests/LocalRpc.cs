@@ -20,12 +20,14 @@ namespace Capnp.Net.Runtime.Tests
             var tcs = new TaskCompletionSource<int>();
             var impl = new TestPipelineImpl2(tcs.Task);
             var bproxy = BareProxy.FromImpl(impl);
-            var proxy = bproxy.Cast<ITestPipeline>(true);
-            var cap = proxy.GetCap(0, null).OutBox_Cap();
-            var foo = cap.Foo(123, true);
-            tcs.SetResult(0);
-            Assert.IsTrue(foo.Wait(TestBase.MediumNonDbgTimeout));
-            Assert.AreEqual("bar", foo.Result);
+            using (var proxy = bproxy.Cast<ITestPipeline>(true))
+            using (var cap = proxy.GetCap(0, null).OutBox_Cap())
+            {
+                var foo = cap.Foo(123, true);
+                tcs.SetResult(0);
+                Assert.IsTrue(foo.Wait(TestBase.MediumNonDbgTimeout));
+                Assert.AreEqual("bar", foo.Result);
+            }
         }
     }
 }

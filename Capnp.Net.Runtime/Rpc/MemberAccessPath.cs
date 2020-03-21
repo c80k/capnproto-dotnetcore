@@ -132,7 +132,7 @@ namespace Capnp.Rpc
             {
                 if (state.Kind == ObjectKind.Nil)
                 {
-                    return default(DeserializerState);
+                    return default;
                 }
 
                 if (state.Kind != ObjectKind.Struct)

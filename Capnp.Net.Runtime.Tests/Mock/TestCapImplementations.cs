@@ -574,18 +574,17 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
     class TestCallOrderImpl : ITestCallOrder
     {
         readonly object _lock = new object();
+        uint _counter;
 
         ILogger Logger { get; } = Logging.CreateLogger<TestCallOrderImpl>();
-
-        public uint Count { get; set; }
 
         public uint? CountToDispose { get; set; }
 
         public void Dispose()
         {
             lock (_lock)
-            {
-                Assert.IsTrue(!CountToDispose.HasValue || Count == CountToDispose, "Must not dispose at this point");
+            {                
+                Assert.IsTrue(!CountToDispose.HasValue || _counter == CountToDispose, $"Must not dispose at this point: {_counter} {Thread.CurrentThread.Name}");
             }
         }
 
@@ -593,7 +592,18 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
         {
             lock (_lock)
             {
-                return Task.FromResult(Count++);
+                return Task.FromResult(_counter++);
+            }
+        }
+
+        public uint Count
+        {
+            get
+            {
+                lock (_lock)
+                {
+                    return _counter;
+                }
             }
         }
     }
@@ -749,7 +759,7 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
         public Task<ITestInterface> GetHeld(CancellationToken cancellationToken_)
         {
             Interlocked.Increment(ref _counters.CallCount);
-            return Task.FromResult(ClientToHold);
+            return Task.FromResult(Proxy.Share(ClientToHold));
         }
 
         public Task<ITestMoreStuff> GetNull(CancellationToken cancellationToken_)

@@ -54,10 +54,11 @@ namespace Capnp.Rpc
             return new LocalAnswer(cts, AwaitAnswer(call));
         }
 
-        internal override void Export(IRpcEndpoint endpoint, CapDescriptor.WRITER capDesc)
+        internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER capDesc)
         {
             capDesc.which = CapDescriptor.WHICH.SenderHosted;
             capDesc.SenderHosted = endpoint.AllocateExport(ProvidedCap, out bool _);
+            return null;
         }
 
         internal override void Freeze(out IRpcEndpoint? boundEndpoint)

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 namespace Capnp.Rpc
 {
+#if false
 
     class RemoteAnswerCapabilityDeprecated : RemoteResolvingCapability
     {
@@ -17,7 +18,6 @@ namespace Capnp.Rpc
 
         readonly PendingQuestion _question;
         readonly MemberAccessPath _access;
-        readonly Task<Proxy> _whenResolvedProxy;
         ConsumedCapability? _resolvedCap;
 
         public RemoteAnswerCapabilityDeprecated(PendingQuestion question, MemberAccessPath access): base(question.RpcEndpoint)
@@ -36,9 +36,6 @@ namespace Capnp.Rpc
             }
 
             WhenResolved = AwaitWhenResolved();
-
-            async Task<Proxy> AwaitProxy() => new Proxy(await WhenResolved);
-            _whenResolvedProxy = AwaitProxy();
         }
 
         async void ReAllowFinishWhenDone(Task task)
@@ -59,16 +56,6 @@ namespace Capnp.Rpc
                     --_pendingCallsOnPromise;
                     _question.AllowFinish();
                 }
-            }
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-
-            lock (_question.ReentrancyBlocker)
-            {
-                using var _ = new Proxy(_resolvedCap);
             }
         }
 
@@ -258,8 +245,9 @@ namespace Capnp.Rpc
 
         protected async override void ReleaseRemotely()
         {
-            try { using var _ = await _whenResolvedProxy; }
+            try {  (await WhenResolved)?.Release(false); }
             catch { }
         }
     }
+#endif
 }

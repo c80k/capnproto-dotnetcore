@@ -1,4 +1,6 @@
-﻿namespace Capnp.Rpc
+﻿using System;
+
+namespace Capnp.Rpc
 {
     /// <summary>
     /// Low-level capability which as imported from a remote peer.
@@ -35,7 +37,7 @@
         {
         }
 
-        internal override void Export(IRpcEndpoint endpoint, CapDescriptor.WRITER capDesc)
+        internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER capDesc)
         {
             if (endpoint == _ep)
             {
@@ -47,6 +49,7 @@
                 capDesc.which = CapDescriptor.WHICH.SenderHosted;
                 capDesc.SenderHosted = endpoint.AllocateExport(Vine.Create(this), out var _);
             }
+            return null;
         }
     }
 }

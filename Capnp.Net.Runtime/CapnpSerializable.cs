@@ -160,6 +160,7 @@ namespace Capnp
         /// <returns>The domain object instance. Nullability note: The returned reference may be null if
         /// <paramref name="state"/> represents the nil object.</returns>
         /// <exception cref="ArgumentException">Cannot construct object of type <typeparamref name="T"/></exception>
+        /// <remarks>Note that capability ownership is moved to the domain object</remarks>
         public static T? Create<T>(DeserializerState state)
             where T: class
         {

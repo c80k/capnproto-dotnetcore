@@ -1,4 +1,6 @@
-﻿namespace Capnp.Rpc.Interception
+﻿using System;
+
+namespace Capnp.Rpc.Interception
 {
     class CensorCapability : RefCountingCapability
     {
@@ -26,10 +28,11 @@
             return cc.Answer;
         }
 
-        internal override void Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
+        internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {
             writer.which = CapDescriptor.WHICH.SenderHosted;
             writer.SenderHosted = endpoint.AllocateExport(MyVine, out bool _);
+            return null;
         }
 
         internal override void Freeze(out IRpcEndpoint? boundEndpoint)

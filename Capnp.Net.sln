@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "capnpc-csharp", "capnpc-csh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Capnp.Net.Runtime.Tests.Std20", "Capnp.Net.Runtime.Tests\Capnp.Net.Runtime.Tests.Std20.csproj", "{9ED38750-F83F-4B10-B3A3-4FD6183F9E86}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Capnp.Net.Runtime.Tests.Core21", "Capnp.Net.Runtime.Tests.Core21\Capnp.Net.Runtime.Tests.Core21.csproj", "{58E8FFC8-D207-4B0F-842A-58ED9D3D9EEF}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapnpC.CSharp.Generator.Tests", "CapnpC.CSharp.Generator.Tests\CapnpC.CSharp.Generator.Tests.csproj", "{B77AC567-E232-4072-85C3-8689566BF3D4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapnpC.CSharp.MsBuild.Generation", "CapnpC.CSharp.MsBuild.Generation\CapnpC.CSharp.MsBuild.Generation.csproj", "{1EFC1F20-C7BB-4F44-8BF9-DBB123AACCF4}"
@@ -37,10 +35,6 @@ Global
 		{9ED38750-F83F-4B10-B3A3-4FD6183F9E86}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9ED38750-F83F-4B10-B3A3-4FD6183F9E86}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9ED38750-F83F-4B10-B3A3-4FD6183F9E86}.Release|Any CPU.Build.0 = Release|Any CPU
-		{58E8FFC8-D207-4B0F-842A-58ED9D3D9EEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{58E8FFC8-D207-4B0F-842A-58ED9D3D9EEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{58E8FFC8-D207-4B0F-842A-58ED9D3D9EEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{58E8FFC8-D207-4B0F-842A-58ED9D3D9EEF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B77AC567-E232-4072-85C3-8689566BF3D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B77AC567-E232-4072-85C3-8689566BF3D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B77AC567-E232-4072-85C3-8689566BF3D4}.Release|Any CPU.ActiveCfg = Release|Any CPU

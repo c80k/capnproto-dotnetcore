@@ -30,7 +30,7 @@ namespace Capnp.Rpc
 
         public Task<ConsumedCapability?> WhenResolved { get; private set; }
 
-        internal override void Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
+        internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {
             if (_answer.IsCompleted)
             {
@@ -46,10 +46,11 @@ namespace Capnp.Rpc
 
                 using var proxy = new Proxy(_access.Eval(result));
                 proxy.Export(endpoint, writer);
+                return null;
             }
             else
             {
-                this.ExportAsSenderPromise(endpoint, writer);
+                return this.ExportAsSenderPromise(endpoint, writer);
             }
         }
 

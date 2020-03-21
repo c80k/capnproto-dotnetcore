@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
@@ -60,7 +61,11 @@ namespace Capnp.Net.Runtime.Tests
         {
             var t = new TcpRpcPorted();
             Repeat(100, t.Embargo);
+        }
 
+        [TestMethod]
+        public void EmbargoServer()
+        {
             var t2 = new TcpRpcInterop();
             Repeat(100, t2.EmbargoServer);
         }
@@ -94,35 +99,45 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void ScatteredTransfer()
         {
-
-            using (var server = new TcpRpcServer(IPAddress.Any, TcpPort))
-            using (var client = new TcpRpcClient())
+            for (int retry = 0; retry < 10; retry++)
             {
-                server.InjectMidlayer(s => new ScatteringStream(s, 7));
-                client.InjectMidlayer(s => new ScatteringStream(s, 10));
-                client.Connect("localhost", TcpPort);
-                client.WhenConnected.Wait();
-
-                var counters = new Counters();
-                server.Main = new TestInterfaceImpl(counters);
-                using (var main = client.GetMain<ITestInterface>())
+                try
                 {
-                    for (int i = 0; i < 100; i++)
+                    using (var server = new TcpRpcServer(IPAddress.Any, TcpPort))
+                    using (var client = new TcpRpcClient())
                     {
-                        var request1 = main.Foo(123, true, default);
-                        var request3 = Assert.ThrowsExceptionAsync<RpcException>(() => main.Bar(default));
-                        var s = new TestAllTypes();
-                        Common.InitTestMessage(s);
-                        var request2 = main.Baz(s, default);
+                        server.InjectMidlayer(s => new ScatteringStream(s, 7));
+                        client.InjectMidlayer(s => new ScatteringStream(s, 10));
+                        client.Connect("localhost", TcpPort);
+                        client.WhenConnected.Wait();
 
-                        Assert.IsTrue(request1.Wait(MediumNonDbgTimeout));
-                        Assert.IsTrue(request2.Wait(MediumNonDbgTimeout));
-                        Assert.IsTrue(request3.Wait(MediumNonDbgTimeout));
+                        var counters = new Counters();
+                        server.Main = new TestInterfaceImpl(counters);
+                        using (var main = client.GetMain<ITestInterface>())
+                        {
+                            for (int i = 0; i < 100; i++)
+                            {
+                                var request1 = main.Foo(123, true, default);
+                                var request3 = Assert.ThrowsExceptionAsync<RpcException>(() => main.Bar(default));
+                                var s = new TestAllTypes();
+                                Common.InitTestMessage(s);
+                                var request2 = main.Baz(s, default);
 
-                        Assert.AreEqual("foo", request1.Result);
-                        Assert.AreEqual(2, counters.CallCount);
-                        counters.CallCount = 0;
+                                Assert.IsTrue(request1.Wait(MediumNonDbgTimeout));
+                                Assert.IsTrue(request2.Wait(MediumNonDbgTimeout));
+                                Assert.IsTrue(request3.Wait(MediumNonDbgTimeout));
+
+                                Assert.AreEqual("foo", request1.Result);
+                                Assert.AreEqual(2, counters.CallCount);
+                                counters.CallCount = 0;
+                            }
+                        }
                     }
+                    return;
+                }
+                catch (SocketException)
+                {
+                    IncrementTcpPort();
                 }
             }
         }

@@ -642,7 +642,7 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void RetainAndReleaseClient()
         {
             using (var server = SetupServer())

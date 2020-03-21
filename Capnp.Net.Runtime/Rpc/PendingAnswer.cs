@@ -24,11 +24,35 @@ namespace Capnp.Rpc
             _cts = cts;
             _cancelCompleter = new TaskCompletionSource<AnswerOrCounterquestion>();
             _answerTask = CancelableAwaitWhenReady();
+
+            Chain(async t =>
+            {
+                var aorcq = default(AnswerOrCounterquestion);
+
+                try
+                {
+                    aorcq = await t;
+                }
+                catch
+                {
+                }
+
+                if (aorcq.Answer != null)
+                {
+                    if (aorcq.Answer.Caps != null)
+                    {
+                        foreach (var cap in aorcq.Answer.Caps)
+                        {
+                            cap?.AddRef();
+                        }
+                    }
+                }
+            });
         }
 
         public CancellationToken CancellationToken => _cts?.Token ?? CancellationToken.None;
 
-        public IReadOnlyList<CapDescriptor.WRITER> CapTable { get; set; }
+        public IReadOnlyList<CapDescriptor.WRITER>? CapTable { get; set; }
 
         public void Cancel()
         {
@@ -99,7 +123,7 @@ namespace Capnp.Rpc
                     else
                     {
                         var path = MemberAccessPath.Deserialize(rd);
-                        var cap = new RemoteAnswerCapabilityDeprecated(aorcq.Counterquestion!, path);
+                        var cap = new RemoteAnswerCapability(aorcq.Counterquestion!, path);
                         return new Proxy(cap);
                     }
                 }
@@ -111,6 +135,31 @@ namespace Capnp.Rpc
         public void Dispose()
         {
             _cts?.Dispose();
+
+            Chain(async t =>
+            {
+                AnswerOrCounterquestion aorcq;
+
+                try
+                {
+                    aorcq = await t;
+                }
+                catch
+                {
+                    return;
+                }
+
+                if (aorcq.Answer != null)
+                {
+                    if (aorcq.Answer.Caps != null)
+                    {
+                        foreach (var cap in aorcq.Answer.Caps)
+                        {
+                            cap?.Release(false);
+                        }
+                    }
+                }
+            });
         }
     }
 }

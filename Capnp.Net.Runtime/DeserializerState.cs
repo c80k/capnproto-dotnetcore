@@ -9,7 +9,7 @@ namespace Capnp
     /// Although it is public, you should not use it directly. Instead, use the reader, writer, and domain class adapters which are produced
     /// by the code generator.
     /// </summary>
-    public struct DeserializerState: IStructDeserializer
+    public struct DeserializerState: IStructDeserializer, IDisposable
     {
         /// <summary>
         /// A wire message is essentially a collection of memory blocks.
@@ -50,7 +50,7 @@ namespace Capnp
         /// </summary>
         public IList<Rpc.ConsumedCapability?>? Caps { get; set; }
         /// <summary>
-        /// Current segment (essentially Segments[CurrentSegmentIndex]
+        /// Current segment (essentially Segments[CurrentSegmentIndex])
         /// </summary>
         public ReadOnlySpan<ulong> CurrentSegment => Segments != null ? Segments[(int)CurrentSegmentIndex].Span : default;
 
@@ -106,11 +106,6 @@ namespace Capnp
                 case ObjectKind.ListOfStructs:
                 case ObjectKind.Nil:
                 case ObjectKind.Struct:
-                    if (state.Caps != null)
-                    {
-                        foreach (var cap in state.Caps)
-                            cap?.Release(true);
-                    }
                     return new DeserializerState(state.Allocator!.Segments)
                     {
                         CurrentSegmentIndex = state.SegmentIndex,
@@ -646,13 +641,10 @@ namespace Capnp
         /// <exception cref="IndexOutOfRangeException">negative index</exception>
         /// <exception cref="DeserializationException">state does not represent a struct, invalid pointer,
         /// non-capability pointer, traversal limit exceeded</exception>
-        public T? ReadCap<T>(int index,
-            [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0) where T: class
+        public T? ReadCap<T>(int index) where T: class
         {
             var cap = StructReadRawCap(index);
-            return Rpc.CapabilityReflection.CreateProxy<T>(cap, memberName, sourceFilePath, sourceLineNumber) as T;
+            return Rpc.CapabilityReflection.CreateProxy<T>(cap) as T;
         }
 
         /// <summary>
@@ -689,6 +681,17 @@ namespace Capnp
                 throw new InvalidOperationException("Capability table not set. This is a bug.");
 
             return (Rpc.CapabilityReflection.CreateProxy<T>(Caps[(int)CapabilityIndex]) as T)!;
+        }
+
+        public void Dispose()
+        {
+            if (Caps != null)
+            {
+                foreach (var cap in Caps)
+                {
+                    cap?.Release(false);
+                }
+            }
         }
     }
 }

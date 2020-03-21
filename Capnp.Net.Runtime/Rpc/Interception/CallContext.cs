@@ -50,7 +50,7 @@ namespace Capnp.Rpc.Interception
                 }
             }
 
-            public ConsumedCapability? Access(MemberAccessPath _, Task<IDisposable> task)
+            public ConsumedCapability? Access(MemberAccessPath _, Task<IDisposable?> task)
             {
                 var proxyTask = task.AsProxyTask();
 

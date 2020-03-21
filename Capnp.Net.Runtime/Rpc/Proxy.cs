@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -99,9 +100,12 @@ namespace Capnp.Rpc
         /// </summary>
         public Proxy()
         {
+#if DebugFinalizers
+            CreatorStackTrace = Environment.StackTrace;
+#endif
         }
 
-        internal Proxy(ConsumedCapability? cap)
+        internal Proxy(ConsumedCapability? cap): this()
         {
             Bind(cap);
         }
@@ -118,7 +122,7 @@ namespace Capnp.Rpc
             cap.AddRef();
         }
 
-        internal IProvidedCapability? GetProvider()
+        internal Skeleton? GetProvider()
         {
             switch (ConsumedCap)
             {
@@ -163,7 +167,7 @@ namespace Capnp.Rpc
         ~Proxy()
         {
 #if DebugFinalizers
-            Logger.LogWarning($"Caught orphaned Proxy, created from {CreatorMemberName} in {CreatorFilePath}, line {CreatorLineNumber}.");
+            Logger.LogWarning($"Caught orphaned Proxy, created from here: {CreatorStackTrace}.");
 #endif
 
             Dispose(false);
@@ -230,9 +234,7 @@ namespace Capnp.Rpc
         }
 
 #if DebugFinalizers
-        public string CreatorMemberName { get; set; }
-        public string CreatorFilePath { get; set; }
-        public int CreatorLineNumber { get; set; }
+        string CreatorStackTrace { get; set; }
 #endif
     }
 }

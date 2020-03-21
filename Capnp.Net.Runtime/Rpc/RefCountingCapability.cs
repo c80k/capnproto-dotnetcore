@@ -26,16 +26,33 @@ namespace Capnp.Rpc
         // Value 0 has the special meaning of being in state C.
         long _refCount = 1;
 
-#if DebugCapabilityLifecycle
+#if DebugCapabilityLifecycle || DebugFinalizers
         ILogger Logger { get; } = Logging.CreateLogger<RefCountingCapability>();
+#endif
 
+#if DebugCapabilityLifecycle 
         string? _releasingMethodName;
         string? _releasingFilePath;
         int _releasingLineNumber;
 #endif
 
+#if DebugFinalizers
+        string CreatorStackTrace { get; set; }
+#endif
+
+        public RefCountingCapability()
+        {
+#if DebugFinalizers
+            CreatorStackTrace = Environment.StackTrace;
+#endif
+        }
+
         ~RefCountingCapability()
         {
+#if DebugFinalizers
+            Logger.LogWarning($"Caught orphaned capability, created from here: {CreatorStackTrace}.");
+#endif
+
             Dispose(false);
         }
 
