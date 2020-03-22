@@ -11,6 +11,12 @@ namespace Capnp.Rpc
     /// </summary>
     public class Proxy : IDisposable, IResolvingCapability
     {
+        /// <summary>
+        /// Creates a new proxy object for an existing implementation or proxy, sharing its ownership.
+        /// </summary>
+        /// <typeparam name="T">Capability interface</typeparam>
+        /// <param name="obj">instance to share</param>
+        /// <returns></returns>
         public static T Share<T>(T obj) where T: class
         {
             if (obj is Proxy proxy)
@@ -149,14 +155,14 @@ namespace Capnp.Rpc
             {
                 if (disposing)
                 {
-                    ConsumedCap?.Release(false);
+                    ConsumedCap?.Release();
                 }
                 else
                 {
                     // When called from the Finalizer, we must not throw.
                     // But when reference counting goes wrong, ConsumedCapability.Release() will throw an InvalidOperationException.
                     // The only option here is to suppress that exception.
-                    try { ConsumedCap?.Release(false); }
+                    try { ConsumedCap?.Release(); }
                     catch { }
                 }
 

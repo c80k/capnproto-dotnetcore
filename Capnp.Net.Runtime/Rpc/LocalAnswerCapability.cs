@@ -12,7 +12,7 @@ namespace Capnp.Rpc
             var result = await answer;
             var cap = access.Eval(result);
             var proxy = new Proxy(cap);
-            cap?.Release(false);
+            cap?.Release();
             return proxy;
         }
 

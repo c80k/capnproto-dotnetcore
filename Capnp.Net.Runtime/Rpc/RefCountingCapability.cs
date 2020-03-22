@@ -26,17 +26,8 @@ namespace Capnp.Rpc
         // Value 0 has the special meaning of being in state C.
         long _refCount = 1;
 
-#if DebugCapabilityLifecycle || DebugFinalizers
-        ILogger Logger { get; } = Logging.CreateLogger<RefCountingCapability>();
-#endif
-
-#if DebugCapabilityLifecycle 
-        string? _releasingMethodName;
-        string? _releasingFilePath;
-        int _releasingLineNumber;
-#endif
-
 #if DebugFinalizers
+        ILogger Logger { get; } = Logging.CreateLogger<RefCountingCapability>();
         string CreatorStackTrace { get; set; }
 #endif
 
@@ -83,11 +74,7 @@ namespace Capnp.Rpc
         {
             lock (_reentrancyBlocker)
             {
-                if (_refCount == int.MinValue)
-                {
-                    _refCount = 2;
-                }
-                else if (++_refCount <= 1)
+                if (++_refCount <= 1)
                 {
                     --_refCount;
 
@@ -101,29 +88,15 @@ namespace Capnp.Rpc
             }
         }
 
-        internal sealed override void Release(
-            bool keepAlive,
-            [System.Runtime.CompilerServices.CallerMemberName] string methodName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string filePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int lineNumber = 0)
+        internal sealed override void Release()
         {
             lock (_reentrancyBlocker)
             {
                 switch (_refCount)
                 {
-                    case 2 when keepAlive:
-                        _refCount = int.MinValue;
-                        break;
-
                     case 1: // initial state, actually ref. count 0
                     case 2: // actually ref. count 1
                         _refCount = 0;
-
-#if DebugCapabilityLifecycle
-                        _releasingMethodName = methodName;
-                        _releasingFilePath = filePath;
-                        _releasingLineNumber = lineNumber;
-#endif
 
                         Dispose(true);
                         GC.SuppressFinalize(this);

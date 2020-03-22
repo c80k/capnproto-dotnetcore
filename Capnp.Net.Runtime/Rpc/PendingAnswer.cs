@@ -155,7 +155,7 @@ namespace Capnp.Rpc
                     {
                         foreach (var cap in aorcq.Answer.Caps)
                         {
-                            cap?.Release(false);
+                            cap?.Release();
                         }
                     }
                 }

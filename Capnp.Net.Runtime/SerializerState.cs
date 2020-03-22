@@ -1382,15 +1382,19 @@ namespace Capnp
             return new Rpc.BareProxy(cap);
         }
 
+        /// <summary>
+        /// Releases the capability table
+        /// </summary>
         public void Dispose()
         {
             if (Caps != null && !_disposed)
             {
                 foreach (var cap in Caps)
                 {
-                    cap?.Release(false);
+                    cap?.Release();
                 }
 
+                Caps.Clear();
                 _disposed = true;
             }
         }

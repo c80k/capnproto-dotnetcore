@@ -20,11 +20,7 @@ namespace Capnp.Rpc
         internal abstract void Unfreeze();
 
         internal abstract void AddRef();
-        internal abstract void Release(
-            bool keepAlive,
-            [System.Runtime.CompilerServices.CallerMemberName] string methodName = "", 
-            [System.Runtime.CompilerServices.CallerFilePath] string filePath = "", 
-            [System.Runtime.CompilerServices.CallerLineNumber] int lineNumber = 0);
+        internal abstract void Release();
 
 #if DebugFinalizers
         internal Proxy? OwningProxy { get; set; }

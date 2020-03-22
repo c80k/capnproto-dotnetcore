@@ -93,6 +93,13 @@ namespace Capnp.Rpc
             return answer;
         }
 
+        /// <summary>
+        /// Returns a promise-pipelined capability for a remote method invocation Task.
+        /// </summary>
+        /// <param name="task">remote method invocation task</param>
+        /// <param name="access">path to the desired capability</param>
+        /// <param name="proxyTask">task returning a proxy to the desired capability</param>
+        /// <returns>Pipelined low-level capability</returns>
         public static ConsumedCapability? Access(Task task, MemberAccessPath access, Task<IDisposable?> proxyTask)
         {
             var answer = TryGetAnswer(task);
@@ -106,9 +113,6 @@ namespace Capnp.Rpc
         /// </summary>
         /// <typeparam name="TInterface">Capability interface type</typeparam>
         /// <param name="task">The task</param>
-        /// <param name="memberName">debugging aid</param>
-        /// <param name="sourceFilePath">debugging aid</param>
-        /// <param name="sourceLineNumber">debugging aid</param>
         /// <returns>A proxy for the given task.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="task"/> is null.</exception>
         /// <exception cref="InvalidCapabilityInterfaceException"><typeparamref name="TInterface"/> did not

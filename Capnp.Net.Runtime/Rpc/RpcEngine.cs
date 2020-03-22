@@ -60,11 +60,25 @@ namespace Capnp.Rpc
             }
         }
 
+        /// <summary>
+        /// Stateful implementation for hosting a two-party RPC session. <see cref="RpcEngine"/> may own multiple mutually 
+        /// independent endpoints.
+        /// </summary>
         public class RpcEndpoint : IEndpoint, IRpcEndpoint
         {
+            /// <summary>
+            /// Endpoint state
+            /// </summary>
             public enum EndpointState
             {
+                /// <summary>
+                /// Active means ready for exchanging RPC messages.
+                /// </summary>
                 Active,
+
+                /// <summary>
+                /// The session is closed, either deliberately or due to an error condition.
+                /// </summary>
                 Dismissed
             }
 
@@ -95,8 +109,14 @@ namespace Capnp.Rpc
                 State = EndpointState.Active;
             }
 
+            /// <summary>
+            /// Session state
+            /// </summary>
             public EndpointState State { get; private set; }
 
+            /// <summary>
+            /// Closes the session, clears export table, terminates all pending questions and enters 'Dismissed' state.
+            /// </summary>
             public void Dismiss()
             {
                 lock (_reentrancyBlocker)
@@ -120,6 +140,10 @@ namespace Capnp.Rpc
                 _tx.Dismiss();
             }
 
+            /// <summary>
+            /// Feeds a frame for processing
+            /// </summary>
+            /// <param name="frame">frame to process</param>
             public void Forward(WireFrame frame)
             {
                 if (State == EndpointState.Dismissed)
@@ -129,11 +153,43 @@ namespace Capnp.Rpc
                 ProcessFrame(frame);
             }
 
+            /// <summary>
+            /// Number of frames sent so far
+            /// </summary>
             public long SendCount => Interlocked.Read(ref _sendCount);
+
+            /// <summary>
+            /// Number of frames received so far
+            /// </summary>
             public long RecvCount => Interlocked.Read(ref _recvCount);
 
-            public int ImportedCapabilityCount => _importTable.Count;
-            public int ExportedCapabilityCount => _exportTable.Count;
+            /// <summary>
+            /// Current number of entries in import table
+            /// </summary>
+            public int ImportedCapabilityCount
+            {
+                get
+                {
+                    lock (_reentrancyBlocker)
+                    {
+                        return _importTable.Count;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Current number of entries in export table
+            /// </summary>
+            public int ExportedCapabilityCount
+            {
+                get
+                {
+                    lock (_reentrancyBlocker)
+                    {
+                        return _exportTable.Count;
+                    }
+                }
+            }
 
             void Tx(WireFrame frame)
             {
@@ -1095,6 +1151,10 @@ namespace Capnp.Rpc
                 }
             }
 
+            /// <summary>
+            /// Queries the peer for its bootstrap capability
+            /// </summary>
+            /// <returns>low-level capability</returns>
             public ConsumedCapability QueryMain()
             {
                 var mb = MessageBuilder.Create();
@@ -1370,7 +1430,7 @@ namespace Capnp.Rpc
                     else
                     {
                         postAction += cap.Export(this, capDesc);
-                        cap.Release(false);
+                        cap.Release();
                     }
                 }
 
@@ -1498,6 +1558,11 @@ namespace Capnp.Rpc
 
         readonly ConcurrentBag<RpcEndpoint> _inboundEndpoints = new ConcurrentBag<RpcEndpoint>();
 
+        /// <summary>
+        /// Adds an endpoint
+        /// </summary>
+        /// <param name="outboundEndpoint">endpoint for handling outgoing messages</param>
+        /// <returns>endpoint for handling incoming messages</returns>
         public RpcEndpoint AddEndpoint(IEndpoint outboundEndpoint)
         {
             var inboundEndpoint = new RpcEndpoint(this, outboundEndpoint);

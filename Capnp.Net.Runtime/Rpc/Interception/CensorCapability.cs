@@ -18,7 +18,7 @@ namespace Capnp.Rpc.Interception
 
         protected override void ReleaseRemotely()
         {
-            InterceptedCapability.Release(false);
+            InterceptedCapability.Release();
         }
 
         internal override IPromisedAnswer DoCall(ulong interfaceId, ushort methodId, DynamicSerializerState args)

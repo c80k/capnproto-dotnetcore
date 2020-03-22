@@ -277,13 +277,13 @@ namespace Capnp.Rpc
             {
                 foreach (var cap in inParams.Caps!)
                 {
-                    cap?.Release(false);
+                    cap?.Release();
                 }
             }
 
             if (target != null)
             {
-                target.Release(false);
+                target.Release();
             }
         }
 
@@ -291,7 +291,7 @@ namespace Capnp.Rpc
         {
             foreach (var cap in outParams.Caps!)
             {
-                cap?.Release(false);
+                cap?.Release();
             }
         }
 
