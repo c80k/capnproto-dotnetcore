@@ -11,7 +11,7 @@ namespace Capnp
     /// by the code generator. Particularly, those writer classes are actually specializations of SerializerState, adding convenience methods
     /// for accessing the struct's fields.
     /// </summary>
-    public class SerializerState : IStructSerializer
+    public class SerializerState : IStructSerializer, IDisposable
     {
         /// <summary>
         /// Constructs a SerializerState instance for use in RPC context.
@@ -42,6 +42,7 @@ namespace Capnp
         internal uint CapabilityIndex { get; set; }
 
         SerializerState[]? _linkedStates;
+        bool _disposed;
 
         /// <summary>
         /// Constructs an unbound serializer state.
@@ -1379,6 +1380,19 @@ namespace Capnp
         {
             var cap = StructReadRawCap(slot);
             return new Rpc.BareProxy(cap);
+        }
+
+        public void Dispose()
+        {
+            if (Caps != null && !_disposed)
+            {
+                foreach (var cap in Caps)
+                {
+                    cap?.Release(false);
+                }
+
+                _disposed = true;
+            }
         }
     }
 }

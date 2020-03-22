@@ -45,6 +45,7 @@ namespace Capnp
         /// The kind of object this state currently represents.
         /// </summary>
         public ObjectKind Kind { get; set; }
+        bool _disposed;
         /// <summary>
         /// The capabilities imported from the capability table. Only valid in RPC context.
         /// </summary>
@@ -65,6 +66,7 @@ namespace Capnp
             StructPtrCount = 1;
             Kind = ObjectKind.Struct;
             Caps = null;
+            _disposed = false;
         }
 
         /// <summary>
@@ -685,12 +687,14 @@ namespace Capnp
 
         public void Dispose()
         {
-            if (Caps != null)
+            if (Caps != null && !_disposed)
             {
                 foreach (var cap in Caps)
                 {
                     cap?.Release(false);
                 }
+
+                _disposed = true;
             }
         }
     }

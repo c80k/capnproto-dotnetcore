@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 namespace Capnp.Net.Runtime.Tests
 {
     [TestClass]
+    [TestCategory("Coverage")]
     public class LocalRpc: TestBase
     {
         [TestMethod]
@@ -112,6 +113,24 @@ namespace Capnp.Net.Runtime.Tests
         public void Basic()
         {
             NewLocalTestbed().RunTest(Testsuite.Basic);
+        }
+
+        [TestMethod]
+        public void Ownership1()
+        {
+            NewLocalTestbed().RunTest(Testsuite.Ownership1);
+        }
+
+        [TestMethod]
+        public void Ownership2()
+        {
+            NewLocalTestbed().RunTest(Testsuite.Ownership2);
+        }
+
+        [TestMethod]
+        public void Ownership3()
+        {
+            NewLocalTestbed().RunTest(Testsuite.Ownership3);
         }
     }
 }

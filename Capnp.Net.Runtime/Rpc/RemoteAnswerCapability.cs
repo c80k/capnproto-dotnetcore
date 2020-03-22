@@ -112,9 +112,17 @@ namespace Capnp.Rpc
                 if (!_question.StateFlags.HasFlag(PendingQuestion.State.TailCall) &&
                      _question.StateFlags.HasFlag(PendingQuestion.State.Returned))
                 {
-                    if (ResolvedCap == null)
+                    try
                     {
-                        throw new RpcException("Answer did not resolve to expected capability");
+                        if (ResolvedCap == null)
+                        {
+                            throw new RpcException("Answer did not resolve to expected capability");
+                        }
+                    }
+                    catch
+                    {
+                        args.Dispose();
+                        throw;
                     }
 
                     return CallOnResolution(interfaceId, methodId, args);
@@ -126,11 +134,13 @@ namespace Capnp.Rpc
 #endif
                     if (_question.StateFlags.HasFlag(PendingQuestion.State.Disposed))
                     {
+                        args.Dispose();
                         throw new ObjectDisposedException(nameof(PendingQuestion));
                     }
 
                     if (_question.StateFlags.HasFlag(PendingQuestion.State.FinishRequested))
                     {
+                        args.Dispose();
                         throw new InvalidOperationException("Finish request was already sent");
                     }
 

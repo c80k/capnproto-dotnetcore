@@ -50,17 +50,9 @@ namespace Capnp.Rpc
 
         static async void DisposeCtrWhenReturned(CancellationTokenRegistration ctr, IPromisedAnswer answer)
         {
-            try
-            {
-                await answer.WhenReturned;
-            }
-            catch
-            {
-            }
-            finally
-            {
-                ctr.Dispose();
-            }
+            try { await answer.WhenReturned; }
+            catch { }
+            finally { ctr.Dispose(); }
         }
 
         /// <summary>
@@ -80,10 +72,16 @@ namespace Capnp.Rpc
             bool obsoleteAndIgnored, CancellationToken cancellationToken = default)
         {
             if (_disposedValue)
+            {
+                args.Dispose();
                 throw new ObjectDisposedException(nameof(Proxy));
+            }
 
             if (ConsumedCap == null)
+            {
+                args.Dispose();
                 throw new InvalidOperationException("Cannot call null capability");
+            }
 
             var answer = ConsumedCap.DoCall(interfaceId, methodId, args);
 
@@ -172,7 +170,7 @@ namespace Capnp.Rpc
         ~Proxy()
         {
 #if DebugFinalizers
-            Logger.LogWarning($"Caught orphaned Proxy, created from here: {CreatorStackTrace}.");
+            Logger?.LogWarning($"Caught orphaned Proxy, created from here: {CreatorStackTrace}.");
 #endif
 
             Dispose(false);

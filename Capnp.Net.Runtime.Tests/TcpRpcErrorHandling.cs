@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 namespace Capnp.Net.Runtime.Tests
 {
     [TestClass]
+    [TestCategory("Coverage")]
     public class TcpRpcErrorHandling: TestBase
     {
         class MemStreamEndpoint : IEndpoint

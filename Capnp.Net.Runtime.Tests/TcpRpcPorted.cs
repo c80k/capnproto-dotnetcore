@@ -166,5 +166,23 @@ namespace Capnp.Net.Runtime.Tests
 
             Assert.IsTrue(impl.IsDisposed);
         }
+
+        [TestMethod]
+        public void Ownership1()
+        {
+            NewLocalhostTcpTestbed().RunTest(Testsuite.Ownership1);
+        }
+
+        [TestMethod]
+        public void Ownership2()
+        {
+            NewLocalhostTcpTestbed().RunTest(Testsuite.Ownership2);
+        }
+
+        [TestMethod]
+        public void Ownership3()
+        {
+            NewLocalhostTcpTestbed().RunTest(Testsuite.Ownership3);
+        }
     }
 }

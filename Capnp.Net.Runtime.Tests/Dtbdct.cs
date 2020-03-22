@@ -98,5 +98,23 @@ namespace Capnp.Net.Runtime.Tests
         {
             NewDtbdctTestbed().RunTest(Testsuite.BootstrapReuse);
         }
+
+        [TestMethod]
+        public void Ownership1()
+        {
+            NewDtbdctTestbed().RunTest(Testsuite.Ownership1);
+        }
+
+        [TestMethod]
+        public void Ownership2()
+        {
+            NewDtbdctTestbed().RunTest(Testsuite.Ownership2);
+        }
+
+        [TestMethod]
+        public void Ownership3()
+        {
+            NewDtbdctTestbed().RunTest(Testsuite.Ownership3);
+        }
     }
 }

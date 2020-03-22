@@ -90,9 +90,13 @@ namespace Capnp.Rpc
                         {
                             // Two reasons for ignoring exceptions on the previous task (i.e. not _.Wait()ing):
                             // 1. A faulting predecessor, especially due to cancellation, must not have any impact on this one.
-                            // 2. A faulting disembargo request would be a fatal protocol error, resulting in Abort() - we're dead anyway.
+                            // 2. A faulting disembargo request would imply that the other side cannot send pending requests anyway.
 
-                            cancellationTokenSource.Token.ThrowIfCancellationRequested();
+                            if (cancellationTokenSource.Token.IsCancellationRequested)
+                            {
+                                args.Dispose();
+                                cancellationTokenSource.Token.ThrowIfCancellationRequested();
+                            }
 
                             using var proxy = new Proxy(ResolvedCap);
                             return proxy.Call(interfaceId, methodId, args, default);

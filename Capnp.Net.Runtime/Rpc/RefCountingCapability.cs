@@ -50,7 +50,7 @@ namespace Capnp.Rpc
         ~RefCountingCapability()
         {
 #if DebugFinalizers
-            Logger.LogWarning($"Caught orphaned capability, created from here: {CreatorStackTrace}.");
+            Logger?.LogWarning($"Caught orphaned capability, created from here: {CreatorStackTrace}.");
 #endif
 
             Dispose(false);

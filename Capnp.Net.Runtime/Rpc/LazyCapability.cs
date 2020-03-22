@@ -91,12 +91,28 @@ namespace Capnp.Rpc
 
         async Task<DeserializerState> CallImpl(ulong interfaceId, ushort methodId, DynamicSerializerState args, CancellationToken cancellationToken)
         {
-            var cap = await WhenResolved;
+            ConsumedCapability? cap;
+            try
+            {
+                cap = await WhenResolved;
+            }
+            catch
+            {
+                args.Dispose();
+                throw;
+            }
 
-            cancellationToken.ThrowIfCancellationRequested();
+            if (cancellationToken.IsCancellationRequested)
+            {
+                args.Dispose();
+                cancellationToken.ThrowIfCancellationRequested();
+            }
 
             if (cap == null)
+            {
+                args.Dispose();
                 throw new RpcException("Broken capability");
+            }
 
             using var proxy = new Proxy(cap);
             var call = proxy.Call(interfaceId, methodId, args, default);

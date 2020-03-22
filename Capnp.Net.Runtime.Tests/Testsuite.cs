@@ -532,5 +532,43 @@ namespace Capnp.Net.Runtime.Tests
                 Assert.IsFalse(impl.IsDisposed);
             }
         }
+
+        public static void Ownership1(ITestbed testbed)
+        {
+            var impl = new TestMoreStuffImpl(new Counters());
+            using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
+            {
+                var tcs = new TaskCompletionSource<int>();
+                var ti = new TestInterfaceImpl(new Counters(), tcs);
+                testbed.MustComplete(main.CallFoo(ti, default));
+                testbed.MustComplete(tcs.Task);
+            }
+        }
+
+        public static void Ownership2(ITestbed testbed)
+        {
+            var impl = new TestMoreStuffImpl(new Counters());
+            using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
+            using (var nullProxy = main.GetNull().Eager(true))
+            {
+                var tcs = new TaskCompletionSource<int>();
+                var ti = new TestInterfaceImpl(new Counters(), tcs);
+                testbed.MustComplete(nullProxy.CallFoo(ti, default));
+                testbed.MustComplete(tcs.Task);
+            }
+        }
+
+        public static void Ownership3(ITestbed testbed)
+        {
+            var impl = new TestMoreStuffImpl(new Counters());
+            using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
+            using (var nullProxy = main.GetNull(new CancellationToken(true)).Eager(true))
+            {
+                var tcs = new TaskCompletionSource<int>();
+                var ti = new TestInterfaceImpl(new Counters(), tcs);
+                testbed.MustComplete(nullProxy.CallFoo(ti, default));
+                testbed.MustComplete(tcs.Task);
+            }
+        }
     }
 }

@@ -76,6 +76,7 @@ namespace Capnp.Rpc
         /// <returns>The underlying promise</returns>
         /// <exception cref="ArgumentNullException"><paramref name="task"/> is null.</exception>
         /// <exception cref="ArgumentException">The task was not registered using MakePipelineAware.</exception>
+        [Obsolete("Please re-generate capnp code-behind. GetAnswer(task).Access(...) was replaced by Access(task, ...)")]
         public static IPromisedAnswer GetAnswer(Task task)
         {
             if (!_taskTable.TryGetValue(task, out var answer))

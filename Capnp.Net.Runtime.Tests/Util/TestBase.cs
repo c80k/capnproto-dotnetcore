@@ -167,12 +167,12 @@ namespace Capnp.Net.Runtime.Tests
 
             void ITestbed.MustComplete(params Task[] tasks)
             {
-                Assert.IsTrue(Task.WhenAll(tasks).IsCompleted);
+                Assert.IsTrue(tasks.All(t => t.IsCompleted));
             }
 
             void ITestbed.MustNotComplete(params Task[] tasks)
             {
-                Assert.IsFalse(Task.WhenAny(tasks).IsCompleted);
+                Assert.IsFalse(tasks.Any(t => t.IsCompleted));
             }
         }
 
@@ -248,14 +248,30 @@ namespace Capnp.Net.Runtime.Tests
                 return _client.GetMain<T>();
             }
 
+            static Task[] GulpExceptions(Task[] tasks)
+            {
+                async Task Gulp(Task t)
+                {
+                    try
+                    {
+                        await t;
+                    }
+                    catch
+                    {
+                    }
+                }
+
+                return tasks.Select(Gulp).ToArray();
+            }
+
             void ITestbed.MustComplete(params Task[] tasks)
             {
-                Assert.IsTrue(Task.WaitAll(tasks, MediumNonDbgTimeout));
+                Assert.IsTrue(Task.WaitAll(GulpExceptions(tasks), MediumNonDbgTimeout));
             }
 
             void ITestbed.MustNotComplete(params Task[] tasks)
             {
-                Assert.AreEqual(-1, Task.WaitAny(tasks, ShortTimeout));
+                Assert.AreEqual(-1, Task.WaitAny(GulpExceptions(tasks), ShortTimeout));
             }
 
             void ITestbed.FlushCommunication()
