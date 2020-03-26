@@ -13,6 +13,8 @@ namespace CapnpC.CSharp.Generator.Model
         public string[] Namespace { get; set; }
         public bool? NullableEnable { get; set; }
         public bool EmitNullableDirective { get; set; }
+        public bool EmitDomainClassesAndInterfaces { get; set; }
+        public SupportedAnnotations.TypeVisibility TypeVisibility { get; set; }
 
         public IEnumerable<TypeDefinition> NestedTypes { get => this.GetNestedTypes(); }
         public ICollection<IDefinition> NestedDefinitions { get; } = new List<IDefinition>();

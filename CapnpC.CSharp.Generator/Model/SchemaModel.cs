@@ -94,6 +94,8 @@ namespace CapnpC.CSharp.Generator.Model
             file.Name = name;
             file.NullableEnable = GetNullableEnable(node);
             file.EmitNullableDirective = GetEmitNullableDirective(node) ?? false;
+            file.EmitDomainClassesAndInterfaces = GetEmitDomainClassesAndInterfaces(node) ?? true;
+            file.TypeVisibility = GetTypeVisibility(node) ?? TypeVisibility.Public;
             return ProcessNodePass1(id, name, state) as GenFile;
         }
 

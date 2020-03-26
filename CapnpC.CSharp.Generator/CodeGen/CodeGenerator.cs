@@ -61,9 +61,18 @@
 
         IEnumerable<MemberDeclarationSyntax> TransformStruct(TypeDefinition def)
         {
-            var topDecl = ClassDeclaration(_names.MakeTypeName(def).Identifier)                
-                .AddModifiers(Public)
-                .AddBaseListTypes(SimpleBaseType(_names.Type<Capnp.ICapnpSerializable>(Nullability.NonNullable)));
+            var topDecl = ClassDeclaration(_names.MakeTypeName(def).Identifier)
+                .AddModifiers(_names.TypeVisibilityModifier);
+
+            if (_names.EmitDomainClassesAndInterfaces)
+            {
+                topDecl = topDecl.AddBaseListTypes(SimpleBaseType(_names.Type<Capnp.ICapnpSerializable>(Nullability.NonNullable)));
+            }
+            else
+            {
+                topDecl = topDecl.AddModifiers(Static);
+            }
+                
 
             if (def.GenericParameters.Count > 0)
             {
@@ -80,9 +89,14 @@
                 topDecl = topDecl.AddMembers(_commonGen.MakeUnionSelectorEnum(def));
             }
 
-            topDecl = topDecl.AddMembers(_domClassGen.MakeDomainClassMembers(def));
-            topDecl = topDecl.AddMembers(_readerGen.MakeReaderStruct(def));
-            topDecl = topDecl.AddMembers(_writerGen.MakeWriterStruct(def));
+            if (_names.EmitDomainClassesAndInterfaces)
+            {
+                topDecl = topDecl.AddMembers(_domClassGen.MakeDomainClassMembers(def));
+            }
+
+            topDecl = topDecl.AddMembers(
+                _readerGen.MakeReaderStruct(def),
+                _writerGen.MakeWriterStruct(def));
 
             foreach (var nestedGroup in def.NestedGroups)
             {
@@ -99,6 +113,9 @@
 
         IEnumerable<MemberDeclarationSyntax> TransformInterface(TypeDefinition def)
         {
+            if (!_names.EmitDomainClassesAndInterfaces)
+                yield break;
+
             yield return _interfaceGen.MakeInterface(def);
             yield return _interfaceGen.MakeProxy(def);
             yield return _interfaceGen.MakeSkeleton(def);
@@ -168,7 +185,7 @@
                         if (classDecl == null)
                         {
                             classDecl = ClassDeclaration(_names.MakePipeliningSupportExtensionClassName(file).Identifier)
-                                        .AddModifiers(Public, Static, Partial);
+                                        .AddModifiers(_names.TypeVisibilityModifier, Static, Partial);
                         }
 
                         classDecl = classDecl.AddMembers(members);
@@ -187,6 +204,8 @@
         internal string Transform(GenFile file)
         {
             _names.NullableEnable = file.NullableEnable ?? _options.NullableEnableDefault;
+            _names.EmitDomainClassesAndInterfaces = file.EmitDomainClassesAndInterfaces;
+            _names.TypeVisibility = file.TypeVisibility;
 
             NameSyntax topNamespace = GenNames.NamespaceName(file.Namespace) ?? _names.TopNamespace;
 
@@ -211,11 +230,14 @@
                 ns = ns.AddMembers(Transform(def).ToArray());
             }
 
-            var psc = TransformForPipeliningSupport(file);
-
-            if (psc != null)
+            if (_names.EmitDomainClassesAndInterfaces)
             {
-                ns = ns.AddMembers(psc);
+                var psc = TransformForPipeliningSupport(file);
+
+                if (psc != null)
+                {
+                    ns = ns.AddMembers(psc);
+                }
             }
 
             var cu = CompilationUnit().AddUsings(

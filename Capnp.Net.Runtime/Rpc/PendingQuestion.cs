@@ -165,7 +165,7 @@ namespace Capnp.Rpc
                 SetReturned();
             }
 
-            _tcs.TrySetException(new RpcException(exception.Reason));
+            _tcs.TrySetException(new RpcException(exception.Reason ?? "unknown reason"));
         }
 
         internal void OnException(System.Exception exception)
@@ -313,7 +313,7 @@ namespace Capnp.Rpc
             }
 
             var msg = (Message.WRITER)inParams!.MsgBuilder!.Root!;
-            Debug.Assert(msg.Call.Target.which != MessageTarget.WHICH.undefined);
+            Debug.Assert(msg.Call!.Target.which != MessageTarget.WHICH.undefined);
             var call = msg.Call;
             call.QuestionId = QuestionId;
             call.SendResultsTo.which = IsTailCall ? 

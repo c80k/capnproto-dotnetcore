@@ -1,4 +1,5 @@
 ﻿using CapnpC.CSharp.Generator.Model;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
@@ -74,6 +75,8 @@ namespace CapnpC.CSharp.Generator.CodeGen
         public string SkeletonClassFormat { get; }
         public Name AwaitProxy { get; }
         public bool NullableEnable { get; set; }
+        public bool EmitDomainClassesAndInterfaces { get; set; }
+        public SupportedAnnotations.TypeVisibility TypeVisibility { get; set; }
         public GenNames(GeneratorOptions options)
         {
             TopNamespace = new Name(options.TopNamespaceName).IdentifierName;
@@ -707,6 +710,24 @@ namespace CapnpC.CSharp.Generator.CodeGen
             return NullableEnable ?
                 PostfixUnaryExpression(SyntaxKind.SuppressNullableWarningExpression, expression) :
                 expression;
+        }
+
+        public SyntaxToken TypeVisibilityModifier
+        {
+            get
+            {
+                switch (TypeVisibility)
+                {
+                    case SupportedAnnotations.TypeVisibility.Public:
+                        return Token(SyntaxKind.PublicKeyword);
+
+                    case SupportedAnnotations.TypeVisibility.Internal:
+                        return Token(SyntaxKind.InternalKeyword);
+
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
         }
     }
 }

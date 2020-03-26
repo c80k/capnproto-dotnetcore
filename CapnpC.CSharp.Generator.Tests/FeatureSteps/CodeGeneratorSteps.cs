@@ -241,14 +241,12 @@ namespace CapnpC.CSharp.Generator.Tests
 
                 }
             }
-            catch (AssertFailedException)
+            finally
             {
                 string generated = _result.GeneratedFiles.Single().GeneratedContent;
                 string path = Path.ChangeExtension(Path.GetTempFileName(), ".capnp.cs");
                 File.WriteAllText(path, generated);
                 Console.WriteLine($"Generated code was saved to {path}");
-
-                throw;
             }
         }
     }

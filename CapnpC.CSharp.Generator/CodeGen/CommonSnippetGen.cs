@@ -51,7 +51,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
         {
             var decl = EnumDeclaration(_names.GetCodeIdentifier(def))
                 .WithAttributeLists(MakeTypeIdAttributeLists(def.Id))
-                .AddModifiers(Public)
+                .AddModifiers(_names.TypeVisibilityModifier)
                 .AddBaseListTypes(SimpleBaseType(_names.Type<ushort>(Nullability.NonNullable)));
 
             foreach (var enumerant in def.Enumerants.OrderBy(e => e.CodeOrder))

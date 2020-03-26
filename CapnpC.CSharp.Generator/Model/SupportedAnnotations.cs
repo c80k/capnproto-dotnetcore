@@ -19,7 +19,15 @@ namespace CapnpC.CSharp.Generator.Model
                 public const ulong NullableEnable = 0xeb0d831668c6eda1;
                 public const ulong Name = 0xeb0d831668c6eda2;
                 public const ulong EmitNullableDirective = 0xeb0d831668c6eda3;
+                public const ulong EmitDomainClassesAndInterfaces = 0xeb0d831668c6eda4;
+                public const ulong TypeVisibility = 0xeb0d831668c6eda6;
             }
+        }
+
+        public enum TypeVisibility
+        {
+            Public = 0,
+            Internal = 1
         }
 
         public static string[] GetNamespaceAnnotation(Schema.Node.Reader fileNode)
@@ -94,6 +102,30 @@ namespace CapnpC.CSharp.Generator.Model
                 if (annotation.Id == AnnotationIds.Cs.EmitNullableDirective && annotation.Value.IsBool)
                 {
                     return annotation.Value.Bool;
+                }
+            }
+            return null;
+        }
+
+        public static bool? GetEmitDomainClassesAndInterfaces(Schema.Node.Reader node)
+        {
+            foreach (var annotation in node.Annotations)
+            {
+                if (annotation.Id == AnnotationIds.Cs.EmitDomainClassesAndInterfaces && annotation.Value.IsBool)
+                {
+                    return annotation.Value.Bool;
+                }
+            }
+            return null;
+        }
+
+        public static TypeVisibility? GetTypeVisibility(Schema.Node.Reader node)
+        {
+            foreach (var annotation in node.Annotations)
+            {
+                if (annotation.Id == AnnotationIds.Cs.TypeVisibility && annotation.Value.IsEnum)
+                {
+                    return (TypeVisibility)annotation.Value.Enum;
                 }
             }
             return null;

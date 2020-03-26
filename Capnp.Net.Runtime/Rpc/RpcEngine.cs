@@ -210,7 +210,7 @@ namespace Capnp.Rpc
                 var mb = MessageBuilder.Create();
                 var msg = mb.BuildRoot<Message.WRITER>();
                 msg.which = Message.WHICH.Abort;
-                msg.Abort.Reason = reason;
+                msg.Abort!.Reason = reason;
                 Tx(mb.Frame);
             }
 
@@ -233,18 +233,18 @@ namespace Capnp.Rpc
                 var mb = MessageBuilder.Create();
                 var msg = mb.BuildRoot<Message.WRITER>();
                 msg.which = Message.WHICH.Resolve;
-                var resolve = msg.Resolve;
+                var resolve = msg.Resolve!;
 
                 try
                 {
                     var resolvedCap = resolvedCapGetter();
                     resolve.which = Resolve.WHICH.Cap;
-                    resolvedCap.Export(this, resolve.Cap);
+                    resolvedCap.Export(this, resolve.Cap!);
                 }
                 catch (System.Exception ex)
                 {
                     resolve.which = Resolve.WHICH.Exception;
-                    resolve.Exception.Reason = ex.Message;
+                    resolve.Exception!.Reason = ex.Message;
                 }
                 resolve.PromiseId = preliminaryId;
 
@@ -364,7 +364,7 @@ namespace Capnp.Rpc
                 var ans = bootstrap.MsgBuilder!.BuildRoot<Message.WRITER>();
 
                 ans.which = Message.WHICH.Return;
-                var ret = ans.Return;
+                var ret = ans.Return!;
                 ret.AnswerId = q;
 
                 Task<AnswerOrCounterquestion> bootstrapTask;
@@ -374,7 +374,7 @@ namespace Capnp.Rpc
                 {
                     ret.which = Return.WHICH.Results;
                     bootstrap.SetCapability(bootstrap.ProvideCapability(LocalCapability.Create(bootstrapCap)));
-                    ret.Results.Content = bootstrap;
+                    ret.Results!.Content = bootstrap;
 
                     bootstrapTask = Task.FromResult<AnswerOrCounterquestion>(bootstrap);
                 }
@@ -383,7 +383,7 @@ namespace Capnp.Rpc
                     Logger.LogWarning("Peer asked for bootstrap capability, but no bootstrap capability was set.");
 
                     ret.which = Return.WHICH.Exception;
-                    ret.Exception.Reason = "No bootstrap capability present";
+                    ret.Exception!.Reason = "No bootstrap capability present";
 
                     bootstrapTask = Task.FromException<AnswerOrCounterquestion>(new RpcException(ret.Exception.Reason));
                 }
@@ -403,7 +403,7 @@ namespace Capnp.Rpc
                 }
 
 
-                if (bootstrapCap != null)
+                if (ret.Results != null)
                 {
                     ExportCapTableAndSend(bootstrap, ret.Results);
                 }
@@ -420,7 +420,7 @@ namespace Capnp.Rpc
                 {
                     var rmsg = mb.BuildRoot<Message.WRITER>();
                     rmsg.which = Message.WHICH.Return;
-                    var ret = rmsg.Return;
+                    var ret = rmsg.Return!;
                     ret.AnswerId = req.QuestionId;
 
                     return ret;
@@ -488,7 +488,7 @@ namespace Capnp.Rpc
                                         {
                                             case Call.sendResultsTo.WHICH.Caller:
                                                 ret.which = Return.WHICH.Results;
-                                                ret.Results.Content = results.Rewrap<DynamicSerializerState>();
+                                                ret.Results!.Content = results.Rewrap<DynamicSerializerState>();
                                                 ret.ReleaseParamCaps = releaseParamCaps;
                                                 ExportCapTableAndSend(results, ret.Results);
                                                 pendingAnswer.CapTable = ret.Results.CapTable;
@@ -530,7 +530,7 @@ namespace Capnp.Rpc
                                     ReturnCall(ret =>
                                     {
                                         ret.which = Return.WHICH.Exception;
-                                        ret.Exception.Reason = exception.Message;
+                                        ret.Exception!.Reason = exception.Message;
                                         ret.ReleaseParamCaps = releaseParamCaps;
                                     });
                                 }
@@ -824,7 +824,7 @@ namespace Capnp.Rpc
                             break;
 
                         case Resolve.WHICH.Exception:
-                            resolvableCap.Break(resolve.Exception.Reason);
+                            resolvableCap.Break(resolve.Exception.Reason ?? "unknown reason");
                             break;
 
                         default:
@@ -844,8 +844,8 @@ namespace Capnp.Rpc
                 mb.InitCapTable();
                 var wr = mb.BuildRoot<Message.WRITER>();
                 wr.which = Message.WHICH.Disembargo;
-                wr.Disembargo.Context.which = Disembargo.context.WHICH.ReceiverLoopback;
-                wr.Disembargo.Context.ReceiverLoopback = disembargo.Context.SenderLoopback;
+                wr.Disembargo!.Context.which = Disembargo.context.WHICH.ReceiverLoopback;
+                wr.Disembargo!.Context.ReceiverLoopback = disembargo.Context.SenderLoopback;
                 var reply = wr.Disembargo;
 
                 switch (disembargo.Target.which)
@@ -871,7 +871,7 @@ namespace Capnp.Rpc
                         var promisedAnswer = disembargo.Target.PromisedAnswer;
                         reply.Target.which = MessageTarget.WHICH.PromisedAnswer;
                         var replyPromisedAnswer = reply.Target.PromisedAnswer;
-                        replyPromisedAnswer.QuestionId = disembargo.Target.PromisedAnswer.QuestionId;
+                        replyPromisedAnswer!.QuestionId = disembargo.Target.PromisedAnswer.QuestionId;
                         int count = promisedAnswer.Transform.Count;
                         replyPromisedAnswer.Transform.Init(count);
 
@@ -1162,7 +1162,7 @@ namespace Capnp.Rpc
                 var req = mb.BuildRoot<Message.WRITER>();
                 req.which = Message.WHICH.Bootstrap;
                 var pendingBootstrap = AllocateQuestion(null, null);
-                req.Bootstrap.QuestionId = pendingBootstrap.QuestionId;
+                req.Bootstrap!.QuestionId = pendingBootstrap.QuestionId;
 
                 Tx(mb.Frame);
 
@@ -1237,7 +1237,7 @@ namespace Capnp.Rpc
                     mb.InitCapTable();
                     var reply = mb.BuildRoot<Message.WRITER>();
                     reply.which = Message.WHICH.Unimplemented;
-                    Reserializing.DeepCopy(msg, reply.Unimplemented.Rewrap<DynamicSerializerState>());
+                    Reserializing.DeepCopy(msg, reply.Unimplemented!.Rewrap<DynamicSerializerState>());
 
                     Tx(mb.Frame);
                 }
@@ -1472,8 +1472,8 @@ namespace Capnp.Rpc
                 var mb = MessageBuilder.Create();
                 var msg = mb.BuildRoot<Message.WRITER>();
                 msg.which = Message.WHICH.Finish;
-                msg.Finish.QuestionId = questionId;
-                msg.Finish.ReleaseResultCaps = false;
+                msg.Finish!.QuestionId = questionId;
+                msg.Finish!.ReleaseResultCaps = false;
 
                 try
                 {
@@ -1518,8 +1518,8 @@ namespace Capnp.Rpc
                     var mb = MessageBuilder.Create();
                     var msg = mb.BuildRoot<Message.WRITER>();
                     msg.which = Message.WHICH.Release;
-                    msg.Release.Id = importId;
-                    msg.Release.ReferenceCount = (uint)count;
+                    msg.Release!.Id = importId;
+                    msg.Release!.ReferenceCount = (uint)count;
 
                     try
                     {
@@ -1540,7 +1540,7 @@ namespace Capnp.Rpc
                 mb.InitCapTable();
                 var msg = mb.BuildRoot<Message.WRITER>();
                 msg.which = Message.WHICH.Disembargo;
-                describe(msg.Disembargo.Target);
+                describe(msg.Disembargo!.Target);
                 var ctx = msg.Disembargo.Context;
                 ctx.which = Disembargo.context.WHICH.SenderLoopback;
                 ctx.SenderLoopback = id;

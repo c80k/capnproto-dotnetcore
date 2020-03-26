@@ -101,7 +101,7 @@ namespace Capnp.Rpc
         protected override void GetMessageTarget(MessageTarget.WRITER wr)
         {
             wr.which = MessageTarget.WHICH.PromisedAnswer;
-            wr.PromisedAnswer.QuestionId = _question.QuestionId;
+            wr.PromisedAnswer!.QuestionId = _question.QuestionId;
             _access.Serialize(wr.PromisedAnswer);
         }
 
@@ -178,7 +178,7 @@ namespace Capnp.Rpc
             var call = base.SetupMessage(args, interfaceId, methodId);
 
             call.Target.which = MessageTarget.WHICH.PromisedAnswer;
-            call.Target.PromisedAnswer.QuestionId = _question.QuestionId;
+            call.Target.PromisedAnswer!.QuestionId = _question.QuestionId;
             _access.Serialize(call.Target.PromisedAnswer);
 
             return call;
@@ -243,8 +243,8 @@ namespace Capnp.Rpc
                     if (endpoint == _ep)
                     {
                         writer.which = CapDescriptor.WHICH.ReceiverAnswer;
-                        _access.Serialize(writer.ReceiverAnswer);
-                        writer.ReceiverAnswer.QuestionId = _question.QuestionId;
+                        _access.Serialize(writer.ReceiverAnswer!);
+                        writer.ReceiverAnswer!.QuestionId = _question.QuestionId;
                     }
                     else if (_question.IsTailCall)
                     {

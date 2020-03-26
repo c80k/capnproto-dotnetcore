@@ -29,7 +29,7 @@ namespace Capnp.Rpc
 
             callMsg.which = Message.WHICH.Call;
 
-            var call = callMsg.Call;
+            var call = callMsg.Call!;
             call.AllowThirdPartyTailCall = false;
             call.InterfaceId = interfaceId;
             call.MethodId = methodId;
