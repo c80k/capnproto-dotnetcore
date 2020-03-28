@@ -119,7 +119,7 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void Embargo()
         {
-            NewLocalhostTcpTestbed().RunTest(Testsuite.Embargo);
+            NewLocalhostTcpTestbed().RunTest(Testsuite.EmbargoOnPromisedAnswer);
         }
 
         [TestMethod]

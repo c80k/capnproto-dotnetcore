@@ -158,8 +158,16 @@ namespace Capnp.Rpc
                     throw new ArgumentException("The task was not returned from a remote method invocation. See documentation for details.");
                 }
 
-                var lazyCap = new LazyCapability(task.AsProxyTask());
-                return (CapabilityReflection.CreateProxy<TInterface>(lazyCap) as TInterface)!;
+                var proxyTask = task.AsProxyTask();
+                if (proxyTask.ReplacementTaskIsCompletedSuccessfully())
+                {
+                    return proxyTask.Result.Cast<TInterface>(true);
+                }
+                else
+                {
+                    var lazyCap = new LazyCapability(proxyTask);
+                    return (CapabilityReflection.CreateProxy<TInterface>(lazyCap) as TInterface)!;
+                }
             }
             else
             {
@@ -170,6 +178,17 @@ namespace Capnp.Rpc
 
                 return (CapabilityReflection.CreateProxy<TInterface>(answer.Access(Path_OneAndOnly, AsDisposableTask())) as TInterface)!;
             }
+        }
+
+        public static async Task<TInterface> Unwrap<TInterface>(this TInterface cap) where TInterface: class, IDisposable
+        {
+            using var proxy = cap as Proxy;
+
+            if (proxy == null)
+                return cap;
+
+            var unwrapped = await proxy.ConsumedCap.Unwrap();
+            return ((CapabilityReflection.CreateProxy<TInterface>(unwrapped)) as TInterface)!;
         }
 
         internal static IRpcEndpoint? AskingEndpoint

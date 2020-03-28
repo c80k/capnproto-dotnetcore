@@ -64,8 +64,7 @@ namespace Capnp.Rpc
             if (WhenResolved.ReplacementTaskIsCompletedSuccessfully())
             {
                 using var proxy = new Proxy(WhenResolved.Result);
-                proxy.Export(endpoint, writer);
-                return null;
+                return proxy.Export(endpoint, writer);
             }
             else
             {

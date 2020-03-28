@@ -34,7 +34,7 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void Embargo()
         {
-            NewLocalTestbed().RunTest(Testsuite.Embargo);
+            NewLocalTestbed().RunTest(Testsuite.EmbargoOnPromisedAnswer);
         }
 
         [TestMethod]
@@ -129,6 +129,12 @@ namespace Capnp.Net.Runtime.Tests
 
         [TestMethod]
         public void Ownership3()
+        {
+            NewLocalTestbed().RunTest(Testsuite.Ownership3);
+        }
+
+        [TestMethod]
+        public void ImportReceiverAnswer()
         {
             NewLocalTestbed().RunTest(Testsuite.Ownership3);
         }

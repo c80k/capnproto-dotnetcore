@@ -511,7 +511,7 @@ namespace Capnp
             }
         }
 
-        internal void SetCapability(uint capabilityIndex)
+        public void SetCapability(uint capabilityIndex)
         {
             if (Kind == ObjectKind.Nil)
             {
@@ -1259,10 +1259,10 @@ namespace Capnp
         /// Adds an entry to the capability table if the provided capability does not yet exist.
         /// </summary>
         /// <param name="obj">The capability, in one of the following forms:<list type="bullet">
-        /// <item><description>Low-level capability object (<code>Rpc.ConsumedCapability</code>)</description></item>
-        /// <item><description>Proxy object (<code>Rpc.Proxy</code>). Note that the provision has "move semantics": SerializerState
+        /// <item><description>Low-level capability (<see cref="Rpc.ConsumedCapability"/>)</description></item>
+        /// <item><description>Proxy object (<see cref="Rpc.Proxy"/>). Note that the provision has "move semantics": SerializerState
         /// takes ownership, so the Proxy object will be disposed.</description></item>
-        /// <item><description>Skeleton object (<code>Rpc.Skeleton</code>)</description></item>
+        /// <item><description><see cref="Rpc.Skeleton"/> instance</description></item>
         /// <item><description>Capability interface implementation</description></item>
         /// </list></param>
         /// <returns>Index of the given capability in the capability table</returns>

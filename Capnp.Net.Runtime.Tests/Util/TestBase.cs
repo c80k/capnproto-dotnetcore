@@ -15,7 +15,7 @@ namespace Capnp.Net.Runtime.Tests
 {
     public interface ITestbed
     {
-        T ConnectMain<T>(T main) where T : class;
+        T ConnectMain<T>(object main) where T : class;
         void MustComplete(params Task[] tasks);
         void MustNotComplete(params Task[] tasks);
         void FlushCommunication();
@@ -52,8 +52,11 @@ namespace Capnp.Net.Runtime.Tests
 
                 public void Dismiss()
                 {
-                    OtherEndpoint.Dismiss();
-                    _dismissed = true;
+                    if (!_dismissed)
+                    {
+                        _dismissed = true;
+                        OtherEndpoint.Dismiss();
+                    }
                 }
 
                 public void Forward(WireFrame frame)
@@ -156,9 +159,9 @@ namespace Capnp.Net.Runtime.Tests
                 action(this);
             }
 
-            T ITestbed.ConnectMain<T>(T main)
+            T ITestbed.ConnectMain<T>(object main)
             {
-                return main;
+                return (T)main;
             }
 
             void ITestbed.FlushCommunication()
@@ -199,7 +202,7 @@ namespace Capnp.Net.Runtime.Tests
                 });
             }
 
-            T ITestbed.ConnectMain<T>(T main)
+            T ITestbed.ConnectMain<T>(object main)
             {
                 return SetupEnginePair<T>(main, _decisionTree, out _enginePair);
             }
@@ -242,7 +245,7 @@ namespace Capnp.Net.Runtime.Tests
                 }
             }
 
-            T ITestbed.ConnectMain<T>(T main)
+            T ITestbed.ConnectMain<T>(object main)
             {
                 _server.Main = main;
                 return _client.GetMain<T>();
@@ -330,7 +333,7 @@ namespace Capnp.Net.Runtime.Tests
             return (server, client);
         }
 
-        protected static T SetupEnginePair<T>(T main, DecisionTree decisionTree, out EnginePair pair) where T: class
+        protected static T SetupEnginePair<T>(object main, DecisionTree decisionTree, out EnginePair pair) where T: class
         {
             pair = new EnginePair(decisionTree);
             pair.Engine1.Main = main;

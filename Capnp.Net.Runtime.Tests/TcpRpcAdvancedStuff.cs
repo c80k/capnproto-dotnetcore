@@ -13,7 +13,7 @@ namespace Capnp.Net.Runtime.Tests
     [TestCategory("Coverage")]
     public class TcpRpcAdvancedStuff : TestBase
     {
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void MultiConnect()
         {
             using (var server = SetupServer())
@@ -51,7 +51,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void TwoClients()
         {
             using (var server = SetupServer())
@@ -90,7 +90,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void ClosingServerWhileRequestingBootstrap()
         {
             for (int i = 0; i < 100; i++)

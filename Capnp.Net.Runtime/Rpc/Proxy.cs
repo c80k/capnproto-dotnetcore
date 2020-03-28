@@ -131,18 +131,17 @@ namespace Capnp.Rpc
 #endif
         }
 
-        internal Skeleton? GetProvider()
+        internal async Task<Skeleton> GetProvider()
         {
-            switch (ConsumedCap)
+            var unwrapped = await ConsumedCap.Unwrap();
+
+            switch (unwrapped)
             {
                 case LocalCapability lcap:
                     return lcap.ProvidedCap;
 
-                case null:
-                    return null;
-
                 default:
-                    return Vine.Create(ConsumedCap);
+                    return Vine.Create(unwrapped);
             }
         }
 
@@ -214,15 +213,20 @@ namespace Capnp.Rpc
             }
         }
 
-        internal void Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
+        internal Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {
             if (_disposedValue)
                 throw new ObjectDisposedException(nameof(Proxy));
 
             if (ConsumedCap == null)
+            {
                 writer.which = CapDescriptor.WHICH.None;
+                return null;
+            }
             else
-                ConsumedCap.Export(endpoint, writer);
+            {
+                return ConsumedCap.Export(endpoint, writer);
+            }
         }
 
         internal void Freeze(out IRpcEndpoint? boundEndpoint)

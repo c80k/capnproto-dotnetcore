@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -89,6 +90,7 @@ namespace Capnp.Rpc
         internal object ReentrancyBlocker { get; } = new object();
         internal uint QuestionId => _questionId;
         internal State StateFlags { get; private set; }
+        internal IReadOnlyList<CapDescriptor.WRITER>? CapTable { get; set; }
 
         /// <summary>
         /// Eventually returns the server answer
@@ -323,6 +325,7 @@ namespace Capnp.Rpc
             try
             {
                 RpcEndpoint.SendQuestion(inParams, call.Params);
+                CapTable = call.Params.CapTable;
             }
             catch (System.Exception exception)
             {

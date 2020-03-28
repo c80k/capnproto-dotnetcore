@@ -53,7 +53,7 @@ namespace Capnp.Net.Runtime.Tests
                 ftask.GetAwaiter().GetResult(); // re-throw exception
         }
 
-        public static void Embargo(ITestbed testbed)
+        public static void EmbargoOnPromisedAnswer(ITestbed testbed)
         {
             var counters = new Counters();
             var impl = new TestMoreStuffImpl(counters);
@@ -113,7 +113,64 @@ namespace Capnp.Net.Runtime.Tests
                 }
             }
         }
- 
+
+        public static void EmbargoOnImportedCap(ITestbed testbed)
+        {
+            var impl = new TestMoreStuffImpl2();
+
+            using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
+            {
+                var cap = new TestCallOrderImpl();
+                cap.CountToDispose = 6;
+
+                var earlyCall = main.GetCallSequence(0, default);
+
+                var echo = main.Echo(cap, default);
+                testbed.MustComplete(echo);
+                using (var pipeline = echo.Result)
+                {
+                    var call0 = pipeline.GetCallSequence(0, default);
+                    var call1 = pipeline.GetCallSequence(1, default);
+
+                    testbed.MustComplete(earlyCall);
+
+                    impl.EnableEcho();
+
+                    var call2 = pipeline.GetCallSequence(2, default);
+
+                    testbed.MustComplete(echo);
+                    using (var resolved = echo.Result)
+                    {
+                        var call3 = pipeline.GetCallSequence(3, default);
+                        var call4 = pipeline.GetCallSequence(4, default);
+                        var call5 = pipeline.GetCallSequence(5, default);
+
+                        try
+                        {
+                            testbed.MustComplete(call0);
+                            testbed.MustComplete(call1);
+                            testbed.MustComplete(call2);
+                            testbed.MustComplete(call3);
+                            testbed.MustComplete(call4);
+                            testbed.MustComplete(call5);
+                        }
+                        catch (System.Exception)
+                        {
+                            cap.CountToDispose = null;
+                            throw;
+                        }
+
+                        Assert.AreEqual(0u, call0.Result);
+                        Assert.AreEqual(1u, call1.Result);
+                        Assert.AreEqual(2u, call2.Result);
+                        Assert.AreEqual(3u, call3.Result);
+                        Assert.AreEqual(4u, call4.Result);
+                        Assert.AreEqual(5u, call5.Result);
+                    }
+                }
+            }
+        }
+
         public static void EmbargoError(ITestbed testbed)
         {
             var counters = new Counters();
@@ -404,6 +461,55 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
+        public static void PromiseResolveLate(ITestbed testbed)
+        {
+            var counters = new Counters();
+            var impl = new TestMoreStuffImpl(counters);
+            using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
+            {
+                var tcs = new TaskCompletionSource<ITestInterface>();
+                var disposed = new TaskCompletionSource<int>();
+                using (var eager = tcs.Task.Eager(true))
+                {
+                    var request = main.NeverReturn(Proxy.Share(eager), new CancellationToken(true));
+
+                    testbed.MustComplete(request);
+
+                    var tiimpl = new TestInterfaceImpl(new Counters(), disposed);
+                    tcs.SetResult(tiimpl);
+
+                    Assert.IsFalse(tiimpl.IsDisposed);
+                }
+                testbed.MustComplete(disposed.Task);
+            }
+        }
+
+        public static void PromiseResolveError(ITestbed testbed)
+        {
+            var counters = new Counters();
+            var impl = new TestMoreStuffImpl(counters);
+            using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
+            {
+                var tcs = new TaskCompletionSource<ITestInterface>();
+                using (var eager = tcs.Task.Eager(true))
+                {
+                    var request = main.CallFoo(Proxy.Share(eager), default);
+                    var request2 = main.CallFooWhenResolved(eager, default);
+
+                    var gcs = main.GetCallSequence(0, default);
+                    testbed.MustComplete(gcs);
+                    Assert.AreEqual(2u, gcs.Result);
+                    Assert.AreEqual(3, counters.CallCount);
+
+                    tcs.SetException(new System.Exception("too bad"));
+
+                    testbed.MustComplete(request, request2);
+                    Assert.IsTrue(request.IsFaulted);
+                    Assert.IsTrue(request2.IsFaulted);
+                }
+            }
+        }
+
         public static void Cancelation(ITestbed testbed)
         {
             var counters = new Counters();
@@ -568,6 +674,79 @@ namespace Capnp.Net.Runtime.Tests
                 var ti = new TestInterfaceImpl(new Counters(), tcs);
                 testbed.MustComplete(nullProxy.CallFoo(ti, default));
                 testbed.MustComplete(tcs.Task);
+            }
+        }
+
+        class ThrowingSkeleton : Skeleton
+        {
+            public bool WasCalled { get; private set; }
+
+            public override Task<AnswerOrCounterquestion> Invoke(ulong interfaceId, ushort methodId, DeserializerState args, CancellationToken cancellationToken = default)
+            {
+                WasCalled = true;
+                throw new NotImplementedException();
+            }
+        }
+
+        public static void SillySkeleton(ITestbed testbed)
+        {
+            var impl = new ThrowingSkeleton();
+            using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
+            {
+                var tcs = new TaskCompletionSource<int>();
+                var ti = new TestInterfaceImpl(new Counters(), tcs);
+                testbed.ExpectPromiseThrows(main.CallFoo(ti));
+                Assert.IsTrue(impl.WasCalled);
+                testbed.MustComplete(tcs.Task);
+            }
+        }
+
+        public static void ImportReceiverAnswer(ITestbed testbed)
+        {
+            var impl = new TestMoreStuffImpl2();
+            using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
+            {
+                var held = main.GetHeld().Eager();
+                var foo = main.CallFoo(held);
+                testbed.MustNotComplete(foo);
+                var tcs = new TaskCompletionSource<int>();
+                testbed.MustComplete(
+                    main.Hold(new TestInterfaceImpl(new Counters(), tcs)),
+                    foo,
+                    tcs.Task);
+            }
+        }
+
+        public static void ImportReceiverAnswerError(ITestbed testbed)
+        {
+            var impl = new TestMoreStuffImpl2();
+            using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
+            using (var held = main.GetHeld().Eager())
+            {
+                var foo = main.CallFoo(held);
+                testbed.MustNotComplete(foo);
+                var faulted = Task.FromException<ITestInterface>(
+                    new InvalidOperationException("I faulted")).Eager(true);
+                testbed.MustComplete(
+                    main.Hold(faulted),
+                    foo);
+                Assert.IsTrue(foo.IsFaulted);
+            }
+        }
+
+        public static void ImportReceiverCanceled(ITestbed testbed)
+        {
+            var impl = new TestMoreStuffImpl2();
+            using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
+            using (var held = main.GetHeld().Eager())
+            {
+                var foo = main.CallFoo(held);
+                testbed.MustNotComplete(foo);
+                var canceled = Task.FromCanceled<ITestInterface>(new CancellationToken(true)).Eager(true);
+                testbed.MustComplete(
+                    main.Hold(canceled),
+                    foo);
+                Assert.IsTrue(foo.IsCanceled);
             }
         }
     }

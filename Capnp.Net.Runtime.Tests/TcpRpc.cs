@@ -44,7 +44,7 @@ namespace Capnp.Net.Runtime.Tests
 
         int MediumTimeout => Debugger.IsAttached ? Timeout.Infinite : 2000;
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void CreateAndDispose()
         {
             (var server, var client) = SetupClientServerPair();
@@ -55,7 +55,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void ConnectAndDispose()
         {
             (var server, var client) = SetupClientServerPair();
@@ -77,7 +77,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void ConnectNoServer()
         {
             using (var client = new TcpRpcClient("localhost", TcpPort))
@@ -86,7 +86,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void ConnectAndBootstrap()
         {
             (var server, var client) = SetupClientServerPair();
@@ -105,7 +105,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void ConnectNoBootstrap()
         {
             (var server, var client) = SetupClientServerPair();
@@ -123,7 +123,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void CallReturn()
         {
             (var server, var client) = SetupClientServerPair();
@@ -164,7 +164,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void CallCancelOnServer()
         {
             (var server, var client) = SetupClientServerPair();
@@ -199,7 +199,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void CallCancelOnClient()
         {
             ExpectingLogOutput = false;
@@ -244,7 +244,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void CallReturnAfterClientSideCancel()
         {
             ExpectingLogOutput = false;
@@ -306,7 +306,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void CallServerSideException()
         {
             (var server, var client) = SetupClientServerPair();
@@ -343,7 +343,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void PipelineBeforeReturn()
         {
             (var server, var client) = SetupClientServerPair();
@@ -416,7 +416,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void PipelineAfterReturn()
         {
             (var server, var client) = SetupClientServerPair();
@@ -492,7 +492,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void PipelineMultiple()
         {
             (var server, var client) = SetupClientServerPair();
@@ -609,7 +609,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void PipelineCallAfterDisposal()
         {
             (var server, var client) = SetupClientServerPair();
@@ -656,7 +656,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void PipelineCallDuringDisposal()
         {
             (var server, var client) = SetupClientServerPair();

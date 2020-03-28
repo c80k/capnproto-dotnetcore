@@ -10,9 +10,15 @@ namespace Capnp.Net.Runtime.Tests
     public class Dtbdct: TestBase
     {
         [TestMethod]
-        public void Embargo()
+        public void EmbargoOnPromisedAnswer()
         {
-            NewDtbdctTestbed().RunTest(Testsuite.Embargo);
+            NewDtbdctTestbed().RunTest(Testsuite.EmbargoOnPromisedAnswer);
+        }
+
+        [TestMethod]
+        public void EmbargoOnImportedCap()
+        {
+            NewDtbdctTestbed().RunTest(Testsuite.EmbargoOnImportedCap);
         }
 
         [TestMethod]
@@ -61,6 +67,18 @@ namespace Capnp.Net.Runtime.Tests
         public void PromiseResolve()
         {
             NewDtbdctTestbed().RunTest(Testsuite.PromiseResolve);
+        }
+
+        [TestMethod]
+        public void PromiseResolveLate()
+        {
+            NewDtbdctTestbed().RunTest(Testsuite.PromiseResolveLate);
+        }
+
+        [TestMethod]
+        public void PromiseResolveError()
+        {
+            NewDtbdctTestbed().RunTest(Testsuite.PromiseResolveError);
         }
 
         [TestMethod]
@@ -115,6 +133,30 @@ namespace Capnp.Net.Runtime.Tests
         public void Ownership3()
         {
             NewDtbdctTestbed().RunTest(Testsuite.Ownership3);
+        }
+
+        [TestMethod]
+        public void SillySkeleton()
+        {
+            NewDtbdctTestbed().RunTest(Testsuite.SillySkeleton);
+        }
+
+        [TestMethod]
+        public void ImportReceiverAnswer()
+        {
+            NewDtbdctTestbed().RunTest(Testsuite.ImportReceiverAnswer);
+        }
+
+        [TestMethod]
+        public void ImportReceiverAnswerError()
+        {
+            NewDtbdctTestbed().RunTest(Testsuite.ImportReceiverAnswerError);
+        }
+
+        [TestMethod]
+        public void ImportReceiverAnswerCanceled()
+        {
+            NewDtbdctTestbed().RunTest(Testsuite.ImportReceiverCanceled);
         }
     }
 }

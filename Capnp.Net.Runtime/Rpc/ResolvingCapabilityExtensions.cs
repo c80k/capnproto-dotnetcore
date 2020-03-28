@@ -5,6 +5,18 @@ namespace Capnp.Rpc
 {
     static class ResolvingCapabilityExtensions
     {
+        public static async Task<ConsumedCapability> Unwrap(this ConsumedCapability? cap)
+        {
+            cap ??= LazyCapability.Null;
+
+            while (cap is IResolvingCapability resolving)
+            {
+                cap = await resolving.WhenResolved ?? LazyCapability.Null;
+            }
+
+            return cap;
+        }
+
         public static Action? ExportAsSenderPromise<T>(this T cap, IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
             where T: ConsumedCapability, IResolvingCapability
         {
@@ -20,7 +32,7 @@ namespace Capnp.Rpc
 
                     try
                     {
-                        var resolvedCap = await cap.WhenResolved;
+                        var resolvedCap = await Unwrap(await cap.WhenResolved);
                         endpoint.Resolve(preliminaryId, vine, () => resolvedCap!);
                     }
                     catch (System.Exception exception)
