@@ -571,12 +571,12 @@ namespace Capnp.Net.Runtime.Tests
                 task1.Result.Dispose();
 
                 testbed.FlushCommunication();
-                Assert.AreEqual(1, counters.HandleCount);
+                Assert.IsTrue(SpinWait.SpinUntil(() => counters.HandleCount == 1, TestBase.ShortTimeout));
 
                 task2.Result.Dispose();
 
                 testbed.FlushCommunication();
-                Assert.AreEqual(0, counters.HandleCount);
+                Assert.IsTrue(SpinWait.SpinUntil(() => counters.HandleCount == 0, TestBase.ShortTimeout));
             }
         }
 

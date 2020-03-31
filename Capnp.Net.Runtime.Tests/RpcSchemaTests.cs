@@ -378,6 +378,10 @@ namespace Capnp.Net.Runtime.Tests
             var mb = MessageBuilder.Create();
             var root = mb.BuildRoot<TW>();
             obj.Serialize(root);
+            using (var tr = new FrameTracing.RpcFrameTracer(Console.Out))
+            {
+                tr.TraceFrame(FrameTracing.FrameDirection.Tx, mb.Frame);
+            }
             var d = (DeserializerState)root;
             var obj2 = new TD();
             obj2.Deserialize(d);

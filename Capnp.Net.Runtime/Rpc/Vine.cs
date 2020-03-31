@@ -7,7 +7,7 @@ namespace Capnp.Rpc
 {
     class Vine : Skeleton
     {
-        public static Skeleton Create(ConsumedCapability cap)
+        public static Skeleton Create(ConsumedCapability? cap)
         {
             if (cap is LocalCapability lcap)
                 return lcap.ProvidedCap;
@@ -15,9 +15,9 @@ namespace Capnp.Rpc
                 return new Vine(cap);
         }
 
-        Vine(ConsumedCapability consumedCap)
+        Vine(ConsumedCapability? consumedCap)
         {
-            Proxy = new Proxy(consumedCap ?? throw new ArgumentNullException(nameof(consumedCap)));
+            Proxy = new Proxy(consumedCap);
 
 #if DebugFinalizers
             CreatorStackTrace = Environment.StackTrace;

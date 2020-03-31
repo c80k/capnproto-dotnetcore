@@ -180,7 +180,7 @@ namespace Capnp.Rpc
             }
         }
 
-        public static async Task<TInterface> Unwrap<TInterface>(this TInterface cap) where TInterface: class, IDisposable
+        public static async Task<TInterface?> Unwrap<TInterface>(this TInterface cap) where TInterface: class, IDisposable
         {
             using var proxy = cap as Proxy;
 
@@ -188,6 +188,9 @@ namespace Capnp.Rpc
                 return cap;
 
             var unwrapped = await proxy.ConsumedCap.Unwrap();
+            if (unwrapped == null)
+                return null;
+
             return ((CapabilityReflection.CreateProxy<TInterface>(unwrapped)) as TInterface)!;
         }
 

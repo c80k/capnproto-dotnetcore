@@ -10,7 +10,7 @@ namespace Capnp
     {
         readonly ISegmentAllocator _allocator;
         readonly DynamicSerializerState _rootPtrBuilder;
-        List<Rpc.ConsumedCapability?>? _capTable;
+        List<Rpc.ConsumedCapability>? _capTable;
 
         MessageBuilder(ISegmentAllocator allocator)
         {
@@ -92,13 +92,13 @@ namespace Capnp
             if (_capTable != null)
                 throw new InvalidOperationException("Capability table was already initialized");
 
-            _capTable = new List<Rpc.ConsumedCapability?>();
+            _capTable = new List<Rpc.ConsumedCapability>();
         }
 
         /// <summary>
         /// Returns this message builder's segment allocator.
         /// </summary>
         public ISegmentAllocator Allocator => _allocator;
-        internal List<Rpc.ConsumedCapability?>? Caps => _capTable;
+        internal List<Rpc.ConsumedCapability>? Caps => _capTable;
     }
 }

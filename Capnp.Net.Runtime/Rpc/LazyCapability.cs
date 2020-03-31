@@ -16,8 +16,6 @@ namespace Capnp.Rpc
             return new LazyCapability(Task.FromCanceled<ConsumedCapability?>(token));
         }
 
-        public static LazyCapability Null => CreateBrokenCap("Null capability");
-
         readonly Task<Proxy>? _proxyTask;
 
         public LazyCapability(Task<ConsumedCapability?> capabilityTask)

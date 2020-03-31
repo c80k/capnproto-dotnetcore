@@ -108,7 +108,7 @@ namespace Capnp.Rpc
                                 try
                                 {
                                     var cap = aorcq.Answer.Caps![(int)cur.CapabilityIndex];
-                                    proxy = new Proxy(cap ?? LazyCapability.Null);
+                                    proxy = new Proxy(cap);
                                 }
                                 catch (ArgumentOutOfRangeException)
                                 {

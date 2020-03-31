@@ -219,10 +219,13 @@ namespace Capnp
         /// <summary>
         /// Encodes a capability pointer.
         /// </summary>
-        /// <param name="index">capability index</param>
-        public void SetCapability(uint index)
+        /// <param name="index">capability index, 'null' means 'null pointer'</param>
+        public void SetCapability(uint? index)
         {
-            _ptrData = ((ulong)index << 32) | (ulong)PointerKind.Other;
+            if (index.HasValue)
+                _ptrData = ((ulong)index << 32) | (ulong)PointerKind.Other;
+            else
+                _ptrData = 0;
         }
     }
 }

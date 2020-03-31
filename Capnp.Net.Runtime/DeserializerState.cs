@@ -49,7 +49,7 @@ namespace Capnp
         /// <summary>
         /// The capabilities imported from the capability table. Only valid in RPC context.
         /// </summary>
-        public IList<Rpc.ConsumedCapability?>? Caps { get; set; }
+        public IList<Rpc.ConsumedCapability>? Caps { get; set; }
         /// <summary>
         /// Current segment (essentially Segments[CurrentSegmentIndex])
         /// </summary>

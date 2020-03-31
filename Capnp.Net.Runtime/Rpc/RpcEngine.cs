@@ -1347,9 +1347,9 @@ namespace Capnp.Rpc
                 }
             }
 
-            internal IList<ConsumedCapability?> ImportCapTable(Payload.READER payload)
+            internal IList<ConsumedCapability> ImportCapTable(Payload.READER payload)
             {
-                var list = new List<ConsumedCapability?>();
+                var list = new List<ConsumedCapability>();
 
                 if (payload.CapTable != null)
                 {
@@ -1378,16 +1378,8 @@ namespace Capnp.Rpc
                 foreach (var cap in state.MsgBuilder.Caps)
                 {
                     var capDesc = payload.CapTable[i++];
-
-                    if (cap == null)
-                    {
-                        LazyCapability.Null.Export(this, capDesc);
-                    }
-                    else
-                    {
-                        postAction += cap.Export(this, capDesc);
-                        cap.Release();
-                    }
+                    postAction += cap.Export(this, capDesc);
+                    cap.Release();
                 }
 
                 Tx(state.MsgBuilder.Frame);

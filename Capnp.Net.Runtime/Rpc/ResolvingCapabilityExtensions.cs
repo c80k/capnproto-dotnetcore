@@ -5,13 +5,11 @@ namespace Capnp.Rpc
 {
     static class ResolvingCapabilityExtensions
     {
-        public static async Task<ConsumedCapability> Unwrap(this ConsumedCapability? cap)
+        public static async Task<ConsumedCapability?> Unwrap(this ConsumedCapability? cap)
         {
-            cap ??= LazyCapability.Null;
-
             while (cap is IResolvingCapability resolving)
             {
-                cap = await resolving.WhenResolved ?? LazyCapability.Null;
+                cap = await resolving.WhenResolved;
             }
 
             return cap;
@@ -66,7 +64,7 @@ namespace Capnp.Rpc
             switch (obj)
             {
                 case Proxy proxy: return proxy;
-                case null: return new Proxy(LazyCapability.Null);
+                case null: return new Proxy(null);
                 default: return BareProxy.FromImpl(obj);
             }
         }

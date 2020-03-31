@@ -79,7 +79,7 @@ namespace Capnp
         /// <item><description>This state does neither describe a struct, nor a list of pointers</description></item>
         /// <item><description>Another state is already linked to the specified position (sorry, no overwrite allowed)</description></item></list>
         /// </exception>
-        public new void LinkToCapability(int slot, uint capabilityIndex) => base.LinkToCapability(slot, capabilityIndex);
+        public new void LinkToCapability(int slot, uint? capabilityIndex) => base.LinkToCapability(slot, capabilityIndex);
 
         /// <summary>
         /// Determines the underlying object to be a struct.
@@ -88,6 +88,8 @@ namespace Capnp
         /// <param name="ptrCount">Desired size of the struct's pointer section, in words</param>
         /// <exception cref="InvalidOperationException">The object type was already set to something different</exception>
         public new void SetStruct(ushort dataCount, ushort ptrCount) => base.SetStruct(dataCount, ptrCount);
+
+        public new void SetCapability(uint? capabilityIndex) => base.SetCapability(capabilityIndex);
 
         /// <summary>
         /// Determines the underlying object to be a list of (primitive) values.

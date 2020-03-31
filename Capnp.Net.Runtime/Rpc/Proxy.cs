@@ -197,16 +197,13 @@ namespace Capnp.Rpc
         /// <param name="disposeThis">Whether to Dispose() this Proxy instance</param>
         /// <returns>Proxy for desired capability interface</returns>
         /// <exception cref="InvalidCapabilityInterfaceException"><typeparamref name="T"/> did not qualify as capability interface.</exception>
-        /// <exception cref="InvalidOperationException">This capability is broken, or mismatch between generic type arguments (if capability interface is generic).</exception>
+        /// <exception cref="InvalidOperationException">Mismatch between generic type arguments (if capability interface is generic).</exception>
         /// <exception cref="ArgumentException">Mismatch between generic type arguments (if capability interface is generic).</exception>
         /// <exception cref="System.Reflection.TargetInvocationException">Problem with instatiating the Proxy (constructor threw exception).</exception>
         /// <exception cref="MemberAccessException">Caller does not have permission to invoke the Proxy constructor.</exception>
         /// <exception cref="TypeLoadException">Problem with building the Proxy type, or problem with loading some dependent class.</exception>
         public T Cast<T>(bool disposeThis) where T: class
         {
-            if (IsNull)
-                throw new InvalidOperationException("Capability is broken");
-
             using (disposeThis ? this : null)
             {
                 return (CapabilityReflection.CreateProxy<T>(ConsumedCap) as T)!;

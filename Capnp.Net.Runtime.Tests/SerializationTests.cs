@@ -1,4 +1,5 @@
 ﻿using Capnp.Net.Runtime.Tests.GenImpls;
+using Capnp.Rpc;
 using Capnproto_test.Capnp.Test;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -229,7 +230,7 @@ namespace Capnp.Net.Runtime.Tests
         }
 
         [TestMethod]
-        public void ListOfStructs()
+        public void ListOfStructs1()
         {
             var b = MessageBuilder.Create();
             var list = b.CreateObject<ListOfStructsSerializer<SomeStruct.WRITER>>();
@@ -257,6 +258,19 @@ namespace Capnp.Net.Runtime.Tests
             Assert.AreEqual(4, list3.Count);
             Assert.AreEqual("0", list3[0].SomeText);
             Assert.AreEqual("3", list3[3].SomeText);
+        }
+
+        [TestMethod]
+        public void ListOfStructs2()
+        {
+            var b = MessageBuilder.Create();
+            var list = b.CreateObject<DynamicSerializerState>();
+            list.SetListOfStructs(3, 4, 5);
+            list.SetListOfStructs(3, 4, 5);
+            Assert.ThrowsException<InvalidOperationException>(() => list.SetListOfStructs(1, 4, 5));
+            Assert.ThrowsException<InvalidOperationException>(() => list.SetListOfStructs(3, 1, 5));
+            Assert.ThrowsException<InvalidOperationException>(() => list.SetListOfStructs(3, 4, 1));
+            Assert.ThrowsException<InvalidOperationException>(() => list.StructWriteData(0, 1, 1));
         }
 
         [TestMethod]
@@ -740,6 +754,172 @@ namespace Capnp.Net.Runtime.Tests
             Assert.ThrowsException<IndexOutOfRangeException>(() => { var _ = list[-1]; });
             Assert.ThrowsException<IndexOutOfRangeException>(() => { var _ = list[0]; });
             Assert.AreEqual(0, list.ToArray().Length);
+        }
+
+        class TestSerializerStateStruct11 : SerializerState
+        {
+            public TestSerializerStateStruct11()
+            {
+                SetStruct(1, 1);
+            }
+        }
+
+        class TestSerializerStateStruct20 : SerializerState
+        {
+            public TestSerializerStateStruct20()
+            {
+                SetStruct(2, 0);
+            }
+        }
+
+        class TestSerializerStateStruct11X : SerializerState
+        {
+            public TestSerializerStateStruct11X()
+            {
+                SetStruct(1, 1);
+            }
+        }
+
+        [TestMethod]
+        public void SerializerStateInvalidRewrap1()
+        {
+            var dss = new DynamicSerializerState(MessageBuilder.Create());
+            dss.SetListOfValues(8, 1);
+            Assert.ThrowsException<InvalidOperationException>(() => dss.Rewrap<TestSerializerStateStruct11>());
+        }
+
+        [TestMethod]
+        public void SerializerStateInvalidRewrap2()
+        {
+            var dss = new DynamicSerializerState();
+            dss.SetStruct(1, 0);
+            Assert.ThrowsException<InvalidOperationException>(() => dss.Rewrap<TestSerializerStateStruct11>());
+        }
+
+        [TestMethod]
+        public void SerializerStateInvalidRewrap3()
+        {
+            var dss = new DynamicSerializerState();
+            dss.SetStruct(0, 1);
+            Assert.ThrowsException<InvalidOperationException>(() => dss.Rewrap<TestSerializerStateStruct11>());
+        }
+
+        [TestMethod]
+        public void SerializerStateInvalidRewrap4()
+        {
+            var dss = new DynamicSerializerState();
+            dss.SetStruct(1, 0);
+            Assert.ThrowsException<InvalidOperationException>(() => dss.Rewrap<ListOfTextSerializer>());
+        }
+
+        [TestMethod]
+        public void UnboundSerializerState()
+        {
+            var dss = new DynamicSerializerState();
+            dss.SetStruct(1, 0);
+            Assert.ThrowsException<InvalidOperationException>(() => dss.WriteData(0, 0));
+        }
+
+        [TestMethod]
+        public void LinkBadUsage1()
+        {
+            var mb = MessageBuilder.Create();
+            var dss = mb.CreateObject<DynamicSerializerState>();
+            dss.SetStruct(0, 1);
+            Assert.ThrowsException<ArgumentNullException>(() => dss.Link(0, null));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => dss.Link(-1, dss));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => dss.Link(1, dss));
+            dss.Link(0, dss);
+            Assert.ThrowsException<InvalidOperationException>(() => dss.Link(0, mb.CreateObject<DynamicSerializerState>()));
+        }
+
+        [TestMethod]
+        public void LinkBadUsage2()
+        {
+            var dss = new DynamicSerializerState(MessageBuilder.Create());
+            dss.SetListOfPointers(1);
+            Assert.ThrowsException<ArgumentNullException>(() => dss.Link(0, null));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => dss.Link(-1, dss));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => dss.Link(1, dss));
+        }
+
+        [TestMethod]
+        public void StructReadCapNoCapTable()
+        {
+            var dss = new DynamicSerializerState(MessageBuilder.Create());
+            dss.SetStruct(0, 1);
+            Assert.ThrowsException<InvalidOperationException>(() => dss.ReadCap(0));
+        }
+
+        [TestMethod]
+        public void StructReadCap()
+        {
+            var dss = DynamicSerializerState.CreateForRpc();
+            dss.SetStruct(0, 3);
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => dss.ReadCap(-1));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => dss.ReadCap(100));
+            Assert.IsTrue(dss.ReadCap(0).IsNull);
+            dss.LinkToCapability(1, 99);
+            dss.Link(2, dss);
+            dss.Allocate();
+            Assert.IsTrue(dss.ReadCap(0).IsNull);
+            Assert.IsTrue(dss.ReadCap<ITestCallOrder>(0) is Proxy proxy && proxy.IsNull);
+            Assert.ThrowsException<Rpc.RpcException>(() => dss.ReadCap(1));
+            Assert.ThrowsException<Rpc.RpcException>(() => dss.ReadCap(2));
+        }
+
+        [TestMethod]
+        public void Rewrap()
+        {
+            var mb = MessageBuilder.Create();
+            var list1 = mb.CreateObject<ListOfStructsSerializer<TestSerializerStateStruct11>>();
+            list1.Init(3);
+            var list2 = list1.Rewrap<ListOfStructsSerializer<TestSerializerStateStruct11X>>();
+            list2[0].WriteData(0, 0);
+            Assert.ThrowsException<InvalidOperationException>(() => list2.Rewrap<TestSerializerStateStruct11>());
+            var obj = mb.CreateObject<TestSerializerStateStruct11>();
+            var obj2 = obj.Rewrap<TestSerializerStateStruct11X>();
+            Assert.ThrowsException<InvalidOperationException>(() => obj2.Rewrap<TestSerializerStateStruct20>());
+        }
+
+        [TestMethod]
+        public void AllocatedNil()
+        {
+            var mb = MessageBuilder.Create();
+            mb.InitCapTable();
+            var dss = mb.CreateObject<DynamicSerializerState>();
+            dss.Allocate();
+            Assert.ThrowsException<InvalidOperationException>(() => dss.SetCapability(0));
+            dss.SetCapability(null);
+            Assert.ThrowsException<InvalidOperationException>(() => dss.SetListOfPointers(1));
+            Assert.ThrowsException<InvalidOperationException>(() => dss.SetListOfStructs(1, 1, 1));
+            Assert.ThrowsException<InvalidOperationException>(() => dss.SetListOfValues(8, 1));
+            Assert.ThrowsException<InvalidOperationException>(() => dss.SetObject(mb.CreateObject<TestSerializerStateStruct11>()));
+            dss.SetObject(null);
+            Assert.ThrowsException<InvalidOperationException>(() => dss.SetStruct(1, 1));
+        }
+
+        [TestMethod]
+        public void SetCapability1()
+        {
+            var mb = MessageBuilder.Create();
+            mb.InitCapTable();
+            var dss = mb.CreateObject<DynamicSerializerState>();
+            dss.SetStruct(1, 1);
+            Assert.ThrowsException<InvalidOperationException>(() => dss.SetCapability(null));
+            Assert.ThrowsException<InvalidOperationException>(() => dss.SetCapability(0));
+        }
+
+        [TestMethod]
+        public void SetCapability2()
+        {
+            var mb = MessageBuilder.Create();
+            mb.InitCapTable();
+            var dss = mb.CreateObject<DynamicSerializerState>();
+            dss.SetCapability(7);
+            dss.SetCapability(7);
+            Assert.ThrowsException<InvalidOperationException>(() => dss.SetCapability(8));
+            Assert.ThrowsException<InvalidOperationException>(() => dss.SetCapability(null));
         }
     }
 }

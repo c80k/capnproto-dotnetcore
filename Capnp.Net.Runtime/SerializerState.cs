@@ -30,7 +30,7 @@ namespace Capnp
 
         internal MessageBuilder? MsgBuilder { get; set; }
         internal ISegmentAllocator? Allocator => MsgBuilder?.Allocator;
-        internal List<Rpc.ConsumedCapability?>? Caps => MsgBuilder?.Caps;
+        internal List<Rpc.ConsumedCapability>? Caps => MsgBuilder?.Caps;
         internal SerializerState? Owner { get; set; }
         internal int OwnerSlot { get; set; }
         internal uint SegmentIndex { get; set; }
@@ -156,7 +156,7 @@ namespace Capnp
         /// Returns the allocated memory slice (given this state already is allocated). Note that this definition is somewhat
         /// non-symmetric to <code>DeserializerState.RawData</code>. Never mind: You should not use it directly, anyway.
         /// </summary>
-        public Span<ulong> RawData => SegmentSpan.Slice(Offset, (int)WordsAllocated);
+        public Span<ulong> RawData => IsAllocated ? SegmentSpan.Slice(Offset, (int)WordsAllocated) : Span<ulong>.Empty;
 
         /// <summary>
         /// The kind of object this state currently represents.
@@ -169,12 +169,6 @@ namespace Capnp
             {
                 SegmentIndex = 0;
                 Offset = 0;
-            }
-            else if (Owner?.Kind == ObjectKind.ListOfStructs)
-            {
-                Owner.Allocate();
-                SegmentIndex = Owner.SegmentIndex;
-                Offset = Owner.Offset + OwnerSlot + 1;
             }
             else
             {
@@ -242,25 +236,43 @@ namespace Capnp
             }
         }
 
-        internal void EncodePointer(int offset, SerializerState target, bool allowCopy)
+        internal Rpc.ConsumedCapability? DecodeCapPointer(int offset)
         {
-            if (target == null)
-                throw new ArgumentNullException(nameof(target));
+            if (Caps == null)
+                throw new InvalidOperationException("Capbility table not set");
 
-            if (!target.IsAllocated)
-                throw new InvalidOperationException("Target must be allocated before a pointer can be built");
-
-            if (MsgBuilder == null)
-                throw Unbound();
-
-            try
+            if (!IsAllocated)
             {
-                if (SegmentSpan[offset] != 0)
-                    throw new InvalidOperationException("Won't replace an already allocated pointer to prevent memory leaks and security flaws");
+                return null;
             }
-            catch (IndexOutOfRangeException)
+
+            WirePointer pointer = RawData[offset];
+
+            if (pointer.IsNull)
             {
-                throw new ArgumentOutOfRangeException(nameof(offset));
+                return null;
+            }
+
+            if (pointer.Kind != PointerKind.Other)
+            {
+                throw new Rpc.RpcException(
+                    "Expected a capability pointer, but got something different");
+            }
+
+            if (pointer.CapabilityIndex >= Caps.Count)
+            {
+                throw new Rpc.RpcException(
+                    "Capability index out of range");
+            }
+
+            return Caps[(int)pointer.CapabilityIndex];
+        }
+
+        void EncodePointer(int offset, SerializerState target, bool allowCopy)
+        {
+            if (SegmentSpan[offset] != 0)
+            {
+                throw new InvalidOperationException("Won't replace an already allocated pointer to prevent memory leaks and security flaws");
             }
 
             if (target.Allocator != null &&
@@ -375,31 +387,6 @@ namespace Capnp
             }
         }
 
-        internal Rpc.ConsumedCapability? DecodeCapPointer(int offset)
-        {
-            if (offset < 0)
-                throw new IndexOutOfRangeException(nameof(offset));
-
-            if (Caps == null)
-                throw new InvalidOperationException("Capbility table not set");
-
-            WirePointer pointer = RawData[offset];
-
-            if (pointer.Kind != PointerKind.Other)
-            {
-                throw new Rpc.RpcException(
-                    "Expected a capability pointer, but got something different");
-            }
-
-            if (pointer.CapabilityIndex >= Caps.Count)
-            {
-                throw new Rpc.RpcException(
-                    "Capability index out of range");
-            }
-
-            return Caps[(int)pointer.CapabilityIndex];
-        }
-
         /// <summary>
         /// Links a sub-item (struct field or list element) of this state to another state. Usually, this operation is not necessary, since objects are constructed top-down.
         /// However, there might be some advanced scenarios where you want to reference the same object twice (also interesting for designing amplification attacks).
@@ -471,7 +458,7 @@ namespace Capnp
         /// <item><description>This state does neither describe a struct, nor a list of pointers</description></item>
         /// <item><description>Another state is already linked to the specified position (sorry, no overwrite allowed)</description></item></list>
         /// </exception>
-        protected void LinkToCapability(int slot, uint capabilityIndex)
+        protected void LinkToCapability(int slot, uint? capabilityIndex)
         {
             var cstate = new SerializerState();
             cstate.SetCapability(capabilityIndex);
@@ -511,19 +498,29 @@ namespace Capnp
             }
         }
 
-        public void SetCapability(uint capabilityIndex)
+        protected void SetCapability(uint? capabilityIndex)
         {
-            if (Kind == ObjectKind.Nil)
+            if (capabilityIndex.HasValue)
             {
-                VerifyNotYetAllocated();
+                if (Kind == ObjectKind.Nil)
+                {
+                    VerifyNotYetAllocated();
 
-                Kind = ObjectKind.Capability;
-                CapabilityIndex = capabilityIndex;
-                Allocate();
+                    Kind = ObjectKind.Capability;
+                    CapabilityIndex = capabilityIndex.Value;
+                    Allocate();
+                }
+                else if (Kind != ObjectKind.Capability || CapabilityIndex != capabilityIndex)
+                {
+                    throw AlreadySet();
+                }
             }
-            else if (Kind != ObjectKind.Capability || CapabilityIndex != capabilityIndex)
+            else
             {
-                throw AlreadySet();
+                if (Kind != ObjectKind.Nil)
+                {
+                    throw AlreadySet();
+                }
             }
         }
 
@@ -1225,10 +1222,13 @@ namespace Capnp
         /// Adds an entry to the capability table if the provided capability does not yet exist.
         /// </summary>
         /// <param name="capability">The low-level capability object to provide.</param>
-        /// <returns>Index of the given capability in the capability table</returns>
+        /// <returns>Index of the given capability in the capability table, null if capability is null</returns>
         /// <exception cref="InvalidOperationException">The underlying message builder was not configured for capability table support.</exception>
-        public uint ProvideCapability(Rpc.ConsumedCapability? capability)
+        public uint? ProvideCapability(Rpc.ConsumedCapability? capability)
         {
+            if (capability == null)
+                return null;
+
             if (Caps == null)
                 throw new InvalidOperationException("Underlying MessageBuilder was not enabled to support capabilities");
 
@@ -1252,7 +1252,7 @@ namespace Capnp
         /// <exception cref="InvalidOperationException">The underlying message builder was not configured for capability table support.</exception>
         public uint ProvideCapability(Rpc.Skeleton capability)
         {
-            return ProvideCapability(Rpc.LocalCapability.Create(capability));
+            return ProvideCapability(Rpc.LocalCapability.Create(capability))!.Value;
         }
 
         /// <summary>
@@ -1267,12 +1267,12 @@ namespace Capnp
         /// </list></param>
         /// <returns>Index of the given capability in the capability table</returns>
         /// <exception cref="InvalidOperationException">The underlying message builder was not configured for capability table support.</exception>
-        public uint ProvideCapability(object? obj)
+        public uint? ProvideCapability(object? obj)
         {
             switch (obj)
             {
                 case null:
-                    return ProvideCapability(default(Rpc.ConsumedCapability));
+                    return null;
                 case Rpc.Proxy proxy: using (proxy)
                     return ProvideCapability(proxy.ConsumedCap);
                 case Rpc.ConsumedCapability consumedCapability:
@@ -1348,8 +1348,8 @@ namespace Capnp
             if (Kind != ObjectKind.Struct && Kind != ObjectKind.Nil)
                 throw new InvalidOperationException("Allowed on structs only");
 
-            if (index >= StructPtrCount)
-                return null;
+            if (index < 0 || index >= StructPtrCount)
+                throw new ArgumentOutOfRangeException(nameof(index));
 
             return DecodeCapPointer(index + StructDataCount);
         }
