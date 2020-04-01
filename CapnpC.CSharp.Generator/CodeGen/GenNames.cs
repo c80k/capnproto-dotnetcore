@@ -77,6 +77,9 @@ namespace CapnpC.CSharp.Generator.CodeGen
         public bool NullableEnable { get; set; }
         public bool EmitDomainClassesAndInterfaces { get; set; }
         public SupportedAnnotations.TypeVisibility TypeVisibility { get; set; }
+        public string GeneratorToolName { get; }
+        public string GeneratorToolVersion { get; }
+
         public GenNames(GeneratorOptions options)
         {
             TopNamespace = new Name(options.TopNamespaceName).IdentifierName;
@@ -115,6 +118,8 @@ namespace CapnpC.CSharp.Generator.CodeGen
             ProxyClassFormat = options.ProxyClassFormat;
             SkeletonClassFormat = options.SkeletonClassFormat;
             AwaitProxy = new Name(options.AwaitProxyName);
+            GeneratorToolName = options.GeneratorToolName;
+            GeneratorToolVersion = options.GeneratorToolVersion;
         }
 
         public Name MakeTypeName(TypeDefinition def, NameUsage usage = NameUsage.Default)
@@ -729,5 +734,48 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 }
             }
         }
+
+        static LiteralExpressionSyntax HexLiteral(ulong id) =>
+            LiteralExpression(
+                SyntaxKind.NumericLiteralExpression,
+                Literal($"0x{id:x}UL", id));
+
+        static LiteralExpressionSyntax StringLiteral(string text) =>
+            LiteralExpression(
+                SyntaxKind.StringLiteralExpression,
+                Literal(text));
+
+        public FieldDeclarationSyntax MakeTypeIdConst(ulong id) =>
+            FieldDeclaration(
+                VariableDeclaration(
+                    IdentifierName("UInt64"))
+                .WithVariables(
+                    SingletonSeparatedList<VariableDeclaratorSyntax>(
+                        VariableDeclarator(TypeIdField.Identifier)
+                        .WithInitializer(
+                            EqualsValueClause(HexLiteral(id))))))
+                .WithModifiers(
+                    TokenList(
+                        new[]{
+                            Token(SyntaxKind.PublicKeyword),
+                            Token(SyntaxKind.ConstKeyword)}));
+
+        static AttributeSyntax MakeTypeIdAttribute(ulong id) =>
+            Attribute(
+                IdentifierName("TypeId"))
+            .WithArgumentList(
+                AttributeArgumentList(
+                    SingletonSeparatedList<AttributeArgumentSyntax>(
+                        AttributeArgument(HexLiteral(id)))));
+
+        public AttributeSyntax MakeGeneratedCodeAttribute() =>
+            Attribute(
+                IdentifierName("System.CodeDom.Compiler.GeneratedCode"))
+            .AddArgumentListArguments(
+                AttributeArgument(StringLiteral(GeneratorToolName)),
+                AttributeArgument(StringLiteral(GeneratorToolVersion)));
+
+        public AttributeListSyntax MakeTypeDecorationAttributes(ulong typeId) =>
+            AttributeList().AddAttributes(MakeGeneratedCodeAttribute(), MakeTypeIdAttribute(typeId));
     }
 }

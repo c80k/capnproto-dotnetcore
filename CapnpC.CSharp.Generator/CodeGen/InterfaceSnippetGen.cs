@@ -99,9 +99,8 @@ namespace CapnpC.CSharp.Generator.CodeGen
             var ifaceDecl = InterfaceDeclaration(_names.MakeTypeName(type, NameUsage.Interface).Identifier)
                 .AddModifiers(Public)
                 .AddAttributeLists(
-                    AttributeList()
+                    _names.MakeTypeDecorationAttributes(type.Id)
                         .AddAttributes(
-                            CommonSnippetGen.MakeTypeIdAttribute(type.Id),
                             Attribute(IdentifierName("Proxy"))
                                 .AddArgumentListArguments(
                                     AttributeArgument(

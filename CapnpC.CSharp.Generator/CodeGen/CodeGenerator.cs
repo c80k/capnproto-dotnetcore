@@ -81,8 +81,9 @@
                     .AddConstraintClauses(MakeTypeParameterConstraints(def).ToArray());
             }
 
-            topDecl = topDecl.AddMembers(CommonSnippetGen.MakeTypeIdConst(def.Id, _names));
-            topDecl = topDecl.WithAttributeLists(CommonSnippetGen.MakeTypeIdAttributeLists(def.Id));
+            topDecl = topDecl
+                .AddMembers(_names.MakeTypeIdConst(def.Id))
+                .AddAttributeLists(_names.MakeTypeDecorationAttributes(def.Id));
 
             if (def.UnionInfo != null)
             {
@@ -244,6 +245,7 @@
                 UsingDirective(ParseName("Capnp")),
                 UsingDirective(ParseName("Capnp.Rpc")),
                 UsingDirective(ParseName("System")),
+                UsingDirective(ParseName("System.CodeDom.Compiler")),
                 UsingDirective(ParseName("System.Collections.Generic")));
 
             if (_names.NullableEnable)

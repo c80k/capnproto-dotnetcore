@@ -39,5 +39,7 @@
         public string TypeIdFieldName { get; set; } = "typeId";
         public string AwaitProxyName { get; set; } = "AwaitProxy";
         public bool NullableEnableDefault { get; set; } = false;
+        public string GeneratorToolName { get; set; } = "capnpc-csharp";
+        public string GeneratorToolVersion = ThisAssembly.AssemblyVersion;
     }
 }

@@ -282,7 +282,7 @@ namespace Capnp
                 {
                     Allocate();
 
-                    var targetCopy = new DynamicSerializerState(MsgBuilder);
+                    var targetCopy = new DynamicSerializerState(MsgBuilder!);
                     Reserializing.DeepCopy(target, targetCopy);
                     target = targetCopy;
                 }
