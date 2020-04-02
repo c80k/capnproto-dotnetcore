@@ -80,6 +80,7 @@ namespace Capnp
         {
             SegmentIndex = other.SegmentIndex;
             Offset = other.Offset;
+            WordsAllocated = other.WordsAllocated;
             ListElementCount = other.ListElementCount;
             StructDataCount = other.StructDataCount;
             StructPtrCount = other.StructPtrCount;
@@ -712,6 +713,9 @@ namespace Capnp
             if (index >= data.Length)
                 return 0; // Assume backwards-compatible change
 
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count));
+
             if (relBitOffset + count > 64)
                 throw new ArgumentOutOfRangeException(nameof(count));
 
@@ -772,6 +776,9 @@ namespace Capnp
         {
             if (Kind != ObjectKind.Struct && Kind != ObjectKind.ListOfPointers)
                 throw new InvalidOperationException("This is not a struct or list of pointers");
+
+            if (index < 0 || index >= _linkedStates!.Length)
+                throw new ArgumentOutOfRangeException(nameof(index));
 
             var state = _linkedStates![index];
 
@@ -870,6 +877,9 @@ namespace Capnp
             if (Kind != ObjectKind.ListOfStructs)
                 throw new InvalidOperationException("This is not a list of structs");
 
+            if (index < 0 || index >= _linkedStates!.Length)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
             ref var state = ref _linkedStates![index];
 
             if (state == null)
@@ -896,6 +906,9 @@ namespace Capnp
         {
             if (Kind != ObjectKind.ListOfStructs)
                 throw new InvalidOperationException("This is not a list of structs");
+
+            if (index < 0 || index >= _linkedStates!.Length)
+                throw new ArgumentOutOfRangeException(nameof(index));
 
             ref var state = ref _linkedStates![index];
 
@@ -1045,7 +1058,7 @@ namespace Capnp
         /// </summary>
         /// <returns>The list bytes</returns>
         /// <exception cref="InvalidOperationException">The underlying object was not set to a list of bytes.</exception>
-        Span<byte> ListGetBytes()
+        public Span<byte> ListGetBytes()
         {
             if (Kind != ObjectKind.ListOfBytes)
                 throw new InvalidOperationException("This is not a list of bytes");
