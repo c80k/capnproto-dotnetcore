@@ -17,10 +17,11 @@ namespace Capnp.Rpc
         }
 
         readonly Task<Proxy>? _proxyTask;
+        readonly Task<ConsumedCapability?> _capTask;
 
         public LazyCapability(Task<ConsumedCapability?> capabilityTask)
         {
-            WhenResolved = capabilityTask;
+            _capTask = capabilityTask;
         }
 
         public LazyCapability(Task<Proxy> proxyTask)
@@ -29,7 +30,7 @@ namespace Capnp.Rpc
 
             async Task<ConsumedCapability?> AwaitCap() => (await _proxyTask!).ConsumedCap;
 
-            WhenResolved = AwaitCap();
+            _capTask = AwaitCap();
         }
 
         internal override void Freeze(out IRpcEndpoint? boundEndpoint)
@@ -40,7 +41,7 @@ namespace Capnp.Rpc
 
                 try
                 {
-                    WhenResolved.Result?.Freeze(out boundEndpoint);
+                    _capTask.Result?.Freeze(out boundEndpoint);
                 }
                 catch (AggregateException exception)
                 {
@@ -61,7 +62,7 @@ namespace Capnp.Rpc
         {
             if (WhenResolved.ReplacementTaskIsCompletedSuccessfully())
             {
-                using var proxy = new Proxy(WhenResolved.Result);
+                using var proxy = GetResolvedCapability<BareProxy>()!;
                 return proxy.Export(endpoint, writer);
             }
             else
@@ -84,14 +85,33 @@ namespace Capnp.Rpc
             }
         }
 
-        public Task<ConsumedCapability?> WhenResolved { get; }
+        public Task WhenResolved => _capTask;
+
+        public T? GetResolvedCapability<T>() where T: class
+        {
+            if (_capTask.IsCompleted)
+            {
+                try
+                {
+                    return CapabilityReflection.CreateProxy<T>(_capTask.Result) as T;
+                }
+                catch (AggregateException exception)
+                {
+                    throw exception.InnerException!;
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
 
         async Task<DeserializerState> CallImpl(ulong interfaceId, ushort methodId, DynamicSerializerState args, CancellationToken cancellationToken)
         {
             ConsumedCapability? cap;
             try
             {
-                cap = await WhenResolved;
+                cap = await _capTask;
             }
             catch
             {

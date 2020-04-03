@@ -17,7 +17,7 @@ namespace Capnp.Rpc
         /// <typeparam name="T">Capability interface</typeparam>
         /// <param name="obj">instance to share</param>
         /// <returns></returns>
-        public static T Share<T>(T obj) where T: class
+        public static T Share<T>(T obj) where T : class
         {
             if (obj is Proxy proxy)
                 return proxy.Cast<T>(false);
@@ -32,16 +32,28 @@ namespace Capnp.Rpc
         bool _disposedValue = false;
 
         /// <summary>
-        /// Will eventually give the resolved capability, if this is a promised capability.
+        /// Completes when the capability gets resolved.
         /// </summary>
-        public Task<ConsumedCapability?> WhenResolved
+        public Task WhenResolved
         {
             get
             {
-                return ConsumedCap is IResolvingCapability resolving ? 
-                    resolving.WhenResolved : 
-                    Task.FromResult(ConsumedCap);
+                return ConsumedCap is IResolvingCapability resolving ?
+                    resolving.WhenResolved : Task.CompletedTask;
             }
+        }
+
+        /// <summary>
+        /// Returns the resolved capability
+        /// </summary>
+        /// <typeparam name="T">Capability interface or <see cref="BareProxy"/></typeparam>
+        /// <returns>the resolved capability, or null if it did not resolve yet</returns>
+        public T? GetResolvedCapability<T>() where T : class
+        {
+            if (ConsumedCap is IResolvingCapability resolving)
+                return resolving.GetResolvedCapability<T>();
+            else
+                return CapabilityReflection.CreateProxy<T>(ConsumedCap) as T;
         }
 
         /// <summary>

@@ -21,9 +21,6 @@ namespace Capnp.Rpc
         public LocalAnswerCapability(Task<Proxy> proxyTask)
         {
             _whenResolvedProxy = proxyTask;
-
-            async Task<ConsumedCapability?> AwaitResolved() => (await _whenResolvedProxy).ConsumedCap;
-            WhenResolved = AwaitResolved();
         }
 
         public LocalAnswerCapability(Task<DeserializerState> answer, MemberAccessPath access):
@@ -42,7 +39,9 @@ namespace Capnp.Rpc
         }
 
 
-        public Task<ConsumedCapability?> WhenResolved { get; private set; }
+        public Task WhenResolved => _whenResolvedProxy;
+
+        public T? GetResolvedCapability<T>() where T : class => _whenResolvedProxy.GetResolvedCapability<T>();
 
         internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {

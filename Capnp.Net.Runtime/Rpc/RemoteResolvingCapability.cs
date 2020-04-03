@@ -16,7 +16,8 @@ namespace Capnp.Rpc
         ILogger Logger { get; } = Logging.CreateLogger<RemoteResolvingCapability>();
 #endif
 
-        public abstract Task<ConsumedCapability?> WhenResolved { get; }
+        public abstract Task WhenResolved { get; }
+        public abstract T? GetResolvedCapability<T>() where T : class;
 
         protected RemoteResolvingCapability(IRpcEndpoint ep) : base(ep)
         {

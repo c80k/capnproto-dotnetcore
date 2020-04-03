@@ -9,7 +9,9 @@ namespace Capnp.Rpc
         {
             while (cap is IResolvingCapability resolving)
             {
-                cap = await resolving.WhenResolved;
+                await resolving.WhenResolved;
+                using var proxy = resolving.GetResolvedCapability<BareProxy>()!;
+                cap = proxy.ConsumedCap;
             }
 
             return cap;
@@ -30,7 +32,9 @@ namespace Capnp.Rpc
 
                     try
                     {
-                        var resolvedCap = await Unwrap(await cap.WhenResolved);
+                        await cap.WhenResolved;
+                        using var proxy = cap.GetResolvedCapability<BareProxy>()!;
+                        var resolvedCap = await Unwrap(proxy.ConsumedCap);
                         endpoint.Resolve(preliminaryId, vine, () => resolvedCap!);
                     }
                     catch (System.Exception exception)
@@ -66,6 +70,25 @@ namespace Capnp.Rpc
                 case Proxy proxy: return proxy;
                 case null: return new Proxy(null);
                 default: return BareProxy.FromImpl(obj);
+            }
+        }
+
+        public static T? GetResolvedCapability<T>(this Task<Proxy> proxyTask) where T: class
+        {
+            if (proxyTask.IsCompleted)
+            {
+                try
+                {
+                    return proxyTask.Result.Cast<T>(false);
+                }
+                catch (AggregateException exception)
+                {
+                    throw exception.InnerException!;
+                }
+            }
+            else
+            {
+                return null;
             }
         }
     }

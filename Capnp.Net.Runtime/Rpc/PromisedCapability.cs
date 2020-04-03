@@ -16,11 +16,12 @@ namespace Capnp.Rpc
         {
             _remoteId = remoteId;
 
-            async Task<Proxy> AwaitProxy() => new Proxy(await WhenResolved);
+            async Task<Proxy> AwaitProxy() => new Proxy(await _resolvedCap.Task);
             _whenResolvedProxy = AwaitProxy();
         }
 
-        public override Task<ConsumedCapability?> WhenResolved => _resolvedCap.Task;
+        public override Task WhenResolved => _resolvedCap.Task;
+        public override T? GetResolvedCapability<T>() where T: class => _whenResolvedProxy.GetResolvedCapability<T>();
 
         internal override void Freeze(out IRpcEndpoint? boundEndpoint)
         {

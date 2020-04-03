@@ -23,18 +23,6 @@ namespace Capnp.Rpc
             _question = question ?? throw new ArgumentNullException(nameof(question));
             _access = access ?? throw new ArgumentNullException(nameof(access));
             _whenResolvedProxy = proxyTask ?? throw new ArgumentNullException(nameof(proxyTask));
-
-            async Task<ConsumedCapability?> AwaitWhenResolved()
-            {
-                var proxy = await _whenResolvedProxy;
-
-                if (_question.IsTailCall)
-                    throw new InvalidOperationException("Question is a tail call, so won't resolve back.");
-
-                return proxy.ConsumedCap;
-            }
-
-            WhenResolved = AwaitWhenResolved();
         }
 
         static async Task<Proxy> TransferOwnershipToDummyProxy(PendingQuestion question, MemberAccessPath access)
@@ -81,7 +69,7 @@ namespace Capnp.Rpc
                     {
                         try
                         {
-                            return WhenResolved.Result;
+                            return _whenResolvedProxy.Result.ConsumedCap;
                         }
                         catch (AggregateException exception)
                         {
@@ -96,7 +84,9 @@ namespace Capnp.Rpc
             }
         }
 
-        public override Task<ConsumedCapability?> WhenResolved { get; }
+        public override Task WhenResolved => _whenResolvedProxy;
+
+        public override T? GetResolvedCapability<T>() where T: class => _whenResolvedProxy.GetResolvedCapability<T>();
 
         protected override void GetMessageTarget(MessageTarget.WRITER wr)
         {
