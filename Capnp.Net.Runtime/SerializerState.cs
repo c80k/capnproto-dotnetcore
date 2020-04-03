@@ -1404,7 +1404,7 @@ namespace Capnp
             {
                 foreach (var cap in Caps)
                 {
-                    cap?.Release();
+                    cap.Release();
                 }
 
                 Caps.Clear();

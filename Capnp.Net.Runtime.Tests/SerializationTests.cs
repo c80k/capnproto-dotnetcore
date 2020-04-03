@@ -962,7 +962,7 @@ namespace Capnp.Net.Runtime.Tests
         }
 
         [TestMethod]
-        public void StructReadCap()
+        public void StructReadCap1()
         {
             var dss = DynamicSerializerState.CreateForRpc();
             dss.SetStruct(0, 3);
@@ -976,6 +976,15 @@ namespace Capnp.Net.Runtime.Tests
             Assert.IsTrue(dss.ReadCap<ITestCallOrder>(0) is Proxy proxy && proxy.IsNull);
             Assert.ThrowsException<Rpc.RpcException>(() => dss.ReadCap(1));
             Assert.ThrowsException<Rpc.RpcException>(() => dss.ReadCap(2));
+        }
+
+        [TestMethod]
+        public void StructReadCap2()
+        {
+            var dss = DynamicSerializerState.CreateForRpc();
+            dss.SetListOfStructs(1, 1, 1);
+            dss.Allocate();
+            Assert.ThrowsException<InvalidOperationException>(() => dss.ReadCap(0));
         }
 
         [TestMethod]
@@ -1077,6 +1086,57 @@ namespace Capnp.Net.Runtime.Tests
             Assert.AreEqual(s1, dss2.ListBuildStruct<TestSerializerStateStruct11>(1));
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => dss2.ListBuildStruct<TestSerializerStateStruct11>(-1));
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => dss2.ListBuildStruct<TestSerializerStateStruct11>(2));
+        }
+
+        [TestMethod]
+        public void LinkObject()
+        {
+            var mb = MessageBuilder.Create();
+            var dss = mb.CreateObject<DynamicSerializerState>();
+            dss.SetStruct(0, 4);
+            var s1 = mb.CreateObject<SomeStruct.WRITER>();
+            s1.SomeText = "foo";
+            s1.MoreText = "bar";
+            dss.LinkObject(0, s1);
+            var s2 = mb.CreateObject<SomeStruct.WRITER>();
+            s2.SomeText = "baz";
+            s2.MoreText = "foobar";
+            var d = (DeserializerState)s2;
+            dss.LinkObject(1, d);
+            var s3 = mb.CreateObject<SomeStruct.WRITER>();
+            s3.SomeText = "0";
+            var s4 = mb.CreateObject<SomeStruct.WRITER>();
+            s4.SomeText = "1";
+            var arr = new SomeStruct.WRITER[] { s3, s4 };
+            dss.LinkObject(2, arr);
+            Assert.ThrowsException<InvalidCapabilityInterfaceException>(() => dss.LinkObject(3, new object()));
+
+            var t1 = dss.BuildPointer(0).Rewrap<SomeStruct.WRITER>();
+            Assert.AreEqual("foo", t1.SomeText);
+            Assert.AreEqual("bar", t1.MoreText);
+            var t2 = dss.BuildPointer(1).Rewrap<SomeStruct.WRITER>();
+            Assert.AreEqual("baz", t2.SomeText);
+            Assert.AreEqual("foobar", t2.MoreText);
+            var l = dss.BuildPointer(2).Rewrap<ListOfPointersSerializer<SomeStruct.WRITER>>();
+            Assert.AreEqual(2, l.Count);
+            Assert.AreEqual("0", l[0].SomeText);
+            Assert.AreEqual("1", l[1].SomeText);
+            Assert.AreEqual(ObjectKind.Nil, dss.BuildPointer(3).Kind);
+        }
+
+        [TestMethod]
+        public void Disposing()
+        {
+            var mb = MessageBuilder.Create();
+            var dss = mb.CreateObject<DynamicSerializerState>();
+            dss.Dispose();
+            dss.Dispose();
+            var dss2 = DynamicSerializerState.CreateForRpc();
+            var cap = new TestInterfaceImpl2();
+            dss2.ProvideCapability(cap);
+            dss2.Dispose();
+            Assert.IsTrue(cap.IsDisposed);
+            dss2.Dispose();
         }
     }
 }

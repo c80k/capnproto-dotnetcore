@@ -449,6 +449,7 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
 
         public void Dispose()
         {
+            Assert.IsFalse(IsDisposed);
             IsDisposed = true;
         }
 
