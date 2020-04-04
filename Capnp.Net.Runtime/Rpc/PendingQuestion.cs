@@ -49,13 +49,7 @@ namespace Capnp.Rpc
             /// <summary>
             /// Question object was disposed.
             /// </summary>
-            Disposed = 16,
-
-            /// <summary>
-            /// Question object was finalized by GC. 
-            /// This flag should only be observable when debugging the finalizer itself.
-            /// </summary>
-            Finalized = 32
+            Disposed = 16
         }
 
         readonly TaskCompletionSource<DeserializerState> _tcs = new TaskCompletionSource<DeserializerState>();
@@ -76,7 +70,7 @@ namespace Capnp.Rpc
             {
                 foreach (var cap in inParams.Caps!)
                 {
-                    cap?.AddRef();
+                    cap.AddRef();
                 }
             }
 
@@ -279,7 +273,7 @@ namespace Capnp.Rpc
             {
                 foreach (var cap in inParams.Caps!)
                 {
-                    cap?.Release();
+                    cap.Release();
                 }
             }
 
@@ -293,7 +287,7 @@ namespace Capnp.Rpc
         {
             foreach (var cap in outParams.Caps!)
             {
-                cap?.Release();
+                cap.Release();
             }
         }
 
@@ -332,54 +326,7 @@ namespace Capnp.Rpc
                 OnException(exception);
             }
 
-            ReleaseCaps(target!, inParams);
-        }
-
-        #region IDisposable Support
-
-        void Dispose(bool disposing)
-        {
-            SerializerState? inParams;
-            ConsumedCapability? target;
-            bool justDisposed = false;
-
-            lock (ReentrancyBlocker)
-            {
-                inParams = _inParams;
-                _inParams = null;
-                target = _target;
-                _target = null;
-
-                if (disposing)
-                {
-                    if (!StateFlags.HasFlag(State.Disposed))
-                    {
-                        StateFlags |= State.Disposed;
-                        justDisposed = true;
-
-                        AutoFinish();
-                    }
-                }
-                else
-                {
-                    StateFlags |= State.Finalized;
-                }
-            }
-
             ReleaseCaps(target, inParams);
-
-            if (justDisposed)
-            {
-                _tcs.TrySetCanceled();
-            }
-        }
-
-        /// <summary>
-        /// Finalizer
-        /// </summary>
-        ~PendingQuestion()
-        {
-            Dispose(false);
         }
 
         /// <summary>
@@ -387,9 +334,23 @@ namespace Capnp.Rpc
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            bool justDisposed = false;
+
+            lock (ReentrancyBlocker)
+            {
+                if (!StateFlags.HasFlag(State.Disposed))
+                {
+                    StateFlags |= State.Disposed;
+                    justDisposed = true;
+
+                    AutoFinish();
+                }
+            }
+
+            if (justDisposed)
+            {
+                _tcs.TrySetCanceled();
+            }
         }
-        #endregion
     }
 }
