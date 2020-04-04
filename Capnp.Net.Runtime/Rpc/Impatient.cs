@@ -31,40 +31,11 @@ namespace Capnp.Rpc
 
             var rtask = AwaitAnswer();
 
-            try
-            {
-                // Really weird: We'd expect AwaitAnswer() to initialize a new Task instance upon each invocation.
-                // However, this does not seem to be always true (as indicated by CI test suite). An explanation might be
-                // that the underlying implementation recycles Task instances (um, really? doesn't make sense. But the
-                // observation doesn't make sense, either).
-
-                _taskTable.Add(rtask, promise);
-            }
-            catch (ArgumentException)
-            {
-                if (rtask.IsCompleted)
-                {
-                    // Force .NET to create a new Task instance
-                    if (rtask.IsCanceled)
-                    {
-                        rtask = Task.FromCanceled<T>(new CancellationToken(true));
-                    }
-                    else if (rtask.IsFaulted)
-                    {
-                        rtask = Task.FromException<T>(rtask.Exception!.InnerException!);
-                    }
-                    else
-                    {
-                        rtask = Task.FromResult<T>(rtask.Result);
-                    }
-                    
-                    _taskTable.Add(rtask, promise);
-                }
-                else
-                {
-                    throw new InvalidOperationException("What the heck is wrong with Task?");
-                }
-            }
+            // Rare situation: .NET maintains a cache of some pre-computed tasks for standard results (such as (int)0, (object)null).
+            // AwaitAnswer() might indeed have chosen a fast-path optimization, such that rtask is a cached object instead of a new instance.
+            // Once this happens the second time, and we return the same rtask for a different promise. GetAnswer()/TryGetAnswer() may return the "wrong"
+            // promise! Fortunately, this does not really matter, since the "wrong" promise is guaranteed to return exactly the same answer. :-)
+            _taskTable.GetValue(rtask, _ => promise);
 
             return rtask;
         }

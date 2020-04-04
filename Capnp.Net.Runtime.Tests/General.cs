@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Capnp.Rpc;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,6 +67,54 @@ namespace Capnp.Net.Runtime.Tests
             tcs.SetResult(0);
 
             Task.WhenAll(tasks).Wait();
+        }
+
+        class PromisedAnswerMock : IPromisedAnswer
+        {
+            readonly TaskCompletionSource<DeserializerState> _tcs = new TaskCompletionSource<DeserializerState>();
+
+            public Task<DeserializerState> WhenReturned => _tcs.Task;
+
+            public void Return()
+            {
+                _tcs.SetResult(default);
+            }
+
+            public void Cancel()
+            {
+                _tcs.SetCanceled();
+            }
+
+            public void Fault()
+            {
+                _tcs.SetException(new InvalidOperationException("test fault"));
+            }
+
+            public ConsumedCapability Access(MemberAccessPath access)
+            {
+                throw new NotImplementedException();
+            }
+
+            public ConsumedCapability Access(MemberAccessPath access, Task<IDisposable> proxyTask)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Dispose()
+            {
+            }
+        }
+
+        [TestMethod]
+        public void MakePipelineAwareOnFastPath()
+        {
+            var mock = new PromisedAnswerMock();
+            mock.Return();
+            for (int i = 0; i < 100; i++)
+            {
+                var t = Impatient.MakePipelineAware(mock, _ => (object)null);
+                Assert.IsTrue(t.IsCompleted);
+            };
         }
     }
 }

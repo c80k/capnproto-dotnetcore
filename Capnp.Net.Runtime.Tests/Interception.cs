@@ -97,6 +97,46 @@ namespace Capnp.Net.Runtime.Tests
         }
 
         [TestMethod]
+        public void InterceptServerSideRedirectCall()
+        {
+            var policy = new MyPolicy("a");
+
+            (var server, var client) = SetupClientServerPair();
+
+            using (server)
+            using (client)
+            {
+                client.WhenConnected.Wait();
+
+                var counters = new Counters();
+                server.Main = policy.Attach<ITestInterface>(new TestInterfaceImpl(counters));
+                var redirTarget = new TestInterfaceImpl2();
+                using (var main = client.GetMain<ITestInterface>())
+                using (redirTarget)
+                {
+                    var request1 = main.Foo(123, true, default);
+                    var fcc = policy.Calls.ReceiveAsync();
+                    Assert.IsTrue(fcc.Wait(MediumNonDbgTimeout));
+                    var cc = fcc.Result;
+
+                    Assert.ThrowsException<ArgumentNullException>(() => cc.Bob = null);
+                    cc.Bob = redirTarget;
+                    cc.ForwardToBob();
+
+                    Assert.IsTrue(policy.Returns.ReceiveAsync().Wait(MediumNonDbgTimeout));
+
+                    cc.ReturnToAlice();
+
+                    Assert.IsTrue(request1.Wait(MediumNonDbgTimeout));
+
+                    Assert.AreEqual("bar", request1.Result);
+                }
+                Assert.IsTrue(redirTarget.IsDisposed);
+                Assert.AreEqual(0, counters.CallCount);
+            }
+        }
+
+        [TestMethod]
         public void InterceptClientSideModifyCall()
         {
             var policy = new MyPolicy("a");
@@ -280,6 +320,41 @@ namespace Capnp.Net.Runtime.Tests
 
                     Assert.IsTrue(request1.IsCompleted);
                     Assert.IsTrue(request1.IsFaulted);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void InterceptClientSideOverrideFaultedCall()
+        {
+            var policy = new MyPolicy("a");
+
+            (var server, var client) = SetupClientServerPair();
+
+            using (server)
+            using (client)
+            {
+                client.WhenConnected.Wait();
+
+                var counters = new Counters();
+                server.Main = new TestInterfaceImpl(counters);
+                using (var main = policy.Attach(client.GetMain<ITestInterface>()))
+                {
+                    var request1 = main.Bar();
+                    Assert.IsTrue(policy.Calls.TryReceive(out var cc));
+                    Assert.IsFalse(request1.IsCompleted);
+
+                    cc.ForwardToBob();
+                    Assert.IsTrue(policy.Returns.ReceiveAsync().Wait(MediumNonDbgTimeout));
+                    Assert.IsNotNull(cc.Exception);
+                    cc.ReturnCanceled = false;
+                    cc.Exception = null;
+
+                    cc.ReturnToAlice();
+                    Assert.ThrowsException<InvalidOperationException>(() => cc.ReturnToAlice());
+
+                    Assert.IsTrue(request1.IsCompleted);
+                    Assert.IsFalse(request1.IsFaulted);
                 }
             }
         }

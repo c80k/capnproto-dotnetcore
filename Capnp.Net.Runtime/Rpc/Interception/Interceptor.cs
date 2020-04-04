@@ -45,7 +45,8 @@ namespace Capnp.Rpc.Interception
             switch (cap)
             {
                 case Proxy proxy:
-                    return (CapabilityReflection.CreateProxy<TCap>(Attach(policy, proxy.ConsumedCap!)) as TCap)!;
+                    return (CapabilityReflection.CreateProxy<TCap>(
+                        Attach(policy, proxy.ConsumedCap!)) as TCap)!;
 
                 case ConsumedCapability ccap:
                     return (new CensorCapability(ccap, policy) as TCap)!;
