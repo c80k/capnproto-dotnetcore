@@ -203,6 +203,10 @@ namespace Capnp
                         GetRawBytes();
                         break;
 
+                    case ObjectKind.ListOfShorts:
+                        GetRawShorts();
+                        break;
+
                     case ObjectKind.ListOfInts:
                         GetRawInts();
                         break;
@@ -303,6 +307,8 @@ namespace Capnp
 
                             case ListKind.ListOfStructs:
                                 {
+                                    if (Offset >= CurrentSegment.Length)
+                                        throw new DeserializationException("List of composites pointer exceeds segment bounds");
                                     WirePointer tag = CurrentSegment[Offset];
                                     if (tag.Kind != PointerKind.Struct)
                                         throw new DeserializationException("Unexpected: List of composites with non-struct type tag");
@@ -326,6 +332,10 @@ namespace Capnp
                         if (pointer.IsDoubleFar)
                         {
                             CurrentSegmentIndex = pointer.TargetSegmentIndex;
+
+                            if (pointer.LandingPadOffset >= CurrentSegment.Length - 1)
+                                throw new DeserializationException("Error decoding double-far pointer: exceeds segment bounds");
+
                             Offset = 0;
 
                             WirePointer pointer1 = CurrentSegment[pointer.LandingPadOffset];
@@ -373,14 +383,14 @@ namespace Capnp
         /// </summary>
         /// <param name="offset">Offset relative to this.Offset within current segment</param>
         /// <returns>the low-level capability object, or null if it is a null pointer</returns>
-        /// <exception cref="IndexOutOfRangeException">offset negative or out of range</exception>
+        /// <exception cref="ArgumentOutOfRangeException">offset negative or out of range</exception>
         /// <exception cref="InvalidOperationException">capability table not set</exception>
         /// <exception cref="Rpc.RpcException">not a capability pointer or invalid capability index</exception>
         internal Rpc.ConsumedCapability? DecodeCapPointer(int offset)
         {
             if (offset < 0)
             {
-                throw new IndexOutOfRangeException(nameof(offset));
+                throw new ArgumentOutOfRangeException(nameof(offset));
             }
 
             if (Caps == null)
@@ -677,7 +687,7 @@ namespace Capnp
                 throw new DeserializationException("Expected a capability");
 
             if (Caps == null)
-                throw new InvalidOperationException("Capability table not set. This is a bug.");
+                throw new InvalidOperationException("Capability table not set");
 
             return (Rpc.CapabilityReflection.CreateProxy<T>(Caps[(int)CapabilityIndex]) as T)!;
         }

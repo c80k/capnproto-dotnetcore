@@ -7,6 +7,9 @@ using Capnp.Rpc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using System.Threading.Tasks.Dataflow;
+using Capnp.Net.Runtime.Tests.GenImpls;
+using Capnproto_test.Capnp.Test;
 
 namespace Capnp.Net.Runtime.Tests
 {
@@ -42,7 +45,7 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        int MediumTimeout => Debugger.IsAttached ? Timeout.Infinite : 2000;
+        int MediumNonDbgTimeout => Debugger.IsAttached ? Timeout.Infinite : 2000;
 
         [TestMethod]
         public void CreateAndDispose()
@@ -66,7 +69,7 @@ namespace Capnp.Net.Runtime.Tests
                 try
                 {
                     client.WhenConnected.Wait();
-                    SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
+                    SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumNonDbgTimeout);
                     Assert.AreEqual(1, server.ConnectionCount);
                 }
                 catch (System.Exception e)
@@ -95,13 +98,13 @@ namespace Capnp.Net.Runtime.Tests
             using (client)
             {
                 client.WhenConnected.Wait();
-                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
+                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumNonDbgTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 
                 server.Main = new ProvidedCapabilityMock();
                 var main = client.GetMain<BareProxy>();
                 var resolving = main as IResolvingCapability;
-                Assert.IsTrue(resolving.WhenResolved.Wait(MediumTimeout));
+                Assert.IsTrue(resolving.WhenResolved.Wait(MediumNonDbgTimeout));
             }
         }
 
@@ -114,12 +117,12 @@ namespace Capnp.Net.Runtime.Tests
             using (client)
             {
                 client.WhenConnected.Wait();
-                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
+                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumNonDbgTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 
                 var main = client.GetMain<BareProxy>();
                 var resolving = main as IResolvingCapability;
-                Assert.IsTrue(Assert.ThrowsExceptionAsync<RpcException>(() => resolving.WhenResolved).Wait(MediumTimeout));
+                Assert.IsTrue(Assert.ThrowsExceptionAsync<RpcException>(() => resolving.WhenResolved).Wait(MediumNonDbgTimeout));
             }
         }
 
@@ -132,19 +135,19 @@ namespace Capnp.Net.Runtime.Tests
             using (client)
             {
                 client.WhenConnected.Wait();
-                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
+                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumNonDbgTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 
                 var mock = new ProvidedCapabilityMock();
                 server.Main = mock;
                 var main = client.GetMain<BareProxy>();
-                Assert.IsTrue(main.WhenResolved.Wait(MediumTimeout));
+                Assert.IsTrue(main.WhenResolved.Wait(MediumNonDbgTimeout));
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
                 using (var answer = main.Call(0x1234567812345678, 0x3333, args))
                 {
-                    Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
+                    Assert.IsTrue(mock.WhenCalled.Wait(MediumNonDbgTimeout));
                     (var interfaceId, var methodId, var inargs, var ct) = mock.WhenCalled.Result;
                     Assert.AreEqual<ulong>(0x1234567812345678, interfaceId);
                     Assert.AreEqual<ushort>(0x3333, methodId);
@@ -156,7 +159,7 @@ namespace Capnp.Net.Runtime.Tests
                     result.WriteData(0, 654321);
                     mock.Return.SetResult(result);
 
-                    Assert.IsTrue(answer.WhenReturned.Wait(MediumTimeout));
+                    Assert.IsTrue(answer.WhenReturned.Wait(MediumNonDbgTimeout));
                     var outresult = answer.WhenReturned.Result;
                     Assert.AreEqual(ObjectKind.Struct, outresult.Kind);
                     Assert.AreEqual(654321, outresult.ReadDataInt(0));
@@ -173,19 +176,19 @@ namespace Capnp.Net.Runtime.Tests
             using (client)
             {
                 client.WhenConnected.Wait();
-                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
+                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumNonDbgTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 
                 var mock = new ProvidedCapabilityMock();
                 server.Main = mock;
                 var main = client.GetMain<BareProxy>();
-                Assert.IsTrue(main.WhenResolved.Wait(MediumTimeout));
+                Assert.IsTrue(main.WhenResolved.Wait(MediumNonDbgTimeout));
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
                 using (var answer = main.Call(0x1234567812345678, 0x3333, args))
                 {
-                    Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
+                    Assert.IsTrue(mock.WhenCalled.Wait(MediumNonDbgTimeout));
                     (var interfaceId, var methodId, var inargs, var ct) = mock.WhenCalled.Result;
                     Assert.AreEqual<ulong>(0x1234567812345678, interfaceId);
                     Assert.AreEqual<ushort>(0x3333, methodId);
@@ -194,7 +197,7 @@ namespace Capnp.Net.Runtime.Tests
 
                     mock.Return.SetCanceled();
 
-                    Assert.IsTrue(Assert.ThrowsExceptionAsync<TaskCanceledException>(() => answer.WhenReturned).Wait(MediumTimeout));
+                    Assert.IsTrue(Assert.ThrowsExceptionAsync<TaskCanceledException>(() => answer.WhenReturned).Wait(MediumNonDbgTimeout));
                 }
             }
         }
@@ -212,21 +215,21 @@ namespace Capnp.Net.Runtime.Tests
                 try
                 {
                     client.WhenConnected.Wait();
-                    SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
+                    SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumNonDbgTimeout);
                     Assert.AreEqual(1, server.ConnectionCount);
 
                     var mock = new ProvidedCapabilityMock();
                     server.Main = mock;
                     var main = client.GetMain<BareProxy>();
                     var resolving = main as IResolvingCapability;
-                    Assert.IsTrue(resolving.WhenResolved.Wait(MediumTimeout));
+                    Assert.IsTrue(resolving.WhenResolved.Wait(MediumNonDbgTimeout));
                     var args = DynamicSerializerState.CreateForRpc();
                     args.SetStruct(1, 0);
                     args.WriteData(0, 123456);
                     CancellationToken ctx;
                     using (var answer = main.Call(0x1234567812345678, 0x3333, args))
                     {
-                        Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
+                        Assert.IsTrue(mock.WhenCalled.Wait(MediumNonDbgTimeout));
                         (var interfaceId, var methodId, var inargs, var ct) = mock.WhenCalled.Result;
                         Assert.AreEqual<ulong>(0x1234567812345678, interfaceId);
                         Assert.AreEqual<ushort>(0x3333, methodId);
@@ -235,7 +238,7 @@ namespace Capnp.Net.Runtime.Tests
                         ctx = ct;
                     }
 
-                    Assert.IsTrue(SpinWait.SpinUntil(() => ctx.IsCancellationRequested, MediumTimeout));
+                    Assert.IsTrue(SpinWait.SpinUntil(() => ctx.IsCancellationRequested, MediumNonDbgTimeout));
                 }
                 finally
                 {
@@ -256,13 +259,13 @@ namespace Capnp.Net.Runtime.Tests
                 try
                 {
                     client.WhenConnected.Wait();
-                    SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
+                    SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumNonDbgTimeout);
                     Assert.AreEqual(1, server.ConnectionCount);
 
                     var mock = new ProvidedCapabilityMock();
                     server.Main = mock;
                     var main = client.GetMain<BareProxy>();
-                    Assert.IsTrue(main.WhenResolved.Wait(MediumTimeout));
+                    Assert.IsTrue(main.WhenResolved.Wait(MediumNonDbgTimeout));
                     var args = DynamicSerializerState.CreateForRpc();
                     args.SetStruct(1, 0);
                     args.WriteData(0, 123456);
@@ -270,7 +273,7 @@ namespace Capnp.Net.Runtime.Tests
                     IPromisedAnswer answer;
                     using (answer = main.Call(0x1234567812345678, 0x3333, args))
                     {
-                        Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
+                        Assert.IsTrue(mock.WhenCalled.Wait(MediumNonDbgTimeout));
                         (var interfaceId, var methodId, var inargs, var ct) = mock.WhenCalled.Result;
                         Assert.AreEqual<ulong>(0x1234567812345678, interfaceId);
                         Assert.AreEqual<ushort>(0x3333, methodId);
@@ -279,7 +282,7 @@ namespace Capnp.Net.Runtime.Tests
                         ctx = ct;
                     }
 
-                    Assert.IsTrue(SpinWait.SpinUntil(() => ctx.IsCancellationRequested, MediumTimeout));
+                    Assert.IsTrue(SpinWait.SpinUntil(() => ctx.IsCancellationRequested, MediumNonDbgTimeout));
 
                     var mbr = MessageBuilder.Create();
                     mbr.InitCapTable();
@@ -290,7 +293,7 @@ namespace Capnp.Net.Runtime.Tests
 
                     // Even after the client cancelled the call, the server must still send
                     // a response.
-                    Assert.IsTrue(answer.WhenReturned.ContinueWith(t => { }).Wait(MediumTimeout));
+                    Assert.IsTrue(answer.WhenReturned.ContinueWith(t => { }).Wait(MediumNonDbgTimeout));
                 }
                 finally
                 {
@@ -315,19 +318,19 @@ namespace Capnp.Net.Runtime.Tests
             using (client)
             {
                 client.WhenConnected.Wait();
-                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
+                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumNonDbgTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 
                 var mock = new ProvidedCapabilityMock();
                 server.Main = mock;
                 var main = client.GetMain<BareProxy>();
-                Assert.IsTrue(main.WhenResolved.Wait(MediumTimeout));
+                Assert.IsTrue(main.WhenResolved.Wait(MediumNonDbgTimeout));
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
                 using (var answer = main.Call(0x1234567812345678, 0x3333, args))
                 {
-                    Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
+                    Assert.IsTrue(mock.WhenCalled.Wait(MediumNonDbgTimeout));
                     (var interfaceId, var methodId, var inargs, var ct) = mock.WhenCalled.Result;
                     Assert.AreEqual<ulong>(0x1234567812345678, interfaceId);
                     Assert.AreEqual<ushort>(0x3333, methodId);
@@ -337,7 +340,7 @@ namespace Capnp.Net.Runtime.Tests
                     mock.Return.SetException(new MyTestException());
 
                     var exTask = Assert.ThrowsExceptionAsync<RpcException>(() => answer.WhenReturned);
-                    Assert.IsTrue(exTask.Wait(MediumTimeout));
+                    Assert.IsTrue(exTask.Wait(MediumNonDbgTimeout));
                     Assert.IsTrue(exTask.Result.Message.Contains(new MyTestException().Message));
                 }
             }
@@ -352,19 +355,19 @@ namespace Capnp.Net.Runtime.Tests
             using (client)
             {
                 client.WhenConnected.Wait();
-                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
+                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumNonDbgTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 
                 var mock = new ProvidedCapabilityMock();
                 server.Main = mock;
                 var main = client.GetMain<BareProxy>();
-                Assert.IsTrue(main.WhenResolved.Wait(MediumTimeout));
+                Assert.IsTrue(main.WhenResolved.Wait(MediumNonDbgTimeout));
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
                 using (var answer = main.Call(0x1234567812345678, 0x3333, args))
                 {
-                    Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
+                    Assert.IsTrue(mock.WhenCalled.Wait(MediumNonDbgTimeout));
 
                     var pipelined = (BareProxy)CapabilityReflection.CreateProxy<BareProxy>(answer.Access(
                         new MemberAccessPath(new MemberAccessPath.MemberAccess[] { new MemberAccessPath.StructMemberAccess(1) })));
@@ -391,10 +394,10 @@ namespace Capnp.Net.Runtime.Tests
 
                         mock.Return.SetResult(result);
 
-                        Assert.IsTrue(answer.WhenReturned.Wait(MediumTimeout));
+                        Assert.IsTrue(answer.WhenReturned.Wait(MediumNonDbgTimeout));
                         Assert.IsFalse(ct.IsCancellationRequested);
 
-                        Assert.IsTrue(mock2.WhenCalled.Wait(MediumTimeout));
+                        Assert.IsTrue(mock2.WhenCalled.Wait(MediumNonDbgTimeout));
 
                         (var interfaceId2, var methodId2, var inargs2, var ct2) = mock2.WhenCalled.Result;
                         Assert.AreEqual<ulong>(0x8765432187654321, interfaceId2);
@@ -407,7 +410,7 @@ namespace Capnp.Net.Runtime.Tests
                         result2.WriteData(0, 222222);
                         mock2.Return.SetResult(result2);
 
-                        Assert.IsTrue(answer2.WhenReturned.Wait(MediumTimeout));
+                        Assert.IsTrue(answer2.WhenReturned.Wait(MediumNonDbgTimeout));
                         var outresult2 = answer2.WhenReturned.Result;
                         Assert.AreEqual(ObjectKind.Struct, outresult2.Kind);
                         Assert.AreEqual(222222, outresult2.ReadDataInt(0));
@@ -425,19 +428,19 @@ namespace Capnp.Net.Runtime.Tests
             using (client)
             {
                 client.WhenConnected.Wait();
-                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
+                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumNonDbgTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 
                 var mock = new ProvidedCapabilityMock();
                 server.Main = mock;
                 var main = client.GetMain<BareProxy>();
-                Assert.IsTrue(main.WhenResolved.Wait(MediumTimeout));
+                Assert.IsTrue(main.WhenResolved.Wait(MediumNonDbgTimeout));
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
                 using (var answer = main.Call(0x1234567812345678, 0x3333, args))
                 {
-                    Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
+                    Assert.IsTrue(mock.WhenCalled.Wait(MediumNonDbgTimeout));
 
                     (var interfaceId, var methodId, var inargs, var ct) = mock.WhenCalled.Result;
                     Assert.AreEqual<ulong>(0x1234567812345678, interfaceId);
@@ -467,8 +470,8 @@ namespace Capnp.Net.Runtime.Tests
 
                         using (var answer2 = pipelined.Call(0x8765432187654321, 0x4444, args2))
                         {
-                            Assert.IsTrue(answer.WhenReturned.Wait(MediumTimeout));
-                            Assert.IsTrue(mock2.WhenCalled.Wait(MediumTimeout));
+                            Assert.IsTrue(answer.WhenReturned.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(mock2.WhenCalled.Wait(MediumNonDbgTimeout));
 
                             (var interfaceId2, var methodId2, var inargs2, var ct2) = mock2.WhenCalled.Result;
                             Assert.AreEqual<ulong>(0x8765432187654321, interfaceId2);
@@ -481,7 +484,7 @@ namespace Capnp.Net.Runtime.Tests
                             result2.WriteData(0, 222222);
                             mock2.Return.SetResult(result2);
 
-                            Assert.IsTrue(answer2.WhenReturned.Wait(MediumTimeout));
+                            Assert.IsTrue(answer2.WhenReturned.Wait(MediumNonDbgTimeout));
                             var outresult2 = answer2.WhenReturned.Result;
                             Assert.AreEqual(ObjectKind.Struct, outresult2.Kind);
                             Assert.AreEqual(222222, outresult2.ReadDataInt(0));
@@ -501,19 +504,19 @@ namespace Capnp.Net.Runtime.Tests
             using (client)
             {
                 client.WhenConnected.Wait();
-                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
+                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumNonDbgTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 
                 var mock = new ProvidedCapabilityMock();
                 server.Main = mock;
                 var main = client.GetMain<BareProxy>();
-                Assert.IsTrue(main.WhenResolved.Wait(MediumTimeout));
+                Assert.IsTrue(main.WhenResolved.Wait(MediumNonDbgTimeout));
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
                 using (var answer = main.Call(0x1234567812345678, 0x3333, args))
                 {
-                    Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
+                    Assert.IsTrue(mock.WhenCalled.Wait(MediumNonDbgTimeout));
 
                     var pipelined = (BareProxy)CapabilityReflection.CreateProxy<BareProxy>(answer.Access(new MemberAccessPath(new MemberAccessPath.MemberAccess[] { new MemberAccessPath.StructMemberAccess(1) })));
 
@@ -545,7 +548,7 @@ namespace Capnp.Net.Runtime.Tests
 
                         mock.Return.SetResult(result);
 
-                        Assert.IsTrue(answer.WhenReturned.Wait(MediumTimeout));
+                        Assert.IsTrue(answer.WhenReturned.Wait(MediumNonDbgTimeout));
                         Assert.IsFalse(ct.IsCancellationRequested);
 
                         var args4 = DynamicSerializerState.CreateForRpc();
@@ -564,10 +567,10 @@ namespace Capnp.Net.Runtime.Tests
                             var call4 = mock2.WhenCalled;
                             var call5 = mock2.WhenCalled;
 
-                            Assert.IsTrue(call2.Wait(MediumTimeout));
-                            Assert.IsTrue(call3.Wait(MediumTimeout));
-                            Assert.IsTrue(call4.Wait(MediumTimeout));
-                            Assert.IsTrue(call5.Wait(MediumTimeout));
+                            Assert.IsTrue(call2.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(call3.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(call4.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(call5.Wait(MediumNonDbgTimeout));
 
                             Assert.AreEqual<ulong>(0x1111111111111111, call2.Result.InterfaceId);
                             Assert.AreEqual<ulong>(0x2222222222222222, call3.Result.InterfaceId);
@@ -594,10 +597,10 @@ namespace Capnp.Net.Runtime.Tests
                             ret5.WriteData(0, -4);
                             call5.Result.Result.SetResult(ret5);
 
-                            Assert.IsTrue(answer2.WhenReturned.Wait(MediumTimeout));
-                            Assert.IsTrue(answer3.WhenReturned.Wait(MediumTimeout));
-                            Assert.IsTrue(answer4.WhenReturned.Wait(MediumTimeout));
-                            Assert.IsTrue(answer5.WhenReturned.Wait(MediumTimeout));
+                            Assert.IsTrue(answer2.WhenReturned.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(answer3.WhenReturned.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(answer4.WhenReturned.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(answer5.WhenReturned.Wait(MediumNonDbgTimeout));
 
                             Assert.AreEqual(-1, answer2.WhenReturned.Result.ReadDataInt(0));
                             Assert.AreEqual(-2, answer3.WhenReturned.Result.ReadDataInt(0));
@@ -618,20 +621,20 @@ namespace Capnp.Net.Runtime.Tests
             using (client)
             {
                 client.WhenConnected.Wait();
-                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
+                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumNonDbgTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 
                 var mock = new ProvidedCapabilityMock();
                 server.Main = mock;
                 var main = client.GetMain<BareProxy>();
-                Assert.IsTrue(main.WhenResolved.Wait(MediumTimeout));
+                Assert.IsTrue(main.WhenResolved.Wait(MediumNonDbgTimeout));
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
                 BareProxy pipelined;
                 using (var answer = main.Call(0x1234567812345678, 0x3333, args))
                 {
-                    Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
+                    Assert.IsTrue(mock.WhenCalled.Wait(MediumNonDbgTimeout));
 
                     pipelined = (BareProxy)CapabilityReflection.CreateProxy<BareProxy>(
                         answer.Access(new MemberAccessPath(new MemberAccessPath.MemberAccess[] { new MemberAccessPath.StructMemberAccess(1) })));
@@ -665,20 +668,20 @@ namespace Capnp.Net.Runtime.Tests
             using (client)
             {
                 client.WhenConnected.Wait();
-                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumTimeout);
+                SpinWait.SpinUntil(() => server.ConnectionCount > 0, MediumNonDbgTimeout);
                 Assert.AreEqual(1, server.ConnectionCount);
 
                 var mock = new ProvidedCapabilityMock();
                 server.Main = mock;
                 var main = client.GetMain<BareProxy>();
-                Assert.IsTrue(main.WhenResolved.Wait(MediumTimeout));
+                Assert.IsTrue(main.WhenResolved.Wait(MediumNonDbgTimeout));
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
                 IPromisedAnswer answer2;
                 using (var answer = main.Call(0x1234567812345678, 0x3333, args))
                 {
-                    Assert.IsTrue(mock.WhenCalled.Wait(MediumTimeout));
+                    Assert.IsTrue(mock.WhenCalled.Wait(MediumNonDbgTimeout));
 
                     var pipelined = (BareProxy)CapabilityReflection.CreateProxy<BareProxy>(answer.Access(new MemberAccessPath(new MemberAccessPath.MemberAccess[] { new MemberAccessPath.StructMemberAccess(1) })));
 
@@ -696,7 +699,7 @@ namespace Capnp.Net.Runtime.Tests
                     var tcs = new TaskCompletionSource<int>();
                     using (ct.Register(() => tcs.SetResult(0)))
                     {
-                        Assert.IsTrue(tcs.Task.Wait(MediumTimeout));
+                        Assert.IsTrue(tcs.Task.Wait(MediumNonDbgTimeout));
                     }
 
                     var mock2 = new ProvidedCapabilityMock();
@@ -710,9 +713,100 @@ namespace Capnp.Net.Runtime.Tests
                     mock.Return.SetResult(result);
 
                     Assert.IsTrue(Assert.ThrowsExceptionAsync<TaskCanceledException>(
-                        () => answer2.WhenReturned).Wait(MediumTimeout));
+                        () => answer2.WhenReturned).Wait(MediumNonDbgTimeout));
                 }
             }
+        }
+
+        [TestMethod]
+        public void Server()
+        {
+            var cbb = new BufferBlock<IConnection>();
+            var server = new TcpRpcServer();
+            server.Main = new TestInterfaceImpl2();
+            bool init = true;
+            var tracer = new FrameTracing.RpcFrameTracer(Console.Out);
+            server.OnConnectionChanged += (s, a) =>
+            {
+                var c = a.Connection;
+                if (init)
+                {
+                    Assert.ThrowsException<ArgumentNullException>(() => c.AttachTracer(null));
+                    c.AttachTracer(tracer);
+                    Assert.ThrowsException<ArgumentNullException>(() => c.InjectMidlayer(null));
+                    c.InjectMidlayer(_ => _);
+                    Assert.IsFalse(c.IsComputing);
+                    Assert.IsFalse(c.IsWaitingForData);
+                    Assert.AreEqual(ConnectionState.Initializing, c.State);
+                    Assert.IsNotNull(c.RemotePort);
+                    Assert.AreEqual(TcpPort, c.LocalPort);
+                    Assert.AreEqual(0L, c.RecvCount);
+                    Assert.AreEqual(0L, c.SendCount);
+                }
+                else
+                {
+                    Assert.ThrowsException<InvalidOperationException>(() => c.AttachTracer(tracer));
+                    Assert.ThrowsException<InvalidOperationException>(() => c.InjectMidlayer(_ => _));
+                    Assert.AreEqual(ConnectionState.Down, c.State);
+                }
+
+                cbb.Post(c);
+            };
+
+            Assert.ThrowsException<InvalidOperationException>(() => server.StopListening());
+
+            server.StartAccepting(IPAddress.Any, TcpPort);
+            Assert.IsTrue(server.IsAlive);
+            Assert.ThrowsException<InvalidOperationException>(() => server.StartAccepting(IPAddress.Any, TcpPort));
+
+            var server2 = new TcpRpcServer();
+            Assert.ThrowsException<SocketException>(() => server2.StartAccepting(IPAddress.Any, TcpPort));
+
+            var client1 = new TcpRpcClient("localhost", TcpPort);
+            var c1 = cbb.Receive(TimeSpan.FromMilliseconds(MediumNonDbgTimeout));
+            Assert.IsNotNull(c1);
+            Assert.AreEqual(1, server.ConnectionCount);
+            Assert.AreEqual(c1, server.Connections[0]);
+            Assert.AreEqual(ConnectionState.Active, c1.State);
+            var proxy = client1.GetMain<ITestInterface>();
+            Assert.IsTrue(proxy is IResolvingCapability r && r.WhenResolved.Wait(MediumNonDbgTimeout));
+            Assert.IsTrue(c1.RecvCount > 0);
+            Assert.IsTrue(c1.SendCount > 0);
+
+            var client2 = new TcpRpcClient("localhost", TcpPort);
+            var c2 = cbb.Receive(TimeSpan.FromMilliseconds(MediumNonDbgTimeout));
+            Assert.IsNotNull(c2);
+            Assert.AreEqual(2, server.ConnectionCount);
+            Assert.AreEqual(c2, server.Connections[1]);
+
+            init = false;
+
+            client1.Dispose();
+            var c1d = cbb.Receive(TimeSpan.FromMilliseconds(MediumNonDbgTimeout));
+            Assert.IsNotNull(c1d);
+            Assert.AreEqual(1, server.ConnectionCount);
+            Assert.AreEqual(c2, server.Connections[0]);
+            Assert.IsTrue(SpinWait.SpinUntil(() => c1d.State == ConnectionState.Down, MediumNonDbgTimeout));
+
+            client2.Dispose();
+            var c2d = cbb.Receive(TimeSpan.FromMilliseconds(MediumNonDbgTimeout));
+            Assert.IsNotNull(c2d);
+            Assert.AreEqual(0, server.ConnectionCount);
+            Assert.IsTrue(SpinWait.SpinUntil(() => c2d.State == ConnectionState.Down, MediumNonDbgTimeout));
+
+            server.StopListening();
+            Assert.IsFalse(server.IsAlive);
+            Assert.ThrowsException<InvalidOperationException>(() => server.StopListening());
+
+            for (int i = 0; i < 100; i++)
+            {
+                server.StartAccepting(IPAddress.Any, TcpPort);
+                Assert.IsTrue(server.IsAlive);
+                server.StopListening();
+                Assert.IsFalse(server.IsAlive);
+            }
+
+            server.Dispose();
         }
     }
 }

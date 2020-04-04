@@ -1,4 +1,5 @@
-﻿using Capnproto_test.Capnp.Test;
+﻿using Capnp.Net.Runtime.Tests.GenImpls;
+using Capnproto_test.Capnp.Test;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -790,6 +791,180 @@ namespace Capnp.Net.Runtime.Tests
             _ = loed[12345677];
             var kind = loed.Cast(_ => _.Kind).Take(1).Single();
             Assert.AreEqual(ObjectKind.Nil, kind);
+        }
+
+        [TestMethod]
+        public void DeserializerStateBadConv()
+        {
+            SerializerState s = null;
+            Assert.ThrowsException<ArgumentNullException>(() => (DeserializerState)s);
+            s = new DynamicSerializerState();
+            Assert.ThrowsException<InvalidOperationException>(() => (DeserializerState)s);
+        }
+
+        [TestMethod]
+        public void BadPointers()
+        {
+            var data = new ulong[1];
+            var wf = new WireFrame(new Memory<ulong>[] { new Memory<ulong>(data) });
+            var d0 = DeserializerState.CreateRoot(wf);
+            Assert.AreEqual(ObjectKind.Nil, d0.Kind);
+            WirePointer p = default;
+            p.BeginStruct(1, 0);
+            p.Offset = 0;
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.BeginList(ListKind.ListOfBits, 64);
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.BeginList(ListKind.ListOfBytes, 8);
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.BeginList(ListKind.ListOfEmpty, 6400);
+            data[0] = p;
+            var d1 = DeserializerState.CreateRoot(wf);
+            p.BeginList(ListKind.ListOfInts, 2);
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.BeginList(ListKind.ListOfLongs, 1);
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.BeginList(ListKind.ListOfPointers, 1);
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.BeginList(ListKind.ListOfShorts, 4);
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.BeginList(ListKind.ListOfStructs, 1);
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.SetFarPointer(0, 0, false);
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.SetFarPointer(1, 0, false);
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.SetFarPointer(0, 1, false);
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.SetFarPointer(0, 0, true);
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+
+            var data2 = new ulong[3];
+            var wf2 = new WireFrame(new Memory<ulong>[] { new Memory<ulong>(data2) });
+            p.BeginList(ListKind.ListOfStructs, 1);
+            data2[0] = p;
+            data2[1] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf2));
+
+            p.SetFarPointer(0, 1, true);
+            data2[0] = p;
+            data2[1] = 0;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf2));
+
+            p.SetFarPointer(0, 1, false);
+            data2[1] = p;
+            data2[2] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf2));
+
+            p.SetFarPointer(0, 2, true);
+            data2[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf2));
+        }
+
+        [TestMethod]
+        public void ReadCap1()
+        {
+            var mb = MessageBuilder.Create();
+            var dss = mb.CreateObject<DynamicSerializerState>();
+            dss.SetStruct(0, 1);
+            DeserializerState ds = dss;
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => ds.ReadCap(-1));
+            Assert.ThrowsException<InvalidOperationException>(() => ds.ReadCap(0));
+        }
+
+        [TestMethod]
+        public void ReadCap2()
+        {
+            var mb = MessageBuilder.Create();
+            mb.InitCapTable();
+            var dss1 = mb.CreateObject<DynamicSerializerState>();
+            var dss2 = mb.CreateObject<DynamicSerializerState>();
+            dss2.SetStruct(1, 1);
+            dss1.SetStruct(0, 2);
+            dss1.Link(0, dss2);
+            dss1.LinkToCapability(1, 7);
+            var d = (DeserializerState)dss1;
+            Assert.ThrowsException<Rpc.RpcException>(() => d.ReadCap(0));
+            Assert.ThrowsException<Rpc.RpcException>(() => d.ReadCap(1));
+        }
+
+        [TestMethod]
+        public void Read1()
+        {
+            var mb = MessageBuilder.Create();
+            var dss = mb.CreateObject<DynamicSerializerState>();
+            dss.SetStruct(1, 0);
+            dss.WriteData(0, ulong.MaxValue);
+            var d = (DeserializerState)dss;
+            Assert.AreEqual(ushort.MaxValue, d.ReadDataUShort(48));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => d.ReadDataUShort(49));
+            Assert.AreEqual((ushort)0, d.ReadDataUShort(64));
+            Assert.IsNotNull(d.StructReadPointer(7));
+            Assert.ThrowsException<DeserializationException>(() => d.RequireCapList<ITestInterface>());
+        }
+
+        [TestMethod]
+        public void Read2()
+        {
+            var mb = MessageBuilder.Create();
+            var dss = mb.CreateObject<ListOfBitsSerializer>();
+            dss.Init(50);
+            var d = (DeserializerState)dss;
+            Assert.ThrowsException<DeserializationException>(() => d.ReadDataUInt(0));
+            Assert.ThrowsException<DeserializationException>(() => d.StructReadPointer(0));
+        }
+
+        [TestMethod]
+        public void ReadCapList()
+        {
+            var mb = MessageBuilder.Create();
+            mb.InitCapTable();
+            var dss = mb.CreateObject<DynamicSerializerState>();
+            dss.SetStruct(0, 1);
+            var loc = mb.CreateObject<ListOfCapsSerializer<ITestInterface>>();
+            loc.Init(1);
+            loc[0] = new TestInterfaceImpl2();
+            dss.LinkObject(0, loc);
+            var d = (DeserializerState)dss;
+            var cl = d.ReadCapList<ITestInterface>(0);
+            Assert.AreEqual(1, cl.Count);
+            Assert.IsNotNull(cl[0]);
+        }
+
+        [TestMethod]
+        public void ReadCap()
+        {
+            var dss = DynamicSerializerState.CreateForRpc();
+            dss.SetStruct(0, 1);
+            dss.LinkObject<ITestInterface>(0, new TestInterfaceImpl2());
+            var d = (DeserializerState)dss;
+            Assert.IsNotNull(d.ReadCap(0));
+            Assert.IsNotNull(d.ReadCap<ITestInterface>(0));
+        }
+
+        [TestMethod]
+        public void RequireCap1()
+        {
+            var dss = DynamicSerializerState.CreateForRpc();
+            dss.SetStruct(1, 1);
+            var d = (DeserializerState)dss;
+            Assert.ThrowsException<DeserializationException>(() => d.RequireCap<ITestInterface>());
+        }
+
+        [TestMethod]
+        public void RequireCap2()
+        {
+            DeserializerState d = default;
+            d.Kind = ObjectKind.Capability;
+            Assert.ThrowsException<InvalidOperationException>(() => d.RequireCap<ITestInterface>());
         }
     }
 }

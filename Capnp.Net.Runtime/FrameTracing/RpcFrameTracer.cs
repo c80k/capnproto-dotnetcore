@@ -18,15 +18,26 @@ namespace Capnp.FrameTracing
 
         readonly Stopwatch _timer = new Stopwatch();
         readonly TextWriter _traceWriter;
+        readonly bool _disposeWriter;
 
         /// <summary>
         /// Constructs an instance
         /// </summary>
         /// <param name="traceWriter">textual logging target</param>
-        public RpcFrameTracer(TextWriter traceWriter)
+        public RpcFrameTracer(TextWriter traceWriter): this(traceWriter, true)
+        {
+        }
+
+        /// <summary>
+        /// Constructs an instance
+        /// </summary>
+        /// <param name="traceWriter">textual logging target</param>
+        /// <param name="dispose">whether to dispose the writer when tracing is finished</param>
+        public RpcFrameTracer(TextWriter traceWriter, bool dispose)
         {
             _traceWriter = traceWriter ?? throw new ArgumentNullException(nameof(traceWriter));
             _traceWriter.WriteLine(Header);
+            _disposeWriter = dispose;
         }
 
         /// <summary>
@@ -35,7 +46,8 @@ namespace Capnp.FrameTracing
         public void Dispose()
         {
             _traceWriter.WriteLine("<end of trace>");
-            _traceWriter.Dispose();
+            if (_disposeWriter)
+                _traceWriter.Dispose();
         }
 
         void RenderMessageTarget(MessageTarget.READER target, FrameDirection dir)
