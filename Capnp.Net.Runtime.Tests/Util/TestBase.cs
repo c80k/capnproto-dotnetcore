@@ -193,9 +193,14 @@ namespace Capnp.Net.Runtime.Tests
                     
                     Assert.AreEqual(0, _enginePair.Endpoint1.ExportedCapabilityCount);
                     Assert.AreEqual(0, _enginePair.Endpoint1.ImportedCapabilityCount);
+                    Assert.AreEqual(0, _enginePair.Endpoint1.PendingQuestionCount);
+                    Assert.AreEqual(0, _enginePair.Endpoint1.PendingAnswerCount);
+
                     Assert.AreEqual(0, _enginePair.Endpoint2.ExportedCapabilityCount);
                     Assert.AreEqual(0, _enginePair.Endpoint2.ImportedCapabilityCount);
-                    
+                    Assert.AreEqual(0, _enginePair.Endpoint2.PendingQuestionCount);
+                    Assert.AreEqual(0, _enginePair.Endpoint2.PendingAnswerCount);
+
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
                     GC.Collect();

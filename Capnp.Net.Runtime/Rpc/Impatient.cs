@@ -26,7 +26,11 @@ namespace Capnp.Rpc
         {
             async Task<T> AwaitAnswer()
             {
-                return then(await promise.WhenReturned);
+                var result = await promise.WhenReturned;
+                if (promise.IsTailCall)
+                    throw new TailCallNoDataException();
+
+                return then(result);
             }
 
             var rtask = AwaitAnswer();

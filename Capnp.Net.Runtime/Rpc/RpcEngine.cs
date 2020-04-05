@@ -175,6 +175,34 @@ namespace Capnp.Rpc
                 }
             }
 
+            /// <summary>
+            /// Current number of unanswered questions
+            /// </summary>
+            public int PendingQuestionCount
+            {
+                get
+                {
+                    lock (_reentrancyBlocker)
+                    {
+                        return _questionTable.Count;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Current number of unfinished answers
+            /// </summary>
+            public int PendingAnswerCount
+            {
+                get
+                {
+                    lock (_reentrancyBlocker)
+                    {
+                        return _answerTable.Count;
+                    }
+                }
+            }
+
             void Tx(WireFrame frame)
             {
                 try

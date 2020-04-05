@@ -70,6 +70,8 @@ namespace Capnp.Rpc.Interception
                     _cancelFromAlice.Dispose();
                 }
             }
+
+            public bool IsTailCall => false;
         }
 
         /// <summary>
@@ -194,7 +196,7 @@ namespace Capnp.Rpc.Interception
             _censorCapability = censorCapability;
             _promisedAnswer = new PromisedAnswer(this);
             _inArgs = inArgs;
-            _bob = null!; // Will beinitialized by setting Bob
+            _bob = null!; // Will be initialized later here
 
             CancelFromAlice = _promisedAnswer.CancelFromAlice;
             CancelToBob = CancelFromAlice;

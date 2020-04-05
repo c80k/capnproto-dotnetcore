@@ -70,7 +70,7 @@ namespace Capnp.Rpc
             }
         }
 
-        internal sealed override void AddRef()
+        internal override void AddRef()
         {
             lock (_reentrancyBlocker)
             {
@@ -88,7 +88,7 @@ namespace Capnp.Rpc
             }
         }
 
-        internal sealed override void Release()
+        internal override void Release()
         {
             lock (_reentrancyBlocker)
             {

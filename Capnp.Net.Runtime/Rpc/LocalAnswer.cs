@@ -25,6 +25,8 @@ namespace Capnp.Rpc
 
         public Task<DeserializerState> WhenReturned { get; }
 
+        public bool IsTailCall => false;
+
         public ConsumedCapability Access(MemberAccessPath access)
         {
             return new LocalAnswerCapability(WhenReturned, access);

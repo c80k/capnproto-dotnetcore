@@ -31,5 +31,10 @@ namespace Capnp.Rpc
         /// <param name="proxyTask">Task returning the proxy whose ownership will be taken over</param>
         /// <returns></returns>
         ConsumedCapability? Access(MemberAccessPath access, Task<IDisposable?> proxyTask);
+
+        /// <summary>
+        /// Whether the question was asked as tail call
+        /// </summary>
+        bool IsTailCall { get; }
     }
 }

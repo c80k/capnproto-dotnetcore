@@ -100,6 +100,8 @@ namespace Capnp.Net.Runtime.Tests
                 throw new NotImplementedException();
             }
 
+            public bool IsTailCall => false;
+
             public void Dispose()
             {
             }

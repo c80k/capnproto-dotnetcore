@@ -281,7 +281,7 @@ namespace Capnp.Rpc
                 CheckCtsDisposal();
             }
 
-            if (Impl is IDisposable disposable)
+            if (disposing && Impl is IDisposable disposable)
             {
                 disposable.Dispose();
             }

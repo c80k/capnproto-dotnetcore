@@ -122,7 +122,7 @@ namespace Capnp.Rpc
 #if DebugEmbargos
                     Logger.LogDebug("Call by proxy");
 #endif
-                    if (_question.StateFlags.HasFlag(PendingQuestion.State.Disposed))
+                    if (_question.StateFlags.HasFlag(PendingQuestion.State.CanceledByDispose))
                     {
                         args.Dispose();
                         throw new ObjectDisposedException(nameof(PendingQuestion));
@@ -218,12 +218,12 @@ namespace Capnp.Rpc
         {
             lock (_question.ReentrancyBlocker)
             {
-                if (_question.StateFlags.HasFlag(PendingQuestion.State.Disposed))
+                if (_question.StateFlags.HasFlag(PendingQuestion.State.CanceledByDispose))
                     throw new ObjectDisposedException(nameof(PendingQuestion));
 
-                if (_question.StateFlags.HasFlag(PendingQuestion.State.Returned))
+                if (_question.StateFlags.HasFlag(PendingQuestion.State.Returned) && !_question.IsTailCall)
                 {
-                    ResolvedCap?.Export(endpoint, writer);
+                    ResolvedCap!.Export(endpoint, writer);
                 }
                 else
                 {
@@ -238,10 +238,6 @@ namespace Capnp.Rpc
                     }
                     else if (_question.IsTailCall)
                     {
-                        // FIXME: Resource management! We should prevent finishing this
-                        // cap as long as it is exported. Unfortunately, we cannot determine
-                        // when it gets removed from the export table.
-
                         var vine = Vine.Create(this);
                         uint id = endpoint.AllocateExport(vine, out bool first);
 
@@ -260,8 +256,23 @@ namespace Capnp.Rpc
 
         protected async override void ReleaseRemotely()
         {
-            try { using var _ = await _whenResolvedProxy; }
-            catch { }
+            if (!_question.IsTailCall)
+            {
+                try { using var _ = await _whenResolvedProxy; }
+                catch { }
+            }
+        }
+
+        internal override void AddRef()
+        {
+            base.AddRef();
+            _question.AddRef();
+        }
+
+        internal override void Release()
+        {
+            _question.Release();
+            base.Release();
         }
     }
 }

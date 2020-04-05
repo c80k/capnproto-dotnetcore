@@ -173,5 +173,77 @@ namespace Capnp.Net.Runtime.Tests
                 }
             }
         }
+
+        [TestMethod]
+        public void ExportCapToThirdParty()
+        {
+            using (var server = SetupServer())
+            {
+                var counters = new Counters();
+                server.Main = new TestMoreStuffImpl3();
+
+                using (var client = SetupClient())
+                {
+                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+
+                    using (var main = client.GetMain<ITestMoreStuff>())
+                    {
+                        var held = main.GetHeld().Eager();
+
+                        using (var server2 = SetupServer())
+                        {
+                            server2.Main = new TestMoreStuffImpl2();
+
+                            using (var client2 = SetupClient())
+                            {
+                                Assert.IsTrue(client2.WhenConnected.Wait(MediumNonDbgTimeout));
+
+                                using (var main2 = client2.GetMain<ITestMoreStuff>())
+                                {
+                                    var fooTask = main2.CallFoo(held);
+                                    Assert.IsTrue(main.Hold(new TestInterfaceImpl(new Counters())).Wait(MediumNonDbgTimeout));
+                                    Assert.IsTrue(fooTask.Wait(MediumNonDbgTimeout));
+                                    Assert.AreEqual("bar", fooTask.Result);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void ExportTailCallCapToThirdParty()
+        {
+            using (var server = SetupServer())
+            {
+                server.Main = new TestTailCallerImpl2();
+
+                using (var client = SetupClient())
+                {
+                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+
+                    using (var main = client.GetMain<ITestTailCaller>())
+                    {
+                        var callee = new TestTailCalleeImpl(new Counters());
+                        var fooTask = main.Foo(123, callee);
+                        Assert.IsTrue(fooTask.Wait(MediumNonDbgTimeout));
+
+                        using (var c = fooTask.Result.C)
+                        using (var client2 = SetupClient())
+                        {
+                            Assert.IsTrue(client2.WhenConnected.Wait(MediumNonDbgTimeout));
+
+                            using (var main2 = client2.GetMain<ITestTailCaller>())
+                            {
+                                var fooTask2 = main2.Foo(123, null);
+                                Assert.IsTrue(fooTask2.Wait(MediumNonDbgTimeout));
+                                Assert.IsTrue(fooTask2.C().GetCallSequence(1).Wait(MediumNonDbgTimeout));
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

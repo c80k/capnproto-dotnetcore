@@ -623,20 +623,6 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
     #endregion TestCallOrder
 
     #region TestTailCaller
-    class TestTailCaller : ITestTailCaller
-    {
-        public void Dispose()
-        {
-        }
-
-        public Task<TestTailCallee.TailResult> Foo(int i, ITestTailCallee callee, CancellationToken cancellationToken_)
-        {
-            return callee.Foo(i, "from TestTailCaller", cancellationToken_);
-        }
-    }
-    #endregion TestTailCaller
-
-    #region TestTailCaller
     class TestTailCallerImpl : ITestTailCaller
     {
         readonly Counters _counters;
@@ -657,6 +643,41 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
             using (callee)
             {
                 return callee.Foo(i, "from TestTailCaller", cancellationToken_);
+            }
+        }
+    }
+
+    class TestTailCallerImpl2 : ITestTailCaller
+    {
+        ITestCallOrder _keeper;
+
+        public TestTailCallerImpl2()
+        {
+        }
+
+        public void Dispose()
+        {
+            _keeper?.Dispose();
+        }
+
+        public Task<TestTailCallee.TailResult> Foo(int i, ITestTailCallee callee, CancellationToken cancellationToken_)
+        {
+            using (callee)
+            {
+                if (_keeper == null)
+                {
+                    var task = callee.Foo(i, "from TestTailCaller", cancellationToken_);
+                    _keeper = task.C();
+                    return task;
+                }
+                else
+                {
+                    return Task.FromResult(
+                        new TestTailCallee.TailResult()
+                        {
+                            C = _keeper
+                        });
+                }
             }
         }
     }
@@ -932,6 +953,92 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
         }
 
         public Task<ITestInterface> NeverReturn(ITestInterface cap, CancellationToken cancellationToken_)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    class TestMoreStuffImpl3 : ITestMoreStuff
+    {
+        readonly TaskCompletionSource<ITestInterface> _heldCap = new TaskCompletionSource<ITestInterface>();
+
+        public Task<string> CallFoo(ITestInterface cap, CancellationToken cancellationToken_ = default)
+        {
+            using (cap)
+            {
+                return cap.Foo(123, true);
+            }
+        }
+
+        public Task<string> CallFooWhenResolved(ITestInterface Cap, CancellationToken cancellationToken_ = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string> CallHeld(CancellationToken cancellationToken_ = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async void Dispose()
+        {
+            using (var cap = await _heldCap.Task)
+            {
+            }
+        }
+
+        public Task<ITestCallOrder> Echo(ITestCallOrder Cap, CancellationToken cancellationToken_ = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task ExpectCancel(ITestInterface Cap, CancellationToken cancellationToken_ = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<uint> GetCallSequence(uint Expected, CancellationToken cancellationToken_ = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string> GetEnormousString(CancellationToken cancellationToken_ = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ITestHandle> GetHandle(CancellationToken cancellationToken_ = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<ITestInterface> GetHeld(CancellationToken cancellationToken_ = default)
+        {
+            return await _heldCap.Task;
+        }
+
+        public Task<ITestMoreStuff> GetNull(CancellationToken cancellationToken_ = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Hold(ITestInterface Cap, CancellationToken cancellationToken_ = default)
+        {
+            _heldCap.SetResult(Cap);
+            return Task.CompletedTask;
+        }
+
+        public Task<(string, string)> MethodWithDefaults(string A, uint B, string C, CancellationToken cancellationToken_ = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task MethodWithNullDefault(string A, ITestInterface B, CancellationToken cancellationToken_ = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ITestInterface> NeverReturn(ITestInterface Cap, CancellationToken cancellationToken_ = default)
         {
             throw new NotImplementedException();
         }

@@ -1,13 +1,14 @@
 using Capnp;
 using Capnp.Rpc;
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Capnproto_test.Capnp.Test
 {
-    [TypeId(0x9c8e9318b29d9cd3UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9c8e9318b29d9cd3UL)]
     public enum TestEnum : ushort
     {
         foo,
@@ -20,7 +21,7 @@ namespace Capnproto_test.Capnp.Test
         garply
     }
 
-    [TypeId(0xa0a8f314b80b63fdUL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa0a8f314b80b63fdUL)]
     public class TestAllTypes : ICapnpSerializable
     {
         public const UInt64 typeId = 0xa0a8f314b80b63fdUL;
@@ -545,7 +546,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xeb3f9ebe98c73cb6UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xeb3f9ebe98c73cb6UL)]
     public class TestDefaults : ICapnpSerializable
     {
         public const UInt64 typeId = 0xeb3f9ebe98c73cb6UL;
@@ -1216,7 +1217,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xe3da5a2ccd28c0d8UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xe3da5a2ccd28c0d8UL)]
     public class TestAnyPointer : ICapnpSerializable
     {
         public const UInt64 typeId = 0xe3da5a2ccd28c0d8UL;
@@ -1276,7 +1277,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xf49850f63c2bfa59UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xf49850f63c2bfa59UL)]
     public class TestAnyOthers : ICapnpSerializable
     {
         public const UInt64 typeId = 0xf49850f63c2bfa59UL;
@@ -1366,7 +1367,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xa9d5f8efe770022bUL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa9d5f8efe770022bUL)]
     public class TestOutOfOrder : ICapnpSerializable
     {
         public const UInt64 typeId = 0xa9d5f8efe770022bUL;
@@ -1546,7 +1547,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xf47697362233ce52UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xf47697362233ce52UL)]
     public class TestUnion : ICapnpSerializable
     {
         public const UInt64 typeId = 0xf47697362233ce52UL;
@@ -1766,7 +1767,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xfc76a82eecb7a718UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xfc76a82eecb7a718UL)]
         public class union0 : ICapnpSerializable
         {
             public const UInt64 typeId = 0xfc76a82eecb7a718UL;
@@ -2186,7 +2187,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xee0a6b99b7dc7ab2UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xee0a6b99b7dc7ab2UL)]
         public class union1 : ICapnpSerializable
         {
             public const UInt64 typeId = 0xee0a6b99b7dc7ab2UL;
@@ -2768,7 +2769,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xafc5fd419f0d66d4UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xafc5fd419f0d66d4UL)]
         public class union2 : ICapnpSerializable
         {
             public const UInt64 typeId = 0xafc5fd419f0d66d4UL;
@@ -2983,7 +2984,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xa2fb022ec7f30053UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa2fb022ec7f30053UL)]
         public class union3 : ICapnpSerializable
         {
             public const UInt64 typeId = 0xa2fb022ec7f30053UL;
@@ -3199,7 +3200,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x9e2e784c915329b6UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9e2e784c915329b6UL)]
     public class TestUnnamedUnion : ICapnpSerializable
     {
         public const UInt64 typeId = 0x9e2e784c915329b6UL;
@@ -3380,7 +3381,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x89a9494f1b900f22UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x89a9494f1b900f22UL)]
     public class TestUnionInUnion : ICapnpSerializable
     {
         public const UInt64 typeId = 0x89a9494f1b900f22UL;
@@ -3438,7 +3439,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xd005f6c63707670cUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xd005f6c63707670cUL)]
         public class outer : ICapnpSerializable
         {
             public const UInt64 typeId = 0xd005f6c63707670cUL;
@@ -3570,7 +3571,7 @@ namespace Capnproto_test.Capnp.Test
                 }
             }
 
-            [TypeId(0xff9ce111c6f8e5dbUL)]
+            [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xff9ce111c6f8e5dbUL)]
             public class inner : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xff9ce111c6f8e5dbUL;
@@ -3706,7 +3707,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xdc841556134c3103UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xdc841556134c3103UL)]
     public class TestGroups : ICapnpSerializable
     {
         public const UInt64 typeId = 0xdc841556134c3103UL;
@@ -3764,7 +3765,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xe22ae74ff9113268UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xe22ae74ff9113268UL)]
         public class groups : ICapnpSerializable
         {
             public const UInt64 typeId = 0xe22ae74ff9113268UL;
@@ -3921,7 +3922,7 @@ namespace Capnproto_test.Capnp.Test
                 }
             }
 
-            [TypeId(0xf5fcba89c0c1196fUL)]
+            [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xf5fcba89c0c1196fUL)]
             public class foo : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xf5fcba89c0c1196fUL;
@@ -4010,7 +4011,7 @@ namespace Capnproto_test.Capnp.Test
                 }
             }
 
-            [TypeId(0xf0fa30304066a4b3UL)]
+            [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xf0fa30304066a4b3UL)]
             public class baz : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xf0fa30304066a4b3UL;
@@ -4099,7 +4100,7 @@ namespace Capnproto_test.Capnp.Test
                 }
             }
 
-            [TypeId(0xb727c0d0091a001dUL)]
+            [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xb727c0d0091a001dUL)]
             public class bar : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xb727c0d0091a001dUL;
@@ -4190,7 +4191,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xf77ed6f7454eec40UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xf77ed6f7454eec40UL)]
     public class TestInterleavedGroups : ICapnpSerializable
     {
         public const UInt64 typeId = 0xf77ed6f7454eec40UL;
@@ -4262,7 +4263,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xc7485a3516c7d3c8UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc7485a3516c7d3c8UL)]
         public class group1 : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc7485a3516c7d3c8UL;
@@ -4467,7 +4468,7 @@ namespace Capnproto_test.Capnp.Test
                 }
             }
 
-            [TypeId(0xdb0afd413f4a313aUL)]
+            [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xdb0afd413f4a313aUL)]
             public class corge : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xdb0afd413f4a313aUL;
@@ -4572,7 +4573,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xcc85a335569990e9UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xcc85a335569990e9UL)]
         public class group2 : ICapnpSerializable
         {
             public const UInt64 typeId = 0xcc85a335569990e9UL;
@@ -4777,7 +4778,7 @@ namespace Capnproto_test.Capnp.Test
                 }
             }
 
-            [TypeId(0xa017f0366827ee37UL)]
+            [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa017f0366827ee37UL)]
             public class corge : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xa017f0366827ee37UL;
@@ -4883,7 +4884,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x94f7e0b103b4b718UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x94f7e0b103b4b718UL)]
     public class TestUnionDefaults : ICapnpSerializable
     {
         public const UInt64 typeId = 0x94f7e0b103b4b718UL;
@@ -5030,7 +5031,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xd9f2b5941a343bcdUL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xd9f2b5941a343bcdUL)]
     public class TestNestedTypes : ICapnpSerializable
     {
         public const UInt64 typeId = 0xd9f2b5941a343bcdUL;
@@ -5121,14 +5122,14 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xb651d2fba42056d4UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xb651d2fba42056d4UL)]
         public enum NestedEnum : ushort
         {
             foo,
             bar
         }
 
-        [TypeId(0x82cd03a53b29d76bUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x82cd03a53b29d76bUL)]
         public class NestedStruct : ICapnpSerializable
         {
             public const UInt64 typeId = 0x82cd03a53b29d76bUL;
@@ -5204,7 +5205,7 @@ namespace Capnproto_test.Capnp.Test
                 }
             }
 
-            [TypeId(0xcfa0d546993a3df3UL)]
+            [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xcfa0d546993a3df3UL)]
             public enum NestedEnum : ushort
             {
                 baz,
@@ -5214,7 +5215,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xe78aac389e77b065UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xe78aac389e77b065UL)]
     public class TestUsing : ICapnpSerializable
     {
         public const UInt64 typeId = 0xe78aac389e77b065UL;
@@ -5291,7 +5292,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xe41885c94393277eUL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xe41885c94393277eUL)]
     public class TestLists : ICapnpSerializable
     {
         public const UInt64 typeId = 0xe41885c94393277eUL;
@@ -5485,7 +5486,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x8412c03b75b2cfeeUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8412c03b75b2cfeeUL)]
         public class Struct0 : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8412c03b75b2cfeeUL;
@@ -5530,7 +5531,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xe0fe5870b141ad69UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xe0fe5870b141ad69UL)]
         public class Struct1 : ICapnpSerializable
         {
             public const UInt64 typeId = 0xe0fe5870b141ad69UL;
@@ -5590,7 +5591,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xa6411a353090145bUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa6411a353090145bUL)]
         public class Struct8 : ICapnpSerializable
         {
             public const UInt64 typeId = 0xa6411a353090145bUL;
@@ -5650,7 +5651,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xa8abf7a82928986cUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa8abf7a82928986cUL)]
         public class Struct16 : ICapnpSerializable
         {
             public const UInt64 typeId = 0xa8abf7a82928986cUL;
@@ -5710,7 +5711,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xad7beedc4ed30742UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xad7beedc4ed30742UL)]
         public class Struct32 : ICapnpSerializable
         {
             public const UInt64 typeId = 0xad7beedc4ed30742UL;
@@ -5770,7 +5771,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xef9a34f2ff7cc646UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xef9a34f2ff7cc646UL)]
         public class Struct64 : ICapnpSerializable
         {
             public const UInt64 typeId = 0xef9a34f2ff7cc646UL;
@@ -5830,7 +5831,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xc6abf1b0329e6227UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc6abf1b0329e6227UL)]
         public class StructP : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc6abf1b0329e6227UL;
@@ -5890,7 +5891,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x943a234ca336b16aUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x943a234ca336b16aUL)]
         public class Struct0c : ICapnpSerializable
         {
             public const UInt64 typeId = 0x943a234ca336b16aUL;
@@ -5950,7 +5951,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x8991bc0e74a594cdUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8991bc0e74a594cdUL)]
         public class Struct1c : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8991bc0e74a594cdUL;
@@ -6025,7 +6026,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xed267416528c7a24UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xed267416528c7a24UL)]
         public class Struct8c : ICapnpSerializable
         {
             public const UInt64 typeId = 0xed267416528c7a24UL;
@@ -6100,7 +6101,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x9978837b037d58e6UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9978837b037d58e6UL)]
         public class Struct16c : ICapnpSerializable
         {
             public const UInt64 typeId = 0x9978837b037d58e6UL;
@@ -6175,7 +6176,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xed5fa940f54a7904UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xed5fa940f54a7904UL)]
         public class Struct32c : ICapnpSerializable
         {
             public const UInt64 typeId = 0xed5fa940f54a7904UL;
@@ -6250,7 +6251,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xbc743778f2597c7dUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xbc743778f2597c7dUL)]
         public class Struct64c : ICapnpSerializable
         {
             public const UInt64 typeId = 0xbc743778f2597c7dUL;
@@ -6325,7 +6326,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xc2e364a40182013dUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc2e364a40182013dUL)]
         public class StructPc : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc2e364a40182013dUL;
@@ -6401,7 +6402,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x92fc29a80f3ddd5cUL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x92fc29a80f3ddd5cUL)]
     public class TestFieldZeroIsBit : ICapnpSerializable
     {
         public const UInt64 typeId = 0x92fc29a80f3ddd5cUL;
@@ -6493,7 +6494,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xa851ad32cbc2ffeaUL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa851ad32cbc2ffeaUL)]
     public class TestListDefaults : ICapnpSerializable
     {
         public const UInt64 typeId = 0xa851ad32cbc2ffeaUL;
@@ -6588,7 +6589,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xa76e3c9bb7fd56d3UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa76e3c9bb7fd56d3UL)]
     public class TestLateUnion : ICapnpSerializable
     {
         public const UInt64 typeId = 0xa76e3c9bb7fd56d3UL;
@@ -6705,7 +6706,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x807280a2901aa079UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x807280a2901aa079UL)]
         public class theUnion : ICapnpSerializable
         {
             public const UInt64 typeId = 0x807280a2901aa079UL;
@@ -6866,7 +6867,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xc1973984dee98e3aUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc1973984dee98e3aUL)]
         public class anotherUnion : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc1973984dee98e3aUL;
@@ -7028,7 +7029,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x95b30dd14e01dda8UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x95b30dd14e01dda8UL)]
     public class TestOldVersion : ICapnpSerializable
     {
         public const UInt64 typeId = 0x95b30dd14e01dda8UL;
@@ -7118,7 +7119,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x8ed75a7469f04ce3UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8ed75a7469f04ce3UL)]
     public class TestNewVersion : ICapnpSerializable
     {
         public const UInt64 typeId = 0x8ed75a7469f04ce3UL;
@@ -7240,7 +7241,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xbd5fe16e5170c492UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xbd5fe16e5170c492UL)]
     public class TestOldUnionVersion : ICapnpSerializable
     {
         public const UInt64 typeId = 0xbd5fe16e5170c492UL;
@@ -7356,7 +7357,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xc7e4c513a975492bUL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc7e4c513a975492bUL)]
     public class TestNewUnionVersion : ICapnpSerializable
     {
         public const UInt64 typeId = 0xc7e4c513a975492bUL;
@@ -7489,7 +7490,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x86232c1de4513e84UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x86232c1de4513e84UL)]
         public class a : ICapnpSerializable
         {
             public const UInt64 typeId = 0x86232c1de4513e84UL;
@@ -7605,7 +7606,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xfaf781ef89a00e39UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xfaf781ef89a00e39UL)]
     public class TestStructUnion : ICapnpSerializable
     {
         public const UInt64 typeId = 0xfaf781ef89a00e39UL;
@@ -7663,7 +7664,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x992edc677bef5a3cUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x992edc677bef5a3cUL)]
         public class un : ICapnpSerializable
         {
             public const UInt64 typeId = 0x992edc677bef5a3cUL;
@@ -7797,7 +7798,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x9daec9823f171085UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9daec9823f171085UL)]
         public class SomeStruct : ICapnpSerializable
         {
             public const UInt64 typeId = 0x9daec9823f171085UL;
@@ -7873,7 +7874,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xdec497819d097c3cUL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xdec497819d097c3cUL)]
     public class TestPrintInlineStructs : ICapnpSerializable
     {
         public const UInt64 typeId = 0xdec497819d097c3cUL;
@@ -7947,7 +7948,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x8e4936003708dac2UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8e4936003708dac2UL)]
         public class InlineStruct : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8e4936003708dac2UL;
@@ -8023,7 +8024,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x91afd4a864dbb030UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x91afd4a864dbb030UL)]
     public class TestWholeFloatDefault : ICapnpSerializable
     {
         public const UInt64 typeId = 0x91afd4a864dbb030UL;
@@ -8100,7 +8101,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x9d5b8cd8de9922ebUL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9d5b8cd8de9922ebUL)]
     public class TestGenerics<TFoo, TBar> : ICapnpSerializable where TFoo : class where TBar : class
     {
         public const UInt64 typeId = 0x9d5b8cd8de9922ebUL;
@@ -8260,7 +8261,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xb46a779beaf3384eUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xb46a779beaf3384eUL)]
         public class ug : ICapnpSerializable
         {
             public const UInt64 typeId = 0xb46a779beaf3384eUL;
@@ -8319,7 +8320,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xf6a841117e19ac73UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xf6a841117e19ac73UL)]
         public class Inner : ICapnpSerializable
         {
             public const UInt64 typeId = 0xf6a841117e19ac73UL;
@@ -8394,7 +8395,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xa9ab42b118d6d435UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa9ab42b118d6d435UL)]
         public class Inner2<TBaz> : ICapnpSerializable where TBaz : class
         {
             public const UInt64 typeId = 0xa9ab42b118d6d435UL;
@@ -8498,7 +8499,7 @@ namespace Capnproto_test.Capnp.Test
                 }
             }
 
-            [TypeId(0xb6a0829c762b06f3UL)]
+            [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xb6a0829c762b06f3UL)]
             public class DeepNest<TQux> : ICapnpSerializable where TQux : class
             {
                 public const UInt64 typeId = 0xb6a0829c762b06f3UL;
@@ -8602,7 +8603,7 @@ namespace Capnproto_test.Capnp.Test
                     }
                 }
 
-                [TypeId(0x8839ed86c9794287UL), Proxy(typeof(DeepNestInterface_Proxy<>)), Skeleton(typeof(DeepNestInterface_Skeleton<>))]
+                [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8839ed86c9794287UL), Proxy(typeof(DeepNestInterface_Proxy<>)), Skeleton(typeof(DeepNestInterface_Skeleton<>))]
                 public interface IDeepNestInterface<TQuux> : IDisposable where TQuux : class
                 {
                     Task Call(CancellationToken cancellationToken_ = default);
@@ -8646,7 +8647,7 @@ namespace Capnproto_test.Capnp.Test
                 public static class DeepNestInterface<TQuux>
                     where TQuux : class
                 {
-                    [TypeId(0xb84eecc799437049UL)]
+                    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xb84eecc799437049UL)]
                     public class Params_Call : ICapnpSerializable
                     {
                         public const UInt64 typeId = 0xb84eecc799437049UL;
@@ -8691,7 +8692,7 @@ namespace Capnproto_test.Capnp.Test
                         }
                     }
 
-                    [TypeId(0xe080f0fc54614f6fUL)]
+                    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xe080f0fc54614f6fUL)]
                     public class Result_Call : ICapnpSerializable
                     {
                         public const UInt64 typeId = 0xe080f0fc54614f6fUL;
@@ -8739,7 +8740,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xc9e749e8dd54da5cUL), Proxy(typeof(Interface_Proxy<>)), Skeleton(typeof(Interface_Skeleton<>))]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc9e749e8dd54da5cUL), Proxy(typeof(Interface_Proxy<>)), Skeleton(typeof(Interface_Skeleton<>))]
         public interface IInterface<TQux> : IDisposable where TQux : class
         {
             Task<(TQux, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>)> Call(Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<string> arg_, CancellationToken cancellationToken_ = default);
@@ -8792,7 +8793,7 @@ namespace Capnproto_test.Capnp.Test
         public static class Interface<TQux>
             where TQux : class
         {
-            [TypeId(0xa5b46224e33581adUL)]
+            [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa5b46224e33581adUL)]
             public class Result_Call : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xa5b46224e33581adUL;
@@ -8868,7 +8869,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x8e656edfb45ba6cfUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8e656edfb45ba6cfUL)]
         public class UseAliases : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8e656edfb45ba6cfUL;
@@ -9004,7 +9005,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xa9b2b1f52dde845dUL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa9b2b1f52dde845dUL)]
     public class TestGenericsWrapper<TFoo, TBar> : ICapnpSerializable where TFoo : class where TBar : class
     {
         public const UInt64 typeId = 0xa9b2b1f52dde845dUL;
@@ -9064,7 +9065,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xf28f83667a557a04UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xf28f83667a557a04UL)]
     public class TestGenericsWrapper2 : ICapnpSerializable
     {
         public const UInt64 typeId = 0xf28f83667a557a04UL;
@@ -9124,7 +9125,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x8b9717a3f8d85a9aUL), Proxy(typeof(TestImplicitMethodParams_Proxy)), Skeleton(typeof(TestImplicitMethodParams_Skeleton))]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8b9717a3f8d85a9aUL), Proxy(typeof(TestImplicitMethodParams_Proxy)), Skeleton(typeof(TestImplicitMethodParams_Skeleton))]
     public interface ITestImplicitMethodParams : IDisposable
     {
         Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT Foo, TU Bar, CancellationToken cancellationToken_ = default)
@@ -9181,7 +9182,7 @@ namespace Capnproto_test.Capnp.Test
 
     public static class TestImplicitMethodParams
     {
-        [TypeId(0xf83f8caf54bdc486UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xf83f8caf54bdc486UL)]
         public class Params_Call<TT, TU> : ICapnpSerializable where TT : class where TU : class
         {
             public const UInt64 typeId = 0xf83f8caf54bdc486UL;
@@ -9257,7 +9258,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xdf9ccdeb81a704c9UL), Proxy(typeof(TestImplicitMethodParamsInGeneric_Proxy<>)), Skeleton(typeof(TestImplicitMethodParamsInGeneric_Skeleton<>))]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xdf9ccdeb81a704c9UL), Proxy(typeof(TestImplicitMethodParamsInGeneric_Proxy<>)), Skeleton(typeof(TestImplicitMethodParamsInGeneric_Skeleton<>))]
     public interface ITestImplicitMethodParamsInGeneric<TV> : IDisposable where TV : class
     {
         Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT Foo, TU Bar, CancellationToken cancellationToken_ = default)
@@ -9315,7 +9316,7 @@ namespace Capnproto_test.Capnp.Test
     public static class TestImplicitMethodParamsInGeneric<TV>
         where TV : class
     {
-        [TypeId(0x9aab8e25c808d71eUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9aab8e25c808d71eUL)]
         public class Params_Call<TT, TU> : ICapnpSerializable where TT : class where TU : class
         {
             public const UInt64 typeId = 0x9aab8e25c808d71eUL;
@@ -9391,7 +9392,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xa54870440e919063UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa54870440e919063UL)]
     public class TestGenericsUnion<TFoo, TBar> : ICapnpSerializable where TFoo : class where TBar : class
     {
         public const UInt64 typeId = 0xa54870440e919063UL;
@@ -9526,7 +9527,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x9427b2a71030338fUL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9427b2a71030338fUL)]
     public class TestUseGenerics : ICapnpSerializable
     {
         public const UInt64 typeId = 0x9427b2a71030338fUL;
@@ -10625,7 +10626,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xc5598844441096dcUL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc5598844441096dcUL)]
     public class TestEmptyStruct : ICapnpSerializable
     {
         public const UInt64 typeId = 0xc5598844441096dcUL;
@@ -10670,7 +10671,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xabed745cd8c92095UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xabed745cd8c92095UL)]
     public class TestConstants : ICapnpSerializable
     {
         public const UInt64 typeId = 0xabed745cd8c92095UL;
@@ -10715,7 +10716,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xddc280dbee9c99b3UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xddc280dbee9c99b3UL)]
     public class TestAnyPointerConstants : ICapnpSerializable
     {
         public const UInt64 typeId = 0xddc280dbee9c99b3UL;
@@ -10820,7 +10821,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x88eb12a0e0af92b2UL), Proxy(typeof(TestInterface_Proxy)), Skeleton(typeof(TestInterface_Skeleton))]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x88eb12a0e0af92b2UL), Proxy(typeof(TestInterface_Proxy)), Skeleton(typeof(TestInterface_Skeleton))]
     public interface ITestInterface : IDisposable
     {
         Task<string> Foo(uint I, bool J, CancellationToken cancellationToken_ = default);
@@ -10919,7 +10920,7 @@ namespace Capnproto_test.Capnp.Test
 
     public static class TestInterface
     {
-        [TypeId(0xb874edc0d559b391UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xb874edc0d559b391UL)]
         public class Params_Foo : ICapnpSerializable
         {
             public const UInt64 typeId = 0xb874edc0d559b391UL;
@@ -10994,7 +10995,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xb04fcaddab714ba4UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xb04fcaddab714ba4UL)]
         public class Result_Foo : ICapnpSerializable
         {
             public const UInt64 typeId = 0xb04fcaddab714ba4UL;
@@ -11054,7 +11055,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xd044893357b42568UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xd044893357b42568UL)]
         public class Params_Bar : ICapnpSerializable
         {
             public const UInt64 typeId = 0xd044893357b42568UL;
@@ -11099,7 +11100,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x9bf141df4247d52fUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9bf141df4247d52fUL)]
         public class Result_Bar : ICapnpSerializable
         {
             public const UInt64 typeId = 0x9bf141df4247d52fUL;
@@ -11144,7 +11145,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xd9ac8abb2a91cfbcUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xd9ac8abb2a91cfbcUL)]
         public class Params_Baz : ICapnpSerializable
         {
             public const UInt64 typeId = 0xd9ac8abb2a91cfbcUL;
@@ -11204,7 +11205,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x9b99d14f2f375b2dUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9b99d14f2f375b2dUL)]
         public class Result_Baz : ICapnpSerializable
         {
             public const UInt64 typeId = 0x9b99d14f2f375b2dUL;
@@ -11250,7 +11251,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xe4e9bac98670b748UL), Proxy(typeof(TestExtends_Proxy)), Skeleton(typeof(TestExtends_Skeleton))]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xe4e9bac98670b748UL), Proxy(typeof(TestExtends_Proxy)), Skeleton(typeof(TestExtends_Skeleton))]
     public interface ITestExtends : Capnproto_test.Capnp.Test.ITestInterface
     {
         Task Qux(CancellationToken cancellationToken_ = default);
@@ -11383,7 +11384,7 @@ namespace Capnproto_test.Capnp.Test
 
     public static class TestExtends
     {
-        [TypeId(0x83a4bc5471363f17UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x83a4bc5471363f17UL)]
         public class Params_Qux : ICapnpSerializable
         {
             public const UInt64 typeId = 0x83a4bc5471363f17UL;
@@ -11428,7 +11429,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x8e4b3d1a3e2753ddUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8e4b3d1a3e2753ddUL)]
         public class Result_Qux : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8e4b3d1a3e2753ddUL;
@@ -11473,7 +11474,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xacf67532a7e7bad9UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xacf67532a7e7bad9UL)]
         public class Result_Corge : ICapnpSerializable
         {
             public const UInt64 typeId = 0xacf67532a7e7bad9UL;
@@ -11518,7 +11519,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xf3b834e851ea8af6UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xf3b834e851ea8af6UL)]
         public class Params_Grault : ICapnpSerializable
         {
             public const UInt64 typeId = 0xf3b834e851ea8af6UL;
@@ -11564,7 +11565,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x98d7e0ef61488783UL), Proxy(typeof(TestExtends2_Proxy)), Skeleton(typeof(TestExtends2_Skeleton))]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x98d7e0ef61488783UL), Proxy(typeof(TestExtends2_Proxy)), Skeleton(typeof(TestExtends2_Skeleton))]
     public interface ITestExtends2 : Capnproto_test.Capnp.Test.ITestExtends
     {
     }
@@ -11658,7 +11659,7 @@ namespace Capnproto_test.Capnp.Test
         public override ulong InterfaceId => 11013518732491786115UL;
     }
 
-    [TypeId(0xa5a404caa61d4cd0UL), Proxy(typeof(TestPipeline_Proxy)), Skeleton(typeof(TestPipeline_Skeleton))]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa5a404caa61d4cd0UL), Proxy(typeof(TestPipeline_Proxy)), Skeleton(typeof(TestPipeline_Skeleton))]
     public interface ITestPipeline : IDisposable
     {
         Task<(string, Capnproto_test.Capnp.Test.TestPipeline.Box)> GetCap(uint N, Capnproto_test.Capnp.Test.ITestInterface InCap, CancellationToken cancellationToken_ = default);
@@ -11774,7 +11775,7 @@ namespace Capnproto_test.Capnp.Test
 
     public static class TestPipeline
     {
-        [TypeId(0xb0b29e51db0e26b1UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xb0b29e51db0e26b1UL)]
         public class Box : ICapnpSerializable
         {
             public const UInt64 typeId = 0xb0b29e51db0e26b1UL;
@@ -11834,7 +11835,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x9442ad5a1d2c8acbUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9442ad5a1d2c8acbUL)]
         public class AnyBox : ICapnpSerializable
         {
             public const UInt64 typeId = 0x9442ad5a1d2c8acbUL;
@@ -11894,7 +11895,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xc7e8df5096257034UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc7e8df5096257034UL)]
         public class Params_GetCap : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc7e8df5096257034UL;
@@ -11969,7 +11970,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xb2442a9e0ba28fdfUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xb2442a9e0ba28fdfUL)]
         public class Result_GetCap : ICapnpSerializable
         {
             public const UInt64 typeId = 0xb2442a9e0ba28fdfUL;
@@ -12044,7 +12045,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xa604ee63cf37819fUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa604ee63cf37819fUL)]
         public class Params_TestPointers : ICapnpSerializable
         {
             public const UInt64 typeId = 0xa604ee63cf37819fUL;
@@ -12134,7 +12135,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x8eda54756c6070d6UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8eda54756c6070d6UL)]
         public class Result_TestPointers : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8eda54756c6070d6UL;
@@ -12179,7 +12180,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xf8e36b53ab093d4eUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xf8e36b53ab093d4eUL)]
         public class Params_GetAnyCap : ICapnpSerializable
         {
             public const UInt64 typeId = 0xf8e36b53ab093d4eUL;
@@ -12254,7 +12255,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xbf44b4c94c26ef79UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xbf44b4c94c26ef79UL)]
         public class Result_GetAnyCap : ICapnpSerializable
         {
             public const UInt64 typeId = 0xbf44b4c94c26ef79UL;
@@ -12330,7 +12331,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xa0e77035bdff0051UL), Proxy(typeof(TestCallOrder_Proxy)), Skeleton(typeof(TestCallOrder_Skeleton))]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa0e77035bdff0051UL), Proxy(typeof(TestCallOrder_Proxy)), Skeleton(typeof(TestCallOrder_Skeleton))]
     public interface ITestCallOrder : IDisposable
     {
         Task<uint> GetCallSequence(uint Expected, CancellationToken cancellationToken_ = default);
@@ -12380,7 +12381,7 @@ namespace Capnproto_test.Capnp.Test
 
     public static class TestCallOrder
     {
-        [TypeId(0x8f1e8cd56ceb74dcUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8f1e8cd56ceb74dcUL)]
         public class Params_GetCallSequence : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8f1e8cd56ceb74dcUL;
@@ -12440,7 +12441,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xdedbb6bf3810eab7UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xdedbb6bf3810eab7UL)]
         public class Result_GetCallSequence : ICapnpSerializable
         {
             public const UInt64 typeId = 0xdedbb6bf3810eab7UL;
@@ -12501,7 +12502,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xddd699207eb8e23bUL), Proxy(typeof(TestTailCallee_Proxy)), Skeleton(typeof(TestTailCallee_Skeleton))]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xddd699207eb8e23bUL), Proxy(typeof(TestTailCallee_Proxy)), Skeleton(typeof(TestTailCallee_Skeleton))]
     public interface ITestTailCallee : IDisposable
     {
         Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int I, string T, CancellationToken cancellationToken_ = default);
@@ -12555,7 +12556,7 @@ namespace Capnproto_test.Capnp.Test
 
     public static class TestTailCallee
     {
-        [TypeId(0xa9ed2e5a9fd53d19UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa9ed2e5a9fd53d19UL)]
         public class TailResult : ICapnpSerializable
         {
             public const UInt64 typeId = 0xa9ed2e5a9fd53d19UL;
@@ -12645,7 +12646,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xc5e1efc325614957UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc5e1efc325614957UL)]
         public class Params_Foo : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc5e1efc325614957UL;
@@ -12721,7 +12722,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x870bf40110ce3035UL), Proxy(typeof(TestTailCaller_Proxy)), Skeleton(typeof(TestTailCaller_Skeleton))]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x870bf40110ce3035UL), Proxy(typeof(TestTailCaller_Proxy)), Skeleton(typeof(TestTailCaller_Skeleton))]
     public interface ITestTailCaller : IDisposable
     {
         Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int I, Capnproto_test.Capnp.Test.ITestTailCallee Callee, CancellationToken cancellationToken_ = default);
@@ -12775,7 +12776,7 @@ namespace Capnproto_test.Capnp.Test
 
     public static class TestTailCaller
     {
-        [TypeId(0xb07a279515dc8ac5UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xb07a279515dc8ac5UL)]
         public class Params_Foo : ICapnpSerializable
         {
             public const UInt64 typeId = 0xb07a279515dc8ac5UL;
@@ -12851,7 +12852,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xa38e5efe41e53a15UL), Proxy(typeof(TestHandle_Proxy)), Skeleton(typeof(TestHandle_Skeleton))]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa38e5efe41e53a15UL), Proxy(typeof(TestHandle_Proxy)), Skeleton(typeof(TestHandle_Skeleton))]
     public interface ITestHandle : IDisposable
     {
     }
@@ -12870,7 +12871,7 @@ namespace Capnproto_test.Capnp.Test
         public override ulong InterfaceId => 11785461720995412501UL;
     }
 
-    [TypeId(0xddc70bf9784133cfUL), Proxy(typeof(TestMoreStuff_Proxy)), Skeleton(typeof(TestMoreStuff_Skeleton))]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xddc70bf9784133cfUL), Proxy(typeof(TestMoreStuff_Proxy)), Skeleton(typeof(TestMoreStuff_Skeleton))]
     public interface ITestMoreStuff : Capnproto_test.Capnp.Test.ITestCallOrder
     {
         Task<string> CallFoo(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default);
@@ -13307,7 +13308,7 @@ namespace Capnproto_test.Capnp.Test
 
     public static class TestMoreStuff
     {
-        [TypeId(0x931ba418da60f6e4UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x931ba418da60f6e4UL)]
         public class Params_CallFoo : ICapnpSerializable
         {
             public const UInt64 typeId = 0x931ba418da60f6e4UL;
@@ -13367,7 +13368,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x9a28970beccecdd0UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9a28970beccecdd0UL)]
         public class Result_CallFoo : ICapnpSerializable
         {
             public const UInt64 typeId = 0x9a28970beccecdd0UL;
@@ -13427,7 +13428,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xfabc700c2ebe6378UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xfabc700c2ebe6378UL)]
         public class Params_CallFooWhenResolved : ICapnpSerializable
         {
             public const UInt64 typeId = 0xfabc700c2ebe6378UL;
@@ -13487,7 +13488,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xa54ce1e9aa822f90UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa54ce1e9aa822f90UL)]
         public class Result_CallFooWhenResolved : ICapnpSerializable
         {
             public const UInt64 typeId = 0xa54ce1e9aa822f90UL;
@@ -13547,7 +13548,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x94fe60465c95182bUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x94fe60465c95182bUL)]
         public class Params_NeverReturn : ICapnpSerializable
         {
             public const UInt64 typeId = 0x94fe60465c95182bUL;
@@ -13607,7 +13608,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xdef4e5fa6999c5dcUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xdef4e5fa6999c5dcUL)]
         public class Result_NeverReturn : ICapnpSerializable
         {
             public const UInt64 typeId = 0xdef4e5fa6999c5dcUL;
@@ -13667,7 +13668,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xfe7c8fbb769d8e58UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xfe7c8fbb769d8e58UL)]
         public class Params_Hold : ICapnpSerializable
         {
             public const UInt64 typeId = 0xfe7c8fbb769d8e58UL;
@@ -13727,7 +13728,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xf839fb1374d003c9UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xf839fb1374d003c9UL)]
         public class Result_Hold : ICapnpSerializable
         {
             public const UInt64 typeId = 0xf839fb1374d003c9UL;
@@ -13772,7 +13773,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xf8c5e5ef1edf83beUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xf8c5e5ef1edf83beUL)]
         public class Params_CallHeld : ICapnpSerializable
         {
             public const UInt64 typeId = 0xf8c5e5ef1edf83beUL;
@@ -13817,7 +13818,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xe59935f160ac7578UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xe59935f160ac7578UL)]
         public class Result_CallHeld : ICapnpSerializable
         {
             public const UInt64 typeId = 0xe59935f160ac7578UL;
@@ -13877,7 +13878,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xfeffc025fce317e3UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xfeffc025fce317e3UL)]
         public class Params_GetHeld : ICapnpSerializable
         {
             public const UInt64 typeId = 0xfeffc025fce317e3UL;
@@ -13922,7 +13923,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xef4e146185af67ceUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xef4e146185af67ceUL)]
         public class Result_GetHeld : ICapnpSerializable
         {
             public const UInt64 typeId = 0xef4e146185af67ceUL;
@@ -13982,7 +13983,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xc07526f7e2e533b9UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc07526f7e2e533b9UL)]
         public class Params_Echo : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc07526f7e2e533b9UL;
@@ -14042,7 +14043,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xa6224536593d5b92UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa6224536593d5b92UL)]
         public class Result_Echo : ICapnpSerializable
         {
             public const UInt64 typeId = 0xa6224536593d5b92UL;
@@ -14102,7 +14103,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xa1cc32d87f3edeb1UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa1cc32d87f3edeb1UL)]
         public class Params_ExpectCancel : ICapnpSerializable
         {
             public const UInt64 typeId = 0xa1cc32d87f3edeb1UL;
@@ -14162,7 +14163,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x8a3eba1758c0916eUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8a3eba1758c0916eUL)]
         public class Result_ExpectCancel : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8a3eba1758c0916eUL;
@@ -14207,7 +14208,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x99160a25fa50fbf1UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x99160a25fa50fbf1UL)]
         public class Params_MethodWithDefaults : ICapnpSerializable
         {
             public const UInt64 typeId = 0x99160a25fa50fbf1UL;
@@ -14299,7 +14300,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x9c7e066f845a6c56UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9c7e066f845a6c56UL)]
         public class Result_MethodWithDefaults : ICapnpSerializable
         {
             public const UInt64 typeId = 0x9c7e066f845a6c56UL;
@@ -14375,7 +14376,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xead024a301a092a1UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xead024a301a092a1UL)]
         public class Params_GetHandle : ICapnpSerializable
         {
             public const UInt64 typeId = 0xead024a301a092a1UL;
@@ -14420,7 +14421,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xc3490d75420a1fe8UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc3490d75420a1fe8UL)]
         public class Result_GetHandle : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc3490d75420a1fe8UL;
@@ -14480,7 +14481,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xd8493f0e175d61f2UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xd8493f0e175d61f2UL)]
         public class Params_GetNull : ICapnpSerializable
         {
             public const UInt64 typeId = 0xd8493f0e175d61f2UL;
@@ -14525,7 +14526,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xe6955d8ef1023671UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xe6955d8ef1023671UL)]
         public class Result_GetNull : ICapnpSerializable
         {
             public const UInt64 typeId = 0xe6955d8ef1023671UL;
@@ -14585,7 +14586,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x805df436f55dd07aUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x805df436f55dd07aUL)]
         public class Params_GetEnormousString : ICapnpSerializable
         {
             public const UInt64 typeId = 0x805df436f55dd07aUL;
@@ -14630,7 +14631,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x860e7512dc3925b0UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x860e7512dc3925b0UL)]
         public class Result_GetEnormousString : ICapnpSerializable
         {
             public const UInt64 typeId = 0x860e7512dc3925b0UL;
@@ -14690,7 +14691,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xfb92899aeb0ee74fUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xfb92899aeb0ee74fUL)]
         public class Params_MethodWithNullDefault : ICapnpSerializable
         {
             public const UInt64 typeId = 0xfb92899aeb0ee74fUL;
@@ -14765,7 +14766,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x8467348247305cf7UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8467348247305cf7UL)]
         public class Result_MethodWithNullDefault : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8467348247305cf7UL;
@@ -14811,7 +14812,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xc07d8dcd80a69c0cUL), Proxy(typeof(TestMembrane_Proxy)), Skeleton(typeof(TestMembrane_Skeleton))]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc07d8dcd80a69c0cUL), Proxy(typeof(TestMembrane_Proxy)), Skeleton(typeof(TestMembrane_Skeleton))]
     public interface ITestMembrane : IDisposable
     {
         Task<Capnproto_test.Capnp.Test.TestMembrane.IThing> MakeThing(CancellationToken cancellationToken_ = default);
@@ -14985,7 +14986,7 @@ namespace Capnproto_test.Capnp.Test
 
     public static class TestMembrane
     {
-        [TypeId(0x9352e4e41f173917UL), Proxy(typeof(Thing_Proxy)), Skeleton(typeof(Thing_Skeleton))]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9352e4e41f173917UL), Proxy(typeof(Thing_Proxy)), Skeleton(typeof(Thing_Skeleton))]
         public interface IThing : IDisposable
         {
             Task<Capnproto_test.Capnp.Test.TestMembrane.Result> PassThrough(CancellationToken cancellationToken_ = default);
@@ -15062,7 +15063,7 @@ namespace Capnproto_test.Capnp.Test
 
         public static class Thing
         {
-            [TypeId(0xff9bdcd05085d786UL)]
+            [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xff9bdcd05085d786UL)]
             public class Params_PassThrough : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xff9bdcd05085d786UL;
@@ -15107,7 +15108,7 @@ namespace Capnproto_test.Capnp.Test
                 }
             }
 
-            [TypeId(0xee94bed3615ee745UL)]
+            [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xee94bed3615ee745UL)]
             public class Params_Intercept : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xee94bed3615ee745UL;
@@ -15153,7 +15154,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xb0c6163faf291965UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xb0c6163faf291965UL)]
         public class Result : ICapnpSerializable
         {
             public const UInt64 typeId = 0xb0c6163faf291965UL;
@@ -15213,7 +15214,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xd8ac2acc3ece6556UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xd8ac2acc3ece6556UL)]
         public class Params_MakeThing : ICapnpSerializable
         {
             public const UInt64 typeId = 0xd8ac2acc3ece6556UL;
@@ -15258,7 +15259,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xe5d4904814ccbf29UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xe5d4904814ccbf29UL)]
         public class Result_MakeThing : ICapnpSerializable
         {
             public const UInt64 typeId = 0xe5d4904814ccbf29UL;
@@ -15318,7 +15319,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x945d9f634a6a29daUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x945d9f634a6a29daUL)]
         public class Params_CallPassThrough : ICapnpSerializable
         {
             public const UInt64 typeId = 0x945d9f634a6a29daUL;
@@ -15393,7 +15394,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x8749aac3375c5c71UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8749aac3375c5c71UL)]
         public class Params_CallIntercept : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8749aac3375c5c71UL;
@@ -15468,7 +15469,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x869a1b7ab34b42c9UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x869a1b7ab34b42c9UL)]
         public class Params_Loopback : ICapnpSerializable
         {
             public const UInt64 typeId = 0x869a1b7ab34b42c9UL;
@@ -15528,7 +15529,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xecd19398fd88ab5cUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xecd19398fd88ab5cUL)]
         public class Result_Loopback : ICapnpSerializable
         {
             public const UInt64 typeId = 0xecd19398fd88ab5cUL;
@@ -15588,7 +15589,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x8f6bb30cc62917ffUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8f6bb30cc62917ffUL)]
         public class Params_WaitForever : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8f6bb30cc62917ffUL;
@@ -15633,7 +15634,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xc343a4907280be01UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc343a4907280be01UL)]
         public class Result_WaitForever : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc343a4907280be01UL;
@@ -15679,7 +15680,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x949449ad7c11fa5cUL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x949449ad7c11fa5cUL)]
     public class TestContainMembrane : ICapnpSerializable
     {
         public const UInt64 typeId = 0x949449ad7c11fa5cUL;
@@ -15754,7 +15755,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xdd2b66a791a279f0UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xdd2b66a791a279f0UL)]
     public class TestTransferCap : ICapnpSerializable
     {
         public const UInt64 typeId = 0xdd2b66a791a279f0UL;
@@ -15813,7 +15814,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xc7263e8f88844abcUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc7263e8f88844abcUL)]
         public class Element : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc7263e8f88844abcUL;
@@ -15889,7 +15890,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x9ae342d394247cfcUL), Proxy(typeof(TestKeywordMethods_Proxy)), Skeleton(typeof(TestKeywordMethods_Skeleton))]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9ae342d394247cfcUL), Proxy(typeof(TestKeywordMethods_Proxy)), Skeleton(typeof(TestKeywordMethods_Skeleton))]
     public interface ITestKeywordMethods : IDisposable
     {
         Task Delete(CancellationToken cancellationToken_ = default);
@@ -16004,7 +16005,7 @@ namespace Capnproto_test.Capnp.Test
 
     public static class TestKeywordMethods
     {
-        [TypeId(0xca3a89cdeb6bd6b7UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xca3a89cdeb6bd6b7UL)]
         public class Params_Delete : ICapnpSerializable
         {
             public const UInt64 typeId = 0xca3a89cdeb6bd6b7UL;
@@ -16049,7 +16050,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xeeb5843598307592UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xeeb5843598307592UL)]
         public class Result_Delete : ICapnpSerializable
         {
             public const UInt64 typeId = 0xeeb5843598307592UL;
@@ -16094,7 +16095,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x9cf5a8313c5db036UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9cf5a8313c5db036UL)]
         public class Params_Class : ICapnpSerializable
         {
             public const UInt64 typeId = 0x9cf5a8313c5db036UL;
@@ -16139,7 +16140,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xc0253868ac12e7d8UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc0253868ac12e7d8UL)]
         public class Result_Class : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc0253868ac12e7d8UL;
@@ -16184,7 +16185,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xa4a08763833c7757UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa4a08763833c7757UL)]
         public class Params_Void : ICapnpSerializable
         {
             public const UInt64 typeId = 0xa4a08763833c7757UL;
@@ -16229,7 +16230,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xde82773089c0aeabUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xde82773089c0aeabUL)]
         public class Result_Void : ICapnpSerializable
         {
             public const UInt64 typeId = 0xde82773089c0aeabUL;
@@ -16274,7 +16275,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x99817360625e8ca3UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x99817360625e8ca3UL)]
         public class Params_Return : ICapnpSerializable
         {
             public const UInt64 typeId = 0x99817360625e8ca3UL;
@@ -16319,7 +16320,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xb70872e07eaa992fUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xb70872e07eaa992fUL)]
         public class Result_Return : ICapnpSerializable
         {
             public const UInt64 typeId = 0xb70872e07eaa992fUL;
@@ -16365,7 +16366,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xea72cc77253798cdUL), Proxy(typeof(TestAuthenticatedBootstrap_Proxy<>)), Skeleton(typeof(TestAuthenticatedBootstrap_Skeleton<>))]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xea72cc77253798cdUL), Proxy(typeof(TestAuthenticatedBootstrap_Proxy<>)), Skeleton(typeof(TestAuthenticatedBootstrap_Skeleton<>))]
     public interface ITestAuthenticatedBootstrap<TVatId> : IDisposable where TVatId : class
     {
         Task<TVatId> GetCallerId(CancellationToken cancellationToken_ = default);
@@ -16420,7 +16421,7 @@ namespace Capnproto_test.Capnp.Test
     public static class TestAuthenticatedBootstrap<TVatId>
         where TVatId : class
     {
-        [TypeId(0x8ec30e2451f1cffeUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8ec30e2451f1cffeUL)]
         public class Params_GetCallerId : ICapnpSerializable
         {
             public const UInt64 typeId = 0x8ec30e2451f1cffeUL;
@@ -16465,7 +16466,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xc71cf776034a3e67UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc71cf776034a3e67UL)]
         public class Result_GetCallerId : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc71cf776034a3e67UL;
@@ -16526,7 +16527,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xceba982cb629f6c2UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xceba982cb629f6c2UL)]
     public class TestSturdyRef : ICapnpSerializable
     {
         public const UInt64 typeId = 0xceba982cb629f6c2UL;
@@ -16601,7 +16602,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xe02d3bbe1010e342UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xe02d3bbe1010e342UL)]
     public class TestSturdyRefHostId : ICapnpSerializable
     {
         public const UInt64 typeId = 0xe02d3bbe1010e342UL;
@@ -16661,7 +16662,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xaeb2ad168e2f5697UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xaeb2ad168e2f5697UL)]
     public class TestSturdyRefObjectId : ICapnpSerializable
     {
         public const UInt64 typeId = 0xaeb2ad168e2f5697UL;
@@ -16720,7 +16721,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xef428f2f67c4d439UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xef428f2f67c4d439UL)]
         public enum Tag : ushort
         {
             testInterface,
@@ -16732,7 +16733,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0x9e5c574772b1d462UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9e5c574772b1d462UL)]
     public class TestProvisionId : ICapnpSerializable
     {
         public const UInt64 typeId = 0x9e5c574772b1d462UL;
@@ -16777,7 +16778,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xea2fb7dca9cdbdeaUL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xea2fb7dca9cdbdeaUL)]
     public class TestRecipientId : ICapnpSerializable
     {
         public const UInt64 typeId = 0xea2fb7dca9cdbdeaUL;
@@ -16822,7 +16823,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xa805157b98b65469UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa805157b98b65469UL)]
     public class TestThirdPartyCapId : ICapnpSerializable
     {
         public const UInt64 typeId = 0xa805157b98b65469UL;
@@ -16867,7 +16868,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xf4c58a8ebcd0f600UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xf4c58a8ebcd0f600UL)]
     public class TestJoinResult : ICapnpSerializable
     {
         public const UInt64 typeId = 0xf4c58a8ebcd0f600UL;
@@ -16912,7 +16913,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xd1fd8e9caf2a5d58UL)]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xd1fd8e9caf2a5d58UL)]
     public class TestNameAnnotation : ICapnpSerializable
     {
         public const UInt64 typeId = 0xd1fd8e9caf2a5d58UL;
@@ -17076,7 +17077,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0x89d9d1626b34017cUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x89d9d1626b34017cUL)]
         public class badlyNamedUnion : ICapnpSerializable
         {
             public const UInt64 typeId = 0x89d9d1626b34017cUL;
@@ -17208,7 +17209,7 @@ namespace Capnproto_test.Capnp.Test
                 }
             }
 
-            [TypeId(0xc3594bce5b24b722UL)]
+            [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc3594bce5b24b722UL)]
             public class badlyNamedGroup : ICapnpSerializable
             {
                 public const UInt64 typeId = 0xc3594bce5b24b722UL;
@@ -17253,7 +17254,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xf610d1deb4c9e84aUL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xf610d1deb4c9e84aUL)]
         public enum BadlyNamedEnum : ushort
         {
             foo,
@@ -17261,7 +17262,7 @@ namespace Capnproto_test.Capnp.Test
             baz
         }
 
-        [TypeId(0xbe406b6341d52284UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xbe406b6341d52284UL)]
         public class NestedStruct : ICapnpSerializable
         {
             public const UInt64 typeId = 0xbe406b6341d52284UL;
@@ -17335,7 +17336,7 @@ namespace Capnproto_test.Capnp.Test
                 }
             }
 
-            [TypeId(0xf6cb3f9c7a4322e0UL)]
+            [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xf6cb3f9c7a4322e0UL)]
             public enum DeeplyNestedEnum : ushort
             {
                 quux,
@@ -17345,7 +17346,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
-    [TypeId(0xd112a69d31ed918bUL), Proxy(typeof(TestNameAnnotationInterface_Proxy)), Skeleton(typeof(TestNameAnnotationInterface_Skeleton))]
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xd112a69d31ed918bUL), Proxy(typeof(TestNameAnnotationInterface_Proxy)), Skeleton(typeof(TestNameAnnotationInterface_Skeleton))]
     public interface ITestNameAnnotationInterface : IDisposable
     {
         Task BadlyNamedMethod(byte BadlyNamedParam, CancellationToken cancellationToken_ = default);
@@ -17389,7 +17390,7 @@ namespace Capnproto_test.Capnp.Test
 
     public static class TestNameAnnotationInterface
     {
-        [TypeId(0xc12efc3b075adfe9UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc12efc3b075adfe9UL)]
         public class Params_BadlyNamedMethod : ICapnpSerializable
         {
             public const UInt64 typeId = 0xc12efc3b075adfe9UL;
@@ -17449,7 +17450,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        [TypeId(0xdcc3cdb4b28f6c86UL)]
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xdcc3cdb4b28f6c86UL)]
         public class Result_BadlyNamedMethod : ICapnpSerializable
         {
             public const UInt64 typeId = 0xdcc3cdb4b28f6c86UL;

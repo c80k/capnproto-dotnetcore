@@ -49,14 +49,14 @@ namespace Capnp.Rpc
             /// <summary>
             /// Question object was disposed.
             /// </summary>
-            Disposed = 16
+            CanceledByDispose = 16
         }
 
         readonly TaskCompletionSource<DeserializerState> _tcs = new TaskCompletionSource<DeserializerState>();
         readonly uint _questionId;
         ConsumedCapability? _target;
         SerializerState? _inParams;
-        int _inhibitFinishCounter;
+        int _inhibitFinishCounter, _refCounter;
 
         internal PendingQuestion(IRpcEndpoint ep, uint id, ConsumedCapability? target, SerializerState? inParams)
         {
@@ -91,10 +91,13 @@ namespace Capnp.Rpc
         /// </summary>
         public Task<DeserializerState> WhenReturned => _tcs.Task;
 
-        internal bool IsTailCall
+        /// <summary>
+        /// Whether this question represents a tail call
+        /// </summary>
+        public bool IsTailCall
         {
             get => StateFlags.HasFlag(State.TailCall);
-            set
+            internal set
             {
                 if (value)
                     StateFlags |= State.TailCall;
@@ -102,7 +105,6 @@ namespace Capnp.Rpc
                     StateFlags &= ~State.TailCall;
             }
         }
-        internal bool IsReturned => StateFlags.HasFlag(State.Returned);
 
         internal void DisallowFinish()
         {
@@ -113,6 +115,23 @@ namespace Capnp.Rpc
         {
             --_inhibitFinishCounter;
             AutoFinish();
+        }
+
+        internal void AddRef()
+        {
+            lock (ReentrancyBlocker)
+            {
+                ++_refCounter;
+            }
+        }
+
+        internal void Release()
+        {
+            lock (ReentrancyBlocker)
+            {
+                --_refCounter;
+                AutoFinish();
+            }
         }
 
         const string ReturnDespiteTailCallMessage = "Peer sent actual results despite the question was sent as tail call. This was not expected and is a protocol error.";
@@ -189,11 +208,6 @@ namespace Capnp.Rpc
             RpcEndpoint.DeleteQuestion(this);
         }
 
-        internal void RequestFinish()
-        {
-            RpcEndpoint.Finish(_questionId);
-        }
-
         void AutoFinish()
         {
             if (StateFlags.HasFlag(State.FinishRequested))
@@ -201,12 +215,13 @@ namespace Capnp.Rpc
                 return;
             }
 
-            if ((_inhibitFinishCounter == 0 && StateFlags.HasFlag(State.Returned) && !StateFlags.HasFlag(State.TailCall)) 
-                || StateFlags.HasFlag(State.Disposed))
+            if ((!IsTailCall && _inhibitFinishCounter == 0 && StateFlags.HasFlag(State.Returned)) || 
+                ( IsTailCall && _refCounter == 0 && StateFlags.HasFlag(State.Returned)) ||
+                 StateFlags.HasFlag(State.CanceledByDispose))
             {
                 StateFlags |= State.FinishRequested;
 
-                RequestFinish();
+                RpcEndpoint.Finish(_questionId);
             }
         }
 
@@ -338,9 +353,9 @@ namespace Capnp.Rpc
 
             lock (ReentrancyBlocker)
             {
-                if (!StateFlags.HasFlag(State.Disposed))
+                if (!StateFlags.HasFlag(State.CanceledByDispose))
                 {
-                    StateFlags |= State.Disposed;
+                    StateFlags |= State.CanceledByDispose;
                     justDisposed = true;
 
                     AutoFinish();
