@@ -958,7 +958,7 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
         }
     }
 
-    class TestMoreStuffImpl3 : ITestMoreStuff
+    class TestMoreStuffImpl3 : ITestMoreStuff, ITestCallOrder
     {
         readonly TaskCompletionSource<ITestInterface> _heldCap = new TaskCompletionSource<ITestInterface>();
 
@@ -987,9 +987,18 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
             }
         }
 
-        public Task<ITestCallOrder> Echo(ITestCallOrder Cap, CancellationToken cancellationToken_ = default)
+        int _echoCounter;
+
+        public Task<ITestCallOrder> Echo(ITestCallOrder cap, CancellationToken cancellationToken_ = default)
         {
-            throw new NotImplementedException();
+            if (_echoCounter++ < 20)
+            {
+                return Task.FromResult<ITestCallOrder>(((Proxy)cap).Cast<ITestMoreStuff>(true).Echo(cap).Eager());
+            }
+            else
+            {
+                return Task.FromResult(cap);
+            }
         }
 
         public Task ExpectCancel(ITestInterface Cap, CancellationToken cancellationToken_ = default)
@@ -997,9 +1006,12 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
             throw new NotImplementedException();
         }
 
-        public Task<uint> GetCallSequence(uint Expected, CancellationToken cancellationToken_ = default)
+        uint _counter;
+
+        public Task<uint> GetCallSequence(uint expected, CancellationToken cancellationToken_ = default)
         {
-            throw new NotImplementedException();
+            Assert.AreEqual(_counter, expected);
+            return Task.FromResult(_counter++);
         }
 
         public Task<string> GetEnormousString(CancellationToken cancellationToken_ = default)

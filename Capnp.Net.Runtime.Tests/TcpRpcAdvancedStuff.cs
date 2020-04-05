@@ -245,5 +245,36 @@ namespace Capnp.Net.Runtime.Tests
                 }
             }
         }
+
+        [TestMethod]
+        public void SalamiTactics()
+        {
+            using (var server = SetupServer())
+            {
+                server.Main = new TestMoreStuffImpl3();
+
+                using (var client = SetupClient())
+                {
+                    client.WhenConnected.Wait();
+
+                    using (var main = client.GetMain<ITestMoreStuff>())
+                    {
+                        var echoTask = main.Echo(Proxy.Share<ITestCallOrder>(main));
+                        Assert.IsTrue(echoTask.Wait(MediumNonDbgTimeout));
+                        var echo = echoTask.Result;
+                        var list = new Task<uint>[1000];
+                        for (uint i = 0; i < list.Length; i++)
+                        {
+                            list[i] = echo.GetCallSequence(i);
+                        }
+                        Assert.IsTrue(Task.WaitAll(list, MediumNonDbgTimeout));
+                        for (uint i = 0; i < list.Length; i++)
+                        {
+                            Assert.AreEqual(i, list[i].Result);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
