@@ -890,27 +890,19 @@ namespace Capnp.Rpc
                                     try
                                     {
                                         using var proxy = await t;
-                                        proxy.Freeze(out var boundEndpoint);
 
-                                        try
+                                        if (proxy.ConsumedCap?.Endpoint == this)
                                         {
-                                            if (boundEndpoint == this)
-                                            {
 #if DebugEmbargos
                                             Logger.LogDebug($"Sender loopback disembargo. Thread = {Thread.CurrentThread.Name}");
 #endif
-                                                Tx(mb.Frame);
-                                            }
-                                            else
-                                            {
-                                                Logger.LogWarning("Sender loopback request: Peer asked for disembargoing an answer which does not resolve back to the sender.");
-
-                                                throw new RpcProtocolErrorException("'Disembargo': Answer does not resolve back to me");
-                                            }
+                                            Tx(mb.Frame);
                                         }
-                                        finally
+                                        else
                                         {
-                                            proxy.Unfreeze();
+                                            Logger.LogWarning("Sender loopback request: Peer asked for disembargoing an answer which does not resolve back to the sender.");
+
+                                            throw new RpcProtocolErrorException("'Disembargo': Answer does not resolve back to me");
                                         }
                                     }
                                     catch (System.Exception exception)

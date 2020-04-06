@@ -238,23 +238,6 @@ namespace Capnp.Rpc
             }
         }
 
-        internal void Freeze(out IRpcEndpoint? boundEndpoint)
-        {
-            if (_disposedValue)
-                throw new ObjectDisposedException(nameof(Proxy));
-
-            boundEndpoint = null;
-            ConsumedCap?.Freeze(out boundEndpoint);
-        }
-
-        internal void Unfreeze()
-        {
-            if (_disposedValue)
-                throw new ObjectDisposedException(nameof(Proxy));
-
-            ConsumedCap?.Unfreeze();
-        }
-
 #if DebugFinalizers
         string CreatorStackTrace { get; set; }
 #endif

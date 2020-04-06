@@ -37,91 +37,78 @@ namespace Capnp.Rpc
 
             try
             {
-                ResolvedCap.Freeze(out var resolvedCapEndpoint);
-
-                try
+                if (ResolvedCap.Endpoint!= null && ResolvedCap.Endpoint != _ep)
                 {
-                    if (resolvedCapEndpoint != null && resolvedCapEndpoint != _ep)
-                    {
-                        // Carol lives in a different Vat C.
-                        throw new NotImplementedException("Sorry, level 3 RPC is not yet supported.");
-                    }
+                    // Carol lives in a different Vat C.
+                    throw new NotImplementedException("Sorry, level 3 RPC is not yet supported.");
+                }
 
-                    if (ResolvedCap == null ||
-                        // If the capability resolves to null, disembargo must not be requested.
-                        // Take the direct path, well-knowing that the call will result in an exception.
+                if (ResolvedCap.Endpoint != null ||
+                    //# Note that in the case where Carol actually lives in Vat B (i.e., the same vat that the promise
+                    //# already pointed at), no embargo is needed, because the pipelined calls are delivered over the
+                    //# same path as the later direct calls.
 
-                        resolvedCapEndpoint != null ||
-                        //# Note that in the case where Carol actually lives in Vat B (i.e., the same vat that the promise
-                        //# already pointed at), no embargo is needed, because the pipelined calls are delivered over the
-                        //# same path as the later direct calls.
+                    (_disembargo == null && _pendingCallsOnPromise == 0) ||
+                    // No embargo is needed since all outstanding replies have returned
 
-                        (_disembargo == null && _pendingCallsOnPromise == 0) ||
-                        // No embargo is needed since all outstanding replies have returned
-
-                        _disembargo?.IsCompleted == true
-                        // Disembargo has returned
-                        )
+                    _disembargo?.IsCompleted == true
+                    // Disembargo has returned
+                    )
+                {
+#if DebugEmbargos
+                    Logger.LogDebug("Direct call");
+#endif
+                    using var proxy = new Proxy(ResolvedCap);
+                    return proxy.Call(interfaceId, methodId, args, default);
+                }
+                else
+                {
+                    if (_disembargo == null)
                     {
 #if DebugEmbargos
-                Logger.LogDebug("Direct call");
+                        Logger.LogDebug("Requesting disembargo");
 #endif
-                        using var proxy = new Proxy(ResolvedCap);
-                        return proxy.Call(interfaceId, methodId, args, default);
+                        _disembargo = _ep.RequestSenderLoopback(GetMessageTarget);
                     }
                     else
                     {
-                        if (_disembargo == null)
-                        {
 #if DebugEmbargos
-                    Logger.LogDebug("Requesting disembargo");
+                        Logger.LogDebug("Waiting for requested disembargo");
 #endif
-                            _disembargo = _ep.RequestSenderLoopback(GetMessageTarget);
-                        }
-                        else
-                        {
-#if DebugEmbargos
-                    Logger.LogDebug("Waiting for requested disembargo");
-#endif
-                        }
-
-                        var cancellationTokenSource = new CancellationTokenSource();
-
-                        var callAfterDisembargo = _disembargo.ContinueWith(_ =>
-                        {
-                            // Two reasons for ignoring exceptions on the previous task (i.e. not _.Wait()ing):
-                            // 1. A faulting predecessor, especially due to cancellation, must not have any impact on this one.
-                            // 2. A faulting disembargo request would imply that the other side cannot send pending requests anyway.
-
-                            if (cancellationTokenSource.Token.IsCancellationRequested)
-                            {
-                                args.Dispose();
-                                cancellationTokenSource.Token.ThrowIfCancellationRequested();
-                            }
-
-                            using var proxy = new Proxy(ResolvedCap);
-                            return proxy.Call(interfaceId, methodId, args, default);
-
-                        }, TaskContinuationOptions.ExecuteSynchronously);
-
-                        _disembargo = callAfterDisembargo;
-
-                        async Task<DeserializerState> AwaitAnswer()
-                        {
-                            var promisedAnswer = await callAfterDisembargo;
-
-                            using (cancellationTokenSource.Token.Register(promisedAnswer.Dispose))
-                            {
-                                return await promisedAnswer.WhenReturned;
-                            }
-                        }
-
-                        return new LocalAnswer(cancellationTokenSource, AwaitAnswer());
                     }
-                }
-                finally
-                {
-                    ResolvedCap.Unfreeze();
+
+                    var cancellationTokenSource = new CancellationTokenSource();
+
+                    var callAfterDisembargo = _disembargo.ContinueWith(_ =>
+                    {
+                        // Two reasons for ignoring exceptions on the previous task (i.e. not _.Wait()ing):
+                        // 1. A faulting predecessor, especially due to cancellation, must not have any impact on this one.
+                        // 2. A faulting disembargo request would imply that the other side cannot send pending requests anyway.
+
+                        if (cancellationTokenSource.Token.IsCancellationRequested)
+                        {
+                            args.Dispose();
+                            cancellationTokenSource.Token.ThrowIfCancellationRequested();
+                        }
+
+                        using var proxy = new Proxy(ResolvedCap);
+                        return proxy.Call(interfaceId, methodId, args, default);
+
+                    }, TaskContinuationOptions.ExecuteSynchronously);
+
+                    _disembargo = callAfterDisembargo;
+
+                    async Task<DeserializerState> AwaitAnswer()
+                    {
+                        var promisedAnswer = await callAfterDisembargo;
+
+                        using (cancellationTokenSource.Token.Register(promisedAnswer.Dispose))
+                        {
+                            return await promisedAnswer.WhenReturned;
+                        }
+                    }
+
+                    return new LocalAnswer(cancellationTokenSource, AwaitAnswer());
                 }
             }
             catch (System.Exception exception)

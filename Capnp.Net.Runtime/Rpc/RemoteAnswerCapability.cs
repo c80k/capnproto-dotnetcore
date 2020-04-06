@@ -174,45 +174,7 @@ namespace Capnp.Rpc
             return call;
         }
 
-        internal override void Freeze(out IRpcEndpoint? boundEndpoint)
-        {
-            lock (_question.ReentrancyBlocker)
-            {
-                if ( _question.StateFlags.HasFlag(PendingQuestion.State.Returned) &&
-                    !_question.StateFlags.HasFlag(PendingQuestion.State.TailCall) &&
-                     _pendingCallsOnPromise == 0)
-                {
-                    if (ResolvedCap == null)
-                    {
-                        throw new RpcException("Answer did not resolve to expected capability");
-                    }
-
-                    ResolvedCap.Freeze(out boundEndpoint);
-                }
-                else
-                {
-                    ++_pendingCallsOnPromise;
-                    _question.DisallowFinish();
-                    boundEndpoint = _ep;
-                }
-            }
-        }
-
-        internal override void Unfreeze()
-        {
-            lock (_question.ReentrancyBlocker)
-            {
-                if (_pendingCallsOnPromise > 0)
-                {
-                    --_pendingCallsOnPromise;
-                    _question.AllowFinish();
-                }
-                else
-                {
-                    ResolvedCap?.Unfreeze();
-                }
-            }
-        }
+        internal override IRpcEndpoint Endpoint => _ep;
 
         internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {

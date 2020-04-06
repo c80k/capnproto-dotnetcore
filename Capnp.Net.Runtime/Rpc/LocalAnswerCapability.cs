@@ -29,15 +29,7 @@ namespace Capnp.Rpc
 
         }
 
-        internal override void Freeze(out IRpcEndpoint? boundEndpoint)
-        {
-            boundEndpoint = null;
-        }
-
-        internal override void Unfreeze()
-        {
-        }
-
+        internal override IRpcEndpoint? Endpoint => null;
 
         public Task WhenResolved => _whenResolvedProxy;
 

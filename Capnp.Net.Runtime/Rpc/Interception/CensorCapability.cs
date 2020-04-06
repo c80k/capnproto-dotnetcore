@@ -35,13 +35,6 @@ namespace Capnp.Rpc.Interception
             return null;
         }
 
-        internal override void Freeze(out IRpcEndpoint? boundEndpoint)
-        {
-            boundEndpoint = null;
-        }
-
-        internal override void Unfreeze()
-        {
-        }
+        internal override IRpcEndpoint? Endpoint => null;
     }
 }

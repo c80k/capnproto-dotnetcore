@@ -28,14 +28,7 @@ namespace Capnp.Rpc
             return call;
         }
 
-        internal override void Freeze(out IRpcEndpoint boundEndpoint)
-        {
-            boundEndpoint = _ep;
-        }
-
-        internal override void Unfreeze()
-        {
-        }
+        internal override IRpcEndpoint? Endpoint => _ep;
 
         internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER capDesc)
         {

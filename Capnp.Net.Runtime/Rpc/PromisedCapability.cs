@@ -23,61 +23,7 @@ namespace Capnp.Rpc
         public override Task WhenResolved => _resolvedCap.Task;
         public override T? GetResolvedCapability<T>() where T: class => _whenResolvedProxy.GetResolvedCapability<T>();
 
-        internal override void Freeze(out IRpcEndpoint? boundEndpoint)
-        {
-            lock (_reentrancyBlocker)
-            {
-                if (_resolvedCap.Task.IsCompleted && _pendingCallsOnPromise == 0)
-                {
-                    boundEndpoint = null;
-
-                    try
-                    {
-                        _resolvedCap.Task.Result?.Freeze(out boundEndpoint);
-                    }
-                    catch (AggregateException exception)
-                    {
-                        throw exception.InnerException!;
-                    }
-                }
-                else
-                {
-                    Debug.Assert(!_released);
-                    ++_pendingCallsOnPromise;
-
-                    boundEndpoint = _ep;
-                }
-            }
-        }
-
-        internal override void Unfreeze()
-        {
-            bool release = false;
-
-            lock (_reentrancyBlocker)
-            {
-                if (_pendingCallsOnPromise == 0)
-                {
-                    _resolvedCap.Task.Result?.Unfreeze();
-                }
-                else
-                {
-                    Debug.Assert(_pendingCallsOnPromise > 0);
-                    Debug.Assert(!_released);
-
-                    if (--_pendingCallsOnPromise == 0 && _resolvedCap.Task.IsCompleted)
-                    {
-                        release = true;
-                        _released = true;
-                    }
-                }
-            }
-
-            if (release)
-            {
-                _ep.ReleaseImport(_remoteId);
-            }
-        }
+        internal override IRpcEndpoint? Endpoint => _ep;
 
         internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {

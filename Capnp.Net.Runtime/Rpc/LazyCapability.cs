@@ -33,30 +33,7 @@ namespace Capnp.Rpc
             _capTask = AwaitCap();
         }
 
-        internal override void Freeze(out IRpcEndpoint? boundEndpoint)
-        {
-            if (WhenResolved.IsCompleted)
-            {
-                boundEndpoint = null;
-
-                try
-                {
-                    _capTask.Result?.Freeze(out boundEndpoint);
-                }
-                catch (AggregateException exception)
-                {
-                    throw exception.InnerException!;
-                }
-            }
-            else
-            {
-                boundEndpoint = null;
-            }
-        }
-
-        internal override void Unfreeze()
-        {
-        }
+        internal override IRpcEndpoint? Endpoint => null;
 
         internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {
