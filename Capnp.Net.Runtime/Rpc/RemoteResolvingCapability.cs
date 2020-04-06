@@ -32,18 +32,11 @@ namespace Capnp.Rpc
 
         protected IPromisedAnswer CallOnResolution(ulong interfaceId, ushort methodId, DynamicSerializerState args)
         {
-            if (ResolvedCap == null)
-                throw new InvalidOperationException("Capability not yet resolved, calling on resolution not possible");
+            var resolvedCap = ResolvedCap!;
 
             try
             {
-                if (ResolvedCap.Endpoint!= null && ResolvedCap.Endpoint != _ep)
-                {
-                    // Carol lives in a different Vat C.
-                    throw new NotImplementedException("Sorry, level 3 RPC is not yet supported.");
-                }
-
-                if (ResolvedCap.Endpoint != null ||
+                if (resolvedCap is RemoteCapability ||
                     //# Note that in the case where Carol actually lives in Vat B (i.e., the same vat that the promise
                     //# already pointed at), no embargo is needed, because the pipelined calls are delivered over the
                     //# same path as the later direct calls.
@@ -58,7 +51,7 @@ namespace Capnp.Rpc
 #if DebugEmbargos
                     Logger.LogDebug("Direct call");
 #endif
-                    using var proxy = new Proxy(ResolvedCap);
+                    using var proxy = new Proxy(resolvedCap);
                     return proxy.Call(interfaceId, methodId, args, default);
                 }
                 else

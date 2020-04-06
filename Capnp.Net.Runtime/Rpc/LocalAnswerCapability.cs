@@ -29,8 +29,6 @@ namespace Capnp.Rpc
 
         }
 
-        internal override IRpcEndpoint? Endpoint => null;
-
         public Task WhenResolved => _whenResolvedProxy;
 
         public T? GetResolvedCapability<T>() where T : class => _whenResolvedProxy.GetResolvedCapability<T>();

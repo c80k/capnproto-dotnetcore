@@ -891,7 +891,7 @@ namespace Capnp.Rpc
                                     {
                                         using var proxy = await t;
 
-                                        if (proxy.ConsumedCap?.Endpoint == this)
+                                        if (proxy.ConsumedCap is RemoteCapability remote && remote.Endpoint == this)
                                         {
 #if DebugEmbargos
                                             Logger.LogDebug($"Sender loopback disembargo. Thread = {Thread.CurrentThread.Name}");

@@ -174,8 +174,6 @@ namespace Capnp.Rpc
             return call;
         }
 
-        internal override IRpcEndpoint Endpoint => _ep;
-
         internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {
             lock (_question.ReentrancyBlocker)

@@ -52,8 +52,6 @@ namespace Capnp.Rpc
             return null;
         }
 
-        internal override IRpcEndpoint? Endpoint => null;
-
         protected override void ReleaseRemotely()
         {
         }

@@ -33,8 +33,6 @@ namespace Capnp.Rpc
             _capTask = AwaitCap();
         }
 
-        internal override IRpcEndpoint? Endpoint => null;
-
         internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {
             if (WhenResolved.ReplacementTaskIsCompletedSuccessfully())

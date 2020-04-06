@@ -23,8 +23,6 @@ namespace Capnp.Rpc
         public override Task WhenResolved => _resolvedCap.Task;
         public override T? GetResolvedCapability<T>() where T: class => _whenResolvedProxy.GetResolvedCapability<T>();
 
-        internal override IRpcEndpoint? Endpoint => _ep;
-
         internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {
             lock (_reentrancyBlocker)

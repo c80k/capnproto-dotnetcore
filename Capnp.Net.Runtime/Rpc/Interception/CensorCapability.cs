@@ -34,7 +34,5 @@ namespace Capnp.Rpc.Interception
             writer.SenderHosted = endpoint.AllocateExport(MyVine, out bool _);
             return null;
         }
-
-        internal override IRpcEndpoint? Endpoint => null;
     }
 }

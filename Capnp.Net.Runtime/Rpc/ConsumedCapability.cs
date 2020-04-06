@@ -16,8 +16,6 @@ namespace Capnp.Rpc
         /// </summary>
         protected abstract void ReleaseRemotely();
         internal abstract Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer);
-        internal abstract IRpcEndpoint? Endpoint { get; }
-
         internal abstract void AddRef();
         internal abstract void Release();
 
