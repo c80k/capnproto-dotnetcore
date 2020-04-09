@@ -242,11 +242,16 @@ namespace Capnp.Net.Runtime.Tests
             {
                 (_server, _client) = SetupClientServerPair();
                 _client.WhenConnected.Wait(MediumNonDbgTimeout);
+                Assert.IsTrue(SpinWait.SpinUntil(() => _server.ConnectionCount > 0, MediumNonDbgTimeout));
+                var conn = _server.Connections[0];
 
                 using (_server)
                 using (_client)
                 {
                     action(this);
+
+                    Assert.IsTrue(SpinWait.SpinUntil(() => _client.SendCount == conn.RecvCount, MediumNonDbgTimeout));
+                    Assert.IsTrue(SpinWait.SpinUntil(() => conn.SendCount == _client.RecvCount, MediumNonDbgTimeout));
                 }
             }
 

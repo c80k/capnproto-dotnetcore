@@ -76,7 +76,12 @@ namespace Capnp.Rpc
 
         protected override void Dispose(bool disposing)
         {
-            Proxy.Dispose();
+            if (disposing)
+                Proxy.Dispose();
+            else
+                try { Proxy.Dispose(); }
+                catch { }
+
             base.Dispose(disposing);
         }
     }

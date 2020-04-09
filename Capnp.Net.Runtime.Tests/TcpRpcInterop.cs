@@ -415,20 +415,22 @@ namespace Capnp.Net.Runtime.Tests
                         var callee = new TestTailCalleeImpl(calleeCallCount);
 
                         var promise = main.Foo(456, callee, default);
-                        var dependentCall0 = promise.C().GetCallSequence(0, default);
+                        using (var c = promise.C())
+                        {
+                            var dependentCall0 = c.GetCallSequence(0, default);
 
-                        Assert.IsTrue(promise.Wait(MediumNonDbgTimeout));
-                        Assert.AreEqual(456u, promise.Result.I);
-                        Assert.AreEqual("from TestTailCaller", promise.Result.T);
+                            Assert.IsTrue(promise.Wait(MediumNonDbgTimeout));
+                            Assert.AreEqual(456u, promise.Result.I);
+                            Assert.AreEqual("from TestTailCaller", promise.Result.T);
 
-                        var dependentCall1 = promise.C().GetCallSequence(0, default);
-                        var dependentCall2 = promise.C().GetCallSequence(0, default);
+                            var dependentCall1 = c.GetCallSequence(0, default);
+                            var dependentCall2 = c.GetCallSequence(0, default);
 
-                        AssertOutput(stdout, "foo");
-                        Assert.IsTrue(dependentCall0.Wait(MediumNonDbgTimeout));
-                        Assert.IsTrue(dependentCall1.Wait(MediumNonDbgTimeout));
-                        Assert.IsTrue(dependentCall2.Wait(MediumNonDbgTimeout));
-
+                            AssertOutput(stdout, "foo");
+                            Assert.IsTrue(dependentCall0.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(dependentCall1.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(dependentCall2.Wait(MediumNonDbgTimeout));
+                        }
                         Assert.AreEqual(1, calleeCallCount.CallCount);
                     }
                 }
@@ -523,28 +525,30 @@ namespace Capnp.Net.Runtime.Tests
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
                         var tcs = new TaskCompletionSource<ITestInterface>();
-                        var eager = tcs.Task.Eager(true);
+                        using (var eager = tcs.Task.Eager(true))
+                        {
+                            var request = main.CallFoo(Proxy.Share(eager), default);
+                            AssertOutput(stdout, "callFoo");
+                            var request2 = main.CallFooWhenResolved(Proxy.Share(eager), default);
+                            AssertOutput(stdout, "callFooWhenResolved");
 
-                        var request = main.CallFoo(eager, default);
-                        AssertOutput(stdout, "callFoo");
-                        var request2 = main.CallFooWhenResolved(eager, default);
-                        AssertOutput(stdout, "callFooWhenResolved");
+                            var gcs = main.GetCallSequence(0, default);
+                            AssertOutput(stdout, "getCallSequence");
+                            Assert.IsTrue(gcs.Wait(MediumNonDbgTimeout));
+                            Assert.AreEqual(2u, gcs.Result);
 
-                        var gcs = main.GetCallSequence(0, default);
-                        AssertOutput(stdout, "getCallSequence");
-                        Assert.IsTrue(gcs.Wait(MediumNonDbgTimeout));
-                        Assert.AreEqual(2u, gcs.Result);
+                            var chainedCallCount = new Counters();
+                            var tiimpl = new TestInterfaceImpl(chainedCallCount);
+                            tcs.SetResult(tiimpl);
 
-                        var chainedCallCount = new Counters();
-                        var tiimpl = new TestInterfaceImpl(chainedCallCount);
-                        tcs.SetResult(tiimpl);
+                            Assert.IsTrue(request.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(request2.Wait(MediumNonDbgTimeout));
 
-                        Assert.IsTrue(request.Wait(MediumNonDbgTimeout));
-                        Assert.IsTrue(request2.Wait(MediumNonDbgTimeout));
+                            Assert.AreEqual("bar", request.Result);
+                            Assert.AreEqual("bar", request2.Result);
+                            Assert.AreEqual(2, chainedCallCount.CallCount);
 
-                        Assert.AreEqual("bar", request.Result);
-                        Assert.AreEqual("bar", request2.Result);
-                        Assert.AreEqual(2, chainedCallCount.CallCount);
+                        }
 
                         AssertOutput(stdout, "fin");
                         AssertOutput(stdout, "fin");

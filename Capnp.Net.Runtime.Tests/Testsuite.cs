@@ -749,5 +749,74 @@ namespace Capnp.Net.Runtime.Tests
                 Assert.IsTrue(foo.IsCanceled);
             }
         }
+
+        public static void ButNoTailCall(ITestbed testbed)
+        {
+            var impl = new TestMoreStuffImpl4();
+            using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
+            {
+                var peer = new TestMoreStuffImpl5();
+                var heldTask = main.Echo(peer);
+
+                testbed.MustComplete(heldTask);
+
+                var r = heldTask.Result as IResolvingCapability;
+
+                peer.EnableEcho();
+
+                testbed.MustComplete(r.WhenResolved);
+
+                heldTask.Result.Dispose();
+            }
+        }
+
+        public static void SecondIsTailCall(ITestbed testbed)
+        {
+            var impl = new TestTailCallerImpl3();
+            using (var main = testbed.ConnectMain<ITestTailCaller>(impl))
+            {
+                var callee = new TestTailCalleeImpl(new Counters());
+                var task = main.Foo(123, callee);
+                testbed.MustComplete(task);
+                Assert.AreEqual("from TestTailCaller 2", task.Result.T);
+            }
+        }
+
+        public static void NoTailCallMt(ITestbed testbed)
+        {
+            var impl = new TestTailCallerImpl4();
+            using (var main = testbed.ConnectMain<ITestTailCaller>(impl))
+            using (var callee = Proxy.Share<ITestTailCallee>(new TestTailCalleeImpl(new Counters())))
+            {
+                var tasks = ParallelEnumerable
+                    .Range(0, 1000)
+                    .Select(async i =>
+                    {
+                        var r = await main.Foo(i, Proxy.Share(callee));
+                        Assert.AreEqual((uint)i, r.I);
+                    })
+                    .ToArray();
+
+                testbed.MustComplete(tasks);
+                Assert.IsFalse(tasks.Any(t => t.IsCanceled || t.IsFaulted));
+            }
+        }
+
+        public static void ReexportSenderPromise(ITestbed testbed)
+        {
+            var impl = new TestTailCallerImpl(new Counters());
+            using (var main = testbed.ConnectMain<ITestTailCaller>(impl))
+            {
+                var tcs = new TaskCompletionSource<ITestTailCallee>();
+                using (var promise = Proxy.Share(tcs.Task.Eager(true)))
+                {
+                    var task1 = main.Foo(1, Proxy.Share(promise));
+                    var task2 = main.Foo(2, Proxy.Share(promise));
+                    var callee = new TestTailCalleeImpl(new Counters());
+                    tcs.SetResult(callee);
+                    testbed.MustComplete(task1, task2);
+                }
+            }
+        }
     }
 }

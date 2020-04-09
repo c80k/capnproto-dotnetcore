@@ -261,20 +261,29 @@ namespace Capnp.Net.Runtime.Tests
                     {
                         var echoTask = main.Echo(Proxy.Share<ITestCallOrder>(main));
                         Assert.IsTrue(echoTask.Wait(MediumNonDbgTimeout));
-                        var echo = echoTask.Result;
-                        var list = new Task<uint>[1000];
-                        for (uint i = 0; i < list.Length; i++)
+                        using (var echo = echoTask.Result)
                         {
-                            list[i] = echo.GetCallSequence(i);
-                        }
-                        Assert.IsTrue(Task.WaitAll(list, MediumNonDbgTimeout));
-                        for (uint i = 0; i < list.Length; i++)
-                        {
-                            Assert.AreEqual(i, list[i].Result);
+                            var list = new Task<uint>[1000];
+                            for (uint i = 0; i < list.Length; i++)
+                            {
+                                list[i] = echo.GetCallSequence(i);
+                            }
+                            Assert.IsTrue(Task.WaitAll(list, MediumNonDbgTimeout));
+                            for (uint i = 0; i < list.Length; i++)
+                            {
+                                Assert.AreEqual(i, list[i].Result);
+                            }
                         }
                     }
                 }
             }
+        }
+
+
+        [TestMethod]
+        public void NoTailCallMt()
+        {
+            NewLocalhostTcpTestbed().RunTest(Testsuite.NoTailCallMt);
         }
     }
 }

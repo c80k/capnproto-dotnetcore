@@ -158,5 +158,23 @@ namespace Capnp.Net.Runtime.Tests
         {
             NewDtbdctTestbed().RunTest(Testsuite.ImportReceiverCanceled);
         }
+
+        [TestMethod]
+        public void ButNoTailCall()
+        {
+            NewDtbdctTestbed().RunTest(Testsuite.ButNoTailCall);
+        }
+
+        [TestMethod]
+        public void SecondIsTailCall()
+        {
+            NewDtbdctTestbed().RunTest(Testsuite.SecondIsTailCall);
+        }
+
+        [TestMethod]
+        public void ReexportSenderPromise()
+        {
+            NewDtbdctTestbed().RunTest(Testsuite.ReexportSenderPromise);
+        }
     }
 }

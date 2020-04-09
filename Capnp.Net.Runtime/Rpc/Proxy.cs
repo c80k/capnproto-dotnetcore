@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,10 +25,6 @@ namespace Capnp.Rpc
             else
                 return BareProxy.FromImpl(obj).Cast<T>(true);
         }
-
-#if DebugFinalizers
-        ILogger Logger { get; } = Logging.CreateLogger<Proxy>();
-#endif
 
         bool _disposedValue = false;
 
@@ -56,15 +53,23 @@ namespace Capnp.Rpc
                 return CapabilityReflection.CreateProxy<T>(ConsumedCap) as T;
         }
 
+        ConsumedCapability? _consumedCap;
+
         /// <summary>
         /// Underlying low-level capability
         /// </summary>
-        protected internal ConsumedCapability? ConsumedCap { get; private set; }
+        protected internal ConsumedCapability? ConsumedCap => _disposedValue ?
+            throw new ObjectDisposedException(nameof(Proxy)) : _consumedCap;
 
         /// <summary>
         /// Whether is this a broken capability.
         /// </summary>
-        public bool IsNull => ConsumedCap == null;
+        public bool IsNull => _consumedCap == null;
+
+        /// <summary>
+        /// Whether <see cref="Dispose()"/> was called on this Proxy.
+        /// </summary>
+        public bool IsDisposed => _disposedValue;
 
         static async void DisposeCtrWhenReturned(CancellationTokenRegistration ctr, IPromisedAnswer answer)
         {
@@ -134,12 +139,12 @@ namespace Capnp.Rpc
             if (cap == null)
                 return;
 
-            ConsumedCap = cap;
+            _consumedCap = cap;
             cap.AddRef();
 
 #if DebugFinalizers
-            if (ConsumedCap != null)
-                ConsumedCap.OwningProxy = this;
+            if (_consumedCap != null)
+                _consumedCap.OwningProxy = this;
 #endif
         }
 
@@ -166,14 +171,14 @@ namespace Capnp.Rpc
             {
                 if (disposing)
                 {
-                    ConsumedCap?.Release();
+                    _consumedCap?.Release();
                 }
                 else
                 {
                     // When called from the Finalizer, we must not throw.
                     // But when reference counting goes wrong, ConsumedCapability.Release() will throw an InvalidOperationException.
                     // The only option here is to suppress that exception.
-                    try { ConsumedCap?.Release(); }
+                    try { _consumedCap?.Release(); }
                     catch { }
                 }
 
@@ -187,7 +192,7 @@ namespace Capnp.Rpc
         ~Proxy()
         {
 #if DebugFinalizers
-            Logger?.LogWarning($"Caught orphaned Proxy, created from here: {CreatorStackTrace}.");
+            Debugger.Log(0, "DebugFinalizers", $"Caught orphaned Proxy, created from here: {CreatorStackTrace}.");
 #endif
 
             Dispose(false);

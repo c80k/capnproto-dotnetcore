@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace Capnp.Rpc
     public static class Impatient
     {
         static readonly ConditionalWeakTable<Task, IPromisedAnswer> _taskTable = new ConditionalWeakTable<Task, IPromisedAnswer>();
-        static readonly ThreadLocal<IRpcEndpoint?> _askingEndpoint = new ThreadLocal<IRpcEndpoint?>();
+        static readonly ThreadLocal<Stack<IRpcEndpoint>> _askingEndpoint = new ThreadLocal<Stack<IRpcEndpoint>>(() => new Stack<IRpcEndpoint>());
 
         /// <summary>
         /// Attaches a continuation to the given promise and registers the resulting task for pipelining.
@@ -171,8 +172,17 @@ namespace Capnp.Rpc
 
         internal static IRpcEndpoint? AskingEndpoint
         {
-            get => _askingEndpoint.Value;
-            set { _askingEndpoint.Value = value; }
+            get => _askingEndpoint.Value!.Count > 0 ? _askingEndpoint.Value.Peek() : null;
+        }
+
+        internal static void PushAskingEndpoint(IRpcEndpoint endpoint)
+        {
+            _askingEndpoint.Value!.Push(endpoint);
+        }
+
+        internal static void PopAskingEndpoint()
+        {
+            _askingEndpoint.Value!.Pop();
         }
 
         /// <summary>

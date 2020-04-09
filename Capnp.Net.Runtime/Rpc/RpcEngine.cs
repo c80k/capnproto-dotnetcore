@@ -66,7 +66,7 @@ namespace Capnp.Rpc
                 Dismissed
             }
 
-            static readonly ThreadLocal<PendingQuestion?> _tailCall = new ThreadLocal<PendingQuestion?>();
+            static readonly ThreadLocal<PendingQuestion?> _deferredCall = new ThreadLocal<PendingQuestion?>();
             static readonly ThreadLocal<bool> _canDeferCalls = new ThreadLocal<bool>();
 
             ILogger Logger { get; } = Logging.CreateLogger<RpcEndpoint>();
@@ -81,6 +81,7 @@ namespace Capnp.Rpc
             readonly Dictionary<uint, PendingAnswer> _answerTable = new Dictionary<uint, PendingAnswer>();
             readonly Dictionary<uint, TaskCompletionSource<int>> _pendingDisembargos = new Dictionary<uint, TaskCompletionSource<int>>();
             readonly object _reentrancyBlocker = new object();
+            readonly object _callReturnBlocker = new object();
 
             long _recvCount;
             long _sendCount;
@@ -284,16 +285,8 @@ namespace Capnp.Rpc
 
                     if (_revExportTable.TryGetValue(providedCapability, out uint id))
                     {
+                        _exportTable[id].AddRef();
                         first = false;
-
-                        if (_exportTable.TryGetValue(id, out var rc))
-                        {
-                            rc.AddRef();
-                        }
-                        else
-                        {
-                            Logger.LogError("Inconsistent export table: Capability with id {0} exists in reverse table only", id);
-                        }
                     }
                     else
                     {
@@ -305,7 +298,6 @@ namespace Capnp.Rpc
 
                         _revExportTable.Add(providedCapability, id);
                         _exportTable.Add(id, new RefCounted<Skeleton>(providedCapability));
-
                         first = true;
                     }
 
@@ -407,8 +399,22 @@ namespace Capnp.Rpc
                 }
             }
 
+            void DispatchDeferredCalls()
+            {
+                var call = _deferredCall.Value;
+                _deferredCall.Value = null;
+                call?.Send();
+            }
 
             void ProcessCall(Call.READER req)
+            {
+                lock (_callReturnBlocker)
+                {
+                    ProcessCallLocked(req);
+                }
+            }
+
+            void ProcessCallLocked(Call.READER req)
             {
                 Return.WRITER SetupReturn(MessageBuilder mb)
                 {
@@ -420,8 +426,10 @@ namespace Capnp.Rpc
                     return ret;
                 }
 
-                void ReturnCall(Action<Return.WRITER> why)
+                void ReturnCallNoCapTable(Action<Return.WRITER> why)
                 {
+                    DispatchDeferredCalls();
+
                     var mb = MessageBuilder.Create();
                     mb.InitCapTable();
                     var ret = SetupReturn(mb);
@@ -430,7 +438,10 @@ namespace Capnp.Rpc
 
                     try
                     {
-                        Tx(mb.Frame);
+                        lock (_callReturnBlocker)
+                        {
+                            Tx(mb.Frame);
+                        }
                     }
                     catch (RpcException exception)
                     {
@@ -473,7 +484,7 @@ namespace Capnp.Rpc
                                     {
                                         Debug.Fail("Either answer or counter question must be present");
                                     }
-                                    else if (aorcq.Answer != null || aorcq.Counterquestion != _tailCall.Value)
+                                    else if (aorcq.Answer != null || aorcq.Counterquestion != _deferredCall.Value)
                                     {
                                         var results = aorcq.Answer ?? (DynamicSerializerState)(await aorcq.Counterquestion!.WhenReturned);
                                         var ret = SetupReturn(results.MsgBuilder!);
@@ -484,12 +495,13 @@ namespace Capnp.Rpc
                                                 ret.which = Return.WHICH.Results;
                                                 ret.Results!.Content = results.Rewrap<DynamicSerializerState>();
                                                 ret.ReleaseParamCaps = releaseParamCaps;
+                                                DispatchDeferredCalls();
                                                 ExportCapTableAndSend(results, ret.Results);
                                                 pendingAnswer.CapTable = ret.Results.CapTable;
                                                 break;
 
                                             case Call.sendResultsTo.WHICH.Yourself:
-                                                ReturnCall(ret2 =>
+                                                ReturnCallNoCapTable(ret2 =>
                                                 {
                                                     ret2.which = Return.WHICH.ResultsSentElsewhere;
                                                     ret2.ReleaseParamCaps = releaseParamCaps;
@@ -499,11 +511,11 @@ namespace Capnp.Rpc
                                     }
                                     else if (aorcq.Counterquestion != null)
                                     {
-                                        _tailCall.Value = null;
+                                        _deferredCall.Value = null;
                                         aorcq.Counterquestion.IsTailCall = true;
                                         aorcq.Counterquestion.Send();
 
-                                        ReturnCall(ret2 =>
+                                        ReturnCallNoCapTable(ret2 =>
                                         {
                                             ret2.which = Return.WHICH.TakeFromOtherQuestion;
                                             ret2.TakeFromOtherQuestion = aorcq.Counterquestion.QuestionId;
@@ -513,7 +525,7 @@ namespace Capnp.Rpc
                                 }
                                 catch (TaskCanceledException)
                                 {
-                                    ReturnCall(ret =>
+                                    ReturnCallNoCapTable(ret =>
                                     {
                                         ret.which = Return.WHICH.Canceled;
                                         ret.ReleaseParamCaps = releaseParamCaps;
@@ -521,7 +533,7 @@ namespace Capnp.Rpc
                                 }
                                 catch (System.Exception exception)
                                 {
-                                    ReturnCall(ret =>
+                                    ReturnCallNoCapTable(ret =>
                                     {
                                         ret.which = Return.WHICH.Exception;
                                         ret.Exception!.Reason = exception.Message;
@@ -543,7 +555,7 @@ namespace Capnp.Rpc
                                 }
                                 finally
                                 {
-                                    ReturnCall(ret =>
+                                    ReturnCallNoCapTable(ret =>
                                     {
                                         ret.which = Return.WHICH.ResultsSentElsewhere;
                                         ret.ReleaseParamCaps = releaseParamCaps;
@@ -600,7 +612,7 @@ namespace Capnp.Rpc
                 }
 
                 _canDeferCalls.Value = true;
-                Impatient.AskingEndpoint = this;
+                Impatient.PushAskingEndpoint(this);
 
                 try
                 {
@@ -683,10 +695,8 @@ namespace Capnp.Rpc
                 finally
                 {
                     _canDeferCalls.Value = false;
-                    Impatient.AskingEndpoint = null;
-                    var call = _tailCall.Value;
-                    _tailCall.Value = null;
-                    call?.Send();
+                    Impatient.PopAskingEndpoint();
+                    DispatchDeferredCalls();
                 }
             }
 
@@ -1419,8 +1429,8 @@ namespace Capnp.Rpc
 
                 if (_canDeferCalls.Value)
                 {
-                    _tailCall.Value?.Send();
-                    _tailCall.Value = question;
+                    DispatchDeferredCalls();
+                    _deferredCall.Value = question;
                 }
                 else
                 {

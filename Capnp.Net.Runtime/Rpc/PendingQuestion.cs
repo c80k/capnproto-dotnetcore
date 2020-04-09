@@ -66,14 +66,6 @@ namespace Capnp.Rpc
             _inParams = inParams;
             StateFlags = inParams == null ? State.Sent : State.None;
 
-            if (inParams != null)
-            {
-                foreach (var cap in inParams.Caps!)
-                {
-                    cap.AddRef();
-                }
-            }
-
             if (target != null)
             {
                 target.AddRef();
@@ -282,22 +274,6 @@ namespace Capnp.Rpc
             return new RemoteAnswerCapability(this, access, proxyTask);
         }
 
-        static void ReleaseCaps(ConsumedCapability? target, SerializerState? inParams)
-        {
-            if (inParams != null)
-            {
-                foreach (var cap in inParams.Caps!)
-                {
-                    cap.Release();
-                }
-            }
-
-            if (target != null)
-            {
-                target.Release();
-            }
-        }
-
         static void ReleaseOutCaps(DeserializerState outParams)
         {
             foreach (var cap in outParams.Caps!)
@@ -327,8 +303,8 @@ namespace Capnp.Rpc
             Debug.Assert(msg.Call!.Target.which != MessageTarget.WHICH.undefined);
             var call = msg.Call;
             call.QuestionId = QuestionId;
-            call.SendResultsTo.which = IsTailCall ? 
-                Call.sendResultsTo.WHICH.Yourself : 
+            call.SendResultsTo.which = IsTailCall ?
+                Call.sendResultsTo.WHICH.Yourself :
                 Call.sendResultsTo.WHICH.Caller;
 
             try
@@ -341,7 +317,7 @@ namespace Capnp.Rpc
                 OnException(exception);
             }
 
-            ReleaseCaps(target, inParams);
+            target?.Release();
         }
 
         /// <summary>
