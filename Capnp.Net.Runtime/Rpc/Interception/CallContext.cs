@@ -180,7 +180,7 @@ namespace Capnp.Rpc.Interception
                             break;
 
                         default:
-                            Bob = Skeleton.GetOrCreateSkeleton(value, false);
+                            Bob = CapabilityReflection.CreateSkeletonInternal(value);
                             break;
                     }
 

@@ -18,34 +18,13 @@ namespace Capnp.Rpc
             public SkeletonRelinquisher(Skeleton skeleton)
             {
                 _skeleton = skeleton;
+                _skeleton.Claim();
             }
 
             public void Dispose()
             {
                 _skeleton.Relinquish();
             }
-        }
-
-        static readonly ConditionalWeakTable<object, Skeleton> _implMap =
-            new ConditionalWeakTable<object, Skeleton>();
-
-        internal static Skeleton GetOrCreateSkeleton<T>(T impl, bool addRef)
-            where T: class
-        {
-            if (impl == null)
-                throw new ArgumentNullException(nameof(impl));
-
-            if (impl is Skeleton skel)
-                return skel;
-
-            skel = _implMap.GetValue(impl, _ => CapabilityReflection.CreateSkeleton(_));
-
-            if (addRef)
-            {
-                skel.Claim();
-            }
-
-            return skel;
         }
 
         /// <summary>
@@ -56,7 +35,7 @@ namespace Capnp.Rpc
         /// <returns>A disposable object. Calling Dispose() on the returned instance relinquishes ownership again.</returns>
         public static IDisposable Claim<T>(T impl) where T: class
         {
-            return new SkeletonRelinquisher(GetOrCreateSkeleton(impl, true));
+            return new SkeletonRelinquisher(CapabilityReflection.CreateSkeletonInternal(impl));
         }
 
         /// <summary>

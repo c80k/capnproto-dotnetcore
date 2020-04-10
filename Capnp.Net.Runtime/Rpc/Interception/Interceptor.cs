@@ -53,7 +53,7 @@ namespace Capnp.Rpc.Interception
 
                 default:
                     var temp = (CapabilityReflection.CreateProxy<TCap>(
-                                Skeleton.GetOrCreateSkeleton(cap, false).AsCapability())) as TCap;
+                                CapabilityReflection.CreateSkeletonInternal(cap).AsCapability())) as TCap;
                     return Attach(policy, temp!)!;
             }
         }

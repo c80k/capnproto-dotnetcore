@@ -94,6 +94,8 @@ namespace Capnp.Rpc
             new ConditionalWeakTable<Type, ProxyFactory>();
         static ConditionalWeakTable<Type, SkeletonFactory> _skeletonMap =
             new ConditionalWeakTable<Type, SkeletonFactory>();
+        static ConditionalWeakTable<object, Skeleton> _implMap =
+            new ConditionalWeakTable<object, Skeleton>();
 
         static CapabilityReflection()
         {
@@ -155,15 +157,23 @@ namespace Capnp.Rpc
         /// <exception cref="System.Reflection.TargetInvocationException">Problem with instatiating the Skeleton (constructor threw exception).</exception>
         /// <exception cref="MemberAccessException">Caller does not have permission to invoke the Skeleton constructor.</exception>
         /// <exception cref="TypeLoadException">Problem with building the Skeleton type, or problem with loading some dependent class.</exception>
-        public static Skeleton CreateSkeleton(object obj)
+        [Obsolete("Do not use this method directly. Instead, pass objects directly or use Proxy.Share<T>(). This method will be removed with next release.")]
+        public static Skeleton CreateSkeleton(object obj) => CreateSkeletonInternal(obj);
+
+        internal static Skeleton CreateSkeletonInternal(object obj)
         {
             if (obj == null)
                 throw new ArgumentNullException(nameof(obj));
 
-            var factory = GetSkeletonFactory(obj.GetType());
-            var skeleton = factory.NewSkeleton();
-            skeleton.Bind(obj);
-            return skeleton;
+            var result = _implMap.GetValue(obj, _ =>
+            {
+                var factory = GetSkeletonFactory(_.GetType());
+                var skeleton = factory.NewSkeleton();
+                skeleton.Bind(obj);
+                return skeleton;
+            });
+
+            return result;
         }
 
         static ProxyFactory GetProxyFactory(Type type)

@@ -1570,7 +1570,7 @@ namespace Capnp.Rpc
         /// </summary>
         public object Main
         {
-            set { BootstrapCap = Skeleton.GetOrCreateSkeleton(value, false); }
+            set { BootstrapCap = value is Skeleton skeleton ? skeleton : CapabilityReflection.CreateSkeletonInternal(value); }
         }
     }
 }

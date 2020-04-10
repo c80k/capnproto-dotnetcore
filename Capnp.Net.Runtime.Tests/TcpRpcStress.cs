@@ -67,7 +67,7 @@ namespace Capnp.Net.Runtime.Tests
         public void EmbargoServer()
         {
             var t2 = new TcpRpcInterop();
-            Repeat(100, t2.EmbargoServer);
+            Repeat(20, t2.EmbargoServer);
         }
 
         [TestMethod]

@@ -1291,7 +1291,7 @@ namespace Capnp
                 case Rpc.Skeleton providedCapability:
                     return ProvideCapability(providedCapability);
                 default:
-                    return ProvideCapability(Rpc.Skeleton.GetOrCreateSkeleton(obj, false));
+                    return ProvideCapability(Rpc.CapabilityReflection.CreateSkeletonInternal(obj));
             }
         }
 

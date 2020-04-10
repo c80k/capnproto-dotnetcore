@@ -19,7 +19,7 @@
         /// <exception cref="System.TypeLoadException">Problem with building the Skeleton type, or problem with loading some dependent class.</exception>
         public static BareProxy FromImpl(object impl)
         {
-            return new BareProxy(CapabilityReflection.CreateSkeleton(impl).AsCapability());
+            return new BareProxy(CapabilityReflection.CreateSkeletonInternal(impl).AsCapability());
         }
 
         /// <summary>
