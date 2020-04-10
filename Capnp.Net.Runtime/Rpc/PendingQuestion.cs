@@ -58,7 +58,7 @@ namespace Capnp.Rpc
         SerializerState? _inParams;
         int _inhibitFinishCounter, _refCounter;
 
-        internal PendingQuestion(IRpcEndpoint ep, uint id, ConsumedCapability? target, SerializerState? inParams)
+        internal PendingQuestion(IRpcEndpoint ep, uint id, ConsumedCapability target, SerializerState? inParams)
         {
             RpcEndpoint = ep ?? throw new ArgumentNullException(nameof(ep));
             _questionId = id;
@@ -237,7 +237,7 @@ namespace Capnp.Rpc
         /// <param name="access">Access path</param>
         /// <returns>Low-level capability</returns>
         /// <exception cref="DeserializationException">The referenced member does not exist or does not resolve to a capability pointer.</exception>
-        public ConsumedCapability? Access(MemberAccessPath access)
+        public ConsumedCapability Access(MemberAccessPath access)
         {
             lock (ReentrancyBlocker)
             {
@@ -268,7 +268,7 @@ namespace Capnp.Rpc
         /// <param name="task">promises the cap whose ownership is transferred to this object</param>
         /// <returns>Low-level capability</returns>
         /// <exception cref="DeserializationException">The referenced member does not exist or does not resolve to a capability pointer.</exception>
-        public ConsumedCapability? Access(MemberAccessPath access, Task<IDisposable?> task)
+        public ConsumedCapability Access(MemberAccessPath access, Task<IDisposable?> task)
         {
             var proxyTask = task.AsProxyTask();
             return new RemoteAnswerCapability(this, access, proxyTask);

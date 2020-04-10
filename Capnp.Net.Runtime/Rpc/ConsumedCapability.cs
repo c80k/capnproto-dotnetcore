@@ -18,6 +18,7 @@ namespace Capnp.Rpc
         internal abstract Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer);
         internal abstract void AddRef();
         internal abstract void Release();
+        internal abstract Skeleton AsSkeleton();
 
 #if DebugFinalizers
         internal Proxy? OwningProxy { get; set; }

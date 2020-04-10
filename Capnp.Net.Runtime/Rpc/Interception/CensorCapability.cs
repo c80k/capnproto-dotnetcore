@@ -9,12 +9,10 @@ namespace Capnp.Rpc.Interception
             InterceptedCapability = interceptedCapability;
             interceptedCapability.AddRef();
             Policy = policy;
-            MyVine = Vine.Create(this);
         }
 
         public ConsumedCapability InterceptedCapability { get; }
         public IInterceptionPolicy Policy { get; }
-        internal Skeleton MyVine { get; }
 
         protected override void ReleaseRemotely()
         {
@@ -31,7 +29,7 @@ namespace Capnp.Rpc.Interception
         internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {
             writer.which = CapDescriptor.WHICH.SenderHosted;
-            writer.SenderHosted = endpoint.AllocateExport(MyVine, out bool _);
+            writer.SenderHosted = endpoint.AllocateExport(AsSkeleton(), out bool _);
             return null;
         }
     }

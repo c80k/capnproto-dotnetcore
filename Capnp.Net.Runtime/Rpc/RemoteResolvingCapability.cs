@@ -36,7 +36,10 @@ namespace Capnp.Rpc
 
             try
             {
-                if (resolvedCap is RemoteCapability ||
+                if (resolvedCap is NullCapability ||
+                    // Must not request disembargo on null cap
+
+                    resolvedCap is RemoteCapability ||
                     //# Note that in the case where Carol actually lives in Vat B (i.e., the same vat that the promise
                     //# already pointed at), no embargo is needed, because the pipelined calls are delivered over the
                     //# same path as the later direct calls.
@@ -84,7 +87,7 @@ namespace Capnp.Rpc
                             cancellationTokenSource.Token.ThrowIfCancellationRequested();
                         }
 
-                        using var proxy = new Proxy(ResolvedCap);
+                        using var proxy = new Proxy(resolvedCap);
                         return proxy.Call(interfaceId, methodId, args, default);
 
                     }, TaskContinuationOptions.ExecuteSynchronously);

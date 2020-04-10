@@ -7,14 +7,6 @@ namespace Capnp.Rpc
 {
     class LocalCapability : ConsumedCapability
     {
-        public static ConsumedCapability Create(Skeleton skeleton)
-        {
-            if (skeleton is Vine vine)
-                return vine.Proxy.ConsumedCap!;
-            else
-                return new LocalCapability(skeleton);
-        }
-
         static async Task<DeserializerState> AwaitAnswer(Task<AnswerOrCounterquestion> call)
         {
             var aorcq = await call;
@@ -23,7 +15,9 @@ namespace Capnp.Rpc
 
         public Skeleton ProvidedCap { get; }
 
-        LocalCapability(Skeleton providedCap)
+        internal override Skeleton AsSkeleton() => ProvidedCap;
+
+        public LocalCapability(Skeleton providedCap)
         {
             ProvidedCap = providedCap ?? throw new ArgumentNullException(nameof(providedCap));
         }

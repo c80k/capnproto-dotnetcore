@@ -259,7 +259,7 @@ namespace Capnp.Rpc
         /// <exception cref="System.Reflection.TargetInvocationException">Problem with instatiating the Proxy (constructor threw exception).</exception>
         /// <exception cref="MemberAccessException">Caller does not have permission to invoke the Proxy constructor.</exception>
         /// <exception cref="TypeLoadException">Problem with building the Proxy type, or problem with loading some dependent class.</exception>
-        public static Proxy CreateProxy<TInterface>(ConsumedCapability? cap)
+        public static Proxy CreateProxy<TInterface>(ConsumedCapability cap)
         {
             var factory = GetProxyFactory(typeof(TInterface));
             var proxy = factory.NewProxy();

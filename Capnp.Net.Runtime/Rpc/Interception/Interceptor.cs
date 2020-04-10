@@ -52,10 +52,9 @@ namespace Capnp.Rpc.Interception
                     return (new CensorCapability(ccap, policy) as TCap)!;
 
                 default:
-                    return (Attach(policy, 
-                        (CapabilityReflection.CreateProxy<TCap>(
-                            LocalCapability.Create(
-                                Skeleton.GetOrCreateSkeleton(cap, false))) as TCap)!));
+                    var temp = (CapabilityReflection.CreateProxy<TCap>(
+                                Skeleton.GetOrCreateSkeleton(cap, false).AsCapability())) as TCap;
+                    return Attach(policy, temp!)!;
             }
         }
 

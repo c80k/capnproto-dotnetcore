@@ -4,22 +4,23 @@ using System.Threading.Tasks;
 
 namespace Capnp.Rpc
 {
+
     class LazyCapability : RefCountingCapability, IResolvingCapability
     {
         public static LazyCapability CreateBrokenCap(string message)
         {
-            return new LazyCapability(Task.FromException<ConsumedCapability?>(new RpcException(message)));
+            return new LazyCapability(Task.FromException<ConsumedCapability>(new RpcException(message)));
         }
 
         public static LazyCapability CreateCanceledCap(CancellationToken token)
         {
-            return new LazyCapability(Task.FromCanceled<ConsumedCapability?>(token));
+            return new LazyCapability(Task.FromCanceled<ConsumedCapability>(token));
         }
 
         readonly Task<Proxy>? _proxyTask;
-        readonly Task<ConsumedCapability?> _capTask;
+        readonly Task<ConsumedCapability> _capTask;
 
-        public LazyCapability(Task<ConsumedCapability?> capabilityTask)
+        public LazyCapability(Task<ConsumedCapability> capabilityTask)
         {
             _capTask = capabilityTask;
         }
@@ -28,7 +29,7 @@ namespace Capnp.Rpc
         {
             _proxyTask = proxyTask;
 
-            async Task<ConsumedCapability?> AwaitCap() => (await _proxyTask!).ConsumedCap;
+            async Task<ConsumedCapability> AwaitCap() => (await _proxyTask!).ConsumedCap;
 
             _capTask = AwaitCap();
         }
@@ -68,7 +69,7 @@ namespace Capnp.Rpc
             {
                 try
                 {
-                    return CapabilityReflection.CreateProxy<T>(_capTask.Result) as T;
+                    return (CapabilityReflection.CreateProxy<T>(_capTask.Result) as T)!;
                 }
                 catch (AggregateException exception)
                 {
@@ -83,7 +84,7 @@ namespace Capnp.Rpc
 
         async Task<DeserializerState> CallImpl(ulong interfaceId, ushort methodId, DynamicSerializerState args, CancellationToken cancellationToken)
         {
-            ConsumedCapability? cap;
+            ConsumedCapability cap;
             try
             {
                 cap = await _capTask;

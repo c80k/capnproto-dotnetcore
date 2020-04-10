@@ -7,6 +7,7 @@ namespace Capnp.Rpc
     abstract class RefCountingCapability: ConsumedCapability
     {
         readonly object _reentrancyBlocker = new object();
+        Vine? _vine;
 
         // Note on reference counting: Works in analogy to COM. AddRef() adds a reference,
         // Release() removes it. When the reference count reaches zero, the capability must be
@@ -120,6 +121,16 @@ namespace Capnp.Rpc
                 {
                     throw new ObjectDisposedException(ToString(), "Validation failed, capability is already disposed");
                 }
+            }
+        }
+
+        internal override Skeleton AsSkeleton()
+        {
+            lock (_reentrancyBlocker)
+            {
+                if (_vine == null)
+                    _vine = new Vine(this);
+                return _vine;
             }
         }
     }

@@ -386,7 +386,7 @@ namespace Capnp
         /// <exception cref="ArgumentOutOfRangeException">offset negative or out of range</exception>
         /// <exception cref="InvalidOperationException">capability table not set</exception>
         /// <exception cref="Rpc.RpcException">not a capability pointer or invalid capability index</exception>
-        internal Rpc.ConsumedCapability? DecodeCapPointer(int offset)
+        internal Rpc.ConsumedCapability DecodeCapPointer(int offset)
         {
             if (offset < 0)
             {
@@ -404,7 +404,7 @@ namespace Capnp
             {
                 // Despite this behavior is not officially specified, 
                 // the official C++ implementation seems to send null pointers for null caps.
-                return null;
+                return Rpc.NullCapability.Instance;
             }
 
             if (pointer.Kind != PointerKind.Other)
@@ -496,13 +496,13 @@ namespace Capnp
             return state;
         }
 
-        internal Rpc.ConsumedCapability? StructReadRawCap(int index)
+        internal Rpc.ConsumedCapability StructReadRawCap(int index)
         {
             if (Kind != ObjectKind.Struct && Kind != ObjectKind.Nil)
                 throw new InvalidOperationException("Allowed on structs only");
 
             if (index >= StructPtrCount)
-                return null;
+                return Rpc.NullCapability.Instance;
 
             return DecodeCapPointer(index + StructDataCount);
         }

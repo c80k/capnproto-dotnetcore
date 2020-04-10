@@ -677,7 +677,7 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        class ThrowingSkeleton : Skeleton
+        class ThrowingSkeleton : RefCountingSkeleton
         {
             public bool WasCalled { get; private set; }
 

@@ -25,12 +25,12 @@ namespace Capnp.Rpc.Interception
             public Task<DeserializerState> WhenReturned => _futureResult.Task;
             public CancellationToken CancelFromAlice => _cancelFromAlice.Token;
 
-            public ConsumedCapability? Access(MemberAccessPath access)
+            public ConsumedCapability Access(MemberAccessPath access)
             {
                 return new LocalAnswerCapability(_futureResult.Task, access);
             }
 
-            public ConsumedCapability? Access(MemberAccessPath _, Task<IDisposable?> task)
+            public ConsumedCapability Access(MemberAccessPath _, Task<IDisposable?> task)
             {
                 var proxyTask = task.AsProxyTask();
                 return new LocalAnswerCapability(proxyTask);
@@ -165,12 +165,18 @@ namespace Capnp.Rpc.Interception
                             BobProxy = proxy.Cast<BareProxy>(false);
                             break;
 
-                        case ConsumedCapability cap: using (var temp = CapabilityReflection.CreateProxy<object>(cap)) {
-                            Bob = temp; }
+                        case ConsumedCapability cap: 
+                            using (var temp = CapabilityReflection.CreateProxy<object>(cap)) 
+                            {
+                                Bob = temp; 
+                            }
                             break;
 
                         case Skeleton skeleton:
-                            Bob = LocalCapability.Create(skeleton);
+                            using (var nullProxy = new Proxy())
+                            {
+                                Bob = (object?)skeleton.AsCapability() ?? nullProxy;
+                            }
                             break;
 
                         default:
@@ -213,9 +219,12 @@ namespace Capnp.Rpc.Interception
                 for (int i = 0; i < state.Caps.Count; i++)
                 {
                     var cap = state.Caps[i];
-                    cap = policy.Attach(cap);
-                    state.Caps[i] = cap;
-                    cap.AddRef();
+                    if (cap != null)
+                    {
+                        cap = policy.Attach(cap);
+                        state.Caps[i] = cap;
+                        cap.AddRef();
+                    }
                 }
             }
         }
@@ -227,9 +236,12 @@ namespace Capnp.Rpc.Interception
                 for (int i = 0; i < state.Caps.Count; i++)
                 {
                     var cap = state.Caps[i];
-                    cap = policy.Detach(cap);
-                    state.Caps[i] = cap;
-                    cap.AddRef();
+                    if (cap != null)
+                    {
+                        cap = policy.Detach(cap);
+                        state.Caps[i] = cap;
+                        cap.AddRef();
+                    }
                 }
             }
         }

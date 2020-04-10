@@ -4,7 +4,7 @@ using Capnp.Rpc;
 
 namespace Capnp.Net.Runtime.Tests
 {
-    class ProvidedCapabilityMock : Skeleton
+    class ProvidedCapabilityMock : RefCountingSkeleton
     {
         readonly TaskCompletionSource<(ulong, ushort, DeserializerState, CancellationToken)>
             _call = new TaskCompletionSource<(ulong, ushort, DeserializerState, CancellationToken)>();

@@ -38,7 +38,7 @@ namespace Capnp.Rpc
             else
             {
                 capDesc.which = CapDescriptor.WHICH.SenderHosted;
-                capDesc.SenderHosted = endpoint.AllocateExport(Vine.Create(this), out var _);
+                capDesc.SenderHosted = endpoint.AllocateExport(AsSkeleton(), out var _);
             }
             return null;
         }

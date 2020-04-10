@@ -88,7 +88,7 @@ namespace Capnp.Rpc
                                     }
                                     catch (System.Exception)
                                     {
-                                        throw new ArgumentOutOfRangeException("Illegal pointer field in transformation operation");
+                                        throw new RpcException("Illegal pointer field in transformation operation");
                                     }
                                     break;
 
@@ -100,21 +100,20 @@ namespace Capnp.Rpc
                             }
                         }
 
-                        Proxy proxy;
-
                         switch (cur.Kind)
                         {
                             case ObjectKind.Capability:
                                 try
                                 {
-                                    var cap = aorcq.Answer.Caps![(int)cur.CapabilityIndex];
-                                    proxy = new Proxy(cap);
+                                    return new Proxy(aorcq.Answer.Caps![(int)cur.CapabilityIndex]);
                                 }
                                 catch (ArgumentOutOfRangeException)
                                 {
-                                    throw new ArgumentOutOfRangeException("Bad capability table in internal answer - internal error?");
+                                    throw new RpcException("Capability index out of range");
                                 }
-                                return proxy;
+
+                            case ObjectKind.Nil:
+                                return new Proxy(NullCapability.Instance);
 
                             default:
                                 throw new ArgumentOutOfRangeException("Transformation did not result in a capability");

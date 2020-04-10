@@ -22,7 +22,7 @@ namespace Capnp.Rpc
         /// </summary>
         /// <param name="access">Path to the desired capability inside the result struct.</param>
         /// <returns>Pipelined low-level capability</returns>
-        ConsumedCapability? Access(MemberAccessPath access);
+        ConsumedCapability Access(MemberAccessPath access);
 
         /// <summary>
         /// 
@@ -30,7 +30,7 @@ namespace Capnp.Rpc
         /// <param name="access">Creates a low-level capability for promise pipelining.</param>
         /// <param name="proxyTask">Task returning the proxy whose ownership will be taken over</param>
         /// <returns></returns>
-        ConsumedCapability? Access(MemberAccessPath access, Task<IDisposable?> proxyTask);
+        ConsumedCapability Access(MemberAccessPath access, Task<IDisposable?> proxyTask);
 
         /// <summary>
         /// Whether the question was asked as tail call

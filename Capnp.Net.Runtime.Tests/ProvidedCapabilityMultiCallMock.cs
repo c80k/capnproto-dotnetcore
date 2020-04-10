@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Capnp.Net.Runtime.Tests
 {
-    class ProvidedCapabilityMultiCallMock : Skeleton
+    class ProvidedCapabilityMultiCallMock : RefCountingSkeleton
     {
         readonly BufferBlock<TestCallContext> _ccs = new BufferBlock<TestCallContext>();
 

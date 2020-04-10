@@ -102,19 +102,6 @@ namespace Capnp.Rpc
                 if (!_question.StateFlags.HasFlag(PendingQuestion.State.TailCall) &&
                      _question.StateFlags.HasFlag(PendingQuestion.State.Returned))
                 {
-                    try
-                    {
-                        if (ResolvedCap == null)
-                        {
-                            throw new RpcException("Answer did not resolve to expected capability");
-                        }
-                    }
-                    catch
-                    {
-                        args.Dispose();
-                        throw;
-                    }
-
                     return CallOnResolution(interfaceId, methodId, args);
                 }
                 else
@@ -198,8 +185,7 @@ namespace Capnp.Rpc
                     }
                     else if (_question.IsTailCall)
                     {
-                        var vine = Vine.Create(this);
-                        uint id = endpoint.AllocateExport(vine, out bool first);
+                        uint id = endpoint.AllocateExport(AsSkeleton(), out bool first);
 
                         writer.which = CapDescriptor.WHICH.SenderHosted;
                         writer.SenderHosted = id;

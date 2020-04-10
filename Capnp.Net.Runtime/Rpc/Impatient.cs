@@ -76,7 +76,7 @@ namespace Capnp.Rpc
         /// <param name="access">path to the desired capability</param>
         /// <param name="proxyTask">task returning a proxy to the desired capability</param>
         /// <returns>Pipelined low-level capability</returns>
-        public static ConsumedCapability? Access(Task task, MemberAccessPath access, Task<IDisposable?> proxyTask)
+        public static ConsumedCapability Access(Task task, MemberAccessPath access, Task<IDisposable?> proxyTask)
         {
             var answer = TryGetAnswer(task);
             if (answer != null) return answer.Access(access, proxyTask);
@@ -164,7 +164,7 @@ namespace Capnp.Rpc
                 return cap;
 
             var unwrapped = await proxy.ConsumedCap.Unwrap();
-            if (unwrapped == null)
+            if (unwrapped == null || unwrapped == NullCapability.Instance)
                 return null;
 
             return ((CapabilityReflection.CreateProxy<TInterface>(unwrapped)) as TInterface)!;

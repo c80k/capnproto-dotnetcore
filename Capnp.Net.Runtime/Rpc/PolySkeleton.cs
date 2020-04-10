@@ -8,7 +8,7 @@ namespace Capnp.Rpc
     /// <summary>
     /// Combines multiple skeletons to represent objects which implement multiple interfaces.
     /// </summary>
-    public class PolySkeleton: Skeleton
+    public class PolySkeleton: RefCountingSkeleton
     {
         readonly Dictionary<ulong, Skeleton> _ifmap = new Dictionary<ulong, Skeleton>();
 

@@ -8,7 +8,7 @@ namespace Capnp.Rpc
     {
         readonly uint _remoteId;
         readonly object _reentrancyBlocker = new object();
-        readonly TaskCompletionSource<ConsumedCapability?> _resolvedCap = new TaskCompletionSource<ConsumedCapability?>();
+        readonly TaskCompletionSource<ConsumedCapability> _resolvedCap = new TaskCompletionSource<ConsumedCapability>();
         readonly Task<Proxy> _whenResolvedProxy;
         bool _released;
 
@@ -149,9 +149,10 @@ namespace Capnp.Rpc
             lock (_reentrancyBlocker)
             {
 #if DebugFinalizers
-                resolvedCap.ResolvingCap = this;
+                if (resolvedCap != null)
+                    resolvedCap.ResolvingCap = this;
 #endif
-                _resolvedCap.SetResult(resolvedCap);
+                _resolvedCap.SetResult(resolvedCap!);
 
                 if (_pendingCallsOnPromise == 0)
                 {

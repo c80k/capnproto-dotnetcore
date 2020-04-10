@@ -310,7 +310,7 @@ namespace Capnp.Rpc
                 return AllocateExport(providedCapability, out first);
             }
 
-            PendingQuestion AllocateQuestion(ConsumedCapability? target, SerializerState? inParams)
+            PendingQuestion AllocateQuestion(ConsumedCapability target, SerializerState? inParams)
             {
                 lock (_reentrancyBlocker)
                 {
@@ -359,7 +359,7 @@ namespace Capnp.Rpc
                 if (bootstrapCap != null)
                 {
                     ret.which = Return.WHICH.Results;
-                    bootstrap.SetCapability(bootstrap.ProvideCapability(LocalCapability.Create(bootstrapCap)));
+                    bootstrap.SetCapability(bootstrap.ProvideCapability(bootstrapCap.AsCapability()));
                     ret.Results!.Content = bootstrap;
 
                     bootstrapTask = Task.FromResult<AnswerOrCounterquestion>(bootstrap);
@@ -897,29 +897,20 @@ namespace Capnp.Rpc
                                 disembargo.Target.PromisedAnswer,
                                 async t =>
                                 {
-                                    try
-                                    {
-                                        using var proxy = await t;
+                                    using var proxy = await t;
 
-                                        if (proxy.ConsumedCap is RemoteCapability remote && remote.Endpoint == this)
-                                        {
+                                    if (proxy.ConsumedCap is RemoteCapability remote && remote.Endpoint == this)
+                                    {
 #if DebugEmbargos
-                                            Logger.LogDebug($"Sender loopback disembargo. Thread = {Thread.CurrentThread.Name}");
+                                        Logger.LogDebug($"Sender loopback disembargo. Thread = {Thread.CurrentThread.Name}");
 #endif
-                                            Tx(mb.Frame);
-                                        }
-                                        else
-                                        {
-                                            Logger.LogWarning("Sender loopback request: Peer asked for disembargoing an answer which does not resolve back to the sender.");
-
-                                            throw new RpcProtocolErrorException("'Disembargo': Answer does not resolve back to me");
-                                        }
+                                        Tx(mb.Frame);
                                     }
-                                    catch (System.Exception exception)
+                                    else
                                     {
-                                        Logger.LogWarning($"Sender loopback request: Peer asked for disembargoing an answer which either has not yet returned, was canceled, or faulted: {exception.Message}");
+                                        Logger.LogWarning("Sender loopback request: Peer asked for disembargoing an answer which does not resolve back to the sender.");
 
-                                        throw new RpcProtocolErrorException($"'Disembargo' failure: {exception}");
+                                        throw new RpcProtocolErrorException("'Disembargo': Answer does not resolve back to me");
                                     }
                                 });
                         }
@@ -1177,7 +1168,7 @@ namespace Capnp.Rpc
                 mb.InitCapTable();
                 var req = mb.BuildRoot<Message.WRITER>();
                 req.which = Message.WHICH.Bootstrap;
-                var pendingBootstrap = AllocateQuestion(null, null);
+                var pendingBootstrap = AllocateQuestion(NullCapability.Instance, null);
                 req.Bootstrap!.QuestionId = pendingBootstrap.QuestionId;
 
                 Tx(mb.Frame);
@@ -1315,7 +1306,7 @@ namespace Capnp.Rpc
                         case CapDescriptor.WHICH.ReceiverHosted:
                             if (_exportTable.TryGetValue(capDesc.ReceiverHosted, out var rc))
                             {
-                                return LocalCapability.Create(rc.Cap);
+                                return rc.Cap.AsCapability();
                             }
                             else
                             {
@@ -1369,6 +1360,9 @@ namespace Capnp.Rpc
                                 rcv = new RefCounted<RemoteCapability>(newCap);
                                 return newCap;
                             }
+
+                        case CapDescriptor.WHICH.None:
+                            return NullCapability.Instance;
 
                         default:
                             Logger.LogWarning("Unknown capability descriptor category");

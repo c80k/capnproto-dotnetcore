@@ -389,7 +389,7 @@ namespace Capnp.Net.Runtime.Tests
                         var result = DynamicSerializerState.CreateForRpc();
                         result.SetStruct(1, 2);
                         result.WriteData(0, 654321);
-                        uint id = result.ProvideCapability(mock2);
+                        uint id = result.ProvideCapability(mock2).Value;
                         result.LinkToCapability(1, id);
 
                         mock.Return.SetResult(result);
@@ -453,7 +453,7 @@ namespace Capnp.Net.Runtime.Tests
                     var result = DynamicSerializerState.CreateForRpc();
                     result.SetStruct(1, 2);
                     result.WriteData(0, 654321);
-                    uint id = result.ProvideCapability(mock2);
+                    uint id = result.ProvideCapability(mock2).Value;
                     result.LinkToCapability(1, id);
 
                     mock.Return.SetResult(result);
@@ -543,7 +543,7 @@ namespace Capnp.Net.Runtime.Tests
                         var result = DynamicSerializerState.CreateForRpc();
                         result.SetStruct(1, 2);
                         result.WriteData(0, 654321);
-                        uint id = result.ProvideCapability(mock2);
+                        uint id = result.ProvideCapability(mock2).Value;
                         result.LinkToCapability(1, id);
 
                         mock.Return.SetResult(result);
@@ -707,7 +707,7 @@ namespace Capnp.Net.Runtime.Tests
                     var result = DynamicSerializerState.CreateForRpc();
                     result.SetStruct(1, 2);
                     result.WriteData(0, 654321);
-                    uint id = result.ProvideCapability(mock2);
+                    uint id = result.ProvideCapability(mock2).Value;
                     result.LinkToCapability(1, id);
 
                     mock.Return.SetResult(result);

@@ -53,18 +53,18 @@ namespace Capnp.Rpc
                 return CapabilityReflection.CreateProxy<T>(ConsumedCap) as T;
         }
 
-        ConsumedCapability? _consumedCap;
+        ConsumedCapability _consumedCap = NullCapability.Instance;
 
         /// <summary>
         /// Underlying low-level capability
         /// </summary>
-        protected internal ConsumedCapability? ConsumedCap => _disposedValue ?
+        protected internal ConsumedCapability ConsumedCap => _disposedValue ?
             throw new ObjectDisposedException(nameof(Proxy)) : _consumedCap;
 
         /// <summary>
         /// Whether is this a broken capability.
         /// </summary>
-        public bool IsNull => _consumedCap == null;
+        public bool IsNull => _consumedCap == NullCapability.Instance;
 
         /// <summary>
         /// Whether <see cref="Dispose()"/> was called on this Proxy.
@@ -100,12 +100,6 @@ namespace Capnp.Rpc
                 throw new ObjectDisposedException(nameof(Proxy));
             }
 
-            if (ConsumedCap == null)
-            {
-                args.Dispose();
-                throw new InvalidOperationException("Cannot call null capability");
-            }
-
             var answer = ConsumedCap.DoCall(interfaceId, methodId, args);
 
             if (cancellationToken.CanBeCanceled)
@@ -126,20 +120,17 @@ namespace Capnp.Rpc
 #endif
         }
 
-        internal Proxy(ConsumedCapability? cap): this()
+        internal Proxy(ConsumedCapability cap): this()
         {
             Bind(cap);
         }
 
-        internal void Bind(ConsumedCapability? cap)
+        internal void Bind(ConsumedCapability cap)
         {
-            if (ConsumedCap != null)
+            if (ConsumedCap != NullCapability.Instance)
                 throw new InvalidOperationException("Proxy was already bound");
 
-            if (cap == null)
-                return;
-
-            _consumedCap = cap;
+            _consumedCap = cap ?? throw new ArgumentNullException(nameof(cap));
             cap.AddRef();
 
 #if DebugFinalizers
@@ -151,15 +142,7 @@ namespace Capnp.Rpc
         internal async Task<Skeleton> GetProvider()
         {
             var unwrapped = await ConsumedCap.Unwrap();
-
-            switch (unwrapped)
-            {
-                case LocalCapability lcap:
-                    return lcap.ProvidedCap;
-
-                default:
-                    return Vine.Create(unwrapped);
-            }
+            return unwrapped.AsSkeleton();
         }
 
         /// <summary>

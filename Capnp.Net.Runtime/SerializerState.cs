@@ -237,33 +237,31 @@ namespace Capnp
             }
         }
 
-        internal Rpc.ConsumedCapability? DecodeCapPointer(int offset)
+        internal Rpc.ConsumedCapability DecodeCapPointer(int offset)
         {
             if (Caps == null)
                 throw new InvalidOperationException("Capbility table not set");
 
             if (!IsAllocated)
             {
-                return null;
+                return Rpc.NullCapability.Instance;
             }
 
             WirePointer pointer = RawData[offset];
 
             if (pointer.IsNull)
             {
-                return null;
+                return Rpc.NullCapability.Instance;
             }
 
             if (pointer.Kind != PointerKind.Other)
             {
-                throw new Rpc.RpcException(
-                    "Expected a capability pointer, but got something different");
+                throw new Rpc.RpcException("Expected a capability pointer, but got something different");
             }
 
             if (pointer.CapabilityIndex >= Caps.Count)
             {
-                throw new Rpc.RpcException(
-                    "Capability index out of range");
+                throw new Rpc.RpcException("Capability index out of range");
             }
 
             return Caps[(int)pointer.CapabilityIndex];
@@ -1237,9 +1235,9 @@ namespace Capnp
         /// <param name="capability">The low-level capability object to provide.</param>
         /// <returns>Index of the given capability in the capability table, null if capability is null</returns>
         /// <exception cref="InvalidOperationException">The underlying message builder was not configured for capability table support.</exception>
-        public uint? ProvideCapability(Rpc.ConsumedCapability? capability)
+        public uint? ProvideCapability(Rpc.ConsumedCapability capability)
         {
-            if (capability == null)
+            if (capability == null || capability == Rpc.NullCapability.Instance)
                 return null;
 
             if (Caps == null)
@@ -1251,7 +1249,7 @@ namespace Capnp
             {
                 index = Caps.Count;
                 Caps.Add(capability);
-                capability?.AddRef();
+                capability.AddRef();
             }
 
             return (uint)index;
@@ -1263,9 +1261,9 @@ namespace Capnp
         /// <param name="capability">The capability to provide, in terms of its skeleton.</param>
         /// <returns>Index of the given capability in the capability table</returns>
         /// <exception cref="InvalidOperationException">The underlying message builder was not configured for capability table support.</exception>
-        public uint ProvideCapability(Rpc.Skeleton capability)
+        public uint? ProvideCapability(Rpc.Skeleton capability)
         {
-            return ProvideCapability(Rpc.LocalCapability.Create(capability))!.Value;
+            return ProvideCapability(capability.AsCapability());
         }
 
         /// <summary>
@@ -1356,7 +1354,7 @@ namespace Capnp
             }
         }
 
-        internal Rpc.ConsumedCapability? StructReadRawCap(int index)
+        internal Rpc.ConsumedCapability StructReadRawCap(int index)
         {
             if (Kind != ObjectKind.Struct && Kind != ObjectKind.Nil)
                 throw new InvalidOperationException("Allowed on structs only");
@@ -1376,10 +1374,10 @@ namespace Capnp
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="slot"/> is out of range.</exception>
         /// <exception cref="ArgumentException">The desired interface does not qualify as capability interface (<see cref="Rpc.ProxyAttribute"/>)</exception>
         /// <exception cref="InvalidOperationException">This state does not represent a struct.</exception>
-        public T? ReadCap<T>(int slot) where T : class
+        public T ReadCap<T>(int slot) where T : class
         {
             var cap = StructReadRawCap(slot);
-            return Rpc.CapabilityReflection.CreateProxy<T>(cap) as T;
+            return (Rpc.CapabilityReflection.CreateProxy<T>(cap) as T)!;
         }
 
         /// <summary>

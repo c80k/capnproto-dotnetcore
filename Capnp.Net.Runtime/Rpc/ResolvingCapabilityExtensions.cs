@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Capnp.Rpc
 {
     static class ResolvingCapabilityExtensions
     {
-        public static async Task<ConsumedCapability?> Unwrap(this ConsumedCapability? cap)
+        public static async Task<ConsumedCapability> Unwrap(this ConsumedCapability cap)
         {
             while (cap is IResolvingCapability resolving)
             {
@@ -20,7 +21,7 @@ namespace Capnp.Rpc
         public static Action? ExportAsSenderPromise<T>(this T cap, IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
             where T: ConsumedCapability, IResolvingCapability
         {
-            var vine = Vine.Create(cap);
+            var vine = cap.AsSkeleton();
             uint preliminaryId = endpoint.AllocateExport(vine, out bool first);
 
             writer.which = CapDescriptor.WHICH.SenderPromise;
@@ -58,7 +59,10 @@ namespace Capnp.Rpc
             }
             catch (TaskCanceledException exception)
             {
-                return new Proxy(LazyCapability.CreateCanceledCap(exception.CancellationToken));
+                var token = exception.CancellationToken;
+                if (!token.IsCancellationRequested)
+                    token = new CancellationToken(true);
+                return new Proxy(LazyCapability.CreateCanceledCap(token));
             }
             catch (System.Exception exception)
             {
@@ -68,7 +72,7 @@ namespace Capnp.Rpc
             switch (obj)
             {
                 case Proxy proxy: return proxy;
-                case null: return new Proxy(null);
+                case null: return new Proxy(NullCapability.Instance);
                 default: return BareProxy.FromImpl(obj);
             }
         }
