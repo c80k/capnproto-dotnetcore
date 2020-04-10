@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -54,7 +55,8 @@ namespace Capnp.Rpc
         /// </summary>
         protected override void Dispose(bool disposing)
         {
-            foreach (var cap in _ifmap.Values)
+            foreach (var cap in _ifmap.Values.Take(1))
+            // releasing first skeleton is sufficient. Avoid double-Dispose!
             {
                 cap.Relinquish();
             }
@@ -64,7 +66,7 @@ namespace Capnp.Rpc
 
         internal override void Bind(object impl)
         {
-            foreach (Skeleton skel in _ifmap.Values)
+            foreach (Skeleton skel in _ifmap.Values) 
             {
                 skel.Bind(impl);
             }

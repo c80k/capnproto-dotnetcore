@@ -311,7 +311,7 @@ namespace Capnp.Net.Runtime.Tests
 
                 using (var claimer = Skeleton.Claim(cap))
                 {
-                    var ftask = main.CallFoo(cap, default);
+                    var ftask = main.CallFoo(Proxy.Share<ITestInterface>(cap), default);
                     testbed.MustComplete(ftask);
                     Assert.AreEqual("bar", ftask.Result);
 
@@ -319,8 +319,8 @@ namespace Capnp.Net.Runtime.Tests
                     testbed.MustComplete(ctask);
                     Assert.AreEqual(1u, ctask.Result);
 
-                    ftask1 = main.CallFoo(cap, default);
-                    ftask2 = main.CallFoo(cap, default);
+                    ftask1 = main.CallFoo(Proxy.Share<ITestInterface>(cap), default);
+                    ftask2 = main.CallFoo(Proxy.Share<ITestInterface>(cap), default);
                 }
 
                 testbed.MustComplete(ftask1);
@@ -804,18 +804,20 @@ namespace Capnp.Net.Runtime.Tests
 
         public static void ReexportSenderPromise(ITestbed testbed)
         {
-            var impl = new TestTailCallerImpl(new Counters());
-            using (var main = testbed.ConnectMain<ITestTailCaller>(impl))
+            var impl = new TestMoreStuffImpl(new Counters());
+            using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
             {
-                var tcs = new TaskCompletionSource<ITestTailCallee>();
-                using (var promise = Proxy.Share(tcs.Task.Eager(true)))
+                var tcs = new TaskCompletionSource<ITestInterface>();
+                var tcsd = new TaskCompletionSource<int>();
+                using (var promise = tcs.Task.Eager(true))
                 {
-                    var task1 = main.Foo(1, Proxy.Share(promise));
-                    var task2 = main.Foo(2, Proxy.Share(promise));
-                    var callee = new TestTailCalleeImpl(new Counters());
+                    var task1 = main.CallFooWhenResolved(Proxy.Share(promise));
+                    var task2 = main.CallFooWhenResolved(Proxy.Share(promise));
+                    var callee = new TestInterfaceImpl(new Counters(), tcsd);
                     tcs.SetResult(callee);
                     testbed.MustComplete(task1, task2);
                 }
+                testbed.MustComplete(tcsd.Task);
             }
         }
     }

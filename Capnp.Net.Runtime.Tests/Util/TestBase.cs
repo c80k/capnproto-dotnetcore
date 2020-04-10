@@ -161,7 +161,7 @@ namespace Capnp.Net.Runtime.Tests
 
             T ITestbed.ConnectMain<T>(object main)
             {
-                return (T)main;
+                return Proxy.Share<T>((T)main);
             }
 
             void ITestbed.FlushCommunication()

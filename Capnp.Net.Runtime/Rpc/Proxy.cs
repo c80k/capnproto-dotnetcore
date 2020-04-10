@@ -154,14 +154,14 @@ namespace Capnp.Rpc
             {
                 if (disposing)
                 {
-                    _consumedCap?.Release();
+                    _consumedCap.Release();
                 }
                 else
                 {
                     // When called from the Finalizer, we must not throw.
                     // But when reference counting goes wrong, ConsumedCapability.Release() will throw an InvalidOperationException.
                     // The only option here is to suppress that exception.
-                    try { _consumedCap?.Release(); }
+                    try { _consumedCap.Release(); }
                     catch { }
                 }
 

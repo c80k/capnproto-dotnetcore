@@ -421,9 +421,12 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
         public void Dispose()
         {
             _tcs?.TrySetResult(0);
+            Assert.IsFalse(IsDisposed);
             IsDisposed = true;
+            DisposeCallStack = Environment.StackTrace;
         }
 
+        public string DisposeCallStack { get; private set; }
         public bool IsDisposed { get; private set; }
 
         public virtual Task<string> Foo(uint i, bool j, CancellationToken cancellationToken)
@@ -836,6 +839,7 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
         public void Dispose()
         {
             ClientToHold?.Dispose();
+            ClientToHold = null;
         }
 
         public Task<ITestCallOrder> Echo(ITestCallOrder cap, CancellationToken cancellationToken_)
