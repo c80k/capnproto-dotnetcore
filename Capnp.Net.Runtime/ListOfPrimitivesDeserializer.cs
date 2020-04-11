@@ -31,7 +31,7 @@ namespace Capnp
                     var state = _lpd.State;
 
                     if (index < 0 || index >= _lpd.Count)
-                        throw new ArgumentOutOfRangeException(nameof(index));
+                        throw new IndexOutOfRangeException();
 
                     state.Offset += index;
                     state.Kind = ObjectKind.Struct;

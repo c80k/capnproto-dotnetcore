@@ -15,7 +15,7 @@ namespace Capnp.Net.Runtime.Tests
 {
     public interface ITestbed
     {
-        T ConnectMain<T>(object main) where T : class;
+        T ConnectMain<T>(object main) where T : class, IDisposable;
         void MustComplete(params Task[] tasks);
         void MustNotComplete(params Task[] tasks);
         void FlushCommunication();
@@ -241,7 +241,7 @@ namespace Capnp.Net.Runtime.Tests
             public void RunTest(Action<ITestbed> action)
             {
                 (_server, _client) = SetupClientServerPair();
-                _client.WhenConnected.Wait(MediumNonDbgTimeout);
+                //_client.WhenConnected.Wait(MediumNonDbgTimeout);
                 Assert.IsTrue(SpinWait.SpinUntil(() => _server.ConnectionCount > 0, MediumNonDbgTimeout));
                 var conn = _server.Connections[0];
 

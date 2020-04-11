@@ -25,8 +25,9 @@ namespace Capnp.Rpc
             if (skeleton == null)
                 throw new ArgumentNullException(nameof(skeleton));
 
-            skeleton.Claim();
             _ifmap.Add(interfaceId, skeleton);
+            if (_ifmap.Count == 1) // Claiming only the first one is sufficient
+                skeleton.Claim();
         }
 
         internal void AddInterface(Skeleton skeleton)
@@ -60,8 +61,6 @@ namespace Capnp.Rpc
             {
                 cap.Relinquish();
             }
-
-            base.Dispose(disposing);
         }
 
         internal override void Bind(object impl)

@@ -67,7 +67,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = policy.Attach<ITestInterface>(new TestInterfaceImpl(counters));
@@ -106,7 +106,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = policy.Attach<ITestInterface>(new TestInterfaceImpl(counters));
@@ -146,7 +146,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestInterfaceImpl(counters);
@@ -204,7 +204,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestInterfaceImpl(counters);
@@ -237,7 +237,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestInterfaceImpl(counters);
@@ -268,7 +268,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestInterfaceImpl(counters);
@@ -334,7 +334,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestInterfaceImpl(counters);
@@ -369,7 +369,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestInterfaceImpl(counters);
@@ -406,7 +406,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestInterfaceImpl(counters);
@@ -431,7 +431,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestTailCallerImpl(counters);
@@ -463,7 +463,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
@@ -503,7 +503,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = policy.Attach<ITestMoreStuff>(new TestMoreStuffImpl(counters));
@@ -560,7 +560,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
@@ -628,7 +628,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
@@ -668,7 +668,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 server.Main = implAc;
                 using (var main = client.GetMain<ITestInterface>())

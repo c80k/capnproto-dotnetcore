@@ -151,6 +151,9 @@ namespace Capnp.Net.Runtime.Tests
             Assert.AreEqual(2, asListOfStructs.Count);
             Assert.AreEqual(0ul, asListOfStructs[0].ReadDataULong(0));
             Assert.AreEqual(ulong.MaxValue, asListOfStructs[1].ReadDataULong(0));
+            Assert.ThrowsException<IndexOutOfRangeException>(() => asListOfStructs[-1].ReadDataUShort(0));
+            Assert.ThrowsException<IndexOutOfRangeException>(() => asListOfStructs[3].ReadDataUShort(0));
+            CollectionAssert.AreEqual(new ulong[] { 0, ulong.MaxValue }, asListOfStructs.Select(_ => _.ReadDataULong(0)).ToArray());
         }
 
         [TestMethod]

@@ -35,7 +35,7 @@ namespace Capnp.Net.Runtime.Tests
                 using (server)
                 using (client)
                 {
-                    client.WhenConnected.Wait();
+                    //client.WhenConnected.Wait();
 
                     var counters = new Counters();
                     var impl = new TestMoreStuffImpl(counters);
@@ -109,7 +109,7 @@ namespace Capnp.Net.Runtime.Tests
                         server.InjectMidlayer(s => new ScatteringStream(s, 7));
                         client.InjectMidlayer(s => new ScatteringStream(s, 10));
                         client.Connect("localhost", TcpPort);
-                        client.WhenConnected.Wait();
+                        //client.WhenConnected.Wait();
 
                         var counters = new Counters();
                         server.Main = new TestInterfaceImpl(counters);

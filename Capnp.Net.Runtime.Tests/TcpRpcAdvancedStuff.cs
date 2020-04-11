@@ -26,7 +26,7 @@ namespace Capnp.Net.Runtime.Tests
                 {
                     using (var client = SetupClient())
                     {
-                        client.WhenConnected.Wait();
+                        //client.WhenConnected.Wait();
 
                         using (var main = client.GetMain<ITestInterface>())
                         {
@@ -62,8 +62,8 @@ namespace Capnp.Net.Runtime.Tests
                 using (var client1 = SetupClient())
                 using (var client2 = SetupClient())
                 {
-                    Assert.IsTrue(client1.WhenConnected.Wait(MediumNonDbgTimeout));
-                    Assert.IsTrue(client2.WhenConnected.Wait(MediumNonDbgTimeout));
+                    //Assert.IsTrue(client1.WhenConnected.Wait(MediumNonDbgTimeout));
+                    //Assert.IsTrue(client2.WhenConnected.Wait(MediumNonDbgTimeout));
 
                     using (var main = client1.GetMain<ITestMoreStuff>())
                     {
@@ -132,7 +132,7 @@ namespace Capnp.Net.Runtime.Tests
 
                 using (var client = SetupClient())
                 {
-                    client.WhenConnected.Wait();
+                    //client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<CapnpGen.IB2>())
                     {
@@ -154,7 +154,7 @@ namespace Capnp.Net.Runtime.Tests
 
                 using (var client = SetupClient())
                 {
-                    client.WhenConnected.Wait();
+                    //client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<CapnpGen.IIssue25B>())
                     {
@@ -184,7 +184,7 @@ namespace Capnp.Net.Runtime.Tests
 
                 using (var client = SetupClient())
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                    //Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
@@ -196,7 +196,7 @@ namespace Capnp.Net.Runtime.Tests
 
                             using (var client2 = SetupClient())
                             {
-                                Assert.IsTrue(client2.WhenConnected.Wait(MediumNonDbgTimeout));
+                                //Assert.IsTrue(client2.WhenConnected.Wait(MediumNonDbgTimeout));
 
                                 using (var main2 = client2.GetMain<ITestMoreStuff>())
                                 {
@@ -221,7 +221,7 @@ namespace Capnp.Net.Runtime.Tests
 
                 using (var client = SetupClient())
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                    //Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
 
                     using (var main = client.GetMain<ITestTailCaller>())
                     {
@@ -232,7 +232,7 @@ namespace Capnp.Net.Runtime.Tests
                         using (var c = fooTask.Result.C)
                         using (var client2 = SetupClient())
                         {
-                            Assert.IsTrue(client2.WhenConnected.Wait(MediumNonDbgTimeout));
+                            //Assert.IsTrue(client2.WhenConnected.Wait(MediumNonDbgTimeout));
 
                             using (var main2 = client2.GetMain<ITestTailCaller>())
                             {
@@ -255,7 +255,7 @@ namespace Capnp.Net.Runtime.Tests
 
                 using (var client = SetupClient())
                 {
-                    client.WhenConnected.Wait();
+                    //client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {

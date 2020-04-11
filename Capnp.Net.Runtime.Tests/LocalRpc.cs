@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 
 namespace Capnp.Net.Runtime.Tests
 {
@@ -137,6 +138,60 @@ namespace Capnp.Net.Runtime.Tests
         public void ImportReceiverAnswer()
         {
             NewLocalTestbed().RunTest(Testsuite.Ownership3);
+        }
+
+        [TestMethod]
+        public void EagerRace()
+        {
+            var impl = new TestMoreStuffImpl(new Counters());
+            var tcs = new TaskCompletionSource<ITestMoreStuff>();
+            using (var promise = tcs.Task.Eager(true))
+            using (var cts = new CancellationTokenSource())
+            {
+                var bb = new BufferBlock<Task<uint>>();
+                int counter = 0;
+
+                void Generator()
+                {
+                    while (!cts.IsCancellationRequested)
+                    {
+                        bb.Post(promise.GetCallSequence((uint)Volatile.Read(ref counter)));
+                        Interlocked.Increment(ref counter);
+                    }
+
+                    bb.Complete();
+                }
+
+                async Task Verifier()
+                {
+                    uint i = 0;
+                    while (true)
+                    {
+                        Task<uint> t;
+
+                        try
+                        {
+                            t = await bb.ReceiveAsync();
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            break;
+                        }
+
+                        uint j = await t;
+                        Assert.AreEqual(i, j);
+                        i++;
+                    }
+                }
+
+                var genTask = Task.Run(() => Generator());
+                var verTask = Verifier();
+                SpinWait.SpinUntil(() => Volatile.Read(ref counter) >= 100);
+                tcs.SetResult(impl);
+                cts.Cancel();
+                Assert.IsTrue(genTask.Wait(MediumNonDbgTimeout));
+                Assert.IsTrue(verTask.Wait(MediumNonDbgTimeout));
+            }
         }
     }
 }

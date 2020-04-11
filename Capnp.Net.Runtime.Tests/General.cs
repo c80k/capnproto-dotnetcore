@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 
 namespace Capnp.Net.Runtime.Tests
 {
@@ -36,33 +37,6 @@ namespace Capnp.Net.Runtime.Tests
             var tasks =
                 from i in Enumerable.Range(0, 100)
                 select ExpectCount(tcs.Task, i);
-
-            tcs.SetResult(0);
-
-            Task.WhenAll(tasks).Wait();
-        }
-
-        [TestMethod]
-        public void AwaitOrderTest2()
-        {
-            int returnCounter = 0;
-
-            async Task ExpectCount(Task task, int count)
-            {
-                await task;
-                Assert.AreEqual(count, returnCounter++);
-            }
-
-            var tcs = new TaskCompletionSource<int>();
-            var cts = new CancellationTokenSource();
-
-            var tasks =
-                from i in Enumerable.Range(0, 100)
-                select ExpectCount(tcs.Task.ContinueWith(
-                    t => t, 
-                    cts.Token,
-                    TaskContinuationOptions.ExecuteSynchronously,
-                    TaskScheduler.Current), i);
 
             tcs.SetResult(0);
 

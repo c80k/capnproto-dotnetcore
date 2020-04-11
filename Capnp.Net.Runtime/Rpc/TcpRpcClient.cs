@@ -151,24 +151,20 @@ namespace Capnp.Rpc
         /// <typeparam name="TProxy">Bootstrap capability interface</typeparam>
         /// <returns>A proxy for the bootstrap capability</returns>
         /// <exception cref="InvalidOperationException">Not connected</exception>
-        public TProxy GetMain<TProxy>() where TProxy: class
+        public TProxy GetMain<TProxy>() where TProxy: class, IDisposable
         {
             if (WhenConnected == null)
             {
                 throw new InvalidOperationException("Not connecting");
             }
 
-            if (!WhenConnected.IsCompleted)
+            async Task<TProxy> GetMainAsync()
             {
-                throw new InvalidOperationException("Connection not yet established");
+                await WhenConnected!;
+                return (CapabilityReflection.CreateProxy<TProxy>(_inboundEndpoint!.QueryMain()) as TProxy)!;
             }
 
-            if (!WhenConnected.ReplacementTaskIsCompletedSuccessfully())
-            {
-                throw new InvalidOperationException("Connection not successfully established");
-            }
-
-            return (CapabilityReflection.CreateProxy<TProxy>(_inboundEndpoint!.QueryMain()) as TProxy)!;
+            return GetMainAsync().Eager(true);
         }
 
         /// <summary>

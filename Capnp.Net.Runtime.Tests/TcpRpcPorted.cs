@@ -43,7 +43,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
@@ -151,7 +151,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 server.Main = impl;
                 for (int i = 0; i < 10; i++)
