@@ -1179,7 +1179,77 @@ namespace Capnp.Net.Runtime.Tests
                 Assert.AreEqual(Message.WHICH.Call, _.which);
                 Assert.AreEqual(MessageTarget.WHICH.ImportedCap, _.Call.Target.which);
                 Assert.AreEqual(27u, _.Call.Target.ImportedCap);
+
+                tester.Send(_1 =>
+                {
+                    _1.which = Message.WHICH.Return;
+                    _1.Return.AnswerId = _.Call.QuestionId;
+                    _1.Return.which = Return.WHICH.Results;
+                    _1.Return.Results.CapTable.Init(1);
+                    _1.Return.Results.CapTable[0].which = CapDescriptor.WHICH.ThirdPartyHosted;
+                    _1.Return.Results.CapTable[0].ThirdPartyHosted.VineId = 27;
+                    _1.Return.Results.Content.SetCapability(0);
+                });
             });
+        }
+
+        [TestMethod]
+        public void NoneImportBootstrap()
+        {
+            var tester = new RpcEngineTester();
+
+            var cap = tester.RealEnd.QueryMain();
+            var proxy = new BareProxy(cap);
+
+            tester.Recv(_ => {
+                Assert.AreEqual(Message.WHICH.Bootstrap, _.which);
+
+                tester.Send(_1 =>
+                {
+                    _1.which = Message.WHICH.Return;
+                    _1.Return.AnswerId = _.Bootstrap.QuestionId;
+                    _1.Return.which = Return.WHICH.Results;
+                    _1.Return.Results.CapTable.Init(1);
+                    _1.Return.Results.CapTable[0].which = CapDescriptor.WHICH.None;
+                });
+            });
+
+            tester.Recv(_ => {
+                Assert.AreEqual(Message.WHICH.Finish, _.which);
+            });
+
+            var answer = proxy.Call(1, 2, DynamicSerializerState.CreateForRpc());
+            var task = Impatient.MakePipelineAware(answer, _ => _);
+            Assert.IsTrue(task.IsFaulted);
+            Assert.IsFalse(tester.IsDismissed);
+        }
+
+        [TestMethod]
+        public void UnknownImportBootstrap()
+        {
+            var tester = new RpcEngineTester();
+
+            var cap = tester.RealEnd.QueryMain();
+            var proxy = new BareProxy(cap);
+
+            tester.Recv(_ => {
+                Assert.AreEqual(Message.WHICH.Bootstrap, _.which);
+
+                tester.Send(_1 =>
+                {
+                    _1.which = Message.WHICH.Return;
+                    _1.Return.AnswerId = _.Bootstrap.QuestionId;
+                    _1.Return.which = Return.WHICH.Results;
+                    _1.Return.Results.CapTable.Init(1);
+                    _1.Return.Results.CapTable[0].which = (CapDescriptor.WHICH)27;
+                });
+            });
+
+            tester.Recv(_ => {
+                Assert.AreEqual(Message.WHICH.Unimplemented, _.which);
+            });
+
+            Assert.IsFalse(tester.IsDismissed);
         }
     }
 }

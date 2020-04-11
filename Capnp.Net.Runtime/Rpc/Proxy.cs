@@ -58,7 +58,7 @@ namespace Capnp.Rpc
         /// <summary>
         /// Underlying low-level capability
         /// </summary>
-        protected internal ConsumedCapability ConsumedCap => _disposedValue ?
+        public ConsumedCapability ConsumedCap => _disposedValue ?
             throw new ObjectDisposedException(nameof(Proxy)) : _consumedCap;
 
         /// <summary>

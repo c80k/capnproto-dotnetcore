@@ -719,7 +719,7 @@ namespace Capnp.Net.Runtime.Tests
         }
 
         [TestMethod]
-        public void Server()
+        public void Server1()
         {
             var cbb = new BufferBlock<IConnection>();
             var server = new TcpRpcServer();
@@ -807,6 +807,73 @@ namespace Capnp.Net.Runtime.Tests
             }
 
             server.Dispose();
+        }
+
+        [TestMethod]
+        public void Server2()
+        {
+            var server = new TcpRpcServer();
+            server.Main = new TestInterfaceImpl2();
+            var tracer = new FrameTracing.RpcFrameTracer(Console.Out);
+            server.OnConnectionChanged += (s, a) =>
+            {
+                server.Dispose();
+            };
+
+            server.StartAccepting(IPAddress.Any, TcpPort);
+
+            var client1 = new TcpRpcClient("localhost", TcpPort);
+            Assert.IsTrue(client1.WhenConnected.Wait(MediumNonDbgTimeout));
+            Assert.IsTrue(SpinWait.SpinUntil(() => client1.State == ConnectionState.Down, MediumNonDbgTimeout));
+        }
+
+        [TestMethod]
+        public void Server3()
+        {
+            using (var server = new TcpRpcServer())
+            {
+                server.Main = new TestInterfaceImpl2();
+                var tracer = new FrameTracing.RpcFrameTracer(Console.Out);
+                server.OnConnectionChanged += (s, a) =>
+                {
+                    a.Connection.Close();
+                };
+
+                server.StartAccepting(IPAddress.Any, TcpPort);
+
+                var client1 = new TcpRpcClient("localhost", TcpPort);
+                Assert.IsTrue(client1.WhenConnected.Wait(MediumNonDbgTimeout));
+                Assert.IsTrue(SpinWait.SpinUntil(() => client1.State == ConnectionState.Down, MediumNonDbgTimeout));
+            }
+        }
+
+        [TestMethod]
+        public void Client()
+        {
+            using (var server = new TcpRpcServer())
+            using (var client = new TcpRpcClient())
+            {
+                Assert.IsFalse(client.IsComputing);
+                Assert.IsFalse(client.IsWaitingForData);
+                Assert.AreEqual(0L, client.SendCount);
+                Assert.AreEqual(0L, client.RecvCount);
+                Assert.ThrowsException<InvalidOperationException>(() => client.GetMain<ITestInterface>());
+                Assert.ThrowsException<ArgumentNullException>(() => client.AttachTracer(null));
+                Assert.ThrowsException<ArgumentNullException>(() => client.InjectMidlayer(null));
+                server.StartAccepting(IPAddress.Any, TcpPort);
+                client.Connect("localhost", TcpPort);
+                Assert.ThrowsException<InvalidOperationException>(() => client.Connect("localhost", TcpPort));
+                Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                Assert.ThrowsException<InvalidOperationException>(() => client.AttachTracer(new FrameTracing.RpcFrameTracer(Console.Out, false)));
+                Assert.ThrowsException<InvalidOperationException>(() => client.InjectMidlayer(_ => _));
+                Assert.AreEqual(TcpPort, client.RemotePort);
+                Assert.IsTrue(client.LocalPort != 0);
+                Assert.AreEqual(0L, client.SendCount);
+                Assert.AreEqual(0L, client.RecvCount);
+                Assert.IsTrue(SpinWait.SpinUntil(() => client.IsWaitingForData, MediumNonDbgTimeout));
+                ((IConnection)client).Close();
+                Assert.IsTrue(SpinWait.SpinUntil(() => client.State == ConnectionState.Down, MediumNonDbgTimeout));
+            }
         }
     }
 }

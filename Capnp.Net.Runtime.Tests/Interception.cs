@@ -67,9 +67,8 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                //client.WhenConnected.Wait();
-
                 var counters = new Counters();
+
                 server.Main = policy.Attach<ITestInterface>(new TestInterfaceImpl(counters));
                 using (var main = client.GetMain<ITestInterface>())
                 {
@@ -696,5 +695,35 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
+        [TestMethod]
+        public void AttachWrongUse()
+        {
+            var impl = new TestInterfaceImpl2();
+            Assert.ThrowsException<ArgumentNullException>(() => default(IInterceptionPolicy).Attach(impl));
+            Assert.ThrowsException<ArgumentNullException>(() => new MyPolicy("x").Attach(default(ITestInterface)));
+        }
+
+        [TestMethod]
+        public void DetachWrongUse()
+        {
+            var impl = new TestInterfaceImpl2();
+            Assert.ThrowsException<ArgumentNullException>(() => default(IInterceptionPolicy).Detach(impl));
+            Assert.ThrowsException<ArgumentNullException>(() => new MyPolicy("x").Detach(default(ITestInterface)));
+        }
+
+        [TestMethod]
+        public void AttachDetach()
+        {
+            ConsumedCapability GetCap(object obj) => ((Proxy)obj).ConsumedCap;
+
+            var a = new MyPolicy("a");
+            var b = new MyPolicy("b");
+            var c = new MyPolicy("c");
+            var proxy = Proxy.Share<ITestInterface>(new TestInterfaceImpl2());
+            var attached = a.Attach(b.Attach(c.Attach(proxy)));
+            Assert.AreEqual(GetCap(attached), GetCap(b.Attach(attached)));
+            var detached = c.Detach(a.Detach(b.Detach(attached)));
+            Assert.AreEqual(GetCap(proxy), GetCap(detached));
+        }
     }
 }

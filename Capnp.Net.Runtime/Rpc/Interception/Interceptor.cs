@@ -9,9 +9,6 @@ namespace Capnp.Rpc.Interception
     /// </summary>
     public static class Interceptor
     {
-        static readonly ConditionalWeakTable<ConsumedCapability, CensorCapability> _interceptMap =
-            new ConditionalWeakTable<ConsumedCapability, CensorCapability>();
-
         /// <summary>
         /// Attach this policy to given capability.
         /// </summary>
