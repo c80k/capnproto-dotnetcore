@@ -40,6 +40,10 @@ namespace Capnp.Net.Runtime.Tests
                     // exception had to be serialized, so we receive
                     // the wrapped version.
                 }
+                catch (TaskCanceledException)
+                {
+                    // Also used in some test
+                }
                 catch (System.Exception exception)
                 {
                     Assert.Fail($"Got wrong kind of exception: {exception}");
@@ -407,7 +411,9 @@ namespace Capnp.Net.Runtime.Tests
                     // Note that this was a bug in previous versions: 
                     // Since passing a cap has move semantics, we need to create an explicit copy.
                     var copy = Proxy.Share(cap);
+                    Assert.IsFalse(((Proxy)copy).IsDisposed);
                     var ctask = main.CallFoo(copy, default);
+                    Assert.IsTrue(((Proxy)copy).IsDisposed);
                     testbed.MustComplete(ctask);
                     Assert.AreEqual("bar", ctask.Result);
 
@@ -818,6 +824,35 @@ namespace Capnp.Net.Runtime.Tests
                     testbed.MustComplete(task1, task2);
                 }
                 testbed.MustComplete(tcsd.Task);
+            }
+        }
+
+        public static void CallAfterFinish1(ITestbed testbed)
+        {
+            var counters = new Counters();
+            var impl = new TestMoreStuffImpl3();
+            using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
+            {
+                using (var held = main.GetHeld().Eager())
+                {
+                    testbed.CloseClient();
+                    testbed.ExpectPromiseThrows(held.Foo(123, true));
+                }
+            }
+        }
+
+        public static void CallAfterFinish2(ITestbed testbed)
+        {
+            var counters = new Counters();
+            var impl = new TestMoreStuffImpl3();
+            using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
+            {
+                using (var cts = new CancellationTokenSource())
+                using (var held = main.GetHeld(cts.Token).Eager())
+                {
+                    cts.Cancel();
+                    testbed.ExpectPromiseThrows(held.Foo(123, true));
+                }
             }
         }
     }

@@ -176,5 +176,17 @@ namespace Capnp.Net.Runtime.Tests
         {
             NewDtbdctTestbed().RunTest(Testsuite.ReexportSenderPromise);
         }
+
+        [TestMethod]
+        public void CallAfterFinish1()
+        {
+            NewDtbdctTestbed().RunTest(Testsuite.CallAfterFinish1);
+        }
+
+        [TestMethod]
+        public void CallAfterFinish2()
+        {
+            NewDtbdctTestbed().RunTest(Testsuite.CallAfterFinish2);
+        }
     }
 }

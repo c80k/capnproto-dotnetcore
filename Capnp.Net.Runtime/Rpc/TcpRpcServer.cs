@@ -110,6 +110,7 @@ namespace Capnp.Rpc
                         }
                     }
                 });
+                PumpRunner.Start();
             }
 
             public ConnectionState State { get; set; } = ConnectionState.Initializing;
@@ -191,8 +192,6 @@ namespace Capnp.Rpc
                         OnConnectionChanged?.Invoke(this, new ConnectionEventArgs(connection));
                         connection.Start();
                     }
-
-                    connection.PumpRunner!.Start();
                 }
             }
             catch (SocketException)
@@ -206,38 +205,6 @@ namespace Capnp.Rpc
                 Logger.LogError(exception.Message);
             }
         }
-
-        void SafeJoin(Thread? thread)
-        {
-            if (thread == null)
-            {
-                return;
-            }
-
-            for (int retry = 0; retry < 5; ++retry)
-            {
-                try
-                {
-                    if (!thread.Join(500))
-                    {
-                        Logger.LogError($"Unable to join {thread.Name} within timeout");
-                    }
-                    break;
-                }
-                catch (ThreadStateException)
-                {
-                    // In rare cases it happens that despite thread.Start() was called, the thread did not actually start yet.
-                    Logger.LogDebug("Waiting for thread to start in order to join it");
-                    Thread.Sleep(100);
-                }
-                catch (System.Exception exception)
-                {
-                    Logger.LogError($"Unable to join {thread.Name}: {exception.Message}");
-                    break;
-                }
-            }
-        }
-
 
         /// <summary>
         /// Stops accepting incoming attempts and closes all existing connections.
@@ -260,7 +227,7 @@ namespace Capnp.Rpc
             {
                 connection.Client.Dispose();
                 connection.Pump?.Dispose();
-                SafeJoin(connection.PumpRunner);
+                connection.PumpRunner?.Join(5000);
             }
 
             _rpcEngine.BootstrapCap = null;
@@ -286,7 +253,8 @@ namespace Capnp.Rpc
             finally
             {
                 _listener = null;
-                SafeJoin(_acceptorThread);
+                if (Thread.CurrentThread != _acceptorThread)
+                    _acceptorThread?.Join();
                 _acceptorThread = null;
             }
         }

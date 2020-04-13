@@ -10,7 +10,7 @@ namespace Capnp.Util
     internal class StrictlyOrderedAwaitTask<T>: INotifyCompletion
     {
         readonly Task<T> _awaitedTask;
-        object _lock;
+        object? _lock;
         long _inOrder, _outOrder;
 
         public StrictlyOrderedAwaitTask(Task<T> awaitedTask)
@@ -26,7 +26,7 @@ namespace Capnp.Util
 
         public async void OnCompleted(Action continuation)
         {
-            object safeLock = Volatile.Read(ref _lock);
+            object? safeLock = Volatile.Read(ref _lock);
 
             if (safeLock == null)
             {
@@ -69,7 +69,7 @@ namespace Capnp.Util
             }
         }
 
-        public bool IsCompleted => Volatile.Read(ref _lock) == null;
+        public bool IsCompleted => Volatile.Read(ref _lock) == null || (_awaitedTask.IsCompleted && Volatile.Read(ref _inOrder) == 0);
 
         public T GetResult() => _awaitedTask.GetAwaiter().GetResult();
 

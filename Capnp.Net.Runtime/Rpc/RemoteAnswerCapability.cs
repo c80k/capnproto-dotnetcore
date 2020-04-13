@@ -109,16 +109,11 @@ namespace Capnp.Rpc
 #if DebugEmbargos
                     Logger.LogDebug("Call by proxy");
 #endif
-                    if (_question.StateFlags.HasFlag(PendingQuestion.State.CanceledByDispose))
+                    if (_question.StateFlags.HasFlag(PendingQuestion.State.CanceledByDispose) ||
+                        _question.StateFlags.HasFlag(PendingQuestion.State.FinishRequested))
                     {
                         args.Dispose();
                         throw new ObjectDisposedException(nameof(PendingQuestion));
-                    }
-
-                    if (_question.StateFlags.HasFlag(PendingQuestion.State.FinishRequested))
-                    {
-                        args.Dispose();
-                        throw new InvalidOperationException("Finish request was already sent");
                     }
 
                     _question.DisallowFinish();

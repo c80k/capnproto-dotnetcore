@@ -276,7 +276,7 @@ namespace Capnp.Net.Runtime.Tests
         }
 
         [TestMethod]
-        public void ListOfUShorts()
+        public void ListOfUShortsWrongUse()
         {
             var b = MessageBuilder.Create();
             var wrong = b.CreateObject<DynamicSerializerState>();
@@ -287,6 +287,54 @@ namespace Capnp.Net.Runtime.Tests
             list.SetListOfValues(16, 3);
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => list.ListWriteValue(-1, (ushort)1));
             Assert.ThrowsException<ArgumentOutOfRangeException>(() => list.ListWriteValue(64, (ushort)1));
+        }
+
+        [TestMethod]
+        public void ListOfUShortsFromSegment()
+        {
+            var b = MessageBuilder.Create();
+            var list = b.CreateObject<ListOfPrimitivesSerializer<ushort>>();
+            var array = new ushort[] { 1, 2, 3, 4, 5, 6 };
+            var segment = new ArraySegment<ushort>(array, 1, 3);
+            list.Init(segment);
+            CollectionAssert.AreEqual(segment.ToArray(), list.ToArray());
+        }
+
+        [TestMethod]
+        public void ListOfUShortsFromDeser()
+        {
+            var b = MessageBuilder.Create();
+            var list0 = b.CreateObject<ListOfPrimitivesSerializer<ushort>>();
+            var expected = new ushort[] { 2, 3, 4 };
+            list0.Init(expected);
+            var deser = ((DeserializerState)list0).RequireList().CastUShort();
+            var list = b.CreateObject<ListOfPrimitivesSerializer<ushort>>();
+            list.Init(deser);
+            CollectionAssert.AreEqual(expected, list.ToArray());
+        }
+
+        [TestMethod]
+        public void ListOfUShortsFromSer()
+        {
+            var b = MessageBuilder.Create();
+            var list0 = b.CreateObject<ListOfPrimitivesSerializer<ushort>>();
+            var expected = new ushort[] { 2, 3, 4 };
+            list0.Init(expected);
+            var list = b.CreateObject<ListOfPrimitivesSerializer<ushort>>();
+            list.Init(list0);
+            CollectionAssert.AreEqual(expected, list.ToArray());
+        }
+
+        [TestMethod]
+        public void ListOfUShortsFromList()
+        {
+            var b = MessageBuilder.Create();
+            var list0 = b.CreateObject<ListOfPrimitivesSerializer<ushort>>();
+            var expected = new List<ushort> { 2, 3, 4 };
+            list0.Init(expected);
+            var list = b.CreateObject<ListOfPrimitivesSerializer<ushort>>();
+            list.Init(list0);
+            CollectionAssert.AreEqual(expected, list.ToArray());
         }
 
         [TestMethod]
@@ -1093,7 +1141,7 @@ namespace Capnp.Net.Runtime.Tests
         {
             var mb = MessageBuilder.Create();
             var dss = mb.CreateObject<DynamicSerializerState>();
-            dss.SetStruct(0, 4);
+            dss.SetStruct(0, 5);
             var s1 = mb.CreateObject<SomeStruct.WRITER>();
             s1.SomeText = "foo";
             s1.MoreText = "bar";
@@ -1109,7 +1157,8 @@ namespace Capnp.Net.Runtime.Tests
             s4.SomeText = "1";
             var arr = new SomeStruct.WRITER[] { s3, s4 };
             dss.LinkObject(2, arr);
-            Assert.ThrowsException<InvalidCapabilityInterfaceException>(() => dss.LinkObject(3, new object()));
+            Assert.ThrowsException<InvalidOperationException>(() => dss.LinkObject(3, new object()));
+            dss.LinkObject(3, new SomeStruct() { SomeText = "corge" });
 
             var t1 = dss.BuildPointer(0).Rewrap<SomeStruct.WRITER>();
             Assert.AreEqual("foo", t1.SomeText);
@@ -1121,7 +1170,8 @@ namespace Capnp.Net.Runtime.Tests
             Assert.AreEqual(2, l.Count);
             Assert.AreEqual("0", l[0].SomeText);
             Assert.AreEqual("1", l[1].SomeText);
-            Assert.AreEqual(ObjectKind.Nil, dss.BuildPointer(3).Kind);
+            Assert.AreEqual("corge", dss.BuildPointer(3).Rewrap<SomeStruct.WRITER>().SomeText);
+            Assert.AreEqual(ObjectKind.Nil, dss.BuildPointer(4).Kind);
         }
 
         [TestMethod]
@@ -1137,6 +1187,24 @@ namespace Capnp.Net.Runtime.Tests
             dss2.Dispose();
             Assert.IsTrue(cap.IsDisposed);
             dss2.Dispose();
+        }
+
+        [TestMethod]
+        public void ProvideCapability()
+        {
+            var dss = DynamicSerializerState.CreateForRpc();
+            var impl = new TestInterfaceImpl2();
+            var p1 = (Proxy)Proxy.Share<ITestInterface>(impl);
+            var p2 = (Proxy)Proxy.Share<ITestInterface>(impl);
+            Assert.AreEqual(0u, dss.ProvideCapability(p1));
+            Assert.AreEqual(0u, dss.ProvideCapability(p2.ConsumedCap));
+            Assert.AreEqual(0u, dss.ProvideCapability(CapabilityReflection.CreateSkeleton(impl)));
+            Assert.IsTrue(p1.IsDisposed);
+            Assert.IsFalse(p2.IsDisposed);
+            p2.Dispose();
+            Assert.IsFalse(impl.IsDisposed);
+            dss.Dispose();
+            Assert.IsTrue(impl.IsDisposed);
         }
     }
 }

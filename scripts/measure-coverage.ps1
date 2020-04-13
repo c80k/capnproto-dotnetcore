@@ -20,7 +20,7 @@ If(!(test-path $coverageReportDir))
 }
 
 & $openCover -target:"$vsTestConsole" `
-  -targetArgs:"/inIsolation $runtimeTests /TestCaseFilter:`"TestCategory=Coverage`"" `
+  -targetArgs:"/inIsolation $runtimeTests /TestCaseFilter:`"TestCategory=Coverage`" /Framework:.NETCoreApp,Version=v2.1" `
   -filter:"+[Capnp.Net.Runtime]Capnp.*" `
   -excludebyattribute:"System.CodeDom.Compiler.GeneratedCodeAttribute" `
   -output:"$coverageOutput" `

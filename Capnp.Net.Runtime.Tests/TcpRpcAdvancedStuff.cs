@@ -285,5 +285,17 @@ namespace Capnp.Net.Runtime.Tests
         {
             NewLocalhostTcpTestbed().RunTest(Testsuite.NoTailCallMt);
         }
+
+        [TestMethod]
+        public void CallAfterFinish1()
+        {
+            NewLocalhostTcpTestbed().RunTest(Testsuite.CallAfterFinish1);
+        }
+
+        [TestMethod]
+        public void CallAfterFinish2()
+        {
+            NewLocalhostTcpTestbed().RunTest(Testsuite.CallAfterFinish2);
+        }
     }
 }

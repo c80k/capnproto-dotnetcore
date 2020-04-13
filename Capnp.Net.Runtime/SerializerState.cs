@@ -1314,7 +1314,7 @@ namespace Capnp
         /// </list></param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="slot"/> is out of range.</exception>
         /// <exception cref="InvalidOperationException"><list type="bullet">
-        /// <item><description>This state does neither describe a struct, nor a list of pointers</description></item>
+        /// <item><description>Object neither describes a struct, nor a list of pointers, nor a capability</description></item>
         /// <item><description>Another state is already linked to the specified position (sorry, no overwrite allowed)</description></item></list>
         /// </exception>
         public void LinkObject<T>(int slot, T obj)
@@ -1346,9 +1346,15 @@ namespace Capnp
                     break;
 
                 default:
-                    if (Rpc.CapabilityReflection.IsValidCapabilityInterface(typeof(T)))
+                    try
                     {
                         LinkToCapability(slot, ProvideCapability(obj));
+                    }
+                    catch (Exception exception) when (
+                        exception is Rpc.InvalidCapabilityInterfaceException ||
+                        exception is InvalidOperationException)
+                    {
+                        throw new InvalidOperationException("Object neither describes a struct, nor a list of pointers, nor a capability", exception);
                     }
                     break;
             }

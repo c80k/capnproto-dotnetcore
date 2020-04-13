@@ -237,28 +237,7 @@ namespace Capnp.Rpc
         /// <param name="access">Access path</param>
         /// <returns>Low-level capability</returns>
         /// <exception cref="DeserializationException">The referenced member does not exist or does not resolve to a capability pointer.</exception>
-        public ConsumedCapability Access(MemberAccessPath access)
-        {
-            lock (ReentrancyBlocker)
-            {
-                if ( StateFlags.HasFlag(State.Returned) && 
-                    !StateFlags.HasFlag(State.TailCall))
-                {
-                    try
-                    {
-                        return access.Eval(WhenReturned.Result);
-                    }
-                    catch (AggregateException exception)
-                    {
-                        throw exception.InnerException!;
-                    }
-                }
-                else
-                {
-                    return new RemoteAnswerCapability(this, access);
-                }
-            }
-        }
+        public ConsumedCapability Access(MemberAccessPath access) => new RemoteAnswerCapability(this, access);
 
         /// <summary>
         /// Refer to a (possibly nested) member of this question's (possibly future) result and return

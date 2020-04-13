@@ -239,7 +239,7 @@ namespace Capnp.Rpc
         }
 
         /// <summary>
-        /// Checks whether a given type qualifies as cpapbility interface.
+        /// Checks whether a given type qualifies as capability interface.
         /// </summary>
         /// <param name="interfaceType">type to check</param>
         /// <returns>true when <paramref name="interfaceType"/> is a capability interface</returns>

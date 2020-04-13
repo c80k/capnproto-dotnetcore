@@ -31,7 +31,7 @@ namespace Capnp
         /// <summary>
         /// The list's data
         /// </summary>
-        public Span<T> Data => MemoryMarshal.Cast<ulong, T>(RawData);
+        public Span<T> Data => MemoryMarshal.Cast<ulong, T>(RawData).Slice(0, Count);
 
         /// <summary>
         /// Gets or sets the value at given index.
@@ -118,7 +118,7 @@ namespace Capnp
 
         IEnumerable<T> Enumerate()
         {
-            for (int i = 0; i < Data.Length; i++)
+            for (int i = 0; i < Count; i++)
                 yield return Data[i];
         }
 

@@ -104,12 +104,6 @@ namespace Capnp.Rpc
                 cancellationToken.ThrowIfCancellationRequested();
             }
 
-            if (cap == null)
-            {
-                args.Dispose();
-                throw new RpcException("Broken capability");
-            }
-
             using var proxy = new Proxy(cap);
             var call = proxy.Call(interfaceId, methodId, args, default);
             var whenReturned = call.WhenReturned;

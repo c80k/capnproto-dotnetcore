@@ -19,6 +19,8 @@ namespace Capnp.Net.Runtime.Tests
         void MustComplete(params Task[] tasks);
         void MustNotComplete(params Task[] tasks);
         void FlushCommunication();
+        void CloseClient();
+        void CloseServer();
 
         long ClientSendCount { get; }
     }
@@ -84,7 +86,13 @@ namespace Capnp.Net.Runtime.Tests
                     {
                         var frame = _frameBuffer.Dequeue();
                         _recursion = true;
-                        OtherEndpoint.Forward(frame);
+                        try
+                        {
+                            OtherEndpoint.Forward(frame);
+                        }
+                        catch (InvalidOperationException)
+                        {
+                        }
                         _recursion = false;
 
                         return true;
@@ -177,6 +185,16 @@ namespace Capnp.Net.Runtime.Tests
             {
                 Assert.IsFalse(tasks.Any(t => t.IsCompleted));
             }
+
+            void ITestbed.CloseClient()
+            {
+                throw new NotSupportedException();
+            }
+
+            void ITestbed.CloseServer()
+            {
+                throw new NotSupportedException();
+            }
         }
 
         protected class DtbdctTestbed : ITestbed, ITestController
@@ -231,17 +249,27 @@ namespace Capnp.Net.Runtime.Tests
             }
 
             long ITestbed.ClientSendCount => _enginePair.Channel2SendCount;
+
+            void ITestbed.CloseClient()
+            {
+                _enginePair.Endpoint1.Dismiss();
+            }
+
+            void ITestbed.CloseServer()
+            {
+                _enginePair.Endpoint2.Dismiss();
+            }
         }
 
         protected class LocalhostTcpTestbed : ITestbed, ITestController
         {
             TcpRpcServer _server;
             TcpRpcClient _client;
+            bool _prematurelyClosed;
 
             public void RunTest(Action<ITestbed> action)
             {
                 (_server, _client) = SetupClientServerPair();
-                //_client.WhenConnected.Wait(MediumNonDbgTimeout);
                 Assert.IsTrue(SpinWait.SpinUntil(() => _server.ConnectionCount > 0, MediumNonDbgTimeout));
                 var conn = _server.Connections[0];
 
@@ -250,8 +278,11 @@ namespace Capnp.Net.Runtime.Tests
                 {
                     action(this);
 
-                    Assert.IsTrue(SpinWait.SpinUntil(() => _client.SendCount == conn.RecvCount, MediumNonDbgTimeout));
-                    Assert.IsTrue(SpinWait.SpinUntil(() => conn.SendCount == _client.RecvCount, MediumNonDbgTimeout));
+                    if (!_prematurelyClosed)
+                    {
+                        Assert.IsTrue(SpinWait.SpinUntil(() => _client.SendCount == conn.RecvCount, MediumNonDbgTimeout));
+                        Assert.IsTrue(SpinWait.SpinUntil(() => conn.SendCount == _client.RecvCount, MediumNonDbgTimeout));
+                    }
                 }
             }
 
@@ -293,6 +324,18 @@ namespace Capnp.Net.Runtime.Tests
             }
 
             long ITestbed.ClientSendCount => _client.SendCount;
+
+            void ITestbed.CloseClient()
+            {
+                _prematurelyClosed = true;
+                _client.Dispose();
+            }
+
+            void ITestbed.CloseServer()
+            {
+                _prematurelyClosed = true;
+                _server.Dispose();
+            }
         }
 
         public static int TcpPort = 49152;

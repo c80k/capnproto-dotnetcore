@@ -823,8 +823,9 @@ namespace Capnp.Net.Runtime.Tests
             server.StartAccepting(IPAddress.Any, TcpPort);
 
             var client1 = new TcpRpcClient("localhost", TcpPort);
-            Assert.IsTrue(client1.WhenConnected.Wait(MediumNonDbgTimeout));
-            Assert.IsTrue(SpinWait.SpinUntil(() => client1.State == ConnectionState.Down, MediumNonDbgTimeout));
+            Assert.IsTrue(client1.WhenConnected.Wait(MediumNonDbgTimeout), "Did not connect");
+            Assert.IsTrue(SpinWait.SpinUntil(() => client1.State == ConnectionState.Down, MediumNonDbgTimeout),
+                $"Connection did not go down: {client1.State}");
         }
 
         [TestMethod]

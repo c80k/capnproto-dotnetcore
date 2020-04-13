@@ -438,10 +438,7 @@ namespace Capnp.Rpc
 
                     try
                     {
-                        lock (_callReturnBlocker)
-                        {
-                            Tx(mb.Frame);
-                        }
+                        Tx(mb.Frame);
                     }
                     catch (RpcException exception)
                     {

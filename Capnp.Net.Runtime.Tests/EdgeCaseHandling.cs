@@ -29,6 +29,7 @@ namespace Capnp.Net.Runtime.Tests
             {
                 var pipe = new Pipe();
                 _fromEnginePump = new FramePump(pipe.Writer.AsStream());
+                _fromEnginePump.AttachTracer(new FrameTracing.RpcFrameTracer(Console.Out, false));
                 _reader = new BinaryReader(pipe.Reader.AsStream());
             }
 
