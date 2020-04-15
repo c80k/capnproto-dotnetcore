@@ -1,4 +1,5 @@
 ﻿using Capnp.Rpc;
+using Capnp.Util;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ using System.Threading.Tasks.Dataflow;
 namespace Capnp.Net.Runtime.Tests
 {
     [TestClass]
-    public class General
+    public class General: TestBase
     {
         [TestMethod]
         public void AwaitOrderTest()
@@ -91,6 +92,116 @@ namespace Capnp.Net.Runtime.Tests
                 var t = Impatient.MakePipelineAware(mock, _ => (object)null);
                 Assert.IsTrue(t.IsCompleted);
             };
+        }
+
+        [TestMethod]
+        public void SafeJoinCompletedThread()
+        {
+            var thread = new Thread(() =>
+            {
+            });
+            thread.Start();
+            thread.SafeJoin(null, 1000);
+        }
+
+        [TestMethod]
+        public void SafeJoinBusyThread()
+        {
+            var thread = new Thread(() =>
+            {
+                try
+                {
+                    while (true) ;
+                }
+                catch (ThreadInterruptedException)
+                {
+                    Console.WriteLine("Interrupted");
+                }
+                catch (ThreadAbortException)
+                {
+                    Console.WriteLine("Aborted");
+                }
+            });
+            thread.Start();
+            thread.SafeJoin(null, 1000);
+        }
+
+        [TestMethod]
+        public void SafeJoinSleepingThread()
+        {
+            var thread = new Thread(() =>
+            {
+                try
+                {
+                    Thread.Sleep(Timeout.Infinite);
+                }
+                catch (ThreadInterruptedException)
+                {
+                    Console.WriteLine("Interrupted");
+                }
+                catch (ThreadAbortException)
+                {
+                    Console.WriteLine("Aborted");
+                }
+            });
+
+            thread.Start();
+            thread.SafeJoin(null, 1000);
+        }
+
+        [TestMethod]
+        public void SafeJoinDeadlockedThread()
+        {
+            var lk = new object();
+
+            lock (lk)
+            {
+                var thread = new Thread(() =>
+                {
+                    try
+                    {
+                        lock (lk)
+                        {
+                        }
+                    }
+                    catch (ThreadInterruptedException)
+                    {
+                        Console.WriteLine("Interrupted");
+                    }
+                    catch (ThreadAbortException)
+                    {
+                        Console.WriteLine("Aborted");
+                    }
+                });
+
+                thread.Start();
+                thread.SafeJoin(null, 1000);
+            }
+        }
+
+        [TestMethod]
+        public void SafeJoinDefensiveThread()
+        {
+            var thread = new Thread(() =>
+            {
+                for (; ; )
+                {
+                    try
+                    {
+                        Thread.Sleep(Timeout.Infinite);
+                    }
+                    catch (ThreadInterruptedException)
+                    {
+                        Console.WriteLine("Interrupted");
+                    }
+                    catch (ThreadAbortException)
+                    {
+                        Console.WriteLine("Aborted");
+                    }
+                }
+            });
+            thread.Start();
+            thread.SafeJoin(null, 1000);
         }
     }
 }

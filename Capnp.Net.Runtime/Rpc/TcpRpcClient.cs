@@ -1,4 +1,5 @@
 ﻿using Capnp.FrameTracing;
+using Capnp.Util;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
@@ -91,6 +92,10 @@ namespace Capnp.Rpc
                     Thread.CurrentThread.Name = $"TCP RPC Client Thread {Thread.CurrentThread.ManagedThreadId}";
 
                     _pump.Run();
+                }
+                catch (ThreadInterruptedException)
+                {
+                    Logger.LogError($"{Thread.CurrentThread.Name} interrupted at {Environment.StackTrace}");
                 }
                 finally
                 {
@@ -186,10 +191,7 @@ namespace Capnp.Rpc
                 Logger.LogError(e, "Failure disposing client");
             }
 
-            if (_pumpThread != null && !_pumpThread.Join(500))
-            {
-                Logger.LogError("Unable to join pump thread within timeout");
-            }
+            _pumpThread?.SafeJoin(Logger);
 
             GC.SuppressFinalize(this);
         }

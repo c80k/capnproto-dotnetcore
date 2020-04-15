@@ -1,4 +1,5 @@
 ﻿using Capnp.FrameTracing;
+using Capnp.Util;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -60,6 +61,8 @@ namespace Capnp.Rpc
 
         class Connection: IConnection
         {
+            ILogger Logger { get; } = Logging.CreateLogger<Connection>();
+
             readonly List<IFrameTracer> _tracers = new List<IFrameTracer>();
             readonly TcpRpcServer _server;
             Stream _stream;
@@ -94,6 +97,10 @@ namespace Capnp.Rpc
                         Thread.CurrentThread.Name = $"TCP RPC Server Thread {Thread.CurrentThread.ManagedThreadId}";
 
                         Pump.Run();
+                    }
+                    catch (ThreadInterruptedException)
+                    {
+                        Logger.LogError($"{Thread.CurrentThread.Name} interrupted at {Environment.StackTrace}");
                     }
                     finally
                     {
@@ -199,6 +206,10 @@ namespace Capnp.Rpc
                 // Listener was stopped. Maybe a little bit rude, but this is
                 // our way of shutting down the acceptor thread.
             }
+            catch (ThreadInterruptedException)
+            {
+                Logger.LogError($"{Thread.CurrentThread.Name} interrupted at {Environment.StackTrace}");
+            }
             catch (System.Exception exception)
             {
                 // Any other exception might be due to some other problem.
@@ -227,7 +238,7 @@ namespace Capnp.Rpc
             {
                 connection.Client.Dispose();
                 connection.Pump?.Dispose();
-                connection.PumpRunner?.Join(5000);
+                connection.PumpRunner?.SafeJoin(Logger);
             }
 
             _rpcEngine.BootstrapCap = null;

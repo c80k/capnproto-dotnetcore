@@ -7,17 +7,21 @@ using System.Threading.Tasks;
 
 namespace Capnp.Util
 {
-    public class StrictlyOrderedAwaitTask<T>: INotifyCompletion
+    internal class StrictlyOrderedAwaitTask<T>: INotifyCompletion
     {
-        static readonly Action Capsule = () => throw new InvalidProgramException("Not invocable");
+        class Cover { }
+        class Seal { }
+
+        static readonly Cover s_cover = new Cover();
+        static readonly Seal s_seal = new Seal();
 
         readonly Task<T> _awaitedTask;
-        Action? _state;
+        object? _state;
 
         public StrictlyOrderedAwaitTask(Task<T> awaitedTask)
         {
             _awaitedTask = awaitedTask;
-            AwaitInternal();
+            _state = s_cover;
         }
 
         public StrictlyOrderedAwaitTask<T> GetAwaiter()
@@ -41,41 +45,54 @@ namespace Capnp.Util
                     Action? continuations;
                     do
                     {
-                        continuations = Interlocked.Exchange(ref _state, null);
+                        continuations = (Action?)Interlocked.Exchange(ref _state, null);
                         continuations?.Invoke();
 
                     } while (continuations != null);
 
-                    return Interlocked.CompareExchange(ref _state, Capsule, null) == null;
+                    return Interlocked.CompareExchange(ref _state, s_seal, null) == null;
                 });
             }
         }
 
         public void OnCompleted(Action continuation)
         {
+            bool first = false;
+
             SpinWait.SpinUntil(() => {
-                Action? cur, next;
+                object? cur, next;
                 cur = Volatile.Read(ref _state);
+                first = false;
                 switch (cur)
                 {
+                    case Cover cover:
+                        next = continuation;
+                        first = true;
+                        break;
+
                     case null:
                         next = continuation;
                         break;
 
-                    case Action capsule when capsule == Capsule:
-                        continuation();
-                        return true;
-
                     case Action action:
                         next = action + continuation;
                         break;
+
+                    default:
+                        continuation();
+                        return true;
                 }
 
                 return Interlocked.CompareExchange(ref _state, next, cur) == cur;
             });
+
+            if (first)
+            {
+                AwaitInternal();
+            }
         }
 
-        public bool IsCompleted => _awaitedTask.IsCompleted && _state == Capsule;
+        public bool IsCompleted => _awaitedTask.IsCompleted && _state == s_seal;
 
         public T GetResult() => _awaitedTask.GetAwaiter().GetResult();
 
@@ -84,7 +101,7 @@ namespace Capnp.Util
         public Task<T> WrappedTask => _awaitedTask;
     }
 
-    public static class StrictlyOrderedTaskExtensions
+    internal static class StrictlyOrderedTaskExtensions
     {
         public static StrictlyOrderedAwaitTask<T> EnforceAwaitOrder<T>(this Task<T> task)
         {

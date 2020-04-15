@@ -195,7 +195,7 @@ namespace Capnp.Net.Runtime.Tests
         }
 
         [TestMethod]
-        public void EagerRace2()
+        public void AwaitNoDeadlock()
         {
             for (int i = 0; i < 100; i++)
             {
