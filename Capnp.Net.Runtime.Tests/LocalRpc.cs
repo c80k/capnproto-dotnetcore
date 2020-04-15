@@ -187,10 +187,43 @@ namespace Capnp.Net.Runtime.Tests
                 var genTask = Task.Run(() => Generator());
                 var verTask = Verifier();
                 SpinWait.SpinUntil(() => Volatile.Read(ref counter) >= 100);
-                tcs.SetResult(impl);
+                Task.Run(() => tcs.SetResult(impl));
                 cts.Cancel();
                 Assert.IsTrue(genTask.Wait(MediumNonDbgTimeout));
                 Assert.IsTrue(verTask.Wait(MediumNonDbgTimeout));
+            }
+        }
+
+        [TestMethod]
+        public void EagerRace2()
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                var tcs1 = new TaskCompletionSource<int>();
+                var tcs2 = new TaskCompletionSource<int>();
+
+                var t1 = Capnp.Util.StrictlyOrderedTaskExtensions.EnforceAwaitOrder(tcs1.Task);
+                var t2 = Capnp.Util.StrictlyOrderedTaskExtensions.EnforceAwaitOrder(tcs2.Task);
+
+                async Task Wait1()
+                {
+                    await t1;
+                    await t2;
+                }
+
+                async Task Wait2()
+                {
+                    await t2;
+                    await t1;
+                }
+
+                var w1 = Wait1();
+                var w2 = Wait2();
+
+                Task.Run(() => tcs1.SetResult(0));
+                Task.Run(() => tcs2.SetResult(0));
+
+                Assert.IsTrue(Task.WaitAll(new Task[] { w1, w2 }, MediumNonDbgTimeout));
             }
         }
     }
