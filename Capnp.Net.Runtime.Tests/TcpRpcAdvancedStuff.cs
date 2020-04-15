@@ -263,7 +263,7 @@ namespace Capnp.Net.Runtime.Tests
                         Assert.IsTrue(echoTask.Wait(MediumNonDbgTimeout));
                         using (var echo = echoTask.Result)
                         {
-                            var list = new Task<uint>[1000];
+                            var list = new Task<uint>[200];
                             for (uint i = 0; i < list.Length; i++)
                             {
                                 list[i] = echo.GetCallSequence(i);

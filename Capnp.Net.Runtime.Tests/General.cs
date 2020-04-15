@@ -95,16 +95,18 @@ namespace Capnp.Net.Runtime.Tests
         }
 
         [TestMethod]
+        [TestCategory("Coverage")]
         public void SafeJoinCompletedThread()
         {
             var thread = new Thread(() =>
             {
             });
             thread.Start();
-            thread.SafeJoin(null, 1000);
+            thread.SafeJoin(null, 200);
         }
 
         [TestMethod]
+        [TestCategory("Coverage")]
         public void SafeJoinBusyThread()
         {
             var thread = new Thread(() =>
@@ -123,10 +125,11 @@ namespace Capnp.Net.Runtime.Tests
                 }
             });
             thread.Start();
-            thread.SafeJoin(null, 1000);
+            thread.SafeJoin(null, 5);
         }
 
         [TestMethod]
+        [TestCategory("Coverage")]
         public void SafeJoinSleepingThread()
         {
             var thread = new Thread(() =>
@@ -146,10 +149,11 @@ namespace Capnp.Net.Runtime.Tests
             });
 
             thread.Start();
-            thread.SafeJoin(null, 1000);
+            thread.SafeJoin(null, 5);
         }
 
         [TestMethod]
+        [TestCategory("Coverage")]
         public void SafeJoinDeadlockedThread()
         {
             var lk = new object();
@@ -175,11 +179,12 @@ namespace Capnp.Net.Runtime.Tests
                 });
 
                 thread.Start();
-                thread.SafeJoin(null, 1000);
+                thread.SafeJoin(null, 5);
             }
         }
 
         [TestMethod]
+        [TestCategory("Coverage")]
         public void SafeJoinDefensiveThread()
         {
             var thread = new Thread(() =>
@@ -201,7 +206,7 @@ namespace Capnp.Net.Runtime.Tests
                 }
             });
             thread.Start();
-            thread.SafeJoin(null, 1000);
+            thread.SafeJoin(null, 5);
         }
     }
 }

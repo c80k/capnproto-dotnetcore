@@ -20,14 +20,14 @@ If(!(test-path $coverageReportDir))
 }
 
 & $openCover -target:"$vsTestConsole" `
-  -targetArgs:"/inIsolation $runtimeTests /TestCaseFilter:`"TestCategory=Coverage`" /Framework:.NETCoreApp,Version=v2.1" `
+  -targetArgs:"/inIsolation $runtimeTests /TestCaseFilter:`"TestCategory=Coverage`" /Framework:.NETCoreApp,Version=v2.1 /logger:trx;LogFileName=runtime.trx" `
   -filter:"+[Capnp.Net.Runtime]Capnp.*" `
   -excludebyattribute:"System.CodeDom.Compiler.GeneratedCodeAttribute" `
   -output:"$coverageOutput" `
   -mergebyhash -register:user -oldStyle
 
 & $openCover -target:"$vsTestConsole" `
-  -targetArgs:"/inIsolation $generatorTests" `
+  -targetArgs:"/inIsolation $generatorTests /logger:trx;LogFileName=generator.trx" `
   -filter:"+[CapnpC.CSharp.Generator]CapnpC.CSharp.Generator.* -[CapnpC.CSharp.Generator]CapnpC.CSharp.Generator.Schema.*" `
   -excludebyattribute:"System.CodeDom.Compiler.GeneratedCodeAttribute" `
   -output:"$coverageOutput" `

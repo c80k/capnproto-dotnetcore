@@ -795,7 +795,7 @@ namespace Capnp.Net.Runtime.Tests
             using (var callee = Proxy.Share<ITestTailCallee>(new TestTailCalleeImpl(new Counters())))
             {
                 var tasks = ParallelEnumerable
-                    .Range(0, 1000)
+                    .Range(0, 200)
                     .Select(async i =>
                     {
                         var r = await main.Foo(i, Proxy.Share(callee));
