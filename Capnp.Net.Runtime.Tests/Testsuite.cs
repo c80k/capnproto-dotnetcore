@@ -855,5 +855,23 @@ namespace Capnp.Net.Runtime.Tests
                 }
             }
         }
+
+        public static void LegacyAccess(ITestbed testbed)
+        {
+            var impl = new TestMoreStuffImpl(new Counters());
+            using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
+            {
+                var task = main.Echo(new TestCallOrderImpl());
+                var answer = Impatient.TryGetAnswer(task);
+                Assert.IsNotNull(answer);
+                var cap = answer.Access(new MemberAccessPath(0));
+                using (var proxy = (ITestCallOrder)CapabilityReflection.CreateProxy<ITestCallOrder>(cap))
+                {
+                    var seq = proxy.GetCallSequence(0);
+                    testbed.MustComplete(seq);
+                    Assert.AreEqual(0u, seq.Result);
+                }
+            }
+        }
     }
 }

@@ -27,13 +27,13 @@ namespace Capnp.Rpc.Interception
 
             public ConsumedCapability Access(MemberAccessPath access)
             {
-                return new LocalAnswerCapability(_futureResult.Task, access);
+                return _callContext._censorCapability.Policy.Attach<ConsumedCapability>(new LocalAnswerCapability(_futureResult.Task, access));
             }
 
             public ConsumedCapability Access(MemberAccessPath _, Task<IDisposable?> task)
             {
                 var proxyTask = task.AsProxyTask();
-                return new LocalAnswerCapability(proxyTask);
+                return _callContext._censorCapability.Policy.Attach<ConsumedCapability>(new LocalAnswerCapability(proxyTask));
             }
 
             public void Dispose()

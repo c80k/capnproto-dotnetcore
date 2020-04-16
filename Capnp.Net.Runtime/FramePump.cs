@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -160,9 +161,12 @@ namespace Capnp
                     }
                 }
             }
-            catch (EndOfStreamException)
+            catch (Exception exception) when (exception is EndOfStreamException ||
+                   exception is IOException ioex && 
+                   ioex.InnerException is SocketException sockex && 
+                   sockex.SocketErrorCode == SocketError.Interrupted)
             {
-                Logger.LogWarning("Encountered End of Stream");
+                Logger.LogInformation("Encountered end of stream");
             }
             catch (InvalidDataException e)
             {

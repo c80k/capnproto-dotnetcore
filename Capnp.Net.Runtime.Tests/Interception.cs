@@ -396,6 +396,44 @@ namespace Capnp.Net.Runtime.Tests
         }
 
         [TestMethod]
+        public void InterceptClientSideModifyPipelinedCall()
+        {
+            var policy = new MyPolicy("a");
+
+            (var server, var client) = SetupClientServerPair();
+
+            using (server)
+            using (client)
+            {
+                var counters = new Counters();
+                var impl = new TestMoreStuffImpl(counters);
+                server.Main = impl;
+                using (var main = policy.Attach(client.GetMain<ITestMoreStuff>()))
+                {
+                    var req = main.GetNull().Eager().GetCallSequence(0);
+                    Assert.IsTrue(policy.Calls.TryReceive(out var ccGetNull));
+                    Assert.IsTrue(policy.Calls.TryReceive(out var ccGetCallSequence));
+
+                    ccGetNull.ForwardToBob();
+
+                    Assert.IsTrue(policy.Returns.ReceiveAsync().Wait(MediumNonDbgTimeout));
+
+                    ccGetNull.ReturnToAlice();
+
+                    ccGetCallSequence.Bob = Proxy.Share<ITestMoreStuff>(impl);
+                    ccGetCallSequence.ForwardToBob();
+
+                    Assert.IsTrue(policy.Returns.ReceiveAsync().Wait(MediumNonDbgTimeout));
+
+                    ccGetCallSequence.ReturnToAlice();
+
+                    Assert.IsTrue(req.IsCompleted && !req.IsFaulted && !req.IsCanceled);
+                    Assert.AreEqual(0u, req.Result);
+                }
+            }
+        }
+
+        [TestMethod]
         public void InterfaceAndMethodId()
         {
             var policy = new MyPolicy("a");

@@ -141,6 +141,12 @@ namespace Capnp.Net.Runtime.Tests
         }
 
         [TestMethod]
+        public void LegacyAccess()
+        {
+            NewLocalTestbed().RunTest(Testsuite.LegacyAccess);
+        }
+
+        [TestMethod]
         public void EagerRace()
         {
             var impl = new TestMoreStuffImpl(new Counters());

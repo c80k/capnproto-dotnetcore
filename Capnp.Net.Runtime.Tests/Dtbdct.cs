@@ -188,5 +188,11 @@ namespace Capnp.Net.Runtime.Tests
         {
             NewDtbdctTestbed().RunTest(Testsuite.CallAfterFinish2);
         }
+
+        [TestMethod]
+        public void LegacyAccess()
+        {
+            NewDtbdctTestbed().RunTest(Testsuite.LegacyAccess);
+        }
     }
 }
