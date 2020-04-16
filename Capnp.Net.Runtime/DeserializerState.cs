@@ -329,10 +329,13 @@ namespace Capnp
 
                     case PointerKind.Far:
 
+                        if (pointer.TargetSegmentIndex >= Segments.Count)
+                            throw new DeserializationException("Error decoding pointer: Invalid target segment index");
+
+                        CurrentSegmentIndex = pointer.TargetSegmentIndex;
+
                         if (pointer.IsDoubleFar)
                         {
-                            CurrentSegmentIndex = pointer.TargetSegmentIndex;
-
                             if (pointer.LandingPadOffset >= CurrentSegment.Length - 1)
                                 throw new DeserializationException("Error decoding double-far pointer: exceeds segment bounds");
 
@@ -353,9 +356,12 @@ namespace Capnp
                         }
                         else
                         {
-                            CurrentSegmentIndex = pointer.TargetSegmentIndex;
                             Offset = 0;
                             offset = pointer.LandingPadOffset;
+
+                            if (pointer.LandingPadOffset >= CurrentSegment.Length)
+                                throw new DeserializationException("Error decoding pointer: exceeds segment bounds");
+
                             pointer = CurrentSegment[pointer.LandingPadOffset];
                         }
                         continue;
@@ -701,7 +707,7 @@ namespace Capnp
             {
                 foreach (var cap in Caps)
                 {
-                    cap?.Release();
+                    cap.Release();
                 }
 
                 Caps = null;

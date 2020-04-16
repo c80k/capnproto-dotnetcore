@@ -842,12 +842,16 @@ namespace Capnp.Net.Runtime.Tests
             data[0] = p;
             Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
             p.SetFarPointer(0, 0, false);
+            data[0] = p;
             Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
             p.SetFarPointer(1, 0, false);
+            data[0] = p;
             Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
             p.SetFarPointer(0, 1, false);
+            data[0] = p;
             Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
             p.SetFarPointer(0, 0, true);
+            data[0] = p;
             Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
 
             var data2 = new ulong[3];

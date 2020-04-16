@@ -226,5 +226,22 @@ namespace Capnp.Net.Runtime.Tests
                 Assert.IsTrue(Task.WaitAll(new Task[] { w1, w2 }, MediumNonDbgTimeout));
             }
         }
+
+        [TestMethod]
+        public void DisposedProxy()
+        {
+            var b = new BareProxy();
+            Assert.ThrowsException<ArgumentNullException>(() => b.Bind(null));
+            var impl = new TestInterfaceImpl2();
+            var proxy = Proxy.Share<ITestInterface>(impl);
+            var p = (Proxy)proxy;
+            Assert.ThrowsException<InvalidOperationException>(() => p.Bind(p.ConsumedCap));
+            Assert.IsFalse(p.IsDisposed);
+            proxy.Dispose();
+            Assert.IsTrue(p.IsDisposed);
+            Assert.ThrowsException<ObjectDisposedException>(() => p.ConsumedCap);
+            var t = proxy.Foo(123, true);
+            Assert.IsTrue(Assert.ThrowsExceptionAsync<ObjectDisposedException>(() => t).Wait(MediumNonDbgTimeout));
+        }
     }
 }

@@ -18,6 +18,12 @@ namespace Capnp.Net.Runtime.Tests
         {
             var impl = new TestInterfaceImpl2();
             Assert.AreEqual(impl, await impl.Unwrap<ITestInterface>());
+            using (var proxy = Proxy.Share<ITestInterface>(impl))
+            using (var reso = ((Proxy)proxy).GetResolvedCapability<ITestInterface>())
+            {
+
+                Assert.AreEqual(((Proxy)proxy).ConsumedCap, ((Proxy)reso).ConsumedCap);
+            }
             Assert.IsNull(await default(ITestInterface).Unwrap());
             var tcs = new TaskCompletionSource<ITestInterface>();
             tcs.SetResult(null);
