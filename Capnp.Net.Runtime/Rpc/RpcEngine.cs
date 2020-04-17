@@ -238,8 +238,7 @@ namespace Capnp.Rpc
                 lock (_reentrancyBlocker)
                 {
                     if (!_exportTable.TryGetValue(preliminaryId, out var existing) ||
-                        existing.Cap != preliminaryCap ||
-                        existing.RefCount == 0)
+                        existing.Cap != preliminaryCap)
                     {
                         // Resolved too late. Capability was already released.
                         return;
@@ -579,7 +578,7 @@ namespace Capnp.Rpc
                     {
                         foreach (var cap in inParams.Caps)
                         {
-                            cap?.Release();
+                            cap.Release();
                         }
 
                         pendingAnswer = new PendingAnswer(

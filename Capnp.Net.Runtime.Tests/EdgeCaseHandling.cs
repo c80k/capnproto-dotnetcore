@@ -22,14 +22,16 @@ namespace Capnp.Net.Runtime.Tests
         {
             readonly FramePump _fromEnginePump;
             readonly BinaryReader _reader;
+            readonly FrameTracing.RpcFrameTracer _tracer;
 
             public bool Dismissed { get; private set; }
 
             public MemStreamEndpoint()
             {
                 var pipe = new Pipe();
+                _tracer = new FrameTracing.RpcFrameTracer(Console.Out, false);
                 _fromEnginePump = new FramePump(pipe.Writer.AsStream());
-                _fromEnginePump.AttachTracer(new FrameTracing.RpcFrameTracer(Console.Out, false));
+                _fromEnginePump.AttachTracer(_tracer);
                 _reader = new BinaryReader(pipe.Reader.AsStream());
             }
 
@@ -45,7 +47,9 @@ namespace Capnp.Net.Runtime.Tests
 
             public WireFrame ReadNextFrame()
             {
-                return _reader.ReadWireFrame();
+                var frame = _reader.ReadWireFrame();
+                _tracer.TraceFrame(FrameTracing.FrameDirection.Rx, frame);
+                return frame;
             }
         }
 
@@ -1251,6 +1255,32 @@ namespace Capnp.Net.Runtime.Tests
             });
 
             Assert.IsFalse(tester.IsDismissed);
+        }
+
+        [TestMethod]
+        public void ReturnToWrongSide1()
+        {
+            var tester = new RpcEngineTester();
+
+            var cap = tester.RealEnd.QueryMain();
+            var proxy = new BareProxy(cap);
+            Assert.IsFalse(proxy.WhenResolved.IsCompleted);
+            uint id = 0;
+
+            tester.Recv(_ => {
+                Assert.AreEqual(Message.WHICH.Bootstrap, _.which);
+                id = _.Bootstrap.QuestionId;
+            });
+            tester.Send(_ => {
+                _.which = Message.WHICH.Return;
+                _.Return.which = Return.WHICH.ResultsSentElsewhere;
+            });
+            tester.Recv(_ => {
+                Assert.AreEqual(Message.WHICH.Finish, _.which);
+            });
+            Assert.IsTrue(proxy.WhenResolved.IsCompleted);
+            Assert.IsTrue(proxy.WhenResolved.IsFaulted);
+            tester.ExpectAbort();
         }
     }
 }

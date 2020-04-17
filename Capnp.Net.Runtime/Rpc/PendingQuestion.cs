@@ -127,6 +127,7 @@ namespace Capnp.Rpc
         }
 
         const string ReturnDespiteTailCallMessage = "Peer sent actual results despite the question was sent as tail call. This was not expected and is a protocol error.";
+        const string UnexpectedTailCallReturnMessage = "Peer sent the results of this questions somewhere else. This was not expected and is a protocol error.";
 
         internal void OnReturn(DeserializerState results)
         {
@@ -138,6 +139,7 @@ namespace Capnp.Rpc
             if (StateFlags.HasFlag(State.TailCall))
             {
                 _tcs.TrySetException(new RpcException(ReturnDespiteTailCallMessage));
+                throw new RpcProtocolErrorException(ReturnDespiteTailCallMessage);
             }
             else
             {
@@ -157,7 +159,8 @@ namespace Capnp.Rpc
 
             if (!StateFlags.HasFlag(State.TailCall))
             {
-                _tcs.TrySetException(new RpcException("Peer sent the results of this questions somewhere else. This was not expected and is a protocol error."));
+                _tcs.TrySetException(new RpcException(UnexpectedTailCallReturnMessage));
+                throw new RpcProtocolErrorException(UnexpectedTailCallReturnMessage);
             }
             else
             {

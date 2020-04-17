@@ -723,7 +723,7 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void DynamicSerializerStateSBytes()
         {
-            var expected = new sbyte[] { 1, 2, 3 };
+            var expected = new List<sbyte> { 1, 2, 3 };
 
             var b = MessageBuilder.Create();
             var dss = b.CreateObject<DynamicSerializerState>();
@@ -735,7 +735,7 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void DynamicSerializerStateShorts()
         {
-            var expected = new short[] { 1, 2, 3 };
+            var expected = new List<short> { 1, 2, 3 };
 
             var b = MessageBuilder.Create();
             var dss = b.CreateObject<DynamicSerializerState>();
@@ -759,7 +759,7 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void DynamicSerializerStateInts()
         {
-            var expected = new int[] { 1, 2, 3 };
+            var expected = new List<int> { 1, 2, 3 };
 
             var b = MessageBuilder.Create();
             var dss = b.CreateObject<DynamicSerializerState>();
@@ -783,7 +783,7 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void DynamicSerializerStateLongs()
         {
-            var expected = new long[] { 1, 2, 3 };
+            var expected = new List<long> { 1, 2, 3 };
 
             var b = MessageBuilder.Create();
             var dss = b.CreateObject<DynamicSerializerState>();
