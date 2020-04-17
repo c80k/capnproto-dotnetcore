@@ -345,10 +345,12 @@ namespace Capnp.Net.Runtime.Tests
 
         protected ILogger Logger { get; set; }
 
-        protected static TcpRpcClient SetupClient()
+        protected static TcpRpcClient SetupClient(bool withTracer = false)
         {
             var client = new TcpRpcClient();
             client.AddBuffering();
+            if (withTracer)
+                client.AttachTracer(new FrameTracing.RpcFrameTracer(Console.Out, false));
             client.Connect("localhost", TcpPort);
             return client;
         }
@@ -379,10 +381,10 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        protected static (TcpRpcServer, TcpRpcClient) SetupClientServerPair()
+        protected static (TcpRpcServer, TcpRpcClient) SetupClientServerPair(bool withClientTracer = false)        
         {
             var server = SetupServer();
-            var client = SetupClient();
+            var client = SetupClient(withClientTracer);
             return (server, client);
         }
 

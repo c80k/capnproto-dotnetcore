@@ -400,7 +400,7 @@ namespace Capnp.Net.Runtime.Tests
         {
             var policy = new MyPolicy("a");
 
-            (var server, var client) = SetupClientServerPair();
+            (var server, var client) = SetupClientServerPair(true);
 
             using (server)
             using (client)

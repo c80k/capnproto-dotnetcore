@@ -1282,5 +1282,70 @@ namespace Capnp.Net.Runtime.Tests
             Assert.IsTrue(proxy.WhenResolved.IsFaulted);
             tester.ExpectAbort();
         }
+
+        [TestMethod]
+        public void ReturnToWrongSide2()
+        {
+            var tester = new RpcEngineTester();
+
+            tester.Engine.Main = new TestTailCallerImpl(new Counters());
+
+            tester.Send(_ => {
+                _.which = Message.WHICH.Bootstrap;
+                _.Bootstrap.QuestionId = 0;
+            });
+            uint bootstrapId = 0;
+            tester.Recv(_ => {
+                Assert.AreEqual(Message.WHICH.Return, _.which);
+                Assert.AreEqual(Return.WHICH.Results, _.Return.which);
+                Assert.AreEqual(CapDescriptor.WHICH.SenderHosted, _.Return.Results.CapTable[0].which);
+                bootstrapId = _.Return.Results.CapTable[0].SenderHosted;
+            });
+            tester.Send(_ =>
+            {
+                _.which = Message.WHICH.Call;
+                _.Call.Target.which = MessageTarget.WHICH.ImportedCap;
+                _.Call.Target.ImportedCap = 0;
+                _.Call.SendResultsTo.which = Call.sendResultsTo.WHICH.Caller;
+                _.Call.InterfaceId = new TestTailCaller_Skeleton().InterfaceId;
+                _.Call.MethodId = 0;
+                _.Call.QuestionId = 1;
+                var a = _.Call.Params.Content.Rewrap<TestTailCaller.Params_Foo.WRITER>();
+                a.Callee = new TestTailCalleeImpl(new Counters());
+                _.Call.Params.CapTable.Init(1);
+                _.Call.Params.CapTable[0].which = CapDescriptor.WHICH.SenderHosted;
+                _.Call.Params.CapTable[0].SenderHosted = 0;
+            });
+            uint q = 0;
+            tester.Recv(_ => {
+                Assert.AreEqual(Message.WHICH.Call, _.which);
+                Assert.AreEqual(Call.sendResultsTo.WHICH.Yourself, _.Call.SendResultsTo.which);
+                q = _.Call.QuestionId;
+            });
+            tester.Recv(_ => {
+                Assert.AreEqual(Message.WHICH.Release, _.which);
+            });
+            tester.Recv(_ => {
+                Assert.AreEqual(Message.WHICH.Return, _.which);
+                Assert.AreEqual(Return.WHICH.TakeFromOtherQuestion, _.Return.which);
+            });
+            tester.Send(_ =>
+            {
+                _.which = Message.WHICH.Return;
+                _.Return.which = Return.WHICH.Results;
+                _.Return.AnswerId = q;
+                var wr = _.Return.Results.Content.Rewrap<TestTailCallee.TailResult.WRITER>();
+                wr.C = new TestCallOrderImpl();
+                wr.I = 0;
+                wr.T = "test";
+                _.Return.Results.CapTable.Init(1);
+                _.Return.Results.CapTable[0].which = CapDescriptor.WHICH.SenderHosted;
+                _.Return.Results.CapTable[0].SenderHosted = 1;
+            });
+            tester.Recv(_ => {
+                Assert.AreEqual(Message.WHICH.Finish, _.which);
+            });
+            tester.ExpectAbort();
+        }
     }
 }
