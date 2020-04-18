@@ -497,6 +497,11 @@ namespace Capnp
             }
         }
 
+        /// <summary>
+        /// Determines the underyling object to be a capability.
+        /// </summary>
+        /// <param name="capabilityIndex">Capability table index, or null to encode a null pointer</param>
+        /// <exception cref="InvalidOperationException">The object type was already set to something different</exception>
         protected void SetCapability(uint? capabilityIndex)
         {
             if (capabilityIndex.HasValue)

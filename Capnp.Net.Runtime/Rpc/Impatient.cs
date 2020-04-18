@@ -156,6 +156,16 @@ namespace Capnp.Rpc
             }
         }
 
+        /// <summary>
+        /// Unwraps given capability. Unwrapping walks the chain of promised capabilities and awaits their resolutions,
+        /// until we get the finally resolved capability. If it is the capability, the method returns a null reference.
+        /// If the capability is broken (resolved to exception, dependent answer faulted or cancelled, RPC endpoint closed),
+        /// it throws an exception.
+        /// </summary>
+        /// <typeparam name="TInterface">Capability interface</typeparam>
+        /// <param name="cap">capability to unwrap</param>
+        /// <returns>Task returning the eventually resolved capability</returns>
+        /// <exception cref="RpcException">Capability is broken</exception>
         public static async Task<TInterface?> Unwrap<TInterface>(this TInterface cap) where TInterface: class, IDisposable
         {
             using var proxy = cap as Proxy;

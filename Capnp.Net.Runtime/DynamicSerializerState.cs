@@ -89,6 +89,11 @@ namespace Capnp
         /// <exception cref="InvalidOperationException">The object type was already set to something different</exception>
         public new void SetStruct(ushort dataCount, ushort ptrCount) => base.SetStruct(dataCount, ptrCount);
 
+        /// <summary>
+        /// Determines the underyling object to be a capability.
+        /// </summary>
+        /// <param name="capabilityIndex">Capability table index, or null to encode a null pointer</param>
+        /// <exception cref="InvalidOperationException">The object type was already set to something different</exception>
         public new void SetCapability(uint? capabilityIndex) => base.SetCapability(capabilityIndex);
 
         /// <summary>
