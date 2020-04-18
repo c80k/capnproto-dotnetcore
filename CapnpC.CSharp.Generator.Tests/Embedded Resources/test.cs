@@ -8473,6 +8473,7 @@ namespace Capnproto_test.Capnp.Test
                     Task Call(CancellationToken cancellationToken_ = default);
                 }
 
+                [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8839ed86c9794287UL)]
                 public class DeepNestInterface_Proxy<TQuux> : Proxy, IDeepNestInterface<TQuux> where TQuux : class
                 {
                     public async Task Call(CancellationToken cancellationToken_ = default)
@@ -8489,6 +8490,7 @@ namespace Capnproto_test.Capnp.Test
                     }
                 }
 
+                [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8839ed86c9794287UL)]
                 public class DeepNestInterface_Skeleton<TQuux> : Skeleton<IDeepNestInterface<TQuux>> where TQuux : class
                 {
                     public DeepNestInterface_Skeleton()
@@ -8610,6 +8612,7 @@ namespace Capnproto_test.Capnp.Test
             Task<(TQux, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>)> Call(Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<string> arg_, CancellationToken cancellationToken_ = default);
         }
 
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc9e749e8dd54da5cUL)]
         public class Interface_Proxy<TQux> : Proxy, IInterface<TQux> where TQux : class
         {
             public Task<(TQux, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>)> Call(Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<string> arg_, CancellationToken cancellationToken_ = default)
@@ -8629,6 +8632,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc9e749e8dd54da5cUL)]
         public class Interface_Skeleton<TQux> : Skeleton<IInterface<TQux>> where TQux : class
         {
             public Interface_Skeleton()
@@ -8992,18 +8996,19 @@ namespace Capnproto_test.Capnp.Test
     [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8b9717a3f8d85a9aUL), Proxy(typeof(TestImplicitMethodParams_Proxy)), Skeleton(typeof(TestImplicitMethodParams_Skeleton))]
     public interface ITestImplicitMethodParams : IDisposable
     {
-        Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT Foo, TU Bar, CancellationToken cancellationToken_ = default)
+        Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT foo, TU bar, CancellationToken cancellationToken_ = default)
             where TT : class where TU : class;
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8b9717a3f8d85a9aUL)]
     public class TestImplicitMethodParams_Proxy : Proxy, ITestImplicitMethodParams
     {
-        public Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT Foo, TU Bar, CancellationToken cancellationToken_ = default)
+        public Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT foo, TU bar, CancellationToken cancellationToken_ = default)
             where TT : class where TU : class
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestImplicitMethodParams.Params_Call<TT, TU>.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestImplicitMethodParams.Params_Call<TT, TU>()
-            {Foo = Foo, Bar = Bar};
+            {Foo = foo, Bar = bar};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(10058534285777328794UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
@@ -9018,6 +9023,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8b9717a3f8d85a9aUL)]
     public class TestImplicitMethodParams_Skeleton : Skeleton<ITestImplicitMethodParams>
     {
         public TestImplicitMethodParams_Skeleton()
@@ -9125,18 +9131,19 @@ namespace Capnproto_test.Capnp.Test
     [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xdf9ccdeb81a704c9UL), Proxy(typeof(TestImplicitMethodParamsInGeneric_Proxy<>)), Skeleton(typeof(TestImplicitMethodParamsInGeneric_Skeleton<>))]
     public interface ITestImplicitMethodParamsInGeneric<TV> : IDisposable where TV : class
     {
-        Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT Foo, TU Bar, CancellationToken cancellationToken_ = default)
+        Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT foo, TU bar, CancellationToken cancellationToken_ = default)
             where TT : class where TU : class;
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xdf9ccdeb81a704c9UL)]
     public class TestImplicitMethodParamsInGeneric_Proxy<TV> : Proxy, ITestImplicitMethodParamsInGeneric<TV> where TV : class
     {
-        public Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT Foo, TU Bar, CancellationToken cancellationToken_ = default)
+        public Task<Capnproto_test.Capnp.Test.TestGenerics<TT, TU>> Call<TT, TU>(TT foo, TU bar, CancellationToken cancellationToken_ = default)
             where TT : class where TU : class
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestImplicitMethodParamsInGeneric<TV>.Params_Call<TT, TU>.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestImplicitMethodParamsInGeneric<TV>.Params_Call<TT, TU>()
-            {Foo = Foo, Bar = Bar};
+            {Foo = foo, Bar = bar};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(16112979978201007305UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
@@ -9151,6 +9158,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xdf9ccdeb81a704c9UL)]
     public class TestImplicitMethodParamsInGeneric_Skeleton<TV> : Skeleton<ITestImplicitMethodParamsInGeneric<TV>> where TV : class
     {
         public TestImplicitMethodParamsInGeneric_Skeleton()
@@ -10040,18 +10048,19 @@ namespace Capnproto_test.Capnp.Test
     [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x88eb12a0e0af92b2UL), Proxy(typeof(TestInterface_Proxy)), Skeleton(typeof(TestInterface_Skeleton))]
     public interface ITestInterface : IDisposable
     {
-        Task<string> Foo(uint I, bool J, CancellationToken cancellationToken_ = default);
+        Task<string> Foo(uint i, bool j, CancellationToken cancellationToken_ = default);
         Task Bar(CancellationToken cancellationToken_ = default);
-        Task Baz(Capnproto_test.Capnp.Test.TestAllTypes S, CancellationToken cancellationToken_ = default);
+        Task Baz(Capnproto_test.Capnp.Test.TestAllTypes s, CancellationToken cancellationToken_ = default);
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x88eb12a0e0af92b2UL)]
     public class TestInterface_Proxy : Proxy, ITestInterface
     {
-        public async Task<string> Foo(uint I, bool J, CancellationToken cancellationToken_ = default)
+        public async Task<string> Foo(uint i, bool j, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_Foo.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_Foo()
-            {I = I, J = J};
+            {I = i, J = j};
             arg_?.serialize(in_);
             using (var d_ = await Call(9865999890858873522UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned)
             {
@@ -10073,11 +10082,11 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        public async Task Baz(Capnproto_test.Capnp.Test.TestAllTypes S, CancellationToken cancellationToken_ = default)
+        public async Task Baz(Capnproto_test.Capnp.Test.TestAllTypes s, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_Baz.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_Baz()
-            {S = S};
+            {S = s};
             arg_?.serialize(in_);
             using (var d_ = await Call(9865999890858873522UL, 2, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned)
             {
@@ -10087,6 +10096,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x88eb12a0e0af92b2UL)]
     public class TestInterface_Skeleton : Skeleton<ITestInterface>
     {
         public TestInterface_Skeleton()
@@ -10475,6 +10485,7 @@ namespace Capnproto_test.Capnp.Test
         Task<Capnproto_test.Capnp.Test.TestAllTypes> Grault(CancellationToken cancellationToken_ = default);
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xe4e9bac98670b748UL)]
     public class TestExtends_Proxy : Proxy, ITestExtends
     {
         public async Task Qux(CancellationToken cancellationToken_ = default)
@@ -10514,11 +10525,11 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        public async Task<string> Foo(uint I, bool J, CancellationToken cancellationToken_ = default)
+        public async Task<string> Foo(uint i, bool j, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_Foo.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_Foo()
-            {I = I, J = J};
+            {I = i, J = j};
             arg_?.serialize(in_);
             using (var d_ = await Call(9865999890858873522UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned)
             {
@@ -10540,11 +10551,11 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        public async Task Baz(Capnproto_test.Capnp.Test.TestAllTypes S, CancellationToken cancellationToken_ = default)
+        public async Task Baz(Capnproto_test.Capnp.Test.TestAllTypes s, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_Baz.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_Baz()
-            {S = S};
+            {S = s};
             arg_?.serialize(in_);
             using (var d_ = await Call(9865999890858873522UL, 2, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned)
             {
@@ -10554,6 +10565,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xe4e9bac98670b748UL)]
     public class TestExtends_Skeleton : Skeleton<ITestExtends>
     {
         public TestExtends_Skeleton()
@@ -10786,6 +10798,7 @@ namespace Capnproto_test.Capnp.Test
     {
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x98d7e0ef61488783UL)]
     public class TestExtends2_Proxy : Proxy, ITestExtends2
     {
         public async Task Qux(CancellationToken cancellationToken_ = default)
@@ -10825,11 +10838,11 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        public async Task<string> Foo(uint I, bool J, CancellationToken cancellationToken_ = default)
+        public async Task<string> Foo(uint i, bool j, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_Foo.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_Foo()
-            {I = I, J = J};
+            {I = i, J = j};
             arg_?.serialize(in_);
             using (var d_ = await Call(9865999890858873522UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned)
             {
@@ -10851,11 +10864,11 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        public async Task Baz(Capnproto_test.Capnp.Test.TestAllTypes S, CancellationToken cancellationToken_ = default)
+        public async Task Baz(Capnproto_test.Capnp.Test.TestAllTypes s, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Params_Baz.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestInterface.Params_Baz()
-            {S = S};
+            {S = s};
             arg_?.serialize(in_);
             using (var d_ = await Call(9865999890858873522UL, 2, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned)
             {
@@ -10865,6 +10878,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x98d7e0ef61488783UL)]
     public class TestExtends2_Skeleton : Skeleton<ITestExtends2>
     {
         public TestExtends2_Skeleton()
@@ -10878,18 +10892,19 @@ namespace Capnproto_test.Capnp.Test
     [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa5a404caa61d4cd0UL), Proxy(typeof(TestPipeline_Proxy)), Skeleton(typeof(TestPipeline_Skeleton))]
     public interface ITestPipeline : IDisposable
     {
-        Task<(string, Capnproto_test.Capnp.Test.TestPipeline.Box)> GetCap(uint N, Capnproto_test.Capnp.Test.ITestInterface InCap, CancellationToken cancellationToken_ = default);
-        Task TestPointers(Capnproto_test.Capnp.Test.ITestInterface Cap, object Obj, IReadOnlyList<Capnproto_test.Capnp.Test.ITestInterface> List, CancellationToken cancellationToken_ = default);
-        Task<(string, Capnproto_test.Capnp.Test.TestPipeline.AnyBox)> GetAnyCap(uint N, BareProxy InCap, CancellationToken cancellationToken_ = default);
+        Task<(string, Capnproto_test.Capnp.Test.TestPipeline.Box)> GetCap(uint n, Capnproto_test.Capnp.Test.ITestInterface inCap, CancellationToken cancellationToken_ = default);
+        Task TestPointers(Capnproto_test.Capnp.Test.ITestInterface cap, object obj, IReadOnlyList<Capnproto_test.Capnp.Test.ITestInterface> list, CancellationToken cancellationToken_ = default);
+        Task<(string, Capnproto_test.Capnp.Test.TestPipeline.AnyBox)> GetAnyCap(uint n, BareProxy inCap, CancellationToken cancellationToken_ = default);
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa5a404caa61d4cd0UL)]
     public class TestPipeline_Proxy : Proxy, ITestPipeline
     {
-        public Task<(string, Capnproto_test.Capnp.Test.TestPipeline.Box)> GetCap(uint N, Capnproto_test.Capnp.Test.ITestInterface InCap, CancellationToken cancellationToken_ = default)
+        public Task<(string, Capnproto_test.Capnp.Test.TestPipeline.Box)> GetCap(uint n, Capnproto_test.Capnp.Test.ITestInterface inCap, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestPipeline.Params_GetCap.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestPipeline.Params_GetCap()
-            {N = N, InCap = InCap};
+            {N = n, InCap = inCap};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(11935670180855499984UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
@@ -10903,11 +10918,11 @@ namespace Capnproto_test.Capnp.Test
             );
         }
 
-        public async Task TestPointers(Capnproto_test.Capnp.Test.ITestInterface Cap, object Obj, IReadOnlyList<Capnproto_test.Capnp.Test.ITestInterface> List, CancellationToken cancellationToken_ = default)
+        public async Task TestPointers(Capnproto_test.Capnp.Test.ITestInterface cap, object obj, IReadOnlyList<Capnproto_test.Capnp.Test.ITestInterface> list, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestPipeline.Params_TestPointers.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestPipeline.Params_TestPointers()
-            {Cap = Cap, Obj = Obj, List = List};
+            {Cap = cap, Obj = obj, List = list};
             arg_?.serialize(in_);
             using (var d_ = await Call(11935670180855499984UL, 1, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned)
             {
@@ -10916,11 +10931,11 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        public Task<(string, Capnproto_test.Capnp.Test.TestPipeline.AnyBox)> GetAnyCap(uint N, BareProxy InCap, CancellationToken cancellationToken_ = default)
+        public Task<(string, Capnproto_test.Capnp.Test.TestPipeline.AnyBox)> GetAnyCap(uint n, BareProxy inCap, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestPipeline.Params_GetAnyCap.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestPipeline.Params_GetAnyCap()
-            {N = N, InCap = InCap};
+            {N = n, InCap = inCap};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(11935670180855499984UL, 2, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
@@ -10935,6 +10950,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa5a404caa61d4cd0UL)]
     public class TestPipeline_Skeleton : Skeleton<ITestPipeline>
     {
         public TestPipeline_Skeleton()
@@ -11550,16 +11566,17 @@ namespace Capnproto_test.Capnp.Test
     [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa0e77035bdff0051UL), Proxy(typeof(TestCallOrder_Proxy)), Skeleton(typeof(TestCallOrder_Skeleton))]
     public interface ITestCallOrder : IDisposable
     {
-        Task<uint> GetCallSequence(uint Expected, CancellationToken cancellationToken_ = default);
+        Task<uint> GetCallSequence(uint expected, CancellationToken cancellationToken_ = default);
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa0e77035bdff0051UL)]
     public class TestCallOrder_Proxy : Proxy, ITestCallOrder
     {
-        public async Task<uint> GetCallSequence(uint Expected, CancellationToken cancellationToken_ = default)
+        public async Task<uint> GetCallSequence(uint expected, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestCallOrder.Params_GetCallSequence.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestCallOrder.Params_GetCallSequence()
-            {Expected = Expected};
+            {Expected = expected};
             arg_?.serialize(in_);
             using (var d_ = await Call(11594359141811814481UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned)
             {
@@ -11569,6 +11586,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa0e77035bdff0051UL)]
     public class TestCallOrder_Skeleton : Skeleton<ITestCallOrder>
     {
         public TestCallOrder_Skeleton()
@@ -11721,16 +11739,17 @@ namespace Capnproto_test.Capnp.Test
     [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xddd699207eb8e23bUL), Proxy(typeof(TestTailCallee_Proxy)), Skeleton(typeof(TestTailCallee_Skeleton))]
     public interface ITestTailCallee : IDisposable
     {
-        Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int I, string T, CancellationToken cancellationToken_ = default);
+        Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int i, string t, CancellationToken cancellationToken_ = default);
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xddd699207eb8e23bUL)]
     public class TestTailCallee_Proxy : Proxy, ITestTailCallee
     {
-        public Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int I, string T, CancellationToken cancellationToken_ = default)
+        public Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int i, string t, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestTailCallee.Params_Foo.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestTailCallee.Params_Foo()
-            {I = I, T = T};
+            {I = i, T = t};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(15985132292242203195UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
@@ -11745,6 +11764,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xddd699207eb8e23bUL)]
     public class TestTailCallee_Skeleton : Skeleton<ITestTailCallee>
     {
         public TestTailCallee_Skeleton()
@@ -11941,16 +11961,17 @@ namespace Capnproto_test.Capnp.Test
     [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x870bf40110ce3035UL), Proxy(typeof(TestTailCaller_Proxy)), Skeleton(typeof(TestTailCaller_Skeleton))]
     public interface ITestTailCaller : IDisposable
     {
-        Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int I, Capnproto_test.Capnp.Test.ITestTailCallee Callee, CancellationToken cancellationToken_ = default);
+        Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int i, Capnproto_test.Capnp.Test.ITestTailCallee callee, CancellationToken cancellationToken_ = default);
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x870bf40110ce3035UL)]
     public class TestTailCaller_Proxy : Proxy, ITestTailCaller
     {
-        public Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int I, Capnproto_test.Capnp.Test.ITestTailCallee Callee, CancellationToken cancellationToken_ = default)
+        public Task<Capnproto_test.Capnp.Test.TestTailCallee.TailResult> Foo(int i, Capnproto_test.Capnp.Test.ITestTailCallee callee, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestTailCaller.Params_Foo.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestTailCaller.Params_Foo()
-            {I = I, Callee = Callee};
+            {I = i, Callee = callee};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(9731139705278181429UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
@@ -11965,6 +11986,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x870bf40110ce3035UL)]
     public class TestTailCaller_Skeleton : Skeleton<ITestTailCaller>
     {
         public TestTailCaller_Skeleton()
@@ -12073,10 +12095,12 @@ namespace Capnproto_test.Capnp.Test
     {
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa38e5efe41e53a15UL)]
     public class TestHandle_Proxy : Proxy, ITestHandle
     {
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa38e5efe41e53a15UL)]
     public class TestHandle_Skeleton : Skeleton<ITestHandle>
     {
         public TestHandle_Skeleton()
@@ -12090,28 +12114,29 @@ namespace Capnproto_test.Capnp.Test
     [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xddc70bf9784133cfUL), Proxy(typeof(TestMoreStuff_Proxy)), Skeleton(typeof(TestMoreStuff_Skeleton))]
     public interface ITestMoreStuff : Capnproto_test.Capnp.Test.ITestCallOrder
     {
-        Task<string> CallFoo(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default);
-        Task<string> CallFooWhenResolved(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default);
-        Task<Capnproto_test.Capnp.Test.ITestInterface> NeverReturn(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default);
-        Task Hold(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default);
+        Task<string> CallFoo(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default);
+        Task<string> CallFooWhenResolved(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default);
+        Task<Capnproto_test.Capnp.Test.ITestInterface> NeverReturn(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default);
+        Task Hold(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default);
         Task<string> CallHeld(CancellationToken cancellationToken_ = default);
         Task<Capnproto_test.Capnp.Test.ITestInterface> GetHeld(CancellationToken cancellationToken_ = default);
-        Task<Capnproto_test.Capnp.Test.ITestCallOrder> Echo(Capnproto_test.Capnp.Test.ITestCallOrder Cap, CancellationToken cancellationToken_ = default);
-        Task ExpectCancel(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default);
-        Task<(string, string)> MethodWithDefaults(string A, uint B, string C, CancellationToken cancellationToken_ = default);
+        Task<Capnproto_test.Capnp.Test.ITestCallOrder> Echo(Capnproto_test.Capnp.Test.ITestCallOrder cap, CancellationToken cancellationToken_ = default);
+        Task ExpectCancel(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default);
+        Task<(string, string)> MethodWithDefaults(string a, uint b, string c, CancellationToken cancellationToken_ = default);
         Task<Capnproto_test.Capnp.Test.ITestHandle> GetHandle(CancellationToken cancellationToken_ = default);
         Task<Capnproto_test.Capnp.Test.ITestMoreStuff> GetNull(CancellationToken cancellationToken_ = default);
         Task<string> GetEnormousString(CancellationToken cancellationToken_ = default);
-        Task MethodWithNullDefault(string A, Capnproto_test.Capnp.Test.ITestInterface B, CancellationToken cancellationToken_ = default);
+        Task MethodWithNullDefault(string a, Capnproto_test.Capnp.Test.ITestInterface b, CancellationToken cancellationToken_ = default);
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xddc70bf9784133cfUL)]
     public class TestMoreStuff_Proxy : Proxy, ITestMoreStuff
     {
-        public async Task<string> CallFoo(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default)
+        public async Task<string> CallFoo(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_CallFoo.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_CallFoo()
-            {Cap = Cap};
+            {Cap = cap};
             arg_?.serialize(in_);
             using (var d_ = await Call(15980754968839795663UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned)
             {
@@ -12120,11 +12145,11 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        public async Task<string> CallFooWhenResolved(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default)
+        public async Task<string> CallFooWhenResolved(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_CallFooWhenResolved.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_CallFooWhenResolved()
-            {Cap = Cap};
+            {Cap = cap};
             arg_?.serialize(in_);
             using (var d_ = await Call(15980754968839795663UL, 1, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned)
             {
@@ -12133,11 +12158,11 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        public Task<Capnproto_test.Capnp.Test.ITestInterface> NeverReturn(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default)
+        public Task<Capnproto_test.Capnp.Test.ITestInterface> NeverReturn(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_NeverReturn.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_NeverReturn()
-            {Cap = Cap};
+            {Cap = cap};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(15980754968839795663UL, 2, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
@@ -12151,11 +12176,11 @@ namespace Capnproto_test.Capnp.Test
             );
         }
 
-        public async Task Hold(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default)
+        public async Task Hold(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_Hold.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_Hold()
-            {Cap = Cap};
+            {Cap = cap};
             arg_?.serialize(in_);
             using (var d_ = await Call(15980754968839795663UL, 3, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned)
             {
@@ -12195,11 +12220,11 @@ namespace Capnproto_test.Capnp.Test
             );
         }
 
-        public Task<Capnproto_test.Capnp.Test.ITestCallOrder> Echo(Capnproto_test.Capnp.Test.ITestCallOrder Cap, CancellationToken cancellationToken_ = default)
+        public Task<Capnproto_test.Capnp.Test.ITestCallOrder> Echo(Capnproto_test.Capnp.Test.ITestCallOrder cap, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_Echo.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_Echo()
-            {Cap = Cap};
+            {Cap = cap};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(15980754968839795663UL, 6, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
@@ -12213,11 +12238,11 @@ namespace Capnproto_test.Capnp.Test
             );
         }
 
-        public async Task ExpectCancel(Capnproto_test.Capnp.Test.ITestInterface Cap, CancellationToken cancellationToken_ = default)
+        public async Task ExpectCancel(Capnproto_test.Capnp.Test.ITestInterface cap, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_ExpectCancel.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_ExpectCancel()
-            {Cap = Cap};
+            {Cap = cap};
             arg_?.serialize(in_);
             using (var d_ = await Call(15980754968839795663UL, 7, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned)
             {
@@ -12226,11 +12251,11 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        public async Task<(string, string)> MethodWithDefaults(string A, uint B, string C, CancellationToken cancellationToken_ = default)
+        public async Task<(string, string)> MethodWithDefaults(string a, uint b, string c, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_MethodWithDefaults.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_MethodWithDefaults()
-            {A = A, B = B, C = C};
+            {A = a, B = b, C = c};
             arg_?.serialize(in_);
             using (var d_ = await Call(15980754968839795663UL, 8, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned)
             {
@@ -12288,11 +12313,11 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        public async Task MethodWithNullDefault(string A, Capnproto_test.Capnp.Test.ITestInterface B, CancellationToken cancellationToken_ = default)
+        public async Task MethodWithNullDefault(string a, Capnproto_test.Capnp.Test.ITestInterface b, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMoreStuff.Params_MethodWithNullDefault.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestMoreStuff.Params_MethodWithNullDefault()
-            {A = A, B = B};
+            {A = a, B = b};
             arg_?.serialize(in_);
             using (var d_ = await Call(15980754968839795663UL, 12, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned)
             {
@@ -12301,11 +12326,11 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        public async Task<uint> GetCallSequence(uint Expected, CancellationToken cancellationToken_ = default)
+        public async Task<uint> GetCallSequence(uint expected, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestCallOrder.Params_GetCallSequence.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestCallOrder.Params_GetCallSequence()
-            {Expected = Expected};
+            {Expected = expected};
             arg_?.serialize(in_);
             using (var d_ = await Call(11594359141811814481UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned)
             {
@@ -12315,6 +12340,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xddc70bf9784133cfUL)]
     public class TestMoreStuff_Skeleton : Skeleton<ITestMoreStuff>
     {
         public TestMoreStuff_Skeleton()
@@ -14032,12 +14058,13 @@ namespace Capnproto_test.Capnp.Test
     public interface ITestMembrane : IDisposable
     {
         Task<Capnproto_test.Capnp.Test.TestMembrane.IThing> MakeThing(CancellationToken cancellationToken_ = default);
-        Task<Capnproto_test.Capnp.Test.TestMembrane.Result> CallPassThrough(Capnproto_test.Capnp.Test.TestMembrane.IThing Thing, bool TailCall, CancellationToken cancellationToken_ = default);
-        Task<Capnproto_test.Capnp.Test.TestMembrane.Result> CallIntercept(Capnproto_test.Capnp.Test.TestMembrane.IThing Thing, bool TailCall, CancellationToken cancellationToken_ = default);
-        Task<Capnproto_test.Capnp.Test.TestMembrane.IThing> Loopback(Capnproto_test.Capnp.Test.TestMembrane.IThing Thing, CancellationToken cancellationToken_ = default);
+        Task<Capnproto_test.Capnp.Test.TestMembrane.Result> CallPassThrough(Capnproto_test.Capnp.Test.TestMembrane.IThing thing, bool tailCall, CancellationToken cancellationToken_ = default);
+        Task<Capnproto_test.Capnp.Test.TestMembrane.Result> CallIntercept(Capnproto_test.Capnp.Test.TestMembrane.IThing thing, bool tailCall, CancellationToken cancellationToken_ = default);
+        Task<Capnproto_test.Capnp.Test.TestMembrane.IThing> Loopback(Capnproto_test.Capnp.Test.TestMembrane.IThing thing, CancellationToken cancellationToken_ = default);
         Task WaitForever(CancellationToken cancellationToken_ = default);
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc07d8dcd80a69c0cUL)]
     public class TestMembrane_Proxy : Proxy, ITestMembrane
     {
         public Task<Capnproto_test.Capnp.Test.TestMembrane.IThing> MakeThing(CancellationToken cancellationToken_ = default)
@@ -14058,11 +14085,11 @@ namespace Capnproto_test.Capnp.Test
             );
         }
 
-        public async Task<Capnproto_test.Capnp.Test.TestMembrane.Result> CallPassThrough(Capnproto_test.Capnp.Test.TestMembrane.IThing Thing, bool TailCall, CancellationToken cancellationToken_ = default)
+        public async Task<Capnproto_test.Capnp.Test.TestMembrane.Result> CallPassThrough(Capnproto_test.Capnp.Test.TestMembrane.IThing thing, bool tailCall, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Params_CallPassThrough.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestMembrane.Params_CallPassThrough()
-            {Thing = Thing, TailCall = TailCall};
+            {Thing = thing, TailCall = tailCall};
             arg_?.serialize(in_);
             using (var d_ = await Call(13870398341137210380UL, 1, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned)
             {
@@ -14071,11 +14098,11 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        public async Task<Capnproto_test.Capnp.Test.TestMembrane.Result> CallIntercept(Capnproto_test.Capnp.Test.TestMembrane.IThing Thing, bool TailCall, CancellationToken cancellationToken_ = default)
+        public async Task<Capnproto_test.Capnp.Test.TestMembrane.Result> CallIntercept(Capnproto_test.Capnp.Test.TestMembrane.IThing thing, bool tailCall, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Params_CallIntercept.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestMembrane.Params_CallIntercept()
-            {Thing = Thing, TailCall = TailCall};
+            {Thing = thing, TailCall = tailCall};
             arg_?.serialize(in_);
             using (var d_ = await Call(13870398341137210380UL, 2, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned)
             {
@@ -14084,11 +14111,11 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
-        public Task<Capnproto_test.Capnp.Test.TestMembrane.IThing> Loopback(Capnproto_test.Capnp.Test.TestMembrane.IThing Thing, CancellationToken cancellationToken_ = default)
+        public Task<Capnproto_test.Capnp.Test.TestMembrane.IThing> Loopback(Capnproto_test.Capnp.Test.TestMembrane.IThing thing, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestMembrane.Params_Loopback.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestMembrane.Params_Loopback()
-            {Thing = Thing};
+            {Thing = thing};
             arg_?.serialize(in_);
             return Impatient.MakePipelineAware(Call(13870398341137210380UL, 3, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_), d_ =>
             {
@@ -14116,6 +14143,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc07d8dcd80a69c0cUL)]
     public class TestMembrane_Skeleton : Skeleton<ITestMembrane>
     {
         public TestMembrane_Skeleton()
@@ -14209,6 +14237,7 @@ namespace Capnproto_test.Capnp.Test
             Task<Capnproto_test.Capnp.Test.TestMembrane.Result> Intercept(CancellationToken cancellationToken_ = default);
         }
 
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9352e4e41f173917UL)]
         public class Thing_Proxy : Proxy, IThing
         {
             public async Task<Capnproto_test.Capnp.Test.TestMembrane.Result> PassThrough(CancellationToken cancellationToken_ = default)
@@ -14238,6 +14267,7 @@ namespace Capnproto_test.Capnp.Test
             }
         }
 
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9352e4e41f173917UL)]
         public class Thing_Skeleton : Skeleton<IThing>
         {
             public Thing_Skeleton()
@@ -15115,6 +15145,7 @@ namespace Capnproto_test.Capnp.Test
         Task Return(CancellationToken cancellationToken_ = default);
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9ae342d394247cfcUL)]
     public class TestKeywordMethods_Proxy : Proxy, ITestKeywordMethods
     {
         public async Task Delete(CancellationToken cancellationToken_ = default)
@@ -15170,6 +15201,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9ae342d394247cfcUL)]
     public class TestKeywordMethods_Skeleton : Skeleton<ITestKeywordMethods>
     {
         public TestKeywordMethods_Skeleton()
@@ -15588,6 +15620,7 @@ namespace Capnproto_test.Capnp.Test
         Task<TVatId> GetCallerId(CancellationToken cancellationToken_ = default);
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xea72cc77253798cdUL)]
     public class TestAuthenticatedBootstrap_Proxy<TVatId> : Proxy, ITestAuthenticatedBootstrap<TVatId> where TVatId : class
     {
         public Task<TVatId> GetCallerId(CancellationToken cancellationToken_ = default)
@@ -15609,6 +15642,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xea72cc77253798cdUL)]
     public class TestAuthenticatedBootstrap_Skeleton<TVatId> : Skeleton<ITestAuthenticatedBootstrap<TVatId>> where TVatId : class
     {
         public TestAuthenticatedBootstrap_Skeleton()
@@ -16565,16 +16599,17 @@ namespace Capnproto_test.Capnp.Test
     [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xd112a69d31ed918bUL), Proxy(typeof(TestNameAnnotationInterface_Proxy)), Skeleton(typeof(TestNameAnnotationInterface_Skeleton))]
     public interface ITestNameAnnotationInterface : IDisposable
     {
-        Task BadlyNamedMethod(byte BadlyNamedParam, CancellationToken cancellationToken_ = default);
+        Task BadlyNamedMethod(byte badlyNamedParam, CancellationToken cancellationToken_ = default);
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xd112a69d31ed918bUL)]
     public class TestNameAnnotationInterface_Proxy : Proxy, ITestNameAnnotationInterface
     {
-        public async Task BadlyNamedMethod(byte BadlyNamedParam, CancellationToken cancellationToken_ = default)
+        public async Task BadlyNamedMethod(byte badlyNamedParam, CancellationToken cancellationToken_ = default)
         {
             var in_ = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestNameAnnotationInterface.Params_BadlyNamedMethod.WRITER>();
             var arg_ = new Capnproto_test.Capnp.Test.TestNameAnnotationInterface.Params_BadlyNamedMethod()
-            {BadlyNamedParam = BadlyNamedParam};
+            {BadlyNamedParam = badlyNamedParam};
             arg_?.serialize(in_);
             using (var d_ = await Call(15065286897585459595UL, 0, in_.Rewrap<DynamicSerializerState>(), false, cancellationToken_).WhenReturned)
             {
@@ -16584,6 +16619,7 @@ namespace Capnproto_test.Capnp.Test
         }
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xd112a69d31ed918bUL)]
     public class TestNameAnnotationInterface_Skeleton : Skeleton<ITestNameAnnotationInterface>
     {
         public TestNameAnnotationInterface_Skeleton()

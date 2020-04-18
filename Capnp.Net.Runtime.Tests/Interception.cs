@@ -169,7 +169,7 @@ namespace Capnp.Net.Runtime.Tests
                     var rx = policy.Returns.ReceiveAsync();
 
                     // Racing against Bob's answer
-                    Assert.IsTrue(cc.State == InterceptionState.ForwardedToBob || rx.IsCompleted);
+                    Assert.IsTrue(cc.State == InterceptionState.ForwardedToBob || cc.State == InterceptionState.ReturnedFromBob);
 
                     Assert.IsTrue(rx.Wait(MediumNonDbgTimeout));
                     var rr = new Capnproto_test.Capnp.Test.TestInterface.Result_Foo.READER(cc.OutArgs);

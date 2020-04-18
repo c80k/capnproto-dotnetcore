@@ -47,7 +47,6 @@ namespace CapnpC.CSharp.Generator.CodeGen
         public Name ReaderContextField { get; }
         public Name ContextParameter { get; }
         public Name GroupReaderContextArg { get; }
-        public Name GroupWriterContextArg { get; }
         public Name UnionDiscriminatorEnum { get; }
         public Name UnionDiscriminatorProp { get; }
         public Name UnionDiscriminatorUndefined { get; }
@@ -61,14 +60,12 @@ namespace CapnpC.CSharp.Generator.CodeGen
         public Name ResultLocal { get; }
         public Name SerializeMethod { get; }
         public Name ApplyDefaultsMethod { get; }
-        public Name InstLocalName { get; }
         public string ParamsStructFormat { get; }
         public string ResultStructFormat { get; }
         public string PropertyNamedLikeTypeRenameFormat { get; }
         public string GenericTypeParameterFormat { get; }
         public string MemberAccessPathNameFormat { get; }
         public Name TaskParameter { get; }
-        public Name EagerMethod { get; }
         public Name TypeIdField { get; }
         public string PipeliningExtensionsClassFormat { get; }
         public string ProxyClassFormat { get; }
@@ -91,7 +88,6 @@ namespace CapnpC.CSharp.Generator.CodeGen
             ReaderContextField = new Name(options.ReaderContextFieldName);
             ContextParameter = new Name(options.ContextParameterName);
             GroupReaderContextArg = new Name(options.GroupReaderContextArgName);
-            GroupWriterContextArg = new Name(options.GroupWriterContextArgName);
             UnionDiscriminatorEnum = new Name(options.UnionDiscriminatorEnumName);
             UnionDiscriminatorProp = new Name(options.UnionDiscriminatorPropName);
             UnionDiscriminatorUndefined = new Name(options.UnionDiscriminatorUndefinedName);
@@ -105,14 +101,12 @@ namespace CapnpC.CSharp.Generator.CodeGen
             DeserializerLocal = new Name(options.DeserializerLocalName);
             SerializerLocal = new Name(options.SerializerLocalName);
             ResultLocal = new Name(options.ResultLocalName);
-            InstLocalName = new Name(options.InstLocalName);
             ParamsStructFormat = options.ParamsStructFormat;
             ResultStructFormat = options.ResultStructFormat;
             PropertyNamedLikeTypeRenameFormat = options.PropertyNamedLikeTypeRenameFormat;
             GenericTypeParameterFormat = options.GenericTypeParameterFormat;
             MemberAccessPathNameFormat = options.MemberAccessPathNameFormat;
             TaskParameter = new Name(options.TaskParameterName);
-            EagerMethod = new Name(options.EagerMethodName);
             TypeIdField = new Name(options.TypeIdFieldName);
             PipeliningExtensionsClassFormat = options.PipeliningExtensionsClassFormat;
             ProxyClassFormat = options.ProxyClassFormat;
@@ -594,7 +588,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
         }
 
         string GetCodeIdentifierUpperCamel(Field field) => field.CsName ?? SyntaxHelpers.MakeUpperCamel(field.Name);
-        string GetCodeIdentifierLowerCamel(Field field) => field.CsName ?? IdentifierRenamer.ToNonKeyword(SyntaxHelpers.MakeLowerCamel(field.Name));
+        public string GetCodeIdentifierLowerCamel(Field field) => field.CsName ?? IdentifierRenamer.ToNonKeyword(SyntaxHelpers.MakeLowerCamel(field.Name));
 
         public Name GetCodeIdentifier(Field field)
         {
@@ -604,13 +598,6 @@ namespace CapnpC.CSharp.Generator.CodeGen
             }
 
             var def = field.DeclaringType;
-
-            if (def == null)
-            {
-                // Method parameters are internally represented with the same class "Field".
-                // They do not have a declaring type. Anyway, they don't suffer from the field-name-equals-nested-type-name problem.
-                return new Name(GetCodeIdentifierLowerCamel(field));
-            }
 
             var typeNames = new HashSet<Name>(def.NestedTypes.Select(t => MakeTypeName(t)));
             typeNames.Add(MakeTypeName(def));
@@ -647,10 +634,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         public Name MakePipeliningSupportExtensionMethodName(IReadOnlyList<Field> path)
         {
-            if (path.Count == 1 && path[0].Offset == 0)
-                return EagerMethod;
-            else
-                return new Name(string.Join("_", path.Select(f => GetCodeIdentifier(f).ToString())));
+            return new Name(string.Join("_", path.Select(f => GetCodeIdentifier(f).ToString())));
         }
 
         public Name MakePipeliningSupportExtensionClassName(GenFile file)

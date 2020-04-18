@@ -61,7 +61,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 {
                     foreach (var arg in method.Params)
                     {
-                        list.Add(Parameter(_names.GetCodeIdentifier(arg).Identifier)
+                        list.Add(Parameter(Identifier(_names.GetCodeIdentifierLowerCamel(arg)))
                             .WithType(_names.MakeTypeSyntax(arg.Type, method.DeclaringInterface, TypeUsage.DomainClass, Nullability.NullableRef)));
                     }
                 }
@@ -194,8 +194,8 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
                 yield return AssignmentExpression(
                     SyntaxKind.SimpleAssignmentExpression,
-                    _names.GetCodeIdentifier(field).IdentifierName,
-                    _names.GetCodeIdentifier(methodParam).IdentifierName);
+                    _names.GetCodeIdentifier(methodParam).IdentifierName,
+                    IdentifierName(_names.GetCodeIdentifierLowerCamel(field)));
             }
         }
 
@@ -284,6 +284,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
         public MemberDeclarationSyntax MakeProxy(TypeDefinition type)
         {
             var classDecl = ClassDeclaration(_names.MakeTypeName(type, NameUsage.Proxy).Identifier)
+                .AddAttributeLists(_names.MakeTypeDecorationAttributes(type.Id))
                 .AddModifiers(Public)
                 .AddBaseListTypes(
                     SimpleBaseType(_names.Type<Capnp.Rpc.Proxy>(Nullability.NonNullable)),
@@ -480,7 +481,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 yield return AssignmentExpression(
                     SyntaxKind.SimpleAssignmentExpression,
                     _names.GetCodeIdentifier(arg).IdentifierName,
-                    IdentifierName(IdentifierRenamer.ToNonKeyword(arg.Name)));
+                    IdentifierName(_names.GetCodeIdentifierLowerCamel(arg)));
             }
         }
 
@@ -650,7 +651,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     if (method.Results.Count == 1)
                     {
                         lambdaArg = SimpleLambdaExpression(
-                            Parameter(Identifier(method.Results.Single().Name)),
+                            Parameter(Identifier(_names.GetCodeIdentifierLowerCamel(method.Results.Single()))),
                             MakeMaybeTailCallLambdaBody(method));
                     }
                     else
@@ -662,7 +663,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         {
                             if (paramList.Count > 0)
                                 paramList.Add(Token(SyntaxKind.CommaToken));
-                            paramList.Add(Parameter(Identifier(arg.Name)));
+                            paramList.Add(Parameter(Identifier(_names.GetCodeIdentifierLowerCamel(arg))));
                         }
                         lambdaArg = ParenthesizedLambdaExpression(
                             ParameterList(
@@ -729,6 +730,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
         {
             var name = _names.MakeTypeName(type, NameUsage.Skeleton).Identifier;
             var classDecl = ClassDeclaration(name)
+                .AddAttributeLists(_names.MakeTypeDecorationAttributes(type.Id))
                 .AddModifiers(Public)
                 .AddBaseListTypes(
                     SimpleBaseType(
