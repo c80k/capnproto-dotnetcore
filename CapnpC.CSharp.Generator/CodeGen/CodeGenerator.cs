@@ -260,7 +260,14 @@
 
             cu = cu.AddMembers(ns);
 
-            return cu.NormalizeWhitespace("    ", Environment.NewLine).ToFullString();
+            string content = cu.NormalizeWhitespace("    ", Environment.NewLine).ToFullString();
+
+            if (!string.IsNullOrWhiteSpace(file.HeaderText))
+            {
+                content = file.HeaderText + content;
+            }
+
+            return content;
         }
 
         public IReadOnlyList<FileGenerationResult> Generate()

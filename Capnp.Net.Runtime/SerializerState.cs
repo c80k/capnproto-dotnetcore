@@ -375,7 +375,7 @@ namespace Capnp
                     farPtr2.SetFarPointer(target.SegmentIndex, target.Offset, false);
                     var farSpan = FarSpan(landingPadSlice.SegmentIndex);
                     farSpan[landingPadSlice.Offset] = farPtr2;
-                    targetPtr.Offset = target.Offset;
+                    targetPtr.Offset = 0;
                     farSpan[landingPadSlice.Offset + 1] = targetPtr;
                 }
             }

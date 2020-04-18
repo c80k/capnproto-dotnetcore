@@ -14,6 +14,7 @@ namespace CapnpC.CSharp.Generator.Model
         public bool? NullableEnable { get; set; }
         public bool EmitNullableDirective { get; set; }
         public bool EmitDomainClassesAndInterfaces { get; set; }
+        public string HeaderText { get; set; }
         public SupportedAnnotations.TypeVisibility TypeVisibility { get; set; }
 
         public IEnumerable<TypeDefinition> NestedTypes { get => this.GetNestedTypes(); }

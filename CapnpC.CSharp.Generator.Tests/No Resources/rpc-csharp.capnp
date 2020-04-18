@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Christian Köllner and contributors
+# Copyright (c) 2020 Christian KÃ¶llner and contributors
 # This is a modified version of rpc.capnp, found in the original distribution
 # Copyright (c) 2013-2014 Sandstorm Development Group, Inc. and contributors
 # Licensed under the MIT License:
@@ -110,6 +110,8 @@
 # network at level 4.  And since Cap'n Proto IPC is extremely fast, it may never make sense to
 # bother implementing any other vat network protocol -- just use the correct container type and get
 # it for free.
+# $$embed
+# #pragma warning disable CS1591
 
 using CSharp = import "/csharp.capnp";
 $CSharp.namespace("Capnp.Rpc");

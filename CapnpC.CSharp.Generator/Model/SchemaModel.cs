@@ -13,6 +13,7 @@ namespace CapnpC.CSharp.Generator.Model
         readonly DefinitionManager _typeDefMgr = new DefinitionManager();
 
         readonly Dictionary<ulong, Schema.Node.Reader> _id2node = new Dictionary<ulong, Schema.Node.Reader>();
+        readonly Dictionary<ulong, SourceInfo> _id2sourceInfo = new Dictionary<ulong, SourceInfo>();
 
         public SchemaModel(Schema.CodeGeneratorRequest.Reader request)
         {
@@ -49,6 +50,17 @@ namespace CapnpC.CSharp.Generator.Model
                     throw new InvalidSchemaException($"Node {node.StrId()} \"{node.DisplayName}\" has a duplicate ID, prior node was \"{existingNode.DisplayName}\"");
                 }
                 _id2node[node.Id] = node;
+            }
+
+            foreach (var reader in _request.SourceInfo)
+            {
+                var sourceInfo = new SourceInfo()
+                {
+                    DocComment = reader.DocComment,
+                    MemberDocComments = reader.Members.Select(m => m.DocComment).ToList()
+                };
+
+                _id2sourceInfo.Add(reader.Id, sourceInfo);
             }
 
             var requestedFiles = _request.RequestedFiles.ToDictionary(req => req.Id);
@@ -96,6 +108,10 @@ namespace CapnpC.CSharp.Generator.Model
             file.EmitNullableDirective = GetEmitNullableDirective(node) ?? false;
             file.EmitDomainClassesAndInterfaces = GetEmitDomainClassesAndInterfaces(node) ?? true;
             file.TypeVisibility = GetTypeVisibility(node) ?? TypeVisibility.Public;
+            if (_id2sourceInfo.TryGetValue(node.Id, out var sourceInfo))
+            {
+                file.HeaderText = GetHeaderText(sourceInfo);
+            }
             return ProcessNodePass1(id, name, state) as GenFile;
         }
 

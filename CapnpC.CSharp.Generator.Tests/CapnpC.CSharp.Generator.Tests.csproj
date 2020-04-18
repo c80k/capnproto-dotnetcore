@@ -31,6 +31,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="No Resources\UnitTest1.capnp" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CapnpC.CSharp.Generator\CapnpC.CSharp.Generator.csproj" />
   </ItemGroup>
 

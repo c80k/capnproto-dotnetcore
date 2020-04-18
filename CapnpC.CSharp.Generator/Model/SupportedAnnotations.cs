@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace CapnpC.CSharp.Generator.Model
@@ -129,6 +130,20 @@ namespace CapnpC.CSharp.Generator.Model
                 }
             }
             return null;
+        }
+
+        public static string GetHeaderText(SourceInfo sourceInfo)
+        {
+            if (sourceInfo.DocComment == null)
+                return null;
+
+            var lines = sourceInfo.DocComment
+                .Split('\n')
+                .Select(line => line.Trim())
+                .SkipWhile(line => !line.Equals("$$embed", StringComparison.OrdinalIgnoreCase))
+                .Skip(1);
+
+            return string.Join(Environment.NewLine, lines);
         }
     }
 }

@@ -350,7 +350,7 @@ namespace Capnp
                                 throw new DeserializationException("Error decoding double-far pointer: not followed by intra-segment pointer");
 
                             CurrentSegmentIndex = pointer1.TargetSegmentIndex;
-                            Offset = 0;
+                            Offset = pointer1.LandingPadOffset;
                             pointer = pointer2;
                             offset = -1;
                         }
