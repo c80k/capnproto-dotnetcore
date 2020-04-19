@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Capnp.Util;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,7 +25,7 @@ namespace Capnp.Rpc
         }
 
         protected int _pendingCallsOnPromise;
-        Task? _disembargo;
+        StrictlyOrderedAwaitTask? _disembargo;
 
         protected abstract ConsumedCapability? ResolvedCap { get; }
 
@@ -64,7 +65,7 @@ namespace Capnp.Rpc
 #if DebugEmbargos
                         Logger.LogDebug("Requesting disembargo");
 #endif
-                        _disembargo = _ep.RequestSenderLoopback(GetMessageTarget);
+                        _disembargo = _ep.RequestSenderLoopback(GetMessageTarget).EnforceAwaitOrder();
                     }
                     else
                     {
@@ -75,8 +76,10 @@ namespace Capnp.Rpc
 
                     var cancellationTokenSource = new CancellationTokenSource();
 
-                    var callAfterDisembargo = _disembargo.ContinueWith(_ =>
+                    async Task<DeserializerState> AwaitAnswer()
                     {
+                        await _disembargo!;
+
                         // Two reasons for ignoring exceptions on the previous task (i.e. not _.Wait()ing):
                         // 1. A faulting predecessor, especially due to cancellation, must not have any impact on this one.
                         // 2. A faulting disembargo request would imply that the other side cannot send pending requests anyway.
@@ -88,15 +91,7 @@ namespace Capnp.Rpc
                         }
 
                         using var proxy = new Proxy(resolvedCap);
-                        return proxy.Call(interfaceId, methodId, args, default);
-
-                    }, TaskContinuationOptions.ExecuteSynchronously);
-
-                    _disembargo = callAfterDisembargo;
-
-                    async Task<DeserializerState> AwaitAnswer()
-                    {
-                        var promisedAnswer = await callAfterDisembargo;
+                        var promisedAnswer = proxy.Call(interfaceId, methodId, args, default);
 
                         using (cancellationTokenSource.Token.Register(promisedAnswer.Dispose))
                         {

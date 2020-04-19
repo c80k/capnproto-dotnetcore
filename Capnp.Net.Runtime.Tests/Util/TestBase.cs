@@ -263,13 +263,19 @@ namespace Capnp.Net.Runtime.Tests
 
         protected class LocalhostTcpTestbed : ITestbed, ITestController
         {
+            readonly TcpRpcTestOptions _options;
             TcpRpcServer _server;
             TcpRpcClient _client;
             bool _prematurelyClosed;
 
+            public LocalhostTcpTestbed(TcpRpcTestOptions options)
+            {
+                _options = options;
+            }
+
             public void RunTest(Action<ITestbed> action)
             {
-                (_server, _client) = SetupClientServerPair();
+                (_server, _client) = SetupClientServerPair(_options);
                 Assert.IsTrue(SpinWait.SpinUntil(() => _server.ConnectionCount > 0, MediumNonDbgTimeout));
                 var conn = _server.Connections[0];
 
@@ -345,14 +351,24 @@ namespace Capnp.Net.Runtime.Tests
 
         protected ILogger Logger { get; set; }
 
-        protected static TcpRpcClient SetupClient(bool withTracer = false)
+        protected static TcpRpcClient SetupClient(TcpRpcTestOptions options = TcpRpcTestOptions.None)
         {
             var client = new TcpRpcClient();
             client.AddBuffering();
-            if (withTracer)
+            if (options.HasFlag(TcpRpcTestOptions.ClientTracer))
                 client.AttachTracer(new FrameTracing.RpcFrameTracer(Console.Out, false));
+            if (options.HasFlag(TcpRpcTestOptions.ClientFluctStream))
+                client.InjectMidlayer(s => new FluctStream(s));
             client.Connect("localhost", TcpPort);
             return client;
+        }
+
+        [Flags]
+        public enum TcpRpcTestOptions
+        {
+            None = 0,
+            ClientTracer = 1,
+            ClientFluctStream = 2
         }
 
         protected static TcpRpcServer SetupServer()
@@ -381,10 +397,10 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        protected static (TcpRpcServer, TcpRpcClient) SetupClientServerPair(bool withClientTracer = false)        
+        protected static (TcpRpcServer, TcpRpcClient) SetupClientServerPair(TcpRpcTestOptions options = TcpRpcTestOptions.None)
         {
             var server = SetupServer();
-            var client = SetupClient(withClientTracer);
+            var client = SetupClient(options);
             return (server, client);
         }
 
@@ -404,7 +420,8 @@ namespace Capnp.Net.Runtime.Tests
         }
 
         protected static DtbdctTestbed NewDtbdctTestbed() => new DtbdctTestbed();
-        protected static LocalhostTcpTestbed NewLocalhostTcpTestbed() => new LocalhostTcpTestbed();
+        protected static LocalhostTcpTestbed NewLocalhostTcpTestbed(TcpRpcTestOptions options = TcpRpcTestOptions.None) => 
+            new LocalhostTcpTestbed(options);
 
         protected static LocalTestbed NewLocalTestbed() => new LocalTestbed();
 
@@ -412,9 +429,9 @@ namespace Capnp.Net.Runtime.Tests
         public void InitConsoleLogging()
         {
             Logging.LoggerFactory?.Dispose();
-#pragma warning disable CS0618 // Typ oder Element ist veraltet
+#pragma warning disable CS0618
             Logging.LoggerFactory = new LoggerFactory().AddConsole((msg, level) => true);
-#pragma warning restore CS0618 // Typ oder Element ist veraltet
+#pragma warning restore CS0618
             Logger = Logging.CreateLogger<TcpRpcStress>();
             if (Thread.CurrentThread.Name == null)
                 Thread.CurrentThread.Name = $"Test Thread {Thread.CurrentThread.ManagedThreadId}";

@@ -26,7 +26,7 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void Pipeline()
         {
-            NewLocalhostTcpTestbed().RunTest(Testsuite.Pipeline);
+            NewLocalhostTcpTestbed(TcpRpcTestOptions.ClientTracer).RunTest(Testsuite.Pipeline);
         }
 
         [TestMethod]

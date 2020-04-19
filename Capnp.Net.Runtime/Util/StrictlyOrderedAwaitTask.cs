@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Capnp.Util
 {
-    internal class StrictlyOrderedAwaitTask<T>: INotifyCompletion
+    internal class StrictlyOrderedAwaitTask: INotifyCompletion
     {
         class Cover { }
         class Seal { }
@@ -15,16 +15,16 @@ namespace Capnp.Util
         static readonly Cover s_cover = new Cover();
         static readonly Seal s_seal = new Seal();
 
-        readonly Task<T> _awaitedTask;
+        readonly Task _awaitedTask;
         object? _state;
 
-        public StrictlyOrderedAwaitTask(Task<T> awaitedTask)
+        public StrictlyOrderedAwaitTask(Task awaitedTask)
         {
             _awaitedTask = awaitedTask;
             _state = s_cover;
         }
 
-        public StrictlyOrderedAwaitTask<T> GetAwaiter()
+        public StrictlyOrderedAwaitTask GetAwaiter()
         {
             return this;
         }
@@ -94,18 +94,37 @@ namespace Capnp.Util
 
         public bool IsCompleted => _awaitedTask.IsCompleted && _state == s_seal;
 
-        public T GetResult() => _awaitedTask.GetAwaiter().GetResult();
+        public void GetResult() => _awaitedTask.GetAwaiter().GetResult();
 
-        public T Result => _awaitedTask.Result;
-
-        public Task<T> WrappedTask => _awaitedTask;
+        public Task WrappedTask => _awaitedTask;
     }
+
+    internal class StrictlyOrderedAwaitTask<T> : StrictlyOrderedAwaitTask
+    {
+        public StrictlyOrderedAwaitTask(Task<T> awaitedTask): base(awaitedTask)
+        {
+        }
+
+        public new Task<T> WrappedTask => (Task<T>)base.WrappedTask;
+        public new StrictlyOrderedAwaitTask<T> GetAwaiter() => this;
+
+        public new T GetResult() => WrappedTask.GetAwaiter().GetResult();
+
+        public T Result => WrappedTask.Result;
+
+    }
+
 
     internal static class StrictlyOrderedTaskExtensions
     {
         public static StrictlyOrderedAwaitTask<T> EnforceAwaitOrder<T>(this Task<T> task)
         {
             return new StrictlyOrderedAwaitTask<T>(task);
+        }
+
+        public static StrictlyOrderedAwaitTask EnforceAwaitOrder(this Task task)
+        {
+            return new StrictlyOrderedAwaitTask(task);
         }
     }
 }

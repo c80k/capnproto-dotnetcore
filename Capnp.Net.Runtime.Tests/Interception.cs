@@ -400,7 +400,7 @@ namespace Capnp.Net.Runtime.Tests
         {
             var policy = new MyPolicy("a");
 
-            (var server, var client) = SetupClientServerPair(true);
+            (var server, var client) = SetupClientServerPair(TcpRpcTestOptions.ClientTracer);
 
             using (server)
             using (client)
