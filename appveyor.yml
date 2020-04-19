@@ -83,10 +83,10 @@ test_script:
       vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.MsBuild.Generation.Tests\bin\Release\netcoreapp3.0\CapnpC.CSharp.MsBuild.Generation.Tests.dll
       msbuild -t:restore ./MsBuildGenerationTest/MsBuildGenerationTest.csproj /p:Configuration="Debug" /p:PackageReferenceVersion="%VERSION%"
       msbuild ./MsBuildGenerationTest/MsBuildGenerationTest.sln /p:Configuration="Debug" /p:PackageReferenceVersion="%VERSION%"
-      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Debug\net471\Capnp.Net.Runtime.Tests.Std20.dll
-      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\net471\Capnp.Net.Runtime.Tests.Std20.dll
-      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Debug\netcoreapp2.1\Capnp.Net.Runtime.Tests.Core21.dll
-      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\netcoreapp2.1\Capnp.Net.Runtime.Tests.Core21.dll
+      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Debug\net471\Capnp.Net.Runtime.Tests.dll
+      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\net471\Capnp.Net.Runtime.Tests.dll
+      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Debug\netcoreapp2.1\Capnp.Net.Runtime.Tests.dll
+      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\netcoreapp2.1\Capnp.Net.Runtime.Tests.dll
       powershell -File .\scripts\measure-coverage.ps1
       csmacnz.Coveralls --multiple -i "opencover=coverage\cov-Capnp.Net.Runtime.xml;opencover=coverage\cov-CapnpC.CSharp.Generator.xml" --repoToken %COVERALLS_REPO_TOKEN%
 on_finish :

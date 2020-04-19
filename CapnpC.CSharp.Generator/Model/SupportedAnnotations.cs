@@ -31,7 +31,7 @@ namespace CapnpC.CSharp.Generator.Model
             Internal = 1
         }
 
-        public static string[] GetNamespaceAnnotation(Schema.Node.Reader fileNode)
+        public static string[] GetNamespaceAnnotation(Schema.Node.READER fileNode)
         {
             foreach (var annotation in fileNode.Annotations)
             {
@@ -48,7 +48,7 @@ namespace CapnpC.CSharp.Generator.Model
             return null;
         }
 
-        public static string GetCsName(Schema.Field.Reader node)
+        public static string GetCsName(Schema.Field.READER node)
         {
             foreach (var annotation in node.Annotations)
             {
@@ -60,7 +60,7 @@ namespace CapnpC.CSharp.Generator.Model
             return null;
         }
 
-        public static string GetCsName(Schema.Node.Reader node)
+        public static string GetCsName(Schema.Enumerant.READER node)
         {
             foreach (var annotation in node.Annotations)
             {
@@ -72,7 +72,7 @@ namespace CapnpC.CSharp.Generator.Model
             return null;
         }
 
-        public static string GetCsName(Schema.Method.Reader node)
+        public static string GetCsName(Schema.Node.READER node)
         {
             foreach (var annotation in node.Annotations)
             {
@@ -84,11 +84,23 @@ namespace CapnpC.CSharp.Generator.Model
             return null;
         }
 
-        public static bool? GetNullableEnable(Schema.Node.Reader node)
+        public static string GetCsName(Schema.Method.READER node)
         {
             foreach (var annotation in node.Annotations)
             {
-                if (annotation.Id == AnnotationIds.Cs.NullableEnable && annotation.Value.IsBool)
+                if (annotation.Id == AnnotationIds.Cs.Name)
+                {
+                    return annotation.Value.Text;
+                }
+            }
+            return null;
+        }
+
+        public static bool? GetNullableEnable(Schema.Node.READER node)
+        {
+            foreach (var annotation in node.Annotations)
+            {
+                if (annotation.Id == AnnotationIds.Cs.NullableEnable && annotation.Value.which == Schema.Value.WHICH.Bool)
                 {
                     return annotation.Value.Bool;
                 }
@@ -96,11 +108,11 @@ namespace CapnpC.CSharp.Generator.Model
             return null;
         }
 
-        public static bool? GetEmitNullableDirective(Schema.Node.Reader node)
+        public static bool? GetEmitNullableDirective(Schema.Node.READER node)
         {
             foreach (var annotation in node.Annotations)
             {
-                if (annotation.Id == AnnotationIds.Cs.EmitNullableDirective && annotation.Value.IsBool)
+                if (annotation.Id == AnnotationIds.Cs.EmitNullableDirective && annotation.Value.which == Schema.Value.WHICH.Bool)
                 {
                     return annotation.Value.Bool;
                 }
@@ -108,11 +120,11 @@ namespace CapnpC.CSharp.Generator.Model
             return null;
         }
 
-        public static bool? GetEmitDomainClassesAndInterfaces(Schema.Node.Reader node)
+        public static bool? GetEmitDomainClassesAndInterfaces(Schema.Node.READER node)
         {
             foreach (var annotation in node.Annotations)
             {
-                if (annotation.Id == AnnotationIds.Cs.EmitDomainClassesAndInterfaces && annotation.Value.IsBool)
+                if (annotation.Id == AnnotationIds.Cs.EmitDomainClassesAndInterfaces && annotation.Value.which == Schema.Value.WHICH.Bool)
                 {
                     return annotation.Value.Bool;
                 }
@@ -120,11 +132,11 @@ namespace CapnpC.CSharp.Generator.Model
             return null;
         }
 
-        public static TypeVisibility? GetTypeVisibility(Schema.Node.Reader node)
+        public static TypeVisibility? GetTypeVisibility(Schema.Node.READER node)
         {
             foreach (var annotation in node.Annotations)
             {
-                if (annotation.Id == AnnotationIds.Cs.TypeVisibility && annotation.Value.IsEnum)
+                if (annotation.Id == AnnotationIds.Cs.TypeVisibility && annotation.Value.which == Schema.Value.WHICH.Enum)
                 {
                     return (TypeVisibility)annotation.Value.Enum;
                 }

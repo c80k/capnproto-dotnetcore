@@ -29,7 +29,7 @@ namespace Capnp.Rpc
             {
                 var result = await promise.WhenReturned;
                 if (promise.IsTailCall)
-                    throw new TailCallNoDataException();
+                    throw new NoResultsException();
 
                 return then(result);
             }

@@ -45,13 +45,13 @@ namespace CapnpC.CSharp.Generator.Tests
         [TestMethod]
         public void Test04MutualDependencies()
         {
-            LoadAndGenerate("UnitTest4.capnp.bin");
+            LoadAndGenerate("UnitTest4.capnp.bin", "UnitTest4b.capnp.bin");
         }
 
         [TestMethod]
         public void Test10ImportedNamespaces()
         {
-            var (model, codegen, _) = LoadAndGenerate("UnitTest10.capnp.bin");
+            var (model, codegen, _) = LoadAndGenerate("UnitTest10.capnp.bin", "UnitTest10b.capnp.bin");
             var outerTypeDef = GetGeneratedFile("UnitTest10.capnp", model).NestedTypes.First();
             var outerType = Model.Types.FromDefinition(outerTypeDef);
             var innerType = outerTypeDef.Fields[0].Type;
@@ -72,7 +72,7 @@ namespace CapnpC.CSharp.Generator.Tests
         [TestMethod]
         public void Test11ImportedConst()
         {
-            LoadAndGenerate("UnitTest11.capnp.bin");
+            LoadAndGenerate("UnitTest11.capnp.bin", "UnitTest11b.capnp.bin");
         }
 
         [TestMethod]
@@ -147,20 +147,54 @@ namespace CapnpC.CSharp.Generator.Tests
             LoadAndGenerate("schema-with-offsets.capnp.bin");
         }
 
-        static (Model.SchemaModel, CodeGen.CodeGenerator, string) LoadAndGenerate(string inputName)
+        [TestMethod]
+        public void Issue45()
         {
-            var model = Load(inputName);
-            var codegen = new CodeGen.CodeGenerator(model, new CodeGen.GeneratorOptions());
+            var input = CodeGeneratorSteps.LoadResource("Issue45.capnp.bin");
+            using (input)
+            {
+                var frame = Framing.ReadSegments(input);
+                var ds = DeserializerState.CreateRoot(frame);
+                var cgr = CapnpSerializable.Create<CodeGeneratorRequest>(ds);
+                Assert.IsTrue(cgr.Nodes.Count > 0);
+            }
 
-            var code = model.FilesToGenerate.Select(f => codegen.Transform(f)).ToArray();
+        }
+
+        static (Model.SchemaModel, CodeGen.CodeGenerator, string) LoadAndGenerate(params string[] inputNames)
+        {
+            Model.SchemaModel firstModel = null;
+            CodeGen.CodeGenerator firstCodeGen = null;
+
+            Model.SchemaModel LocalLoad(string name)
+            {
+                var model = Load(name);
+                firstModel = firstModel ?? model;
+                return model;
+            }
+
+            CodeGen.CodeGenerator CreateCodeGen(Model.SchemaModel model)
+            {
+                var codegen = new CodeGen.CodeGenerator(model, new CodeGen.GeneratorOptions());
+                firstCodeGen = firstCodeGen ?? codegen;
+                return codegen;
+            }
+
+            var codes = (
+                from name in inputNames
+                let model = LocalLoad(name)
+                let codegen = CreateCodeGen(model)
+                from file in model.FilesToGenerate
+                select codegen.Transform(file)).ToArray();
+
             Assert.AreEqual(
                 Util.InlineAssemblyCompiler.CompileSummary.Success,
                 Util.InlineAssemblyCompiler.TryCompileCapnp(
                     Microsoft.CodeAnalysis.NullableContextOptions.Disable,
-                    code), 
+                    codes), 
                 "Compilation was not successful with no warnings");
 
-            return (model, codegen, code[0]);
+            return (firstModel, firstCodeGen, codes[0]);
         }
 
         static Model.GenFile GetGeneratedFile(string name, Model.SchemaModel model)
@@ -199,7 +233,7 @@ namespace CapnpC.CSharp.Generator.Tests
                 segments = Framing.ReadSegments(input);
             }
             var dec = DeserializerState.CreateRoot(segments);
-            var reader = CodeGeneratorRequest.Reader.Create(dec);
+            var reader = CodeGeneratorRequest.READER.create(dec);
             var model = Model.SchemaModel.Create(reader);
             return model;
         }

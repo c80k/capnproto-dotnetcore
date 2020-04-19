@@ -718,7 +718,7 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
                         await task2;
                         Assert.Fail("Not a tail call");
                     }
-                    catch (TailCallNoDataException)
+                    catch (NoResultsException)
                     {
                     }
                 }

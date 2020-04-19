@@ -35,6 +35,7 @@ namespace Capnp.Net.Runtime.Tests
             ExpectingLogOutput = true;
 
             Logging.LoggerFactory?.Dispose();
+#pragma warning disable CS0618 // Typ oder Element ist veraltet
             Logging.LoggerFactory = new LoggerFactory().AddConsole((msg, level) =>
             {
                 if (!ExpectingLogOutput && level != LogLevel.Debug)
@@ -43,6 +44,7 @@ namespace Capnp.Net.Runtime.Tests
                 }
                 return true;
             });
+#pragma warning restore CS0618 // Typ oder Element ist veraltet
         }
 
         int MediumNonDbgTimeout => Debugger.IsAttached ? Timeout.Infinite : 2000;

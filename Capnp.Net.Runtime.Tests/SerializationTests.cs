@@ -1198,7 +1198,9 @@ namespace Capnp.Net.Runtime.Tests
             var p2 = (Proxy)Proxy.Share<ITestInterface>(impl);
             Assert.AreEqual(0u, dss.ProvideCapability(p1));
             Assert.AreEqual(0u, dss.ProvideCapability(p2.ConsumedCap));
+#pragma warning disable CS0618 // Typ oder Element ist veraltet
             Assert.AreEqual(0u, dss.ProvideCapability(CapabilityReflection.CreateSkeleton(impl)));
+#pragma warning restore CS0618 // Typ oder Element ist veraltet
             Assert.IsTrue(p1.IsDisposed);
             Assert.IsFalse(p2.IsDisposed);
             p2.Dispose();

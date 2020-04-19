@@ -8,21 +8,23 @@ namespace CapnpC.CSharp.Generator.Model
 {
     class SchemaModel
     {
-        readonly Schema.CodeGeneratorRequest.Reader _request;
+        public const ushort NoDiscriminant = 65535;
+
+        readonly Schema.CodeGeneratorRequest.READER _request;
         readonly List<GenFile> _generatedFiles = new List<GenFile>();
         readonly DefinitionManager _typeDefMgr = new DefinitionManager();
 
-        readonly Dictionary<ulong, Schema.Node.Reader> _id2node = new Dictionary<ulong, Schema.Node.Reader>();
+        readonly Dictionary<ulong, Schema.Node.READER> _id2node = new Dictionary<ulong, Schema.Node.READER>();
         readonly Dictionary<ulong, SourceInfo> _id2sourceInfo = new Dictionary<ulong, SourceInfo>();
 
-        public SchemaModel(Schema.CodeGeneratorRequest.Reader request)
+        public SchemaModel(Schema.CodeGeneratorRequest.READER request)
         {
             _request = request;
         }
 
         public IReadOnlyList<GenFile> FilesToGenerate => _generatedFiles;
 
-        Schema.Node.Reader? IdToNode(ulong id, bool mustExist)
+        Schema.Node.READER? IdToNode(ulong id, bool mustExist)
         {
             if (_id2node.TryGetValue(id, out var node))
                 return node;
@@ -31,9 +33,9 @@ namespace CapnpC.CSharp.Generator.Model
             return null;
         }
 
-        Schema.Node.Reader IdToNode(ulong id)
+        Schema.Node.READER IdToNode(ulong id)
         {
-            return (Schema.Node.Reader)IdToNode(id, true);
+            return (Schema.Node.READER)IdToNode(id, true);
         }
 
         void Build()
@@ -76,13 +78,13 @@ namespace CapnpC.CSharp.Generator.Model
             public IHasNestedDefinitions parent;
         }
 
-        void BuildPass1(Dictionary<ulong, Schema.CodeGeneratorRequest.RequestedFile.Reader> requestedFiles)
+        void BuildPass1(Dictionary<ulong, Schema.CodeGeneratorRequest.RequestedFile.READER> requestedFiles)
         {
             Pass1State state = new Pass1State()
             {
                 unprocessedNodes = new HashSet<ulong>(_id2node.Keys)
             };
-            foreach (var node in _id2node.Values.Where(n => n.IsFile))
+            foreach (var node in _id2node.Values.Where(n => n.which == Schema.Node.WHICH.File))
             {
                 GenFile file;
                 bool isGenerated = requestedFiles.TryGetValue(node.Id, out var req);
@@ -118,7 +120,7 @@ namespace CapnpC.CSharp.Generator.Model
         IDefinition ProcessNodePass1(ulong id, string name, Pass1State state)
         {
             bool mustExist = state.parent == null || (state.parent as IDefinition).IsGenerated;
-            if (!(IdToNode(id, mustExist) is Schema.Node.Reader node))
+            if (!(IdToNode(id, mustExist) is Schema.Node.READER node))
                 return null;
             if (!state.unprocessedNodes.Remove(id))
                 return null;
@@ -175,18 +177,18 @@ namespace CapnpC.CSharp.Generator.Model
                 {
                     ProcessNodePass1(nested.Id, nested.Name, state);
                 }
-            if (processFields && node.Fields != null)
-                foreach (var field in node.Fields.Where(f => f.IsGroup))
+            if (processFields && node.Struct.Fields != null)
+                foreach (var field in node.Struct.Fields.Where(f => f.which == Schema.Field.WHICH.Group))
                 {
-                    var group = IdToNode(field.Group_TypeId);
-                    if (!group.IsStruct || !group.Struct_IsGroup)
+                    var group = IdToNode(field.Group.TypeId);
+                    if (group.which != Schema.Node.WHICH.Struct || !group.Struct.IsGroup)
                     {
                         throw new InvalidSchemaException($"Expected node with id {group.StrId()} to be a struct definition");
                     }
-                    ProcessNodePass1(field.Group_TypeId, field.Name, state);
+                    ProcessNodePass1(field.Group.TypeId, field.Name, state);
                 }
-            if (processInterfaceMethods && node.Interface_Methods != null)
-                foreach (var method in node.Interface_Methods)
+            if (processInterfaceMethods && node.Interface.Methods != null)
+                foreach (var method in node.Interface.Methods)
                 {
                     var pnode = IdToNode(method.ParamStructType);
                     if (pnode.ScopeId == 0) ProcessNodePass1(pnode.Id, null, state); // Anonymous generated type
@@ -204,7 +206,7 @@ namespace CapnpC.CSharp.Generator.Model
             public HashSet<ulong> processedNodes;
         }
 
-        void BuildPass2(Dictionary<ulong, Schema.CodeGeneratorRequest.RequestedFile.Reader> requestedFiles)
+        void BuildPass2(Dictionary<ulong, Schema.CodeGeneratorRequest.RequestedFile.READER> requestedFiles)
         {
             var state = new Pass2State() { processedNodes = new HashSet<ulong>() };
             foreach (var file in _typeDefMgr.Files)
@@ -214,7 +216,7 @@ namespace CapnpC.CSharp.Generator.Model
             }
         }
 
-        void ProcessNestedNodes(IEnumerable<Schema.Node.NestedNode.Reader> nestedNodes, Pass2State state, bool mustExist)
+        void ProcessNestedNodes(IEnumerable<Schema.Node.NestedNode.READER> nestedNodes, Pass2State state, bool mustExist)
         {
             foreach (var nestedNode in nestedNodes)
             {
@@ -222,16 +224,16 @@ namespace CapnpC.CSharp.Generator.Model
             }
         }
 
-        void ProcessBrand(Schema.Brand.Reader brandReader, Type type, Pass2State state)
+        void ProcessBrand(Schema.Brand.READER brandReader, Type type, Pass2State state)
         {
             foreach (var scopeReader in brandReader.Scopes)
             {
                 var whatToBind = ProcessTypeDef(scopeReader.ScopeId, state);
                 int index = 0;
 
-                switch (0)
+                switch (scopeReader.which)
                 {
-                    case 0 when scopeReader.IsBind:
+                    case Schema.Brand.Scope.WHICH.Bind:
                         foreach (var bindingReader in scopeReader.Bind)
                         {
                             var typeParameter = new GenericParameter()
@@ -240,20 +242,20 @@ namespace CapnpC.CSharp.Generator.Model
                                 Index = index++
                             };
 
-                            switch (0)
+                            switch (bindingReader.which)
                             {
-                                case 0 when bindingReader.IsType:
+                                case Schema.Brand.Binding.WHICH.Type:
                                     type.BindGenericParameter(typeParameter, ProcessType(bindingReader.Type, state));
                                     break;
 
-                                case 0 when bindingReader.IsUnbound:
+                                case Schema.Brand.Binding.WHICH.Unbound:
                                     type.BindGenericParameter(typeParameter, Types.FromParameter(typeParameter));
                                     break;
                             }
                         }
                         break;
 
-                    case 0 when scopeReader.IsInherit:
+                    case Schema.Brand.Scope.WHICH.Inherit:
                         for (index = 0; index < type.DeclaringType.Definition.GenericParameters.Count; index++)
                         {
                             var typeParameter = new GenericParameter()
@@ -269,45 +271,44 @@ namespace CapnpC.CSharp.Generator.Model
             }
         }
 
-        Type ProcessType(Schema.Type.Reader typeReader, Pass2State state)
+        Type ProcessType(Schema.Type.READER typeReader, Pass2State state)
         {
             Type result;
 
-            switch (0)
+            switch (typeReader.which)
             {
-                case 0 when typeReader.IsAnyPointer:
-                    switch (0)
+                case Schema.Type.WHICH.AnyPointer:
+                    switch (typeReader.AnyPointer.which)
                     {
-                        case 0 when typeReader.AnyPointer_IsParameter:
+                        case Schema.Type.anyPointer.WHICH.Parameter:
                             return Types.FromParameter(
                                 new GenericParameter()
                                 {
-                                    DeclaringEntity = ProcessTypeDef(typeReader.AnyPointer_Parameter_ScopeId, state),
-                                    Index = typeReader.AnyPointer_Parameter_ParameterIndex
+                                    DeclaringEntity = ProcessTypeDef(typeReader.AnyPointer.Parameter.ScopeId, state),
+                                    Index = typeReader.AnyPointer.Parameter.ParameterIndex
                                 });
 
-                        case 0 when typeReader.AnyPointer_IsImplicitMethodParameter:
+                        case Schema.Type.anyPointer.WHICH.ImplicitMethodParameter:
                             return Types.FromParameter(
                                 new GenericParameter()
                                 {
                                     DeclaringEntity = state.currentMethod ?? throw new InvalidOperationException("current method not set"),
-                                    Index = typeReader.AnyPointer_ImplicitMethodParameter_ParameterIndex
+                                    Index = typeReader.AnyPointer.ImplicitMethodParameter.ParameterIndex
                                 });
 
-                        case 0 when typeReader.AnyPointer_IsUnconstrained:
-
-                            switch (0)
+                        case Schema.Type.anyPointer.WHICH.Unconstrained:
+                            switch (typeReader.AnyPointer.Unconstrained.which)
                             {
-                                case 0 when typeReader.AnyPointer_Unconstrained_IsAnyKind:
+                                case Schema.Type.anyPointer.unconstrained.WHICH.AnyKind:
                                     return Types.AnyPointer;
 
-                                case 0 when typeReader.AnyPointer_Unconstrained_IsCapability:
+                                case Schema.Type.anyPointer.unconstrained.WHICH.Capability:
                                     return Types.CapabilityPointer;
 
-                                case 0 when typeReader.AnyPointer_Unconstrained_IsList:
+                                case Schema.Type.anyPointer.unconstrained.WHICH.List:
                                     return Types.ListPointer;
 
-                                case 0 when typeReader.AnyPointer_Unconstrained_IsStruct:
+                                case Schema.Type.anyPointer.unconstrained.WHICH.Struct:
                                     return Types.StructPointer;
 
                                 default:
@@ -318,62 +319,62 @@ namespace CapnpC.CSharp.Generator.Model
                             throw new NotImplementedException();
                     }
 
-                case 0 when typeReader.IsBool:
+                case Schema.Type.WHICH.Bool:
                     return Types.Bool;
 
-                case 0 when typeReader.IsData:
+                case Schema.Type.WHICH.Data:
                     return Types.Data;
 
-                case 0 when typeReader.IsFloat64:
+                case Schema.Type.WHICH.Float64:
                     return Types.F64;
 
-                case 0 when typeReader.IsEnum:
-                    return Types.FromDefinition(ProcessTypeDef(typeReader.Enum_TypeId, state, TypeTag.Enum));
+                case Schema.Type.WHICH.Enum:
+                    return Types.FromDefinition(ProcessTypeDef(typeReader.Enum.TypeId, state, TypeTag.Enum));
 
-                case 0 when typeReader.IsFloat32:
+                case Schema.Type.WHICH.Float32:
                     return Types.F32;
 
-                case 0 when typeReader.IsInt16:
+                case Schema.Type.WHICH.Int16:
                     return Types.S16;
 
-                case 0 when typeReader.IsInt32:
+                case Schema.Type.WHICH.Int32:
                     return Types.S32;
 
-                case 0 when typeReader.IsInt64:
+                case Schema.Type.WHICH.Int64:
                     return Types.S64;
 
-                case 0 when typeReader.IsInt8:
+                case Schema.Type.WHICH.Int8:
                     return Types.S8;
 
-                case 0 when typeReader.IsInterface:
-                    result = Types.FromDefinition(ProcessTypeDef(typeReader.Interface_TypeId, state, TypeTag.Interface));
-                    ProcessBrand(typeReader.Interface_Brand, result, state);
+                case Schema.Type.WHICH.Interface:
+                    result = Types.FromDefinition(ProcessTypeDef(typeReader.Interface.TypeId, state, TypeTag.Interface));
+                    ProcessBrand(typeReader.Interface.Brand, result, state);
                     return result;
 
-                case 0 when typeReader.IsList:
-                    return Types.List(ProcessType(typeReader.List_ElementType, state));
+                case Schema.Type.WHICH.List:
+                    return Types.List(ProcessType(typeReader.List.ElementType, state));
 
-                case 0 when typeReader.IsStruct:
-                    result = Types.FromDefinition(ProcessTypeDef(typeReader.Struct_TypeId, state, TypeTag.Struct));
-                    ProcessBrand(typeReader.Struct_Brand, result, state);
+                case Schema.Type.WHICH.Struct:
+                    result = Types.FromDefinition(ProcessTypeDef(typeReader.Struct.TypeId, state, TypeTag.Struct));
+                    ProcessBrand(typeReader.Struct.Brand, result, state);
                     return result;
 
-                case 0 when typeReader.IsText:
+                case Schema.Type.WHICH.Text:
                     return Types.Text;
 
-                case 0 when typeReader.IsUInt16:
+                case Schema.Type.WHICH.Uint16:
                     return Types.U16;
 
-                case 0 when typeReader.IsUInt32:
+                case Schema.Type.WHICH.Uint32:
                     return Types.U32;
 
-                case 0 when typeReader.IsUInt64:
+                case Schema.Type.WHICH.Uint64:
                     return Types.U64;
 
-                case 0 when typeReader.IsUInt8:
+                case Schema.Type.WHICH.Uint8:
                     return Types.U8;
 
-                case 0 when typeReader.IsVoid:
+                case Schema.Type.WHICH.Void:
                     return Types.Void;
 
                 default:
@@ -381,103 +382,103 @@ namespace CapnpC.CSharp.Generator.Model
             }
         }
 
-        Value ProcessValue(Schema.Value.Reader valueReader)
+        Value ProcessValue(Schema.Value.READER valueReader)
         {
             var value = new Value();
 
-            switch (0)
+            switch (valueReader.which)
             {
-                case 0 when valueReader.IsAnyPointer:
+                case Schema.Value.WHICH.AnyPointer:
                     value.ScalarValue = valueReader.AnyPointer;
                     value.Type = Types.AnyPointer;
                     break;
 
-                case 0 when valueReader.IsBool:
+                case Schema.Value.WHICH.Bool:
                     value.ScalarValue = valueReader.Bool;
                     value.Type = Types.Bool;
                     break;
 
-                case 0 when valueReader.IsData:
-                    value.Items.AddRange(valueReader.Data.CastByte().Select(Value.Scalar));
+                case Schema.Value.WHICH.Data:
+                    value.Items.AddRange(valueReader.Data.Select(Value.Scalar));
                     value.Type = Types.Data;
                     break;
 
-                case 0 when valueReader.IsEnum:
+                case Schema.Value.WHICH.Enum:
                     value.ScalarValue = valueReader.Enum;
                     value.Type = Types.AnyEnum;
                     break;
 
-                case 0 when valueReader.IsFloat32:
+                case Schema.Value.WHICH.Float32:
                     value.ScalarValue = valueReader.Float32;
                     value.Type = Types.F32;
                     break;
 
-                case 0 when valueReader.IsFloat64:
+                case Schema.Value.WHICH.Float64:
                     value.ScalarValue = valueReader.Float64;
                     value.Type = Types.F64;
                     break;
 
-                case 0 when valueReader.IsInt16:
+                case Schema.Value.WHICH.Int16:
                     value.ScalarValue = valueReader.Int16;
                     value.Type = Types.S16;
                     break;
 
-                case 0 when valueReader.IsInt32:
+                case Schema.Value.WHICH.Int32:
                     value.ScalarValue = valueReader.Int32;
                     value.Type = Types.S32;
                     break;
 
-                case 0 when valueReader.IsInt64:
+                case Schema.Value.WHICH.Int64:
                     value.ScalarValue = valueReader.Int64;
                     value.Type = Types.S64;
                     break;
 
-                case 0 when valueReader.IsInt8:
+                case Schema.Value.WHICH.Int8:
                     value.ScalarValue = valueReader.Int8;
                     value.Type = Types.S8;
                     break;
 
-                case 0 when valueReader.IsInterface:
+                case Schema.Value.WHICH.Interface:
                     value.ScalarValue = null;
                     value.Type = Types.CapabilityPointer;
                     break;
 
-                case 0 when valueReader.IsList:
+                case Schema.Value.WHICH.List:
                     value.RawValue = valueReader.List;
                     value.Type = Types.ListPointer;
                     break;
 
-                case 0 when valueReader.IsStruct:
+                case Schema.Value.WHICH.Struct:
                     value.RawValue = valueReader.Struct;
                     value.Type = Types.StructPointer;
                     break;
 
-                case 0 when valueReader.IsText:
+                case Schema.Value.WHICH.Text:
                     value.ScalarValue = valueReader.Text;
                     value.Type = Types.Text;
                     break;
 
-                case 0 when valueReader.IsUInt16:
-                    value.ScalarValue = valueReader.UInt16;
+                case Schema.Value.WHICH.Uint16:
+                    value.ScalarValue = valueReader.Uint16;
                     value.Type = Types.U16;
                     break;
 
-                case 0 when valueReader.IsUInt32:
-                    value.ScalarValue = valueReader.UInt32;
+                case Schema.Value.WHICH.Uint32:
+                    value.ScalarValue = valueReader.Uint32;
                     value.Type = Types.U32;
                     break;
 
-                case 0 when valueReader.IsUInt64:
-                    value.ScalarValue = valueReader.UInt64;
+                case Schema.Value.WHICH.Uint64:
+                    value.ScalarValue = valueReader.Uint64;
                     value.Type = Types.U64;
                     break;
 
-                case 0 when valueReader.IsUInt8:
-                    value.ScalarValue = valueReader.UInt8;
+                case Schema.Value.WHICH.Uint8:
+                    value.ScalarValue = valueReader.Uint8;
                     value.Type = Types.U8;
                     break;
 
-                case 0 when valueReader.IsVoid:
+                case Schema.Value.WHICH.Void:
                     value.Type = Types.Void;
                     break;
 
@@ -488,14 +489,14 @@ namespace CapnpC.CSharp.Generator.Model
             return value;
         }
 
-        void ProcessFields(Schema.Node.Reader reader, TypeDefinition declaringType, List<Field> fields, Pass2State state)
+        void ProcessFields(Schema.Node.READER reader, TypeDefinition declaringType, List<Field> fields, Pass2State state)
         {
-            if (reader.Fields == null)
+            if (reader.Struct.Fields == null)
             {
                 return;
             }
 
-            foreach (var fieldReader in reader.Fields)
+            foreach (var fieldReader in reader.Struct.Fields)
             {
                 var field = new Field()
                 {
@@ -505,25 +506,25 @@ namespace CapnpC.CSharp.Generator.Model
                     CodeOrder = fieldReader.CodeOrder
                 };
 
-                if (fieldReader.DiscriminantValue != Schema.Field.Reader.NoDiscriminant)
+                if (fieldReader.DiscriminantValue != NoDiscriminant)
                 {
                     field.DiscValue = fieldReader.DiscriminantValue;
                 }
 
-                switch (0)
+                switch (fieldReader.which)
                 {
-                    case 0 when fieldReader.IsGroup:
-                        var def = ProcessTypeDef(fieldReader.Group_TypeId, state, TypeTag.Group);
+                    case Schema.Field.WHICH.Group:
+                        var def = ProcessTypeDef(fieldReader.Group.TypeId, state, TypeTag.Group);
                         field.Type = Types.FromDefinition(def);
                         def.CsName = field.CsName; // Type definitions for unions are artificially generated.
                                                    // Transfer the C# name of the using field.
                         break;
 
-                    case 0 when fieldReader.IsSlot:
-                        field.DefaultValue = ProcessValue(fieldReader.Slot_DefaultValue);
-                        field.DefaultValueIsExplicit = fieldReader.Slot_HadExplicitDefault;
-                        field.Offset = fieldReader.Slot_Offset;
-                        field.Type = ProcessType(fieldReader.Slot_Type, state);
+                    case Schema.Field.WHICH.Slot:
+                        field.DefaultValue = ProcessValue(fieldReader.Slot.DefaultValue);
+                        field.DefaultValueIsExplicit = fieldReader.Slot.HadExplicitDefault;
+                        field.Offset = fieldReader.Slot.Offset;
+                        field.Type = ProcessType(fieldReader.Slot.Type, state);
                         field.DefaultValue.Type = field.Type;
                         break;
 
@@ -537,7 +538,7 @@ namespace CapnpC.CSharp.Generator.Model
             }
         }
 
-        TypeDefinition ProcessInterfaceOrStructTail(TypeDefinition def, Schema.Node.Reader reader, Pass2State state)
+        TypeDefinition ProcessInterfaceOrStructTail(TypeDefinition def, Schema.Node.READER reader, Pass2State state)
         {
             def.IsGeneric = reader.IsGeneric;
 
@@ -553,9 +554,9 @@ namespace CapnpC.CSharp.Generator.Model
 
             ProcessFields(reader, def, def.Fields, state);
 
-            if (reader.IsInterface)
+            if (reader.which == Schema.Node.WHICH.Interface)
             {
-                foreach (var methodReader in reader.Interface_Methods)
+                foreach (var methodReader in reader.Interface.Methods)
                 {
                     var method = new Method()
                     {
@@ -608,22 +609,22 @@ namespace CapnpC.CSharp.Generator.Model
             return def;
         }
 
-        TypeDefinition ProcessStruct(Schema.Node.Reader structReader, TypeDefinition def, Pass2State state)
+        TypeDefinition ProcessStruct(Schema.Node.READER structReader, TypeDefinition def, Pass2State state)
         {
-            def.StructDataWordCount = structReader.Struct_DataWordCount;
-            def.StructPointerCount = structReader.Struct_PointerCount;
+            def.StructDataWordCount = structReader.Struct.DataWordCount;
+            def.StructPointerCount = structReader.Struct.PointerCount;
 
-            if (structReader.Struct_DiscriminantCount > 0)
+            if (structReader.Struct.DiscriminantCount > 0)
             {
                 def.UnionInfo = new TypeDefinition.DiscriminationInfo(
-                    structReader.Struct_DiscriminantCount,
-                    16u * structReader.Struct_DiscriminantOffset);
+                    structReader.Struct.DiscriminantCount,
+                    16u * structReader.Struct.DiscriminantOffset);
             }
 
             return ProcessInterfaceOrStructTail(def, structReader, state);
         }
 
-        TypeDefinition ProcessParameterList(Schema.Node.Reader reader, Schema.Brand.Reader brandReader, List<Field> list, Pass2State state)
+        TypeDefinition ProcessParameterList(Schema.Node.READER reader, Schema.Brand.READER brandReader, List<Field> list, Pass2State state)
         {
 //# If a named parameter list was specified in the method
 //# declaration (rather than a single struct parameter type) then a corresponding struct type is
@@ -633,7 +634,7 @@ namespace CapnpC.CSharp.Generator.Model
 //# this a situation where you can't just climb the scope chain to find where a particular
 //# generic parameter was introduced. Making the `scopeId` zero was a mistake.)
 
-            if (!reader.IsStruct)
+            if (reader.which != Schema.Node.WHICH.Struct)
             {
                 throw new InvalidSchemaException("Expected a struct");
             }
@@ -657,9 +658,9 @@ namespace CapnpC.CSharp.Generator.Model
             }
         }
 
-        TypeDefinition ProcessInterface(Schema.Node.Reader ifaceReader, TypeDefinition def, Pass2State state)
+        TypeDefinition ProcessInterface(Schema.Node.READER ifaceReader, TypeDefinition def, Pass2State state)
         {
-            foreach (var superClassReader in ifaceReader.Interface_Superclasses)
+            foreach (var superClassReader in ifaceReader.Interface.Superclasses)
             {
                 var superClass = Types.FromDefinition(ProcessTypeDef(superClassReader.Id, state, TypeTag.Interface));
                 ProcessBrand(superClassReader.Brand, superClass, state);
@@ -669,9 +670,9 @@ namespace CapnpC.CSharp.Generator.Model
             return ProcessInterfaceOrStructTail(def, ifaceReader, state);
         }
 
-        TypeDefinition ProcessEnum(Schema.Node.Reader enumReader, TypeDefinition def, Pass2State state)
+        TypeDefinition ProcessEnum(Schema.Node.READER enumReader, TypeDefinition def, Pass2State state)
         {
-            foreach (var fieldReader in enumReader.Enumerants)
+            foreach (var fieldReader in enumReader.Enum.Enumerants)
             {
                 var field = new Enumerant()
                 {
@@ -681,20 +682,15 @@ namespace CapnpC.CSharp.Generator.Model
                     CodeOrder = fieldReader.CodeOrder
                 };
 
-                if (fieldReader.Ordinal_IsExplicit)
-                {
-                    field.Ordinal = fieldReader.Ordinal_Explicit;
-                }
-
                 def.Enumerants.Add(field);
             }
             return def;
         }
 
-        Constant ProcessConst(Schema.Node.Reader constReader, Constant @const, Pass2State state)
+        Constant ProcessConst(Schema.Node.READER constReader, Constant @const, Pass2State state)
         {
-            var value = ProcessValue(constReader.Const_Value);
-            value.Type = ProcessType(constReader.Const_Type, state);
+            var value = ProcessValue(constReader.Const.Value);
+            value.Type = ProcessType(constReader.Const.Type, state);
             @const.Value = value;
             return @const;
         }
@@ -712,7 +708,7 @@ namespace CapnpC.CSharp.Generator.Model
 
         IDefinition ProcessNode(ulong id, Pass2State state, bool mustExist, TypeTag tag = default)
         {
-            if (!(IdToNode(id, mustExist) is Schema.Node.Reader node)) return null;
+            if (!(IdToNode(id, mustExist) is Schema.Node.READER node)) return null;
             var kind = node.GetKind();
             if (tag == TypeTag.Unknown) tag = kind.GetTypeTag();
             var def = _typeDefMgr.GetExistingDef(id, tag);
@@ -737,7 +733,7 @@ namespace CapnpC.CSharp.Generator.Model
             }
         }
 
-        public static SchemaModel Create(Schema.CodeGeneratorRequest.Reader request)
+        public static SchemaModel Create(Schema.CodeGeneratorRequest.READER request)
         {
             var model = new SchemaModel(request);
             model.Build();
@@ -759,22 +755,24 @@ namespace CapnpC.CSharp.Generator.Model
 
     public static class SchemaExtensions
     {
-        public static string StrId(this Schema.Node.Reader node)
+        public static string StrId(this Schema.Node.READER node)
             => $"0x{node.Id:X}";
 
         public static string StrId(this ulong nodeId)
             => $"0x{nodeId:X}";
 
-        public static NodeKind GetKind(this Schema.Node.Reader node)
+        public static NodeKind GetKind(this Schema.Node.READER node)
         {
-            if (node.IsStruct)
-                return node.Struct_IsGroup ? NodeKind.Group : NodeKind.Struct;
-            if (node.IsInterface) return NodeKind.Interface;
-            if (node.IsEnum) return NodeKind.Enum;
-            if (node.IsConst) return NodeKind.Const;
-            if (node.IsAnnotation) return NodeKind.Annotation;
-            if (node.IsFile) return NodeKind.File;
-            return NodeKind.Unknown;
+            switch (node.which)
+            {
+                case Schema.Node.WHICH.Struct: return node.Struct.IsGroup ? NodeKind.Group : NodeKind.Struct;
+                case Schema.Node.WHICH.Interface: return NodeKind.Interface;
+                case Schema.Node.WHICH.Enum: return NodeKind.Enum;
+                case Schema.Node.WHICH.Const: return NodeKind.Const;
+                case Schema.Node.WHICH.Annotation: return NodeKind.Annotation;
+                case Schema.Node.WHICH.File: return NodeKind.File;
+                default: return NodeKind.Unknown;
+            }
         }
 
         internal static TypeTag GetTypeTag(this NodeKind kind)
@@ -789,7 +787,6 @@ namespace CapnpC.CSharp.Generator.Model
             }
         }
 
-        internal static TypeTag GetTypeTag(this Schema.Node.Reader node)
-            => node.GetKind().GetTypeTag();
+        internal static TypeTag GetTypeTag(this Schema.Node.READER node) => node.GetKind().GetTypeTag();
     }
 }

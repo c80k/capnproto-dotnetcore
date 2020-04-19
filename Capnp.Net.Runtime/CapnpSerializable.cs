@@ -55,11 +55,22 @@ namespace Capnp
             }
         }
 
+        static object? CreateFromAny(DeserializerState state)
+        {
+            switch (state.Kind)
+            {
+                case ObjectKind.Capability: return state.RequireCap<Rpc.BareProxy>();
+                case ObjectKind.Nil: return null;
+                default: return state;
+            }
+        }
+
         static readonly ConditionalWeakTable<Type, Func<DeserializerState, object?>> _typeMap =
             new ConditionalWeakTable<Type, Func<DeserializerState, object?>>();
 
         static CapnpSerializable()
         {
+            _typeMap.Add(typeof(object), CreateFromAny);
             _typeMap.Add(typeof(string), d => d.RequireList().CastText());
             _typeMap.Add(typeof(IReadOnlyList<bool>), d => d.RequireList().CastBool());
             _typeMap.Add(typeof(IReadOnlyList<sbyte>), d => d.RequireList().CastSByte());

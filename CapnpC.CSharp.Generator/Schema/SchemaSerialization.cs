@@ -1,1574 +1,4380 @@
-﻿using Capnp;
+﻿#pragma warning disable CS1591
+using Capnp;
+using Capnp.Rpc;
+using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CapnpC.CSharp.Generator.Schema
 {
-    namespace Superclass
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xe682ab4cf923a417UL)]
+    public class Node : ICapnpSerializable
     {
-        public struct Reader
+        public const UInt64 typeId = 0xe682ab4cf923a417UL;
+        public enum WHICH : ushort
         {
-            public DeserializerState State { get; }
-
-            public Reader(DeserializerState ctx)
-            {
-                State = ctx;
-            }
-
-            public static Reader Create(DeserializerState ctx) => new Reader(ctx);
-
-            public ulong Id => State.ReadDataULong(0);
-            public Brand.Reader Brand => State.ReadStruct(0, Schema.Brand.Reader.Create);
+            File = 0,
+            Struct = 1,
+            Enum = 2,
+            Interface = 3,
+            Const = 4,
+            Annotation = 5,
+            undefined = 65535
         }
 
-        public class Writer: SerializerState
+        void ICapnpSerializable.Deserialize(DeserializerState arg_)
         {
-            public Writer()
+            var reader = READER.create(arg_);
+            switch (reader.which)
             {
-                SetStruct(1, 1);
+                case WHICH.File:
+                    which = reader.which;
+                    break;
+                case WHICH.Struct:
+                    Struct = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Node.@struct>(reader.Struct);
+                    break;
+                case WHICH.Enum:
+                    Enum = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Node.@enum>(reader.Enum);
+                    break;
+                case WHICH.Interface:
+                    Interface = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Node.@interface>(reader.Interface);
+                    break;
+                case WHICH.Const:
+                    Const = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Node.@const>(reader.Const);
+                    break;
+                case WHICH.Annotation:
+                    Annotation = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Node.annotation>(reader.Annotation);
+                    break;
+            }
+
+            Id = reader.Id;
+            DisplayName = reader.DisplayName;
+            DisplayNamePrefixLength = reader.DisplayNamePrefixLength;
+            ScopeId = reader.ScopeId;
+            NestedNodes = reader.NestedNodes?.ToReadOnlyList(_ => CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Node.NestedNode>(_));
+            Annotations = reader.Annotations?.ToReadOnlyList(_ => CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Annotation>(_));
+            Parameters = reader.Parameters?.ToReadOnlyList(_ => CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Node.Parameter>(_));
+            IsGeneric = reader.IsGeneric;
+            applyDefaults();
+        }
+
+        private WHICH _which = WHICH.undefined;
+        private object _content;
+        public WHICH which
+        {
+            get => _which;
+            set
+            {
+                if (value == _which)
+                    return;
+                _which = value;
+                switch (value)
+                {
+                    case WHICH.File:
+                        break;
+                    case WHICH.Struct:
+                        _content = null;
+                        break;
+                    case WHICH.Enum:
+                        _content = null;
+                        break;
+                    case WHICH.Interface:
+                        _content = null;
+                        break;
+                    case WHICH.Const:
+                        _content = null;
+                        break;
+                    case WHICH.Annotation:
+                        _content = null;
+                        break;
+                }
+            }
+        }
+
+        public void serialize(WRITER writer)
+        {
+            writer.which = which;
+            switch (which)
+            {
+                case WHICH.File:
+                    break;
+                case WHICH.Struct:
+                    Struct?.serialize(writer.Struct);
+                    break;
+                case WHICH.Enum:
+                    Enum?.serialize(writer.Enum);
+                    break;
+                case WHICH.Interface:
+                    Interface?.serialize(writer.Interface);
+                    break;
+                case WHICH.Const:
+                    Const?.serialize(writer.Const);
+                    break;
+                case WHICH.Annotation:
+                    Annotation?.serialize(writer.Annotation);
+                    break;
+            }
+
+            writer.Id = Id;
+            writer.DisplayName = DisplayName;
+            writer.DisplayNamePrefixLength = DisplayNamePrefixLength;
+            writer.ScopeId = ScopeId;
+            writer.NestedNodes.Init(NestedNodes, (_s1, _v1) => _v1?.serialize(_s1));
+            writer.Annotations.Init(Annotations, (_s1, _v1) => _v1?.serialize(_s1));
+            writer.Parameters.Init(Parameters, (_s1, _v1) => _v1?.serialize(_s1));
+            writer.IsGeneric = IsGeneric;
+        }
+
+        void ICapnpSerializable.Serialize(SerializerState arg_)
+        {
+            serialize(arg_.Rewrap<WRITER>());
+        }
+
+        public void applyDefaults()
+        {
+        }
+
+        public ulong Id
+        {
+            get;
+            set;
+        }
+
+        public string DisplayName
+        {
+            get;
+            set;
+        }
+
+        public uint DisplayNamePrefixLength
+        {
+            get;
+            set;
+        }
+
+        public ulong ScopeId
+        {
+            get;
+            set;
+        }
+
+        public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Node.NestedNode> NestedNodes
+        {
+            get;
+            set;
+        }
+
+        public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Annotation> Annotations
+        {
+            get;
+            set;
+        }
+
+        public CapnpC.CSharp.Generator.Schema.Node.@struct Struct
+        {
+            get => _which == WHICH.Struct ? (CapnpC.CSharp.Generator.Schema.Node.@struct)_content : null;
+            set
+            {
+                _which = WHICH.Struct;
+                _content = value;
+            }
+        }
+
+        public CapnpC.CSharp.Generator.Schema.Node.@enum Enum
+        {
+            get => _which == WHICH.Enum ? (CapnpC.CSharp.Generator.Schema.Node.@enum)_content : null;
+            set
+            {
+                _which = WHICH.Enum;
+                _content = value;
+            }
+        }
+
+        public CapnpC.CSharp.Generator.Schema.Node.@interface Interface
+        {
+            get => _which == WHICH.Interface ? (CapnpC.CSharp.Generator.Schema.Node.@interface)_content : null;
+            set
+            {
+                _which = WHICH.Interface;
+                _content = value;
+            }
+        }
+
+        public CapnpC.CSharp.Generator.Schema.Node.@const Const
+        {
+            get => _which == WHICH.Const ? (CapnpC.CSharp.Generator.Schema.Node.@const)_content : null;
+            set
+            {
+                _which = WHICH.Const;
+                _content = value;
+            }
+        }
+
+        public CapnpC.CSharp.Generator.Schema.Node.annotation Annotation
+        {
+            get => _which == WHICH.Annotation ? (CapnpC.CSharp.Generator.Schema.Node.annotation)_content : null;
+            set
+            {
+                _which = WHICH.Annotation;
+                _content = value;
+            }
+        }
+
+        public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Node.Parameter> Parameters
+        {
+            get;
+            set;
+        }
+
+        public bool IsGeneric
+        {
+            get;
+            set;
+        }
+
+        public struct READER
+        {
+            readonly DeserializerState ctx;
+            public READER(DeserializerState ctx)
+            {
+                this.ctx = ctx;
+            }
+
+            public static READER create(DeserializerState ctx) => new READER(ctx);
+            public static implicit operator DeserializerState(READER reader) => reader.ctx;
+            public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+            public WHICH which => (WHICH)ctx.ReadDataUShort(96U, (ushort)0);
+            public ulong Id => ctx.ReadDataULong(0UL, 0UL);
+            public string DisplayName => ctx.ReadText(0, null);
+            public uint DisplayNamePrefixLength => ctx.ReadDataUInt(64UL, 0U);
+            public ulong ScopeId => ctx.ReadDataULong(128UL, 0UL);
+            public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Node.NestedNode.READER> NestedNodes => ctx.ReadList(1).Cast(CapnpC.CSharp.Generator.Schema.Node.NestedNode.READER.create);
+            public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Annotation.READER> Annotations => ctx.ReadList(2).Cast(CapnpC.CSharp.Generator.Schema.Annotation.READER.create);
+            public @struct.READER Struct => which == WHICH.Struct ? new @struct.READER(ctx) : default;
+            public @enum.READER Enum => which == WHICH.Enum ? new @enum.READER(ctx) : default;
+            public @interface.READER Interface => which == WHICH.Interface ? new @interface.READER(ctx) : default;
+            public @const.READER Const => which == WHICH.Const ? new @const.READER(ctx) : default;
+            public annotation.READER Annotation => which == WHICH.Annotation ? new annotation.READER(ctx) : default;
+            public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Node.Parameter.READER> Parameters => ctx.ReadList(5).Cast(CapnpC.CSharp.Generator.Schema.Node.Parameter.READER.create);
+            public bool IsGeneric => ctx.ReadDataBool(288UL, false);
+        }
+
+        public class WRITER : SerializerState
+        {
+            public WRITER()
+            {
+                this.SetStruct(5, 6);
+            }
+
+            public WHICH which
+            {
+                get => (WHICH)this.ReadDataUShort(96U, (ushort)0);
+                set => this.WriteData(96U, (ushort)value, (ushort)0);
             }
 
             public ulong Id
             {
-                get => this.ReadDataULong(0);
-                set => this.WriteData(0, value);
-            }
-
-            public Brand.Writer Brand
-            {
-                get => BuildPointer<Schema.Brand.Writer>(0);
-                set => Link(0, value);
-            }
-        }
-    }
-
-    namespace Method
-    {
-        public struct Reader
-        {
-            public DeserializerState State { get; }
-
-            public Reader(DeserializerState ctx)
-            {
-                State = ctx;
-            }
-
-            public static Reader Create(DeserializerState ctx) => new Reader(ctx);
-
-            public string Name => State.ReadText(0);
-            public ushort CodeOrder => State.ReadDataUShort(0);
-            public IReadOnlyList<Node.Parameter.Reader> ImplicitParameters => State.ReadListOfStructs(4, Node.Parameter.Reader.Create);
-            public ulong ParamStructType => State.ReadDataULong(64);
-            public Brand.Reader ParamBrand => State.ReadStruct(2, Brand.Reader.Create);
-            public ulong ResultStructType => State.ReadDataULong(128);
-            public Brand.Reader ResultBrand => State.ReadStruct(3, Brand.Reader.Create);
-            public IReadOnlyList<Annotation.Reader> Annotations => State.ReadListOfStructs(1, Annotation.Reader.Create);
-        }
-
-        public class Writer: SerializerState
-        {
-            public Writer()
-            {
-                SetStruct(5, 3);
-            }
-
-            public string Name
-            {
-                get => ReadText(0);
-                set => WriteText(0, value);
-            }
-
-            public ushort CodeOrder
-            {
-                get => this.ReadDataUShort(0);
-                set => this.WriteData(0, value);
-            }
-
-            public ListOfStructsSerializer<Node.Parameter.Writer> ImplicitParameters
-            {
-                get => BuildPointer<ListOfStructsSerializer<Node.Parameter.Writer>>(4);
-                set => Link(4, value);
-            }
-
-            public ref ulong ParamStructType => ref this.RefData<ulong>(8);
-
-            public Brand.Writer ParamBrand
-            {
-                get => BuildPointer<Brand.Writer>(2);
-                set => Link(2, value);
-            }
-
-            public ulong ResultStructType
-            {
-                get => this.ReadDataULong(128);
-                set => this.WriteData(128, value);
-            }
-
-            public Brand.Writer ResultBrand
-            {
-                get => BuildPointer<Brand.Writer>(3);
-                set => Link(3, value);
-            }
-
-            public ListOfStructsSerializer<Annotation.Writer> Annotations
-            {
-                get => BuildPointer<ListOfStructsSerializer<Annotation.Writer>>(1);
-                set => Link(1, value);
-            }
-        }
-    }
-
-    namespace Type
-    {
-        public struct Reader
-        {
-            public DeserializerState State { get; }
-
-            public Reader(DeserializerState ctx)
-            {
-                State = ctx;
-            }
-
-            public static Reader Create(DeserializerState ctx) => new Reader(ctx);
-
-            public ushort Tag => State.ReadDataUShort(0);
-            public bool IsVoid => Tag == 0;
-            public bool IsBool => Tag == 1;
-            public bool IsInt8 => Tag == 2;
-            public bool IsInt16 => Tag == 3;
-            public bool IsInt32 => Tag == 4;
-            public bool IsInt64 => Tag == 5;
-            public bool IsUInt8 => Tag == 6;
-            public bool IsUInt16 => Tag == 7;
-            public bool IsUInt32 => Tag == 8;
-            public bool IsUInt64 => Tag == 9;
-            public bool IsFloat32 => Tag == 10;
-            public bool IsFloat64 => Tag == 11;
-            public bool IsText => Tag == 12;
-            public bool IsData => Tag == 13;
-            public bool IsList => Tag == 14;
-            public Reader List_ElementType => IsList ? State.ReadStruct(0, Create) : default;
-            public bool IsEnum => Tag == 15;
-            public ulong Enum_TypeId => IsEnum ? State.ReadDataULong(64) : 0;
-            public Brand.Reader Enum_Brand => IsEnum ? State.ReadStruct(0, Brand.Reader.Create) : default;
-            public bool IsStruct => Tag == 16;
-            public ulong Struct_TypeId => IsStruct ? State.ReadDataULong(64) : 0;
-            public Brand.Reader Struct_Brand => IsStruct ? State.ReadStruct(0, Brand.Reader.Create) : default;
-            public bool IsInterface => Tag == 17;
-            public ulong Interface_TypeId => IsInterface ? State.ReadDataULong(64) : 0;
-            public Brand.Reader Interface_Brand => IsInterface ? State.ReadStruct(0, Brand.Reader.Create) : default;
-            public bool IsAnyPointer => Tag == 18;
-            public ushort AnyPointer_Tag => IsAnyPointer ? State.ReadDataUShort(64) : default;
-            public bool AnyPointer_IsUnconstrained => IsAnyPointer && AnyPointer_Tag == 0;
-            public ushort AnyPointer_Unconstrained_Tag => AnyPointer_IsUnconstrained ? State.ReadDataUShort(80) : (ushort)0;
-            public bool AnyPointer_Unconstrained_IsAnyKind => AnyPointer_IsUnconstrained && AnyPointer_Unconstrained_Tag == 0;
-            public bool AnyPointer_Unconstrained_IsStruct => AnyPointer_IsUnconstrained && AnyPointer_Unconstrained_Tag == 1;
-            public bool AnyPointer_Unconstrained_IsList => AnyPointer_IsUnconstrained && AnyPointer_Unconstrained_Tag == 2;
-            public bool AnyPointer_Unconstrained_IsCapability => AnyPointer_IsUnconstrained && AnyPointer_Unconstrained_Tag == 3;
-            public bool AnyPointer_IsParameter => IsAnyPointer && AnyPointer_Tag == 1;
-            public ulong AnyPointer_Parameter_ScopeId => AnyPointer_IsParameter ? State.ReadDataULong(128) : 0;
-            public ushort AnyPointer_Parameter_ParameterIndex => AnyPointer_IsParameter ? State.ReadDataUShort(80) : (ushort)0;
-            public bool AnyPointer_IsImplicitMethodParameter => AnyPointer_Tag == 2;
-            public ushort AnyPointer_ImplicitMethodParameter_ParameterIndex => AnyPointer_IsImplicitMethodParameter ? State.ReadDataUShort(80) : default;
-        }
-
-        public class Writer: SerializerState
-        {
-            public Writer()
-            {
-                SetStruct(3, 1);
-            }
-
-            public ref ushort Tag => ref this.RefData<ushort>(0);
-
-            public bool IsVoid
-            {
-                get => Tag == 0;
-                set => Tag = 0;
-            }
-
-            public bool IsBool
-            {
-                get => Tag == 1;
-                set => Tag = 1;
-            }
-
-            public bool IsInt8
-            {
-                get => Tag == 2;
-                set => Tag = 2;
-            }
-
-            public bool IsInt16
-            {
-                get => Tag == 3;
-                set => Tag = 3;
-            }
-
-            public bool IsInt32
-            {
-                get => Tag == 4;
-                set => Tag = 4;
-            }
-
-            public bool IsInt64
-            {
-                get => Tag == 5;
-                set => Tag = 5;
-            }
-
-            public bool IsUInt8
-            {
-                get => Tag == 6;
-                set => Tag = 6;
-            }
-
-            public bool IsUInt16
-            {
-                get => Tag == 7;
-                set => Tag = 7;
-            }
-
-            public bool IsUInt32
-            {
-                get => Tag == 8;
-                set => Tag = 8;
-            }
-
-            public bool IsUInt64
-            {
-                get => Tag == 9;
-                set => Tag = 9;
-            }
-
-            public bool IsFloat32
-            {
-                get => Tag == 10;
-                set => Tag = 10;
-            }
-
-            public bool IsFloat64
-            {
-                get => Tag == 11;
-                set => Tag = 11;
-            }
-
-            public bool IsText
-            {
-                get => Tag == 12;
-                set => Tag = 12;
-            }
-
-            public bool IsData
-            {
-                get => Tag == 13;
-                set => Tag = 13;
-            }
-
-            public bool IsList
-            {
-                get => Tag == 14;
-                set => Tag = 14;
-            }
-
-            public Writer List_ElementType
-            {
-                get => IsList ? BuildPointer<Writer>(0) : default;
-                set { Link(0, value); }
-            }
-
-            public bool IsEnum
-            {
-                get => Tag == 15;
-                set => Tag = 15;
-            }
-
-            public ulong Enum_TypeId
-            {
-                get => IsEnum ? this.ReadDataULong(64) : 0;
-                set { this.WriteData(64, value); }
-            }
-
-            public Brand.Writer Enum_Brand
-            {
-                get => IsEnum ? BuildPointer<Brand.Writer>(0) : default;
-                set => Link(0, value);
-            }
-
-            public bool IsStruct
-            {
-                get => Tag == 16;
-                set => Tag = 16;
-            }
-
-            public ulong Struct_TypeId
-            {
-                get => IsStruct ? this.ReadDataULong(64) : 0;
-                set => this.WriteData(64, value);
-            }
-
-            public Brand.Writer Struct_Brand
-            {
-                get => IsStruct ? BuildPointer<Brand.Writer>(0) : default;
-                set => Link(0, value);
-            }
-
-            public bool IsInterface
-            {
-                get => Tag == 17;
-                set => Tag = 17;
-            }
-
-            public ulong Interface_TypeId
-            {
-                get => IsStruct ? this.ReadDataULong(64) : 0;
-                set => this.WriteData(64, value);
-            }
-
-            public Brand.Writer Interface_Brand
-            {
-                get => IsStruct ? BuildPointer<Brand.Writer>(0) : default;
-                set => Link(0, value);
-            }
-
-            public bool IsAnyPointer
-            {
-                get => Tag == 18;
-                set => Tag = 18;
-            }
-
-            public ushort AnyPointer_Tag
-            {
-                get => IsAnyPointer ? this.ReadDataUShort(64) : default;
-                set => this.WriteData(64, value);
-            }
-
-            public bool AnyPointer_IsUnconstrained
-            {
-                get => IsAnyPointer && AnyPointer_Tag == 0;
-                set => AnyPointer_Tag = 0;
-            }
-
-            public ushort AnyPointer_Unconstrained_Tag
-            {
-                get => AnyPointer_IsUnconstrained ? this.ReadDataUShort(80) : (ushort)0;
-                set => this.WriteData(80, value);
-            }
-
-            public bool AnyPointer_Unconstrained_IsAnyKind
-            {
-                get => AnyPointer_IsUnconstrained && AnyPointer_Unconstrained_Tag == 0;
-                set => AnyPointer_Unconstrained_Tag = 0;
-            }
-
-            public bool AnyPointer_Unconstrained_IsStruct
-            {
-                get => AnyPointer_IsUnconstrained && AnyPointer_Unconstrained_Tag == 1;
-                set => AnyPointer_Unconstrained_Tag = 1;
-            }
-
-            public bool AnyPointer_Unconstrained_IsList
-            {
-                get => AnyPointer_IsUnconstrained && AnyPointer_Unconstrained_Tag == 2;
-                set => AnyPointer_Unconstrained_Tag = 2;
-            }
-
-            public bool AnyPointer_Unconstrained_IsCapability
-            {
-                get => AnyPointer_IsUnconstrained && AnyPointer_Unconstrained_Tag == 3;
-                set => AnyPointer_Unconstrained_Tag = 3;
-            }
-
-            public bool AnyPointer_IsParameter
-            {
-                get => IsAnyPointer && AnyPointer_Tag == 1;
-                set => AnyPointer_Tag = 1;
-            }
-
-            public ulong AnyPointer_Parameter_ScopeId
-            {
-                get => AnyPointer_IsParameter ? this.ReadDataULong(128) : 0;
-                set => this.WriteData(128, value);
-            }
-
-            public ushort AnyPointer_Parameter_ParameterIndex
-            {
-                get => AnyPointer_IsParameter ? this.ReadDataUShort(80) : (ushort)0;
-                set => this.WriteData(80, value);
-            }
-
-            public bool AnyPointer_IsImplicitMethodParameter
-            {
-                get => AnyPointer_Tag == 2;
-                set => AnyPointer_Tag = 2;
-            }
-
-            public ushort AnyPointer_ImplicitMethodParameter_ParameterIndex
-            {
-                get => AnyPointer_IsImplicitMethodParameter ? this.ReadDataUShort(80) : default;
-                set => this.WriteData(80, value);
-            }
-        }
-    }
-
-    namespace Brand
-    {
-        namespace Scope
-        {
-            public struct Reader
-            {
-                public DeserializerState State { get; }
-
-                public Reader(DeserializerState ctx)
-                {
-                    State = ctx;
-                }
-
-                public static Reader Create(DeserializerState ctx) => new Reader(ctx);
-
-                public ulong ScopeId => State.ReadDataULong(0);
-                public ushort Tag => State.ReadDataUShort(64);
-                public bool IsBind => Tag == 0;
-                public IReadOnlyList<Binding.Reader> Bind => IsBind ? State.ReadListOfStructs(0, Binding.Reader.Create) : null;
-                public bool IsInherit => Tag == 1;
-            }
-
-            public class Writer: SerializerState
-            {
-                public Writer()
-                {
-                    SetStruct(2, 1);
-                }
-
-                public ulong ScopeId
-                {
-                    get => this.ReadDataULong(0);
-                    set => this.WriteData(0, value);
-                }
-
-                public ushort Tag
-                {
-                    get => this.ReadDataUShort(64);
-                    set => this.WriteData(64, value);
-                }
-
-                public bool IsBind
-                {
-                    get => Tag == 0;
-                    set => Tag = 0;
-                }
-
-                public ListOfStructsSerializer<Binding.Writer> Bind
-                {
-                    get => IsBind ? BuildPointer<ListOfStructsSerializer<Binding.Writer>>(0) : default;
-                    set => Link(0, value);
-                }
-
-                public bool IsInherit
-                {
-                    get => Tag == 1;
-                    set => Tag = 1;
-                }
-            }
-
-            namespace Binding
-            {
-                public struct Reader
-                {
-                    public DeserializerState State { get; }
-
-                    public Reader(DeserializerState ctx)
-                    {
-                        State = ctx;
-                    }
-
-                    public static Reader Create(DeserializerState ctx) => new Reader(ctx);
-
-                    public ushort Tag => State.ReadDataUShort(0);
-                    public bool IsUnbound => Tag == 0;
-                    public bool IsType => Tag == 1;
-                    public Type.Reader Type => IsType ? State.ReadStruct(0, Schema.Type.Reader.Create) : default;
-                }
-
-                public class Writer: SerializerState
-                {
-                    public Writer()
-                    {
-                        SetStruct(1, 1);
-                    }
-
-                    public ushort Tag
-                    {
-                        get => this.ReadDataUShort(0);
-                        set => this.WriteData(0, value);
-                    }
-
-                    public bool IsUnbound
-                    {
-                        get => Tag == 0;
-                        set => Tag = 0;
-                    }
-
-                    public bool IsType
-                    {
-                        get => Tag == 1;
-                        set => Tag = 1;
-                    }
-
-                    public Type.Writer Type
-                    {
-                        get => IsType ? BuildPointer<Schema.Type.Writer>(0) : default;
-                        set => Link(0, value);
-                    }
-                }
-            }
-        }
-
-        public struct Reader
-        {
-            public DeserializerState State { get; }
-
-            public Reader(DeserializerState ctx)
-            {
-                State = ctx;
-            }
-
-            public static Reader Create(DeserializerState ctx) => new Reader(ctx);
-
-            public IReadOnlyList<Scope.Reader> Scopes => State.ReadListOfStructs(0, Scope.Reader.Create);
-        }
-
-        public class Writer: SerializerState
-        {
-            public Writer()
-            {
-                SetStruct(0, 1);
-            }
-
-            public ListOfStructsSerializer<Scope.Writer> Scopes
-            {
-                get => BuildPointer<ListOfStructsSerializer<Scope.Writer>>(0);
-                set => Link(0, value);
-            }
-        }
-    }
-
-    namespace Value
-    {
-        public struct Reader
-        {
-            public DeserializerState State { get; }
-
-            public Reader(DeserializerState ctx)
-            {
-                State = ctx;
-            }
-
-            public static Reader Create(DeserializerState ctx) => new Reader(ctx);
-
-            public ushort Tag => State.ReadDataUShort(0);
-            public bool IsVoid => Tag == 0;
-            public bool IsBool => Tag == 1;
-            public bool Bool => IsBool ? State.ReadDataBool(16) : default;
-            public bool IsInt8 => Tag == 2;
-            public sbyte Int8 => IsInt8 ? State.ReadDataSByte(16) : default;
-            public bool IsInt16 => Tag == 3;
-            public short Int16 => IsInt16 ? State.ReadDataShort(16) : default;
-            public bool IsInt32 => Tag == 4;
-            public int Int32 => IsInt32 ? State.ReadDataInt(32) : default;
-            public bool IsInt64 => Tag == 5;
-            public long Int64 => IsInt64 ? State.ReadDataLong(64) : default;
-            public bool IsUInt8 => Tag == 6;
-            public byte UInt8 => IsUInt8 ? State.ReadDataByte(16) : default;
-            public bool IsUInt16 => Tag == 7;
-            public ushort UInt16 => IsUInt16 ? State.ReadDataUShort(16) : default;
-            public bool IsUInt32 => Tag == 8;
-            public uint UInt32 => IsUInt32 ? State.ReadDataUInt(32) : default;
-            public bool IsUInt64 => Tag == 9;
-            public ulong UInt64 => IsUInt64 ? State.ReadDataULong(64) : default;
-            public bool IsFloat32 => Tag == 10;
-            public float Float32 => IsFloat32 ? State.ReadDataFloat(32) : default;
-            public bool IsFloat64 => Tag == 11;
-            public double Float64 => IsFloat64 ? State.ReadDataDouble(64) : default;
-            public bool IsText => Tag == 12;
-            public string Text => IsText ? State.ReadText(0) : default;
-            public bool IsData => Tag == 13;
-            public ListDeserializer Data => IsData ? State.ReadList(0) : default;
-            public bool IsList => Tag == 14;
-            public DeserializerState List => IsList ? State.StructReadPointer(0) : default;
-            public bool IsEnum => Tag == 15;
-            public ushort Enum => IsEnum ? State.ReadDataUShort(16) : default;
-            public bool IsStruct => Tag == 16;
-            public DeserializerState Struct => IsStruct ? State.StructReadPointer(0) : default;
-            public bool IsInterface => Tag == 17;
-            public bool IsAnyPointer => Tag == 18;
-            public DeserializerState AnyPointer => IsAnyPointer ? State.StructReadPointer(0) : default;
-        }
-
-        public class Writer: SerializerState
-        {
-            public Writer()
-            {
-                SetStruct(2, 1);
-            }
-
-            public ushort Tag
-            {
-                get => this.ReadDataUShort(0);
-                set => this.WriteData(0, value);
-            }
-
-            public bool IsVoid
-            {
-                get => Tag == 0;
-                set => Tag = 0;
-            }
-
-            public bool IsBool
-            {
-                get => Tag == 1;
-                set => Tag = 1;
-            }
-
-            public bool Bool
-            {
-                get => IsBool ? this.ReadDataBool(16) : default;
-                set => this.WriteData(16, value);
-            }
-
-            public bool IsInt8
-            {
-                get => Tag == 2;
-                set => Tag = 2;
-            }
-
-            public sbyte Int8
-            {
-                get => IsInt8 ? this.ReadDataSByte(16) : default;
-                set => this.WriteData(16, value);
-            }
-
-            public bool IsInt16
-            {
-                get => Tag == 3;
-                set => Tag = 3;
-            }
-
-            public short Int16
-            {
-                get => IsInt16 ? this.ReadDataShort(16) : default;
-                set => this.WriteData(16, value);
-            }
-
-            public bool IsInt32
-            {
-                get => Tag == 4;
-                set => Tag = 4;
-            }
-
-            public int Int32
-            {
-                get => IsInt32 ? this.ReadDataInt(32) : default;
-                set => this.WriteData(32, value);
-            }
-
-            public bool IsInt64
-            {
-                get => Tag == 5;
-                set => Tag = 5;
-            }
-
-            public long Int64
-            {
-                get => IsInt64 ? this.ReadDataLong(64) : default;
-                set => this.WriteData(64, value);
-            }
-
-            public bool IsUInt8
-            {
-                get => Tag == 6;
-                set => Tag = 6;
-            }
-
-            public byte UInt8
-            {
-                get => IsUInt8 ? this.ReadDataByte(16) : default;
-                set => this.WriteData(16, value);
-            }
-
-            public bool IsUInt16
-            {
-                get => Tag == 7;
-                set => Tag = 7;
-            }
-
-            public ushort UInt16
-            {
-                get => IsUInt16 ? this.ReadDataUShort(16) : default;
-                set => this.WriteData(16, value);
-            }
-
-            public bool IsUInt32
-            {
-                get => Tag == 8;
-                set => Tag = 8;
-            }
-
-            public uint UInt32
-            {
-                get => IsUInt32 ? this.ReadDataUInt(32) : default;
-                set => this.WriteData(32, value);
-            }
-
-            public bool IsUInt64
-            {
-                get => Tag == 9;
-                set => Tag = 9;
-            }
-
-            public ulong UInt64
-            {
-                get => IsUInt64 ? this.ReadDataULong(64) : default;
-                set => this.WriteData(64, value);
-            }
-
-            public bool IsFloat32
-            {
-                get => Tag == 10;
-                set => Tag = 10;
-            }
-
-            public float Float32
-            {
-                get => IsFloat32 ? this.ReadDataFloat(32) : default;
-                set => this.WriteData(32, value);
-            }
-
-            public bool IsFloat64
-            {
-                get => Tag == 11;
-                set => Tag = 11;
-            }
-
-            public double Float64
-            {
-                get => IsFloat64 ? this.ReadDataDouble(64) : default;
-                set => this.WriteData(64, value);
-            }
-
-            public bool IsText
-            {
-                get => Tag == 12;
-                set => Tag = 12;
-            }
-
-            public string Text
-            {
-                get => IsText ? ReadText(0) : default;
-                set => WriteText(0, value);
-            }
-
-            public bool IsData
-            {
-                get => Tag == 13;
-                set => Tag = 13;
-            }
-
-            public SerializerState Data
-            {
-                get => IsData ? BuildPointer(0) : default;
-                set => Link(0, value);
-            }
-
-            public bool IsList
-            {
-                get => Tag == 14;
-                set => Tag = 14;
-            }
-
-            public SerializerState List
-            {
-                get => IsList ? BuildPointer(0) : default;
-                set => Link(0, value);
-            }
-
-            public bool IsEnum
-            {
-                get => Tag == 15;
-                set => Tag = 15;
-            }
-
-            public ushort Enum
-            {
-                get => IsEnum ? this.ReadDataUShort(16) : default;
-                set => this.WriteData(16, value);
-            }
-
-            public bool IsStruct
-            {
-                get => Tag == 16;
-                set => Tag = 16;
-            }
-
-            public SerializerState Struct
-            {
-                get => IsStruct ? BuildPointer(0) : default;
-                set => Link(0, value);
-            }
-
-            public bool IsInterface
-            {
-                get => Tag == 17;
-                set => Tag = 17;
-            }
-
-            public bool IsAnyPointer
-            {
-                get => Tag == 18;
-                set => Tag = 18;
-            }
-
-            public SerializerState AnyPointer
-            {
-                get => IsAnyPointer ? BuildPointer(0) : default;
-                set => Link(0, value);
-            }
-        }
-    }
-
-    namespace Annotation
-    {
-        public struct Reader
-        {
-            public DeserializerState State { get; }
-
-            public Reader(DeserializerState ctx)
-            {
-                State = ctx;
-            }
-
-            public static Reader Create(DeserializerState ctx) => new Reader(ctx);
-
-            public ulong Id => State.ReadDataULong(0);
-            public Brand.Reader Brand => State.ReadStruct(1, Schema.Brand.Reader.Create);
-            public Value.Reader Value => State.ReadStruct(0, Schema.Value.Reader.Create);
-        }
-
-        public class Writer: SerializerState
-        {
-            public Writer()
-            {
-                SetStruct(1, 2);
-            }
-
-            public ref ulong Id => ref this.RefData<ulong>(0);
-
-            public Brand.Writer Brand
-            {
-                get => BuildPointer<Schema.Brand.Writer>(1);
-                set => Link(1, value);
-            }
-
-            public Value.Writer Value
-            {
-                get => BuildPointer<Schema.Value.Writer>(0);
-                set => Link(0, value);
-            }
-        }
-    }
-
-    public enum ElementSize: ushort
-    {
-        Empty = 0,
-        Bit = 1,
-        Byte = 2,
-        TwoBytes = 3,
-        FourBytes = 4,
-        EightBytes = 5,
-        Pointer = 6,
-        InlineComposite = 7
-    }
-
-    namespace Field
-    {
-        public struct Reader
-        {
-            public DeserializerState State { get; }
-
-            public Reader(DeserializerState ctx)
-            {
-                State = ctx;
-            }
-
-            public static Reader Create(DeserializerState ctx) => new Reader(ctx);
-
-            public string Name => State.ReadText(0);
-            public ushort CodeOrder => State.ReadDataUShort(0);
-            public IReadOnlyList<Annotation.Reader> Annotations => State.ReadListOfStructs(1, Annotation.Reader.Create);
-            public ushort DiscriminantValue => State.ReadDataUShort(16, 65535);
-            public ushort Tag => State.ReadDataUShort(64);
-            public bool IsSlot => Tag == 0;
-            public uint Slot_Offset => IsSlot ? State.ReadDataUInt(32) : default;
-            public Type.Reader Slot_Type => IsSlot ? State.ReadStruct(2, Type.Reader.Create) : default;
-            public Value.Reader Slot_DefaultValue => IsSlot ? State.ReadStruct(3, Value.Reader.Create) : default;
-            public bool Slot_HadExplicitDefault => IsSlot ? State.ReadDataBool(128) : default;
-            public bool IsGroup => Tag == 1;
-            public ulong Group_TypeId => IsGroup ? State.ReadDataULong(128) : default;
-            public ushort Ordinal_Tag => State.ReadDataUShort(80);
-            public bool Ordinal_IsImplicit => Ordinal_Tag == 0;
-            public bool Ordinal_IsExplicit => Ordinal_Tag == 1;
-            public ushort Ordinal_Explicit => Ordinal_IsExplicit ? State.ReadDataUShort(96) : default;
-
-            public const ushort NoDiscriminant = 0xffff;
-        }
-
-        public class Writer: SerializerState
-        {
-            public Writer()
-            {
-                SetStruct(3, 3);
-            }
-
-            public string Name
-            {
-                get => ReadText(0);
-                set => WriteText(0, value);
-            }
-
-            public ref ushort CodeOrder => ref this.RefData<ushort>(0);
-
-            public ListOfStructsSerializer<Annotation.Writer> Annotations
-            {
-                get => BuildPointer<ListOfStructsSerializer<Annotation.Writer>>(1);
-                set => Link(1, value);
-            }
-
-            public ushort DiscriminantValue
-            {
-                get => this.ReadDataUShort(16, 65535);
-                set => this.WriteData(16, value, (ushort)65535);
-            }
-
-            public ref ushort Tag => ref this.RefData<ushort>(8);
-
-            public bool IsSlot
-            {
-                get => Tag == 0;
-                set => Tag = 0;
-            }
-
-            public uint Slot_Offset
-            {
-                get => IsSlot ? this.ReadDataUInt(32) : default;
-                set => this.WriteData(32, value);
-            }
-
-            public Type.Writer Slot_Type
-            {
-                get => IsSlot ? BuildPointer<Type.Writer>(2) : default;
-                set => Link(2, value);
-            }
-
-            public Value.Writer Slot_DefaultValue
-            {
-                get => IsSlot ? BuildPointer<Value.Writer>(3) : default;
-                set => Link(3, value);
-            }
-
-            public bool Slot_HadExplicitDefault
-            {
-                get => IsSlot ? this.ReadDataBool(128) : default;
-                set => this.WriteData(128, value);
-            }
-
-            public bool IsGroup
-            {
-                get => Tag == 1;
-                set => Tag = 1;
-            }
-
-            public ref ulong Group_TypeId => ref this.RefData<ulong>(2);
-
-            public ref ushort Ordinal_Tag => ref this.RefData<ushort>(5);
-
-            public bool Ordinal_IsImplicit
-            {
-                get => Ordinal_Tag == 0;
-                set => Ordinal_Tag = 0;
-            }
-
-            public bool Ordinal_IsExplicit
-            {
-                get => Ordinal_Tag == 1;
-                set => Ordinal_Tag = 1;
-            }
-
-            public ref ushort Ordinal_Explicit => ref this.RefData<ushort>(6);
-        }
-    }
-
-    namespace Node
-    {
-        namespace Parameter
-        {
-            public struct Reader
-            {
-                public DeserializerState State { get; }
-
-                public Reader(DeserializerState ctx)
-                {
-                    State = ctx;
-                }
-
-                public static Reader Create(DeserializerState ctx) => new Reader(ctx);
-
-                public string Name => State.ReadText(0);
-            }
-
-            public class Writer: SerializerState
-            {
-                public Writer()
-                {
-                    SetStruct(0, 1);
-                }
-
-                public string Name
-                {
-                    get => ReadText(0);
-                    set => WriteText(0, value);
-                }
-            }
-        }
-
-        namespace NestedNode
-        {
-            public struct Reader
-            {
-                public DeserializerState State { get; }
-
-                public Reader(DeserializerState ctx)
-                {
-                    State = ctx;
-                }
-
-                public static Reader Create(DeserializerState ctx) => new Reader(ctx);
-
-                public string Name => State.ReadText(0);
-                public ulong Id => State.ReadDataULong(0);
-            }
-
-            public class Writer: SerializerState
-            {
-                public Writer()
-                {
-                    SetStruct(1, 1);
-                }
-
-                public string Name
-                {
-                    get => ReadText(0);
-                    set => WriteText(0, value);
-                }
-
-                public ref ulong Id => ref this.RefData<ulong>(0);
-            }
-        }
-
-        namespace SourceInfo
-        {
-            namespace Member
-            {
-                public struct Reader
-                {
-                    public DeserializerState State { get; }
-
-                    public Reader(DeserializerState ctx)
-                    {
-                        State = ctx;
-                    }
-
-                    public static Reader Create(DeserializerState ctx) => new Reader(ctx);
-
-                    public string DocComment => State.ReadText(0);
-                }
-
-                public class Writer: SerializerState
-                {
-                    public Writer()
-                    {
-                        SetStruct(0, 1);
-                    }
-
-                    public string DocComment
-                    {
-                        get => ReadText(0);
-                        set => WriteText(0, value);
-                    }
-                }
-            }
-
-            public struct Reader
-            {
-                public DeserializerState State { get; }
-
-                public Reader(DeserializerState ctx)
-                {
-                    State = ctx;
-                }
-
-                public static Reader Create(DeserializerState ctx) => new Reader(ctx);
-
-                public ulong Id => State.ReadDataULong(0);
-                public string DocComment => State.ReadText(0);
-                public IReadOnlyList<Member.Reader> Members => State.ReadListOfStructs(1, Member.Reader.Create);
-            }
-
-            public class Writer: SerializerState
-            {
-                public Writer()
-                {
-                    SetStruct(1, 2);
-                }
-
-                public ref ulong Id => ref this.RefData<ulong>(0);
-
-                public string DocComment
-                {
-                    get => ReadText(0);
-                    set => WriteText(0, value);
-                }
-
-                public ListOfStructsSerializer<Member.Writer> Members
-                {
-                    get => BuildPointer<ListOfStructsSerializer<Member.Writer>>(1);
-                    set => Link(1, value);
-                }
-            }
-        }
-
-        public struct Reader
-        {
-            public DeserializerState State { get; }
-
-            public Reader(DeserializerState ctx)
-            {
-                State = ctx;
-            }
-
-            public static Reader Create(DeserializerState ctx) => new Reader(ctx);
-
-            public ulong Id => State.ReadDataULong(0);
-            public string DisplayName => State.ReadText(0);
-            public uint DisplayNamePrefixLength => State.ReadDataUInt(64);
-            public ulong ScopeId => State.ReadDataULong(128);
-            public IReadOnlyList<Parameter.Reader> Parameters => State.ReadListOfStructs(5, Parameter.Reader.Create);
-            public bool IsGeneric => State.ReadDataBool(288);
-            public IReadOnlyList<NestedNode.Reader> NestedNodes => State.ReadListOfStructs(1, NestedNode.Reader.Create);
-            public IReadOnlyList<Annotation.Reader> Annotations => State.ReadListOfStructs(2, Annotation.Reader.Create);
-            public ushort Tag => State.ReadDataUShort(96);
-            public bool IsFile => Tag == 0;
-            public bool IsStruct => Tag == 1;
-            public ushort Struct_DataWordCount => IsStruct ? State.ReadDataUShort(112) : default;
-            public ushort Struct_PointerCount => IsStruct ? State.ReadDataUShort(192) : default;
-            public ElementSize Struct_PreferredListEncoding => IsStruct ? (ElementSize)State.ReadDataUShort(208) : default;
-            public bool Struct_IsGroup => IsStruct ? State.ReadDataBool(224) : default;
-            public ushort Struct_DiscriminantCount => IsStruct ? State.ReadDataUShort(240) : default;
-            public uint Struct_DiscriminantOffset => IsStruct ? State.ReadDataUInt(256) : default;
-            public IReadOnlyList<Field.Reader> Fields => IsStruct ? State.ReadListOfStructs(3, Field.Reader.Create) : default;
-            public bool IsEnum => Tag == 2;
-            public IReadOnlyList<Field.Reader> Enumerants => IsEnum ? State.ReadListOfStructs(3, Field.Reader.Create) : default;
-            public bool IsInterface => Tag == 3;
-            public IReadOnlyList<Method.Reader> Interface_Methods => IsInterface ? State.ReadListOfStructs(3, Method.Reader.Create) : default;
-            public IReadOnlyList<Superclass.Reader> Interface_Superclasses => IsInterface ? State.ReadListOfStructs(4, Superclass.Reader.Create) : default;
-            public bool IsConst => Tag == 4;
-            public Type.Reader Const_Type => IsConst ? State.ReadStruct(3, Type.Reader.Create) : default;
-            public Value.Reader Const_Value => IsConst ? State.ReadStruct(4, Value.Reader.Create) : default;
-            public bool IsAnnotation => Tag == 5;
-            public Type.Reader Annotation_Type => IsAnnotation ? State.ReadStruct(3, Type.Reader.Create) : default;
-            public bool Annotation_TargetsFile => IsAnnotation ? State.ReadDataBool(112) : default;
-            public bool Annotation_TargetsConst => IsAnnotation ? State.ReadDataBool(113) : default;
-            public bool Annotation_TargetsEnum => IsAnnotation ? State.ReadDataBool(114) : default;
-            public bool Annotation_TargetsEnumerant => IsAnnotation ? State.ReadDataBool(115) : default;
-            public bool Annotation_TargetsStruct => IsAnnotation ? State.ReadDataBool(116) : default;
-            public bool Annotation_TargetsField => IsAnnotation ? State.ReadDataBool(117) : default;
-            public bool Annotation_TargetsUnion => IsAnnotation ? State.ReadDataBool(118) : default;
-            public bool Annotation_TargetsGroup => IsAnnotation ? State.ReadDataBool(119) : default;
-            public bool Annotation_TargetsInterface => IsAnnotation ? State.ReadDataBool(120) : default;
-            public bool Annotation_TargetsMethod => IsAnnotation ? State.ReadDataBool(121) : default;
-            public bool Annotation_TargetsParam => IsAnnotation ? State.ReadDataBool(122) : default;
-            public bool Annotation_TargetsAnnotation => IsAnnotation ? State.ReadDataBool(123) : default;
-        }
-
-        public class Writer: SerializerState
-        {
-            public Writer()
-            {
-                SetStruct(5, 6);
-            }
-
-            public ulong Id
-            {
-                get => this.ReadDataULong(0);
-                set => this.WriteData(0, value);
+                get => this.ReadDataULong(0UL, 0UL);
+                set => this.WriteData(0UL, value, 0UL);
             }
 
             public string DisplayName
             {
-                get => ReadText(0);
-                set => WriteText(0, value);
+                get => this.ReadText(0, null);
+                set => this.WriteText(0, value, null);
             }
 
-            public ref uint DisplayNamePrefixLength => ref this.RefData<uint>(2);
-
-            public ref ulong ScopeId => ref this.RefData<ulong>(2);
-
-            public ListOfStructsSerializer<Parameter.Writer> Parameters
+            public uint DisplayNamePrefixLength
             {
-                get => BuildPointer<ListOfStructsSerializer<Parameter.Writer>>(5);
+                get => this.ReadDataUInt(64UL, 0U);
+                set => this.WriteData(64UL, value, 0U);
+            }
+
+            public ulong ScopeId
+            {
+                get => this.ReadDataULong(128UL, 0UL);
+                set => this.WriteData(128UL, value, 0UL);
+            }
+
+            public ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Node.NestedNode.WRITER> NestedNodes
+            {
+                get => BuildPointer<ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Node.NestedNode.WRITER>>(1);
+                set => Link(1, value);
+            }
+
+            public ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Annotation.WRITER> Annotations
+            {
+                get => BuildPointer<ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Annotation.WRITER>>(2);
+                set => Link(2, value);
+            }
+
+            public @struct.WRITER Struct
+            {
+                get => which == WHICH.Struct ? Rewrap<@struct.WRITER>() : default;
+            }
+
+            public @enum.WRITER Enum
+            {
+                get => which == WHICH.Enum ? Rewrap<@enum.WRITER>() : default;
+            }
+
+            public @interface.WRITER Interface
+            {
+                get => which == WHICH.Interface ? Rewrap<@interface.WRITER>() : default;
+            }
+
+            public @const.WRITER Const
+            {
+                get => which == WHICH.Const ? Rewrap<@const.WRITER>() : default;
+            }
+
+            public annotation.WRITER Annotation
+            {
+                get => which == WHICH.Annotation ? Rewrap<annotation.WRITER>() : default;
+            }
+
+            public ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Node.Parameter.WRITER> Parameters
+            {
+                get => BuildPointer<ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Node.Parameter.WRITER>>(5);
                 set => Link(5, value);
             }
 
             public bool IsGeneric
             {
-                get => this.ReadDataBool(288);
-                set => this.WriteData(288, value);
-            }
-
-            public ListOfStructsSerializer<NestedNode.Writer> NestedNodes
-            {
-                get => BuildPointer<ListOfStructsSerializer<NestedNode.Writer>>(1);
-                set => Link(1, value);
-            }
-
-            public ListOfStructsSerializer<Annotation.Writer> Annotations
-            {
-                get => BuildPointer<ListOfStructsSerializer<Annotation.Writer>>(2);
-                set => Link(2, value);
-            }
-
-            public ref ushort Tag => ref this.RefData<ushort>(6);
-
-            public bool IsFile
-            {
-                get => Tag == 0;
-                set => Tag = 0;
-            }
-
-            public bool IsStruct
-            {
-                get => Tag == 1;
-                set => Tag = 1;
-            }
-
-            public ref ushort Struct_DataWordCount => ref this.RefData<ushort>(7);
-
-            public ref ushort Struct_PointerCount => ref this.RefData<ushort>(12);
-
-            public ref ElementSize Struct_PreferredListEncoding => ref this.RefData<ElementSize>(13);
-
-            public bool Struct_IsGroup
-            {
-                get => IsStruct ? this.ReadDataBool(224) : default;
-                set => this.WriteData(224, value);
-            }
-
-            public ref ushort Struct_DiscriminantCount => ref this.RefData<ushort>(15);
-
-            public ref uint Struct_DiscriminantOffset => ref this.RefData<uint>(8);
-
-            public ListOfStructsSerializer<Field.Writer> Fields
-            {
-                get => BuildPointer<ListOfStructsSerializer<Field.Writer>>(3);
-                set => Link(3, value);
-            }
-
-            public bool IsEnum
-            {
-                get => Tag == 2;
-                set => Tag = 2;
-            }
-
-            public ListOfStructsSerializer<Field.Writer> Enumerants
-            {
-                get => BuildPointer<ListOfStructsSerializer<Field.Writer>>(3);
-                set => Link(3, value);
-            }
-
-            public bool IsInterface
-            {
-                get => Tag == 3;
-                set => Tag = 3;
-            }
-
-            public ListOfStructsSerializer<Method.Writer> Interface_Methods
-            {
-                get => BuildPointer<ListOfStructsSerializer<Method.Writer>>(3);
-                set => Link(3, value);
-            }
-
-            public ListOfStructsSerializer<Superclass.Writer> Interface_Superclasses
-            {
-                get => IsInterface ? BuildPointer<ListOfStructsSerializer<Superclass.Writer>>(4) : default;
-                set => Link(4, value);
-            }
-
-            public bool IsConst
-            {
-                get => Tag == 4;
-                set => Tag = 4;
-            }
-
-            public Type.Writer Const_Type
-            {
-                get => IsConst ? BuildPointer<Type.Writer>(3) : default;
-                set => Link(3, value);
-            }
-
-            public Value.Writer Const_Value
-            {
-                get => IsConst ? BuildPointer<Value.Writer>(4) : default;
-                set => Link(4, value);
-            }
-
-            public bool IsAnnotation
-            {
-                get => Tag == 5;
-                set => Tag = 5;
-            }
-
-            public Type.Writer Annotation_Type
-            {
-                get => IsAnnotation ? BuildPointer<Type.Writer>(3) : default;
-                set => Link(3, value);
-            }
-
-            public bool Annotation_TargetsFile
-            {
-                get => IsAnnotation ? this.ReadDataBool(112) : default;
-                set => this.WriteData(112, value);
-            }
-
-            public bool Annotation_TargetsConst
-            {
-                get => IsAnnotation ? this.ReadDataBool(113) : default;
-                set => this.WriteData(113, value);
-            }
-
-            public bool Annotation_TargetsEnum
-            {
-                get => IsAnnotation ? this.ReadDataBool(114) : default;
-                set => this.WriteData(114, value);
-            }
-
-            public bool Annotation_TargetsEnumerant
-            {
-                get => IsAnnotation ? this.ReadDataBool(115) : default;
-                set => this.WriteData(115, value);
-            }
-
-            public bool Annotation_TargetsStruct
-            {
-                get => IsAnnotation ? this.ReadDataBool(116) : default;
-                set => this.WriteData(116, value);
-            }
-
-            public bool Annotation_TargetsField
-            {
-                get => IsAnnotation ? this.ReadDataBool(117) : default;
-                set => this.WriteData(117, value);
-            }
-
-            public bool Annotation_TargetsUnion
-            {
-                get => IsAnnotation ? this.ReadDataBool(118) : default;
-                set => this.WriteData(118, value);
-            }
-
-            public bool Annotation_TargetsGroup
-            {
-                get => IsAnnotation ? this.ReadDataBool(119) : default;
-                set => this.WriteData(119, value);
-            }
-
-            public bool Annotation_TargetsInterface
-            {
-                get => IsAnnotation ? this.ReadDataBool(120) : default;
-                set => this.WriteData(120, value);
-            }
-
-            public bool Annotation_TargetsMethod
-            {
-                get => IsAnnotation ? this.ReadDataBool(121) : default;
-                set => this.WriteData(121, value);
-            }
-
-            public bool Annotation_TargetsParam
-            {
-                get => IsAnnotation ? this.ReadDataBool(122) : default;
-                set => this.WriteData(122, value);
-            }
-
-            public bool Annotation_TargetsAnnotation
-            {
-                get => IsAnnotation ? this.ReadDataBool(123) : default;
-                set => this.WriteData(123, value);
+                get => this.ReadDataBool(288UL, false);
+                set => this.WriteData(288UL, value, false);
             }
         }
-    }
 
-    namespace CapnpVersion
-    {
-        public struct Reader
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9ea0b19b37fb4435UL)]
+        public class @struct : ICapnpSerializable
         {
-            public DeserializerState State { get; }
-
-            public Reader(DeserializerState ctx)
+            public const UInt64 typeId = 0x9ea0b19b37fb4435UL;
+            void ICapnpSerializable.Deserialize(DeserializerState arg_)
             {
-                State = ctx;
+                var reader = READER.create(arg_);
+                DataWordCount = reader.DataWordCount;
+                PointerCount = reader.PointerCount;
+                PreferredListEncoding = reader.PreferredListEncoding;
+                IsGroup = reader.IsGroup;
+                DiscriminantCount = reader.DiscriminantCount;
+                DiscriminantOffset = reader.DiscriminantOffset;
+                Fields = reader.Fields?.ToReadOnlyList(_ => CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Field>(_));
+                applyDefaults();
             }
 
-            public static Reader Create(DeserializerState ctx) => new Reader(ctx);
+            public void serialize(WRITER writer)
+            {
+                writer.DataWordCount = DataWordCount;
+                writer.PointerCount = PointerCount;
+                writer.PreferredListEncoding = PreferredListEncoding;
+                writer.IsGroup = IsGroup;
+                writer.DiscriminantCount = DiscriminantCount;
+                writer.DiscriminantOffset = DiscriminantOffset;
+                writer.Fields.Init(Fields, (_s1, _v1) => _v1?.serialize(_s1));
+            }
 
-            public ushort Major => State.ReadDataUShort(0);
-            public byte Minor => State.ReadDataByte(16);
-            public byte Micro => State.ReadDataByte(24);
+            void ICapnpSerializable.Serialize(SerializerState arg_)
+            {
+                serialize(arg_.Rewrap<WRITER>());
+            }
+
+            public void applyDefaults()
+            {
+            }
+
+            public ushort DataWordCount
+            {
+                get;
+                set;
+            }
+
+            public ushort PointerCount
+            {
+                get;
+                set;
+            }
+
+            public CapnpC.CSharp.Generator.Schema.ElementSize PreferredListEncoding
+            {
+                get;
+                set;
+            }
+
+            public bool IsGroup
+            {
+                get;
+                set;
+            }
+
+            public ushort DiscriminantCount
+            {
+                get;
+                set;
+            }
+
+            public uint DiscriminantOffset
+            {
+                get;
+                set;
+            }
+
+            public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Field> Fields
+            {
+                get;
+                set;
+            }
+
+            public struct READER
+            {
+                readonly DeserializerState ctx;
+                public READER(DeserializerState ctx)
+                {
+                    this.ctx = ctx;
+                }
+
+                public static READER create(DeserializerState ctx) => new READER(ctx);
+                public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                public ushort DataWordCount => ctx.ReadDataUShort(112UL, (ushort)0);
+                public ushort PointerCount => ctx.ReadDataUShort(192UL, (ushort)0);
+                public CapnpC.CSharp.Generator.Schema.ElementSize PreferredListEncoding => (CapnpC.CSharp.Generator.Schema.ElementSize)ctx.ReadDataUShort(208UL, (ushort)0);
+                public bool IsGroup => ctx.ReadDataBool(224UL, false);
+                public ushort DiscriminantCount => ctx.ReadDataUShort(240UL, (ushort)0);
+                public uint DiscriminantOffset => ctx.ReadDataUInt(256UL, 0U);
+                public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Field.READER> Fields => ctx.ReadList(3).Cast(CapnpC.CSharp.Generator.Schema.Field.READER.create);
+            }
+
+            public class WRITER : SerializerState
+            {
+                public WRITER()
+                {
+                }
+
+                public ushort DataWordCount
+                {
+                    get => this.ReadDataUShort(112UL, (ushort)0);
+                    set => this.WriteData(112UL, value, (ushort)0);
+                }
+
+                public ushort PointerCount
+                {
+                    get => this.ReadDataUShort(192UL, (ushort)0);
+                    set => this.WriteData(192UL, value, (ushort)0);
+                }
+
+                public CapnpC.CSharp.Generator.Schema.ElementSize PreferredListEncoding
+                {
+                    get => (CapnpC.CSharp.Generator.Schema.ElementSize)this.ReadDataUShort(208UL, (ushort)0);
+                    set => this.WriteData(208UL, (ushort)value, (ushort)0);
+                }
+
+                public bool IsGroup
+                {
+                    get => this.ReadDataBool(224UL, false);
+                    set => this.WriteData(224UL, value, false);
+                }
+
+                public ushort DiscriminantCount
+                {
+                    get => this.ReadDataUShort(240UL, (ushort)0);
+                    set => this.WriteData(240UL, value, (ushort)0);
+                }
+
+                public uint DiscriminantOffset
+                {
+                    get => this.ReadDataUInt(256UL, 0U);
+                    set => this.WriteData(256UL, value, 0U);
+                }
+
+                public ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Field.WRITER> Fields
+                {
+                    get => BuildPointer<ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Field.WRITER>>(3);
+                    set => Link(3, value);
+                }
+            }
         }
 
-        public class Writer: SerializerState
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xb54ab3364333f598UL)]
+        public class @enum : ICapnpSerializable
         {
-            public Writer()
+            public const UInt64 typeId = 0xb54ab3364333f598UL;
+            void ICapnpSerializable.Deserialize(DeserializerState arg_)
             {
-                SetStruct(1, 0);
+                var reader = READER.create(arg_);
+                Enumerants = reader.Enumerants?.ToReadOnlyList(_ => CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Enumerant>(_));
+                applyDefaults();
             }
 
-            public ref ushort Major => ref this.RefData<ushort>(0);
-            public ref byte Minor => ref this.RefData<byte>(2);
-            public ref byte Micro => ref this.RefData<byte>(3);
+            public void serialize(WRITER writer)
+            {
+                writer.Enumerants.Init(Enumerants, (_s1, _v1) => _v1?.serialize(_s1));
+            }
+
+            void ICapnpSerializable.Serialize(SerializerState arg_)
+            {
+                serialize(arg_.Rewrap<WRITER>());
+            }
+
+            public void applyDefaults()
+            {
+            }
+
+            public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Enumerant> Enumerants
+            {
+                get;
+                set;
+            }
+
+            public struct READER
+            {
+                readonly DeserializerState ctx;
+                public READER(DeserializerState ctx)
+                {
+                    this.ctx = ctx;
+                }
+
+                public static READER create(DeserializerState ctx) => new READER(ctx);
+                public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Enumerant.READER> Enumerants => ctx.ReadList(3).Cast(CapnpC.CSharp.Generator.Schema.Enumerant.READER.create);
+            }
+
+            public class WRITER : SerializerState
+            {
+                public WRITER()
+                {
+                }
+
+                public ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Enumerant.WRITER> Enumerants
+                {
+                    get => BuildPointer<ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Enumerant.WRITER>>(3);
+                    set => Link(3, value);
+                }
+            }
         }
-    }
 
-    namespace CodeGeneratorRequest
-    {
-        namespace RequestedFile
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xe82753cff0c2218fUL)]
+        public class @interface : ICapnpSerializable
         {
-            namespace Import
+            public const UInt64 typeId = 0xe82753cff0c2218fUL;
+            void ICapnpSerializable.Deserialize(DeserializerState arg_)
             {
-                public struct Reader
-                {
-                    public DeserializerState State { get; }
-
-                    public Reader(DeserializerState ctx)
-                    {
-                        State = ctx;
-                    }
-
-                    public static Reader Create(DeserializerState ctx) => new Reader(ctx);
-
-                    public ulong Id => State.ReadDataULong(0);
-                    public string Name => State.ReadText(0);
-                }
-
-                public class Writer: SerializerState
-                {
-                    public Writer()
-                    {
-                        SetStruct(1, 1);
-                    }
-
-                    public ref ulong Id => ref this.RefData<ulong>(0);
-
-                    public string Name
-                    {
-                        get => ReadText(0);
-                        set => WriteText(0, value);
-                    }
-                }
+                var reader = READER.create(arg_);
+                Methods = reader.Methods?.ToReadOnlyList(_ => CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Method>(_));
+                Superclasses = reader.Superclasses?.ToReadOnlyList(_ => CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Superclass>(_));
+                applyDefaults();
             }
 
-            public struct Reader
+            public void serialize(WRITER writer)
             {
-                public DeserializerState State { get; }
-
-                public Reader(DeserializerState ctx)
-                {
-                    State = ctx;
-                }
-
-                public static Reader Create(DeserializerState ctx) => new Reader(ctx);
-
-                public ulong Id => State.ReadDataULong(0);
-                public string Filename => State.ReadText(0);
-                public IReadOnlyList<Import.Reader> Imports => State.ReadListOfStructs(1, Import.Reader.Create);
+                writer.Methods.Init(Methods, (_s1, _v1) => _v1?.serialize(_s1));
+                writer.Superclasses.Init(Superclasses, (_s1, _v1) => _v1?.serialize(_s1));
             }
 
-            public class Writer: SerializerState
+            void ICapnpSerializable.Serialize(SerializerState arg_)
             {
-                public Writer()
+                serialize(arg_.Rewrap<WRITER>());
+            }
+
+            public void applyDefaults()
+            {
+            }
+
+            public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Method> Methods
+            {
+                get;
+                set;
+            }
+
+            public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Superclass> Superclasses
+            {
+                get;
+                set;
+            }
+
+            public struct READER
+            {
+                readonly DeserializerState ctx;
+                public READER(DeserializerState ctx)
                 {
-                    SetStruct(1, 2);
+                    this.ctx = ctx;
                 }
 
-                public ref ulong Id => ref this.RefData<ulong>(0);
+                public static READER create(DeserializerState ctx) => new READER(ctx);
+                public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Method.READER> Methods => ctx.ReadList(3).Cast(CapnpC.CSharp.Generator.Schema.Method.READER.create);
+                public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Superclass.READER> Superclasses => ctx.ReadList(4).Cast(CapnpC.CSharp.Generator.Schema.Superclass.READER.create);
+            }
 
-                public string Filename
+            public class WRITER : SerializerState
+            {
+                public WRITER()
                 {
-                    get => ReadText(0);
-                    set => WriteText(0, value);
                 }
 
-                public ListOfStructsSerializer<Import.Writer> Imports
+                public ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Method.WRITER> Methods
                 {
-                    get => BuildPointer<ListOfStructsSerializer<Import.Writer>>(1);
+                    get => BuildPointer<ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Method.WRITER>>(3);
+                    set => Link(3, value);
+                }
+
+                public ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Superclass.WRITER> Superclasses
+                {
+                    get => BuildPointer<ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Superclass.WRITER>>(4);
+                    set => Link(4, value);
+                }
+            }
+        }
+
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xb18aa5ac7a0d9420UL)]
+        public class @const : ICapnpSerializable
+        {
+            public const UInt64 typeId = 0xb18aa5ac7a0d9420UL;
+            void ICapnpSerializable.Deserialize(DeserializerState arg_)
+            {
+                var reader = READER.create(arg_);
+                Type = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Type>(reader.Type);
+                Value = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Value>(reader.Value);
+                applyDefaults();
+            }
+
+            public void serialize(WRITER writer)
+            {
+                Type?.serialize(writer.Type);
+                Value?.serialize(writer.Value);
+            }
+
+            void ICapnpSerializable.Serialize(SerializerState arg_)
+            {
+                serialize(arg_.Rewrap<WRITER>());
+            }
+
+            public void applyDefaults()
+            {
+            }
+
+            public CapnpC.CSharp.Generator.Schema.Type Type
+            {
+                get;
+                set;
+            }
+
+            public CapnpC.CSharp.Generator.Schema.Value Value
+            {
+                get;
+                set;
+            }
+
+            public struct READER
+            {
+                readonly DeserializerState ctx;
+                public READER(DeserializerState ctx)
+                {
+                    this.ctx = ctx;
+                }
+
+                public static READER create(DeserializerState ctx) => new READER(ctx);
+                public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                public CapnpC.CSharp.Generator.Schema.Type.READER Type => ctx.ReadStruct(3, CapnpC.CSharp.Generator.Schema.Type.READER.create);
+                public CapnpC.CSharp.Generator.Schema.Value.READER Value => ctx.ReadStruct(4, CapnpC.CSharp.Generator.Schema.Value.READER.create);
+            }
+
+            public class WRITER : SerializerState
+            {
+                public WRITER()
+                {
+                }
+
+                public CapnpC.CSharp.Generator.Schema.Type.WRITER Type
+                {
+                    get => BuildPointer<CapnpC.CSharp.Generator.Schema.Type.WRITER>(3);
+                    set => Link(3, value);
+                }
+
+                public CapnpC.CSharp.Generator.Schema.Value.WRITER Value
+                {
+                    get => BuildPointer<CapnpC.CSharp.Generator.Schema.Value.WRITER>(4);
+                    set => Link(4, value);
+                }
+            }
+        }
+
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xec1619d4400a0290UL)]
+        public class annotation : ICapnpSerializable
+        {
+            public const UInt64 typeId = 0xec1619d4400a0290UL;
+            void ICapnpSerializable.Deserialize(DeserializerState arg_)
+            {
+                var reader = READER.create(arg_);
+                Type = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Type>(reader.Type);
+                TargetsFile = reader.TargetsFile;
+                TargetsConst = reader.TargetsConst;
+                TargetsEnum = reader.TargetsEnum;
+                TargetsEnumerant = reader.TargetsEnumerant;
+                TargetsStruct = reader.TargetsStruct;
+                TargetsField = reader.TargetsField;
+                TargetsUnion = reader.TargetsUnion;
+                TargetsGroup = reader.TargetsGroup;
+                TargetsInterface = reader.TargetsInterface;
+                TargetsMethod = reader.TargetsMethod;
+                TargetsParam = reader.TargetsParam;
+                TargetsAnnotation = reader.TargetsAnnotation;
+                applyDefaults();
+            }
+
+            public void serialize(WRITER writer)
+            {
+                Type?.serialize(writer.Type);
+                writer.TargetsFile = TargetsFile;
+                writer.TargetsConst = TargetsConst;
+                writer.TargetsEnum = TargetsEnum;
+                writer.TargetsEnumerant = TargetsEnumerant;
+                writer.TargetsStruct = TargetsStruct;
+                writer.TargetsField = TargetsField;
+                writer.TargetsUnion = TargetsUnion;
+                writer.TargetsGroup = TargetsGroup;
+                writer.TargetsInterface = TargetsInterface;
+                writer.TargetsMethod = TargetsMethod;
+                writer.TargetsParam = TargetsParam;
+                writer.TargetsAnnotation = TargetsAnnotation;
+            }
+
+            void ICapnpSerializable.Serialize(SerializerState arg_)
+            {
+                serialize(arg_.Rewrap<WRITER>());
+            }
+
+            public void applyDefaults()
+            {
+            }
+
+            public CapnpC.CSharp.Generator.Schema.Type Type
+            {
+                get;
+                set;
+            }
+
+            public bool TargetsFile
+            {
+                get;
+                set;
+            }
+
+            public bool TargetsConst
+            {
+                get;
+                set;
+            }
+
+            public bool TargetsEnum
+            {
+                get;
+                set;
+            }
+
+            public bool TargetsEnumerant
+            {
+                get;
+                set;
+            }
+
+            public bool TargetsStruct
+            {
+                get;
+                set;
+            }
+
+            public bool TargetsField
+            {
+                get;
+                set;
+            }
+
+            public bool TargetsUnion
+            {
+                get;
+                set;
+            }
+
+            public bool TargetsGroup
+            {
+                get;
+                set;
+            }
+
+            public bool TargetsInterface
+            {
+                get;
+                set;
+            }
+
+            public bool TargetsMethod
+            {
+                get;
+                set;
+            }
+
+            public bool TargetsParam
+            {
+                get;
+                set;
+            }
+
+            public bool TargetsAnnotation
+            {
+                get;
+                set;
+            }
+
+            public struct READER
+            {
+                readonly DeserializerState ctx;
+                public READER(DeserializerState ctx)
+                {
+                    this.ctx = ctx;
+                }
+
+                public static READER create(DeserializerState ctx) => new READER(ctx);
+                public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                public CapnpC.CSharp.Generator.Schema.Type.READER Type => ctx.ReadStruct(3, CapnpC.CSharp.Generator.Schema.Type.READER.create);
+                public bool TargetsFile => ctx.ReadDataBool(112UL, false);
+                public bool TargetsConst => ctx.ReadDataBool(113UL, false);
+                public bool TargetsEnum => ctx.ReadDataBool(114UL, false);
+                public bool TargetsEnumerant => ctx.ReadDataBool(115UL, false);
+                public bool TargetsStruct => ctx.ReadDataBool(116UL, false);
+                public bool TargetsField => ctx.ReadDataBool(117UL, false);
+                public bool TargetsUnion => ctx.ReadDataBool(118UL, false);
+                public bool TargetsGroup => ctx.ReadDataBool(119UL, false);
+                public bool TargetsInterface => ctx.ReadDataBool(120UL, false);
+                public bool TargetsMethod => ctx.ReadDataBool(121UL, false);
+                public bool TargetsParam => ctx.ReadDataBool(122UL, false);
+                public bool TargetsAnnotation => ctx.ReadDataBool(123UL, false);
+            }
+
+            public class WRITER : SerializerState
+            {
+                public WRITER()
+                {
+                }
+
+                public CapnpC.CSharp.Generator.Schema.Type.WRITER Type
+                {
+                    get => BuildPointer<CapnpC.CSharp.Generator.Schema.Type.WRITER>(3);
+                    set => Link(3, value);
+                }
+
+                public bool TargetsFile
+                {
+                    get => this.ReadDataBool(112UL, false);
+                    set => this.WriteData(112UL, value, false);
+                }
+
+                public bool TargetsConst
+                {
+                    get => this.ReadDataBool(113UL, false);
+                    set => this.WriteData(113UL, value, false);
+                }
+
+                public bool TargetsEnum
+                {
+                    get => this.ReadDataBool(114UL, false);
+                    set => this.WriteData(114UL, value, false);
+                }
+
+                public bool TargetsEnumerant
+                {
+                    get => this.ReadDataBool(115UL, false);
+                    set => this.WriteData(115UL, value, false);
+                }
+
+                public bool TargetsStruct
+                {
+                    get => this.ReadDataBool(116UL, false);
+                    set => this.WriteData(116UL, value, false);
+                }
+
+                public bool TargetsField
+                {
+                    get => this.ReadDataBool(117UL, false);
+                    set => this.WriteData(117UL, value, false);
+                }
+
+                public bool TargetsUnion
+                {
+                    get => this.ReadDataBool(118UL, false);
+                    set => this.WriteData(118UL, value, false);
+                }
+
+                public bool TargetsGroup
+                {
+                    get => this.ReadDataBool(119UL, false);
+                    set => this.WriteData(119UL, value, false);
+                }
+
+                public bool TargetsInterface
+                {
+                    get => this.ReadDataBool(120UL, false);
+                    set => this.WriteData(120UL, value, false);
+                }
+
+                public bool TargetsMethod
+                {
+                    get => this.ReadDataBool(121UL, false);
+                    set => this.WriteData(121UL, value, false);
+                }
+
+                public bool TargetsParam
+                {
+                    get => this.ReadDataBool(122UL, false);
+                    set => this.WriteData(122UL, value, false);
+                }
+
+                public bool TargetsAnnotation
+                {
+                    get => this.ReadDataBool(123UL, false);
+                    set => this.WriteData(123UL, value, false);
+                }
+            }
+        }
+
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xb9521bccf10fa3b1UL)]
+        public class Parameter : ICapnpSerializable
+        {
+            public const UInt64 typeId = 0xb9521bccf10fa3b1UL;
+            void ICapnpSerializable.Deserialize(DeserializerState arg_)
+            {
+                var reader = READER.create(arg_);
+                Name = reader.Name;
+                applyDefaults();
+            }
+
+            public void serialize(WRITER writer)
+            {
+                writer.Name = Name;
+            }
+
+            void ICapnpSerializable.Serialize(SerializerState arg_)
+            {
+                serialize(arg_.Rewrap<WRITER>());
+            }
+
+            public void applyDefaults()
+            {
+            }
+
+            public string Name
+            {
+                get;
+                set;
+            }
+
+            public struct READER
+            {
+                readonly DeserializerState ctx;
+                public READER(DeserializerState ctx)
+                {
+                    this.ctx = ctx;
+                }
+
+                public static READER create(DeserializerState ctx) => new READER(ctx);
+                public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                public string Name => ctx.ReadText(0, null);
+            }
+
+            public class WRITER : SerializerState
+            {
+                public WRITER()
+                {
+                    this.SetStruct(0, 1);
+                }
+
+                public string Name
+                {
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
+                }
+            }
+        }
+
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xdebf55bbfa0fc242UL)]
+        public class NestedNode : ICapnpSerializable
+        {
+            public const UInt64 typeId = 0xdebf55bbfa0fc242UL;
+            void ICapnpSerializable.Deserialize(DeserializerState arg_)
+            {
+                var reader = READER.create(arg_);
+                Name = reader.Name;
+                Id = reader.Id;
+                applyDefaults();
+            }
+
+            public void serialize(WRITER writer)
+            {
+                writer.Name = Name;
+                writer.Id = Id;
+            }
+
+            void ICapnpSerializable.Serialize(SerializerState arg_)
+            {
+                serialize(arg_.Rewrap<WRITER>());
+            }
+
+            public void applyDefaults()
+            {
+            }
+
+            public string Name
+            {
+                get;
+                set;
+            }
+
+            public ulong Id
+            {
+                get;
+                set;
+            }
+
+            public struct READER
+            {
+                readonly DeserializerState ctx;
+                public READER(DeserializerState ctx)
+                {
+                    this.ctx = ctx;
+                }
+
+                public static READER create(DeserializerState ctx) => new READER(ctx);
+                public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                public string Name => ctx.ReadText(0, null);
+                public ulong Id => ctx.ReadDataULong(0UL, 0UL);
+            }
+
+            public class WRITER : SerializerState
+            {
+                public WRITER()
+                {
+                    this.SetStruct(1, 1);
+                }
+
+                public string Name
+                {
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
+                }
+
+                public ulong Id
+                {
+                    get => this.ReadDataULong(0UL, 0UL);
+                    set => this.WriteData(0UL, value, 0UL);
+                }
+            }
+        }
+
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xf38e1de3041357aeUL)]
+        public class SourceInfo : ICapnpSerializable
+        {
+            public const UInt64 typeId = 0xf38e1de3041357aeUL;
+            void ICapnpSerializable.Deserialize(DeserializerState arg_)
+            {
+                var reader = READER.create(arg_);
+                Id = reader.Id;
+                DocComment = reader.DocComment;
+                Members = reader.Members?.ToReadOnlyList(_ => CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Node.SourceInfo.Member>(_));
+                applyDefaults();
+            }
+
+            public void serialize(WRITER writer)
+            {
+                writer.Id = Id;
+                writer.DocComment = DocComment;
+                writer.Members.Init(Members, (_s1, _v1) => _v1?.serialize(_s1));
+            }
+
+            void ICapnpSerializable.Serialize(SerializerState arg_)
+            {
+                serialize(arg_.Rewrap<WRITER>());
+            }
+
+            public void applyDefaults()
+            {
+            }
+
+            public ulong Id
+            {
+                get;
+                set;
+            }
+
+            public string DocComment
+            {
+                get;
+                set;
+            }
+
+            public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Node.SourceInfo.Member> Members
+            {
+                get;
+                set;
+            }
+
+            public struct READER
+            {
+                readonly DeserializerState ctx;
+                public READER(DeserializerState ctx)
+                {
+                    this.ctx = ctx;
+                }
+
+                public static READER create(DeserializerState ctx) => new READER(ctx);
+                public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                public ulong Id => ctx.ReadDataULong(0UL, 0UL);
+                public string DocComment => ctx.ReadText(0, null);
+                public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Node.SourceInfo.Member.READER> Members => ctx.ReadList(1).Cast(CapnpC.CSharp.Generator.Schema.Node.SourceInfo.Member.READER.create);
+            }
+
+            public class WRITER : SerializerState
+            {
+                public WRITER()
+                {
+                    this.SetStruct(1, 2);
+                }
+
+                public ulong Id
+                {
+                    get => this.ReadDataULong(0UL, 0UL);
+                    set => this.WriteData(0UL, value, 0UL);
+                }
+
+                public string DocComment
+                {
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
+                }
+
+                public ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Node.SourceInfo.Member.WRITER> Members
+                {
+                    get => BuildPointer<ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Node.SourceInfo.Member.WRITER>>(1);
                     set => Link(1, value);
                 }
             }
+
+            [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc2ba9038898e1fa2UL)]
+            public class Member : ICapnpSerializable
+            {
+                public const UInt64 typeId = 0xc2ba9038898e1fa2UL;
+                void ICapnpSerializable.Deserialize(DeserializerState arg_)
+                {
+                    var reader = READER.create(arg_);
+                    DocComment = reader.DocComment;
+                    applyDefaults();
+                }
+
+                public void serialize(WRITER writer)
+                {
+                    writer.DocComment = DocComment;
+                }
+
+                void ICapnpSerializable.Serialize(SerializerState arg_)
+                {
+                    serialize(arg_.Rewrap<WRITER>());
+                }
+
+                public void applyDefaults()
+                {
+                }
+
+                public string DocComment
+                {
+                    get;
+                    set;
+                }
+
+                public struct READER
+                {
+                    readonly DeserializerState ctx;
+                    public READER(DeserializerState ctx)
+                    {
+                        this.ctx = ctx;
+                    }
+
+                    public static READER create(DeserializerState ctx) => new READER(ctx);
+                    public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                    public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                    public string DocComment => ctx.ReadText(0, null);
+                }
+
+                public class WRITER : SerializerState
+                {
+                    public WRITER()
+                    {
+                        this.SetStruct(0, 1);
+                    }
+
+                    public string DocComment
+                    {
+                        get => this.ReadText(0, null);
+                        set => this.WriteText(0, value, null);
+                    }
+                }
+            }
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9aad50a41f4af45fUL)]
+    public class Field : ICapnpSerializable
+    {
+        public const UInt64 typeId = 0x9aad50a41f4af45fUL;
+        public enum WHICH : ushort
+        {
+            Slot = 0,
+            Group = 1,
+            undefined = 65535
         }
 
-        public struct Reader
+        void ICapnpSerializable.Deserialize(DeserializerState arg_)
         {
-            public DeserializerState State { get; }
-
-            public Reader(DeserializerState ctx)
+            var reader = READER.create(arg_);
+            switch (reader.which)
             {
-                State = ctx;
+                case WHICH.Slot:
+                    Slot = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Field.slot>(reader.Slot);
+                    break;
+                case WHICH.Group:
+                    Group = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Field.@group>(reader.Group);
+                    break;
             }
 
-            public static Reader Create(DeserializerState ctx) => new Reader(ctx);
-
-            public CapnpVersion.Reader CapnpVersion => State.ReadStruct(2, Schema.CapnpVersion.Reader.Create);
-            public IReadOnlyList<Node.Reader> Nodes => State.ReadListOfStructs(0, Node.Reader.Create);
-            public IReadOnlyList<Node.SourceInfo.Reader> SourceInfo => State.ReadListOfStructs(3, Node.SourceInfo.Reader.Create);
-            public IReadOnlyList<RequestedFile.Reader> RequestedFiles => State.ReadListOfStructs(1, RequestedFile.Reader.Create);
+            Name = reader.Name;
+            CodeOrder = reader.CodeOrder;
+            Annotations = reader.Annotations?.ToReadOnlyList(_ => CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Annotation>(_));
+            DiscriminantValue = reader.DiscriminantValue;
+            Ordinal = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Field.ordinal>(reader.Ordinal);
+            applyDefaults();
         }
 
-        public class Writer: SerializerState
+        private WHICH _which = WHICH.undefined;
+        private object _content;
+        public WHICH which
         {
-            public Writer()
+            get => _which;
+            set
             {
-                SetStruct(0, 3);
+                if (value == _which)
+                    return;
+                _which = value;
+                switch (value)
+                {
+                    case WHICH.Slot:
+                        _content = null;
+                        break;
+                    case WHICH.Group:
+                        _content = null;
+                        break;
+                }
+            }
+        }
+
+        public void serialize(WRITER writer)
+        {
+            writer.which = which;
+            switch (which)
+            {
+                case WHICH.Slot:
+                    Slot?.serialize(writer.Slot);
+                    break;
+                case WHICH.Group:
+                    Group?.serialize(writer.Group);
+                    break;
             }
 
-            public CapnpVersion.Writer CapnpVersion
+            writer.Name = Name;
+            writer.CodeOrder = CodeOrder;
+            writer.Annotations.Init(Annotations, (_s1, _v1) => _v1?.serialize(_s1));
+            writer.DiscriminantValue = DiscriminantValue;
+            Ordinal?.serialize(writer.Ordinal);
+        }
+
+        void ICapnpSerializable.Serialize(SerializerState arg_)
+        {
+            serialize(arg_.Rewrap<WRITER>());
+        }
+
+        public void applyDefaults()
+        {
+        }
+
+        public string Name
+        {
+            get;
+            set;
+        }
+
+        public ushort CodeOrder
+        {
+            get;
+            set;
+        }
+
+        public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Annotation> Annotations
+        {
+            get;
+            set;
+        }
+
+        public ushort DiscriminantValue
+        {
+            get;
+            set;
+        }
+
+        = 65535;
+        public CapnpC.CSharp.Generator.Schema.Field.slot Slot
+        {
+            get => _which == WHICH.Slot ? (CapnpC.CSharp.Generator.Schema.Field.slot)_content : null;
+            set
             {
-                get => BuildPointer<Schema.CapnpVersion.Writer>(2);
+                _which = WHICH.Slot;
+                _content = value;
+            }
+        }
+
+        public CapnpC.CSharp.Generator.Schema.Field.@group Group
+        {
+            get => _which == WHICH.Group ? (CapnpC.CSharp.Generator.Schema.Field.@group)_content : null;
+            set
+            {
+                _which = WHICH.Group;
+                _content = value;
+            }
+        }
+
+        public CapnpC.CSharp.Generator.Schema.Field.ordinal Ordinal
+        {
+            get;
+            set;
+        }
+
+        public struct READER
+        {
+            readonly DeserializerState ctx;
+            public READER(DeserializerState ctx)
+            {
+                this.ctx = ctx;
+            }
+
+            public static READER create(DeserializerState ctx) => new READER(ctx);
+            public static implicit operator DeserializerState(READER reader) => reader.ctx;
+            public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+            public WHICH which => (WHICH)ctx.ReadDataUShort(64U, (ushort)0);
+            public string Name => ctx.ReadText(0, null);
+            public ushort CodeOrder => ctx.ReadDataUShort(0UL, (ushort)0);
+            public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Annotation.READER> Annotations => ctx.ReadList(1).Cast(CapnpC.CSharp.Generator.Schema.Annotation.READER.create);
+            public ushort DiscriminantValue => ctx.ReadDataUShort(16UL, (ushort)65535);
+            public slot.READER Slot => which == WHICH.Slot ? new slot.READER(ctx) : default;
+            public @group.READER Group => which == WHICH.Group ? new @group.READER(ctx) : default;
+            public ordinal.READER Ordinal => new ordinal.READER(ctx);
+        }
+
+        public class WRITER : SerializerState
+        {
+            public WRITER()
+            {
+                this.SetStruct(3, 4);
+            }
+
+            public WHICH which
+            {
+                get => (WHICH)this.ReadDataUShort(64U, (ushort)0);
+                set => this.WriteData(64U, (ushort)value, (ushort)0);
+            }
+
+            public string Name
+            {
+                get => this.ReadText(0, null);
+                set => this.WriteText(0, value, null);
+            }
+
+            public ushort CodeOrder
+            {
+                get => this.ReadDataUShort(0UL, (ushort)0);
+                set => this.WriteData(0UL, value, (ushort)0);
+            }
+
+            public ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Annotation.WRITER> Annotations
+            {
+                get => BuildPointer<ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Annotation.WRITER>>(1);
+                set => Link(1, value);
+            }
+
+            public ushort DiscriminantValue
+            {
+                get => this.ReadDataUShort(16UL, (ushort)65535);
+                set => this.WriteData(16UL, value, (ushort)65535);
+            }
+
+            public slot.WRITER Slot
+            {
+                get => which == WHICH.Slot ? Rewrap<slot.WRITER>() : default;
+            }
+
+            public @group.WRITER Group
+            {
+                get => which == WHICH.Group ? Rewrap<@group.WRITER>() : default;
+            }
+
+            public ordinal.WRITER Ordinal
+            {
+                get => Rewrap<ordinal.WRITER>();
+            }
+        }
+
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc42305476bb4746fUL)]
+        public class slot : ICapnpSerializable
+        {
+            public const UInt64 typeId = 0xc42305476bb4746fUL;
+            void ICapnpSerializable.Deserialize(DeserializerState arg_)
+            {
+                var reader = READER.create(arg_);
+                Offset = reader.Offset;
+                Type = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Type>(reader.Type);
+                DefaultValue = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Value>(reader.DefaultValue);
+                HadExplicitDefault = reader.HadExplicitDefault;
+                applyDefaults();
+            }
+
+            public void serialize(WRITER writer)
+            {
+                writer.Offset = Offset;
+                Type?.serialize(writer.Type);
+                DefaultValue?.serialize(writer.DefaultValue);
+                writer.HadExplicitDefault = HadExplicitDefault;
+            }
+
+            void ICapnpSerializable.Serialize(SerializerState arg_)
+            {
+                serialize(arg_.Rewrap<WRITER>());
+            }
+
+            public void applyDefaults()
+            {
+            }
+
+            public uint Offset
+            {
+                get;
+                set;
+            }
+
+            public CapnpC.CSharp.Generator.Schema.Type Type
+            {
+                get;
+                set;
+            }
+
+            public CapnpC.CSharp.Generator.Schema.Value DefaultValue
+            {
+                get;
+                set;
+            }
+
+            public bool HadExplicitDefault
+            {
+                get;
+                set;
+            }
+
+            public struct READER
+            {
+                readonly DeserializerState ctx;
+                public READER(DeserializerState ctx)
+                {
+                    this.ctx = ctx;
+                }
+
+                public static READER create(DeserializerState ctx) => new READER(ctx);
+                public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                public uint Offset => ctx.ReadDataUInt(32UL, 0U);
+                public CapnpC.CSharp.Generator.Schema.Type.READER Type => ctx.ReadStruct(2, CapnpC.CSharp.Generator.Schema.Type.READER.create);
+                public CapnpC.CSharp.Generator.Schema.Value.READER DefaultValue => ctx.ReadStruct(3, CapnpC.CSharp.Generator.Schema.Value.READER.create);
+                public bool HadExplicitDefault => ctx.ReadDataBool(128UL, false);
+            }
+
+            public class WRITER : SerializerState
+            {
+                public WRITER()
+                {
+                }
+
+                public uint Offset
+                {
+                    get => this.ReadDataUInt(32UL, 0U);
+                    set => this.WriteData(32UL, value, 0U);
+                }
+
+                public CapnpC.CSharp.Generator.Schema.Type.WRITER Type
+                {
+                    get => BuildPointer<CapnpC.CSharp.Generator.Schema.Type.WRITER>(2);
+                    set => Link(2, value);
+                }
+
+                public CapnpC.CSharp.Generator.Schema.Value.WRITER DefaultValue
+                {
+                    get => BuildPointer<CapnpC.CSharp.Generator.Schema.Value.WRITER>(3);
+                    set => Link(3, value);
+                }
+
+                public bool HadExplicitDefault
+                {
+                    get => this.ReadDataBool(128UL, false);
+                    set => this.WriteData(128UL, value, false);
+                }
+            }
+        }
+
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xcafccddb68db1d11UL)]
+        public class @group : ICapnpSerializable
+        {
+            public const UInt64 typeId = 0xcafccddb68db1d11UL;
+            void ICapnpSerializable.Deserialize(DeserializerState arg_)
+            {
+                var reader = READER.create(arg_);
+                TypeId = reader.TypeId;
+                applyDefaults();
+            }
+
+            public void serialize(WRITER writer)
+            {
+                writer.TypeId = TypeId;
+            }
+
+            void ICapnpSerializable.Serialize(SerializerState arg_)
+            {
+                serialize(arg_.Rewrap<WRITER>());
+            }
+
+            public void applyDefaults()
+            {
+            }
+
+            public ulong TypeId
+            {
+                get;
+                set;
+            }
+
+            public struct READER
+            {
+                readonly DeserializerState ctx;
+                public READER(DeserializerState ctx)
+                {
+                    this.ctx = ctx;
+                }
+
+                public static READER create(DeserializerState ctx) => new READER(ctx);
+                public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                public ulong TypeId => ctx.ReadDataULong(128UL, 0UL);
+            }
+
+            public class WRITER : SerializerState
+            {
+                public WRITER()
+                {
+                }
+
+                public ulong TypeId
+                {
+                    get => this.ReadDataULong(128UL, 0UL);
+                    set => this.WriteData(128UL, value, 0UL);
+                }
+            }
+        }
+
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xbb90d5c287870be6UL)]
+        public class ordinal : ICapnpSerializable
+        {
+            public const UInt64 typeId = 0xbb90d5c287870be6UL;
+            public enum WHICH : ushort
+            {
+                Implicit = 0,
+                Explicit = 1,
+                undefined = 65535
+            }
+
+            void ICapnpSerializable.Deserialize(DeserializerState arg_)
+            {
+                var reader = READER.create(arg_);
+                switch (reader.which)
+                {
+                    case WHICH.Implicit:
+                        which = reader.which;
+                        break;
+                    case WHICH.Explicit:
+                        Explicit = reader.Explicit;
+                        break;
+                }
+
+                applyDefaults();
+            }
+
+            private WHICH _which = WHICH.undefined;
+            private object _content;
+            public WHICH which
+            {
+                get => _which;
+                set
+                {
+                    if (value == _which)
+                        return;
+                    _which = value;
+                    switch (value)
+                    {
+                        case WHICH.Implicit:
+                            break;
+                        case WHICH.Explicit:
+                            _content = 0;
+                            break;
+                    }
+                }
+            }
+
+            public void serialize(WRITER writer)
+            {
+                writer.which = which;
+                switch (which)
+                {
+                    case WHICH.Implicit:
+                        break;
+                    case WHICH.Explicit:
+                        writer.Explicit = Explicit.Value;
+                        break;
+                }
+            }
+
+            void ICapnpSerializable.Serialize(SerializerState arg_)
+            {
+                serialize(arg_.Rewrap<WRITER>());
+            }
+
+            public void applyDefaults()
+            {
+            }
+
+            public ushort? Explicit
+            {
+                get => _which == WHICH.Explicit ? (ushort?)_content : null;
+                set
+                {
+                    _which = WHICH.Explicit;
+                    _content = value;
+                }
+            }
+
+            public struct READER
+            {
+                readonly DeserializerState ctx;
+                public READER(DeserializerState ctx)
+                {
+                    this.ctx = ctx;
+                }
+
+                public static READER create(DeserializerState ctx) => new READER(ctx);
+                public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                public WHICH which => (WHICH)ctx.ReadDataUShort(80U, (ushort)0);
+                public ushort Explicit => which == WHICH.Explicit ? ctx.ReadDataUShort(96UL, (ushort)0) : default;
+            }
+
+            public class WRITER : SerializerState
+            {
+                public WRITER()
+                {
+                }
+
+                public WHICH which
+                {
+                    get => (WHICH)this.ReadDataUShort(80U, (ushort)0);
+                    set => this.WriteData(80U, (ushort)value, (ushort)0);
+                }
+
+                public ushort Explicit
+                {
+                    get => which == WHICH.Explicit ? this.ReadDataUShort(96UL, (ushort)0) : default;
+                    set => this.WriteData(96UL, value, (ushort)0);
+                }
+            }
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x978a7cebdc549a4dUL)]
+    public class Enumerant : ICapnpSerializable
+    {
+        public const UInt64 typeId = 0x978a7cebdc549a4dUL;
+        void ICapnpSerializable.Deserialize(DeserializerState arg_)
+        {
+            var reader = READER.create(arg_);
+            Name = reader.Name;
+            CodeOrder = reader.CodeOrder;
+            Annotations = reader.Annotations?.ToReadOnlyList(_ => CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Annotation>(_));
+            applyDefaults();
+        }
+
+        public void serialize(WRITER writer)
+        {
+            writer.Name = Name;
+            writer.CodeOrder = CodeOrder;
+            writer.Annotations.Init(Annotations, (_s1, _v1) => _v1?.serialize(_s1));
+        }
+
+        void ICapnpSerializable.Serialize(SerializerState arg_)
+        {
+            serialize(arg_.Rewrap<WRITER>());
+        }
+
+        public void applyDefaults()
+        {
+        }
+
+        public string Name
+        {
+            get;
+            set;
+        }
+
+        public ushort CodeOrder
+        {
+            get;
+            set;
+        }
+
+        public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Annotation> Annotations
+        {
+            get;
+            set;
+        }
+
+        public struct READER
+        {
+            readonly DeserializerState ctx;
+            public READER(DeserializerState ctx)
+            {
+                this.ctx = ctx;
+            }
+
+            public static READER create(DeserializerState ctx) => new READER(ctx);
+            public static implicit operator DeserializerState(READER reader) => reader.ctx;
+            public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+            public string Name => ctx.ReadText(0, null);
+            public ushort CodeOrder => ctx.ReadDataUShort(0UL, (ushort)0);
+            public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Annotation.READER> Annotations => ctx.ReadList(1).Cast(CapnpC.CSharp.Generator.Schema.Annotation.READER.create);
+        }
+
+        public class WRITER : SerializerState
+        {
+            public WRITER()
+            {
+                this.SetStruct(1, 2);
+            }
+
+            public string Name
+            {
+                get => this.ReadText(0, null);
+                set => this.WriteText(0, value, null);
+            }
+
+            public ushort CodeOrder
+            {
+                get => this.ReadDataUShort(0UL, (ushort)0);
+                set => this.WriteData(0UL, value, (ushort)0);
+            }
+
+            public ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Annotation.WRITER> Annotations
+            {
+                get => BuildPointer<ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Annotation.WRITER>>(1);
+                set => Link(1, value);
+            }
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xa9962a9ed0a4d7f8UL)]
+    public class Superclass : ICapnpSerializable
+    {
+        public const UInt64 typeId = 0xa9962a9ed0a4d7f8UL;
+        void ICapnpSerializable.Deserialize(DeserializerState arg_)
+        {
+            var reader = READER.create(arg_);
+            Id = reader.Id;
+            Brand = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Brand>(reader.Brand);
+            applyDefaults();
+        }
+
+        public void serialize(WRITER writer)
+        {
+            writer.Id = Id;
+            Brand?.serialize(writer.Brand);
+        }
+
+        void ICapnpSerializable.Serialize(SerializerState arg_)
+        {
+            serialize(arg_.Rewrap<WRITER>());
+        }
+
+        public void applyDefaults()
+        {
+        }
+
+        public ulong Id
+        {
+            get;
+            set;
+        }
+
+        public CapnpC.CSharp.Generator.Schema.Brand Brand
+        {
+            get;
+            set;
+        }
+
+        public struct READER
+        {
+            readonly DeserializerState ctx;
+            public READER(DeserializerState ctx)
+            {
+                this.ctx = ctx;
+            }
+
+            public static READER create(DeserializerState ctx) => new READER(ctx);
+            public static implicit operator DeserializerState(READER reader) => reader.ctx;
+            public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+            public ulong Id => ctx.ReadDataULong(0UL, 0UL);
+            public CapnpC.CSharp.Generator.Schema.Brand.READER Brand => ctx.ReadStruct(0, CapnpC.CSharp.Generator.Schema.Brand.READER.create);
+        }
+
+        public class WRITER : SerializerState
+        {
+            public WRITER()
+            {
+                this.SetStruct(1, 1);
+            }
+
+            public ulong Id
+            {
+                get => this.ReadDataULong(0UL, 0UL);
+                set => this.WriteData(0UL, value, 0UL);
+            }
+
+            public CapnpC.CSharp.Generator.Schema.Brand.WRITER Brand
+            {
+                get => BuildPointer<CapnpC.CSharp.Generator.Schema.Brand.WRITER>(0);
+                set => Link(0, value);
+            }
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9500cce23b334d80UL)]
+    public class Method : ICapnpSerializable
+    {
+        public const UInt64 typeId = 0x9500cce23b334d80UL;
+        void ICapnpSerializable.Deserialize(DeserializerState arg_)
+        {
+            var reader = READER.create(arg_);
+            Name = reader.Name;
+            CodeOrder = reader.CodeOrder;
+            ParamStructType = reader.ParamStructType;
+            ResultStructType = reader.ResultStructType;
+            Annotations = reader.Annotations?.ToReadOnlyList(_ => CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Annotation>(_));
+            ParamBrand = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Brand>(reader.ParamBrand);
+            ResultBrand = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Brand>(reader.ResultBrand);
+            ImplicitParameters = reader.ImplicitParameters?.ToReadOnlyList(_ => CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Node.Parameter>(_));
+            applyDefaults();
+        }
+
+        public void serialize(WRITER writer)
+        {
+            writer.Name = Name;
+            writer.CodeOrder = CodeOrder;
+            writer.ParamStructType = ParamStructType;
+            writer.ResultStructType = ResultStructType;
+            writer.Annotations.Init(Annotations, (_s1, _v1) => _v1?.serialize(_s1));
+            ParamBrand?.serialize(writer.ParamBrand);
+            ResultBrand?.serialize(writer.ResultBrand);
+            writer.ImplicitParameters.Init(ImplicitParameters, (_s1, _v1) => _v1?.serialize(_s1));
+        }
+
+        void ICapnpSerializable.Serialize(SerializerState arg_)
+        {
+            serialize(arg_.Rewrap<WRITER>());
+        }
+
+        public void applyDefaults()
+        {
+        }
+
+        public string Name
+        {
+            get;
+            set;
+        }
+
+        public ushort CodeOrder
+        {
+            get;
+            set;
+        }
+
+        public ulong ParamStructType
+        {
+            get;
+            set;
+        }
+
+        public ulong ResultStructType
+        {
+            get;
+            set;
+        }
+
+        public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Annotation> Annotations
+        {
+            get;
+            set;
+        }
+
+        public CapnpC.CSharp.Generator.Schema.Brand ParamBrand
+        {
+            get;
+            set;
+        }
+
+        public CapnpC.CSharp.Generator.Schema.Brand ResultBrand
+        {
+            get;
+            set;
+        }
+
+        public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Node.Parameter> ImplicitParameters
+        {
+            get;
+            set;
+        }
+
+        public struct READER
+        {
+            readonly DeserializerState ctx;
+            public READER(DeserializerState ctx)
+            {
+                this.ctx = ctx;
+            }
+
+            public static READER create(DeserializerState ctx) => new READER(ctx);
+            public static implicit operator DeserializerState(READER reader) => reader.ctx;
+            public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+            public string Name => ctx.ReadText(0, null);
+            public ushort CodeOrder => ctx.ReadDataUShort(0UL, (ushort)0);
+            public ulong ParamStructType => ctx.ReadDataULong(64UL, 0UL);
+            public ulong ResultStructType => ctx.ReadDataULong(128UL, 0UL);
+            public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Annotation.READER> Annotations => ctx.ReadList(1).Cast(CapnpC.CSharp.Generator.Schema.Annotation.READER.create);
+            public CapnpC.CSharp.Generator.Schema.Brand.READER ParamBrand => ctx.ReadStruct(2, CapnpC.CSharp.Generator.Schema.Brand.READER.create);
+            public CapnpC.CSharp.Generator.Schema.Brand.READER ResultBrand => ctx.ReadStruct(3, CapnpC.CSharp.Generator.Schema.Brand.READER.create);
+            public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Node.Parameter.READER> ImplicitParameters => ctx.ReadList(4).Cast(CapnpC.CSharp.Generator.Schema.Node.Parameter.READER.create);
+        }
+
+        public class WRITER : SerializerState
+        {
+            public WRITER()
+            {
+                this.SetStruct(3, 5);
+            }
+
+            public string Name
+            {
+                get => this.ReadText(0, null);
+                set => this.WriteText(0, value, null);
+            }
+
+            public ushort CodeOrder
+            {
+                get => this.ReadDataUShort(0UL, (ushort)0);
+                set => this.WriteData(0UL, value, (ushort)0);
+            }
+
+            public ulong ParamStructType
+            {
+                get => this.ReadDataULong(64UL, 0UL);
+                set => this.WriteData(64UL, value, 0UL);
+            }
+
+            public ulong ResultStructType
+            {
+                get => this.ReadDataULong(128UL, 0UL);
+                set => this.WriteData(128UL, value, 0UL);
+            }
+
+            public ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Annotation.WRITER> Annotations
+            {
+                get => BuildPointer<ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Annotation.WRITER>>(1);
+                set => Link(1, value);
+            }
+
+            public CapnpC.CSharp.Generator.Schema.Brand.WRITER ParamBrand
+            {
+                get => BuildPointer<CapnpC.CSharp.Generator.Schema.Brand.WRITER>(2);
                 set => Link(2, value);
             }
 
-            public ListOfStructsSerializer<Node.Writer> Nodes
+            public CapnpC.CSharp.Generator.Schema.Brand.WRITER ResultBrand
             {
-                get => BuildPointer<ListOfStructsSerializer<Node.Writer>>(0);
-                set => Link(0, value);
-            }
-
-            public ListOfStructsSerializer<Node.SourceInfo.Writer> SourceInfo
-            {
-                get => BuildPointer<ListOfStructsSerializer<Node.SourceInfo.Writer>>(3);
+                get => BuildPointer<CapnpC.CSharp.Generator.Schema.Brand.WRITER>(3);
                 set => Link(3, value);
             }
 
-            public ListOfStructsSerializer<RequestedFile.Writer> RequestedFiles
+            public ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Node.Parameter.WRITER> ImplicitParameters
             {
-                get => BuildPointer<ListOfStructsSerializer<RequestedFile.Writer>>(1);
+                get => BuildPointer<ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Node.Parameter.WRITER>>(4);
+                set => Link(4, value);
+            }
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xd07378ede1f9cc60UL)]
+    public class Type : ICapnpSerializable
+    {
+        public const UInt64 typeId = 0xd07378ede1f9cc60UL;
+        public enum WHICH : ushort
+        {
+            Void = 0,
+            Bool = 1,
+            Int8 = 2,
+            Int16 = 3,
+            Int32 = 4,
+            Int64 = 5,
+            Uint8 = 6,
+            Uint16 = 7,
+            Uint32 = 8,
+            Uint64 = 9,
+            Float32 = 10,
+            Float64 = 11,
+            Text = 12,
+            Data = 13,
+            List = 14,
+            Enum = 15,
+            Struct = 16,
+            Interface = 17,
+            AnyPointer = 18,
+            undefined = 65535
+        }
+
+        void ICapnpSerializable.Deserialize(DeserializerState arg_)
+        {
+            var reader = READER.create(arg_);
+            switch (reader.which)
+            {
+                case WHICH.Void:
+                    which = reader.which;
+                    break;
+                case WHICH.Bool:
+                    which = reader.which;
+                    break;
+                case WHICH.Int8:
+                    which = reader.which;
+                    break;
+                case WHICH.Int16:
+                    which = reader.which;
+                    break;
+                case WHICH.Int32:
+                    which = reader.which;
+                    break;
+                case WHICH.Int64:
+                    which = reader.which;
+                    break;
+                case WHICH.Uint8:
+                    which = reader.which;
+                    break;
+                case WHICH.Uint16:
+                    which = reader.which;
+                    break;
+                case WHICH.Uint32:
+                    which = reader.which;
+                    break;
+                case WHICH.Uint64:
+                    which = reader.which;
+                    break;
+                case WHICH.Float32:
+                    which = reader.which;
+                    break;
+                case WHICH.Float64:
+                    which = reader.which;
+                    break;
+                case WHICH.Text:
+                    which = reader.which;
+                    break;
+                case WHICH.Data:
+                    which = reader.which;
+                    break;
+                case WHICH.List:
+                    List = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Type.list>(reader.List);
+                    break;
+                case WHICH.Enum:
+                    Enum = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Type.@enum>(reader.Enum);
+                    break;
+                case WHICH.Struct:
+                    Struct = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Type.@struct>(reader.Struct);
+                    break;
+                case WHICH.Interface:
+                    Interface = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Type.@interface>(reader.Interface);
+                    break;
+                case WHICH.AnyPointer:
+                    AnyPointer = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Type.anyPointer>(reader.AnyPointer);
+                    break;
+            }
+
+            applyDefaults();
+        }
+
+        private WHICH _which = WHICH.undefined;
+        private object _content;
+        public WHICH which
+        {
+            get => _which;
+            set
+            {
+                if (value == _which)
+                    return;
+                _which = value;
+                switch (value)
+                {
+                    case WHICH.Void:
+                        break;
+                    case WHICH.Bool:
+                        break;
+                    case WHICH.Int8:
+                        break;
+                    case WHICH.Int16:
+                        break;
+                    case WHICH.Int32:
+                        break;
+                    case WHICH.Int64:
+                        break;
+                    case WHICH.Uint8:
+                        break;
+                    case WHICH.Uint16:
+                        break;
+                    case WHICH.Uint32:
+                        break;
+                    case WHICH.Uint64:
+                        break;
+                    case WHICH.Float32:
+                        break;
+                    case WHICH.Float64:
+                        break;
+                    case WHICH.Text:
+                        break;
+                    case WHICH.Data:
+                        break;
+                    case WHICH.List:
+                        _content = null;
+                        break;
+                    case WHICH.Enum:
+                        _content = null;
+                        break;
+                    case WHICH.Struct:
+                        _content = null;
+                        break;
+                    case WHICH.Interface:
+                        _content = null;
+                        break;
+                    case WHICH.AnyPointer:
+                        _content = null;
+                        break;
+                }
+            }
+        }
+
+        public void serialize(WRITER writer)
+        {
+            writer.which = which;
+            switch (which)
+            {
+                case WHICH.Void:
+                    break;
+                case WHICH.Bool:
+                    break;
+                case WHICH.Int8:
+                    break;
+                case WHICH.Int16:
+                    break;
+                case WHICH.Int32:
+                    break;
+                case WHICH.Int64:
+                    break;
+                case WHICH.Uint8:
+                    break;
+                case WHICH.Uint16:
+                    break;
+                case WHICH.Uint32:
+                    break;
+                case WHICH.Uint64:
+                    break;
+                case WHICH.Float32:
+                    break;
+                case WHICH.Float64:
+                    break;
+                case WHICH.Text:
+                    break;
+                case WHICH.Data:
+                    break;
+                case WHICH.List:
+                    List?.serialize(writer.List);
+                    break;
+                case WHICH.Enum:
+                    Enum?.serialize(writer.Enum);
+                    break;
+                case WHICH.Struct:
+                    Struct?.serialize(writer.Struct);
+                    break;
+                case WHICH.Interface:
+                    Interface?.serialize(writer.Interface);
+                    break;
+                case WHICH.AnyPointer:
+                    AnyPointer?.serialize(writer.AnyPointer);
+                    break;
+            }
+        }
+
+        void ICapnpSerializable.Serialize(SerializerState arg_)
+        {
+            serialize(arg_.Rewrap<WRITER>());
+        }
+
+        public void applyDefaults()
+        {
+        }
+
+        public CapnpC.CSharp.Generator.Schema.Type.list List
+        {
+            get => _which == WHICH.List ? (CapnpC.CSharp.Generator.Schema.Type.list)_content : null;
+            set
+            {
+                _which = WHICH.List;
+                _content = value;
+            }
+        }
+
+        public CapnpC.CSharp.Generator.Schema.Type.@enum Enum
+        {
+            get => _which == WHICH.Enum ? (CapnpC.CSharp.Generator.Schema.Type.@enum)_content : null;
+            set
+            {
+                _which = WHICH.Enum;
+                _content = value;
+            }
+        }
+
+        public CapnpC.CSharp.Generator.Schema.Type.@struct Struct
+        {
+            get => _which == WHICH.Struct ? (CapnpC.CSharp.Generator.Schema.Type.@struct)_content : null;
+            set
+            {
+                _which = WHICH.Struct;
+                _content = value;
+            }
+        }
+
+        public CapnpC.CSharp.Generator.Schema.Type.@interface Interface
+        {
+            get => _which == WHICH.Interface ? (CapnpC.CSharp.Generator.Schema.Type.@interface)_content : null;
+            set
+            {
+                _which = WHICH.Interface;
+                _content = value;
+            }
+        }
+
+        public CapnpC.CSharp.Generator.Schema.Type.anyPointer AnyPointer
+        {
+            get => _which == WHICH.AnyPointer ? (CapnpC.CSharp.Generator.Schema.Type.anyPointer)_content : null;
+            set
+            {
+                _which = WHICH.AnyPointer;
+                _content = value;
+            }
+        }
+
+        public struct READER
+        {
+            readonly DeserializerState ctx;
+            public READER(DeserializerState ctx)
+            {
+                this.ctx = ctx;
+            }
+
+            public static READER create(DeserializerState ctx) => new READER(ctx);
+            public static implicit operator DeserializerState(READER reader) => reader.ctx;
+            public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+            public WHICH which => (WHICH)ctx.ReadDataUShort(0U, (ushort)0);
+            public list.READER List => which == WHICH.List ? new list.READER(ctx) : default;
+            public @enum.READER Enum => which == WHICH.Enum ? new @enum.READER(ctx) : default;
+            public @struct.READER Struct => which == WHICH.Struct ? new @struct.READER(ctx) : default;
+            public @interface.READER Interface => which == WHICH.Interface ? new @interface.READER(ctx) : default;
+            public anyPointer.READER AnyPointer => which == WHICH.AnyPointer ? new anyPointer.READER(ctx) : default;
+        }
+
+        public class WRITER : SerializerState
+        {
+            public WRITER()
+            {
+                this.SetStruct(3, 1);
+            }
+
+            public WHICH which
+            {
+                get => (WHICH)this.ReadDataUShort(0U, (ushort)0);
+                set => this.WriteData(0U, (ushort)value, (ushort)0);
+            }
+
+            public list.WRITER List
+            {
+                get => which == WHICH.List ? Rewrap<list.WRITER>() : default;
+            }
+
+            public @enum.WRITER Enum
+            {
+                get => which == WHICH.Enum ? Rewrap<@enum.WRITER>() : default;
+            }
+
+            public @struct.WRITER Struct
+            {
+                get => which == WHICH.Struct ? Rewrap<@struct.WRITER>() : default;
+            }
+
+            public @interface.WRITER Interface
+            {
+                get => which == WHICH.Interface ? Rewrap<@interface.WRITER>() : default;
+            }
+
+            public anyPointer.WRITER AnyPointer
+            {
+                get => which == WHICH.AnyPointer ? Rewrap<anyPointer.WRITER>() : default;
+            }
+        }
+
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x87e739250a60ea97UL)]
+        public class list : ICapnpSerializable
+        {
+            public const UInt64 typeId = 0x87e739250a60ea97UL;
+            void ICapnpSerializable.Deserialize(DeserializerState arg_)
+            {
+                var reader = READER.create(arg_);
+                ElementType = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Type>(reader.ElementType);
+                applyDefaults();
+            }
+
+            public void serialize(WRITER writer)
+            {
+                ElementType?.serialize(writer.ElementType);
+            }
+
+            void ICapnpSerializable.Serialize(SerializerState arg_)
+            {
+                serialize(arg_.Rewrap<WRITER>());
+            }
+
+            public void applyDefaults()
+            {
+            }
+
+            public CapnpC.CSharp.Generator.Schema.Type ElementType
+            {
+                get;
+                set;
+            }
+
+            public struct READER
+            {
+                readonly DeserializerState ctx;
+                public READER(DeserializerState ctx)
+                {
+                    this.ctx = ctx;
+                }
+
+                public static READER create(DeserializerState ctx) => new READER(ctx);
+                public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                public CapnpC.CSharp.Generator.Schema.Type.READER ElementType => ctx.ReadStruct(0, CapnpC.CSharp.Generator.Schema.Type.READER.create);
+            }
+
+            public class WRITER : SerializerState
+            {
+                public WRITER()
+                {
+                }
+
+                public CapnpC.CSharp.Generator.Schema.Type.WRITER ElementType
+                {
+                    get => BuildPointer<CapnpC.CSharp.Generator.Schema.Type.WRITER>(0);
+                    set => Link(0, value);
+                }
+            }
+        }
+
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9e0e78711a7f87a9UL)]
+        public class @enum : ICapnpSerializable
+        {
+            public const UInt64 typeId = 0x9e0e78711a7f87a9UL;
+            void ICapnpSerializable.Deserialize(DeserializerState arg_)
+            {
+                var reader = READER.create(arg_);
+                TypeId = reader.TypeId;
+                Brand = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Brand>(reader.Brand);
+                applyDefaults();
+            }
+
+            public void serialize(WRITER writer)
+            {
+                writer.TypeId = TypeId;
+                Brand?.serialize(writer.Brand);
+            }
+
+            void ICapnpSerializable.Serialize(SerializerState arg_)
+            {
+                serialize(arg_.Rewrap<WRITER>());
+            }
+
+            public void applyDefaults()
+            {
+            }
+
+            public ulong TypeId
+            {
+                get;
+                set;
+            }
+
+            public CapnpC.CSharp.Generator.Schema.Brand Brand
+            {
+                get;
+                set;
+            }
+
+            public struct READER
+            {
+                readonly DeserializerState ctx;
+                public READER(DeserializerState ctx)
+                {
+                    this.ctx = ctx;
+                }
+
+                public static READER create(DeserializerState ctx) => new READER(ctx);
+                public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                public ulong TypeId => ctx.ReadDataULong(64UL, 0UL);
+                public CapnpC.CSharp.Generator.Schema.Brand.READER Brand => ctx.ReadStruct(0, CapnpC.CSharp.Generator.Schema.Brand.READER.create);
+            }
+
+            public class WRITER : SerializerState
+            {
+                public WRITER()
+                {
+                }
+
+                public ulong TypeId
+                {
+                    get => this.ReadDataULong(64UL, 0UL);
+                    set => this.WriteData(64UL, value, 0UL);
+                }
+
+                public CapnpC.CSharp.Generator.Schema.Brand.WRITER Brand
+                {
+                    get => BuildPointer<CapnpC.CSharp.Generator.Schema.Brand.WRITER>(0);
+                    set => Link(0, value);
+                }
+            }
+        }
+
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xac3a6f60ef4cc6d3UL)]
+        public class @struct : ICapnpSerializable
+        {
+            public const UInt64 typeId = 0xac3a6f60ef4cc6d3UL;
+            void ICapnpSerializable.Deserialize(DeserializerState arg_)
+            {
+                var reader = READER.create(arg_);
+                TypeId = reader.TypeId;
+                Brand = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Brand>(reader.Brand);
+                applyDefaults();
+            }
+
+            public void serialize(WRITER writer)
+            {
+                writer.TypeId = TypeId;
+                Brand?.serialize(writer.Brand);
+            }
+
+            void ICapnpSerializable.Serialize(SerializerState arg_)
+            {
+                serialize(arg_.Rewrap<WRITER>());
+            }
+
+            public void applyDefaults()
+            {
+            }
+
+            public ulong TypeId
+            {
+                get;
+                set;
+            }
+
+            public CapnpC.CSharp.Generator.Schema.Brand Brand
+            {
+                get;
+                set;
+            }
+
+            public struct READER
+            {
+                readonly DeserializerState ctx;
+                public READER(DeserializerState ctx)
+                {
+                    this.ctx = ctx;
+                }
+
+                public static READER create(DeserializerState ctx) => new READER(ctx);
+                public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                public ulong TypeId => ctx.ReadDataULong(64UL, 0UL);
+                public CapnpC.CSharp.Generator.Schema.Brand.READER Brand => ctx.ReadStruct(0, CapnpC.CSharp.Generator.Schema.Brand.READER.create);
+            }
+
+            public class WRITER : SerializerState
+            {
+                public WRITER()
+                {
+                }
+
+                public ulong TypeId
+                {
+                    get => this.ReadDataULong(64UL, 0UL);
+                    set => this.WriteData(64UL, value, 0UL);
+                }
+
+                public CapnpC.CSharp.Generator.Schema.Brand.WRITER Brand
+                {
+                    get => BuildPointer<CapnpC.CSharp.Generator.Schema.Brand.WRITER>(0);
+                    set => Link(0, value);
+                }
+            }
+        }
+
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xed8bca69f7fb0cbfUL)]
+        public class @interface : ICapnpSerializable
+        {
+            public const UInt64 typeId = 0xed8bca69f7fb0cbfUL;
+            void ICapnpSerializable.Deserialize(DeserializerState arg_)
+            {
+                var reader = READER.create(arg_);
+                TypeId = reader.TypeId;
+                Brand = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Brand>(reader.Brand);
+                applyDefaults();
+            }
+
+            public void serialize(WRITER writer)
+            {
+                writer.TypeId = TypeId;
+                Brand?.serialize(writer.Brand);
+            }
+
+            void ICapnpSerializable.Serialize(SerializerState arg_)
+            {
+                serialize(arg_.Rewrap<WRITER>());
+            }
+
+            public void applyDefaults()
+            {
+            }
+
+            public ulong TypeId
+            {
+                get;
+                set;
+            }
+
+            public CapnpC.CSharp.Generator.Schema.Brand Brand
+            {
+                get;
+                set;
+            }
+
+            public struct READER
+            {
+                readonly DeserializerState ctx;
+                public READER(DeserializerState ctx)
+                {
+                    this.ctx = ctx;
+                }
+
+                public static READER create(DeserializerState ctx) => new READER(ctx);
+                public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                public ulong TypeId => ctx.ReadDataULong(64UL, 0UL);
+                public CapnpC.CSharp.Generator.Schema.Brand.READER Brand => ctx.ReadStruct(0, CapnpC.CSharp.Generator.Schema.Brand.READER.create);
+            }
+
+            public class WRITER : SerializerState
+            {
+                public WRITER()
+                {
+                }
+
+                public ulong TypeId
+                {
+                    get => this.ReadDataULong(64UL, 0UL);
+                    set => this.WriteData(64UL, value, 0UL);
+                }
+
+                public CapnpC.CSharp.Generator.Schema.Brand.WRITER Brand
+                {
+                    get => BuildPointer<CapnpC.CSharp.Generator.Schema.Brand.WRITER>(0);
+                    set => Link(0, value);
+                }
+            }
+        }
+
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc2573fe8a23e49f1UL)]
+        public class anyPointer : ICapnpSerializable
+        {
+            public const UInt64 typeId = 0xc2573fe8a23e49f1UL;
+            public enum WHICH : ushort
+            {
+                Unconstrained = 0,
+                Parameter = 1,
+                ImplicitMethodParameter = 2,
+                undefined = 65535
+            }
+
+            void ICapnpSerializable.Deserialize(DeserializerState arg_)
+            {
+                var reader = READER.create(arg_);
+                switch (reader.which)
+                {
+                    case WHICH.Unconstrained:
+                        Unconstrained = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Type.anyPointer.unconstrained>(reader.Unconstrained);
+                        break;
+                    case WHICH.Parameter:
+                        Parameter = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Type.anyPointer.parameter>(reader.Parameter);
+                        break;
+                    case WHICH.ImplicitMethodParameter:
+                        ImplicitMethodParameter = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Type.anyPointer.implicitMethodParameter>(reader.ImplicitMethodParameter);
+                        break;
+                }
+
+                applyDefaults();
+            }
+
+            private WHICH _which = WHICH.undefined;
+            private object _content;
+            public WHICH which
+            {
+                get => _which;
+                set
+                {
+                    if (value == _which)
+                        return;
+                    _which = value;
+                    switch (value)
+                    {
+                        case WHICH.Unconstrained:
+                            _content = null;
+                            break;
+                        case WHICH.Parameter:
+                            _content = null;
+                            break;
+                        case WHICH.ImplicitMethodParameter:
+                            _content = null;
+                            break;
+                    }
+                }
+            }
+
+            public void serialize(WRITER writer)
+            {
+                writer.which = which;
+                switch (which)
+                {
+                    case WHICH.Unconstrained:
+                        Unconstrained?.serialize(writer.Unconstrained);
+                        break;
+                    case WHICH.Parameter:
+                        Parameter?.serialize(writer.Parameter);
+                        break;
+                    case WHICH.ImplicitMethodParameter:
+                        ImplicitMethodParameter?.serialize(writer.ImplicitMethodParameter);
+                        break;
+                }
+            }
+
+            void ICapnpSerializable.Serialize(SerializerState arg_)
+            {
+                serialize(arg_.Rewrap<WRITER>());
+            }
+
+            public void applyDefaults()
+            {
+            }
+
+            public CapnpC.CSharp.Generator.Schema.Type.anyPointer.unconstrained Unconstrained
+            {
+                get => _which == WHICH.Unconstrained ? (CapnpC.CSharp.Generator.Schema.Type.anyPointer.unconstrained)_content : null;
+                set
+                {
+                    _which = WHICH.Unconstrained;
+                    _content = value;
+                }
+            }
+
+            public CapnpC.CSharp.Generator.Schema.Type.anyPointer.parameter Parameter
+            {
+                get => _which == WHICH.Parameter ? (CapnpC.CSharp.Generator.Schema.Type.anyPointer.parameter)_content : null;
+                set
+                {
+                    _which = WHICH.Parameter;
+                    _content = value;
+                }
+            }
+
+            public CapnpC.CSharp.Generator.Schema.Type.anyPointer.implicitMethodParameter ImplicitMethodParameter
+            {
+                get => _which == WHICH.ImplicitMethodParameter ? (CapnpC.CSharp.Generator.Schema.Type.anyPointer.implicitMethodParameter)_content : null;
+                set
+                {
+                    _which = WHICH.ImplicitMethodParameter;
+                    _content = value;
+                }
+            }
+
+            public struct READER
+            {
+                readonly DeserializerState ctx;
+                public READER(DeserializerState ctx)
+                {
+                    this.ctx = ctx;
+                }
+
+                public static READER create(DeserializerState ctx) => new READER(ctx);
+                public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                public WHICH which => (WHICH)ctx.ReadDataUShort(64U, (ushort)0);
+                public unconstrained.READER Unconstrained => which == WHICH.Unconstrained ? new unconstrained.READER(ctx) : default;
+                public parameter.READER Parameter => which == WHICH.Parameter ? new parameter.READER(ctx) : default;
+                public implicitMethodParameter.READER ImplicitMethodParameter => which == WHICH.ImplicitMethodParameter ? new implicitMethodParameter.READER(ctx) : default;
+            }
+
+            public class WRITER : SerializerState
+            {
+                public WRITER()
+                {
+                }
+
+                public WHICH which
+                {
+                    get => (WHICH)this.ReadDataUShort(64U, (ushort)0);
+                    set => this.WriteData(64U, (ushort)value, (ushort)0);
+                }
+
+                public unconstrained.WRITER Unconstrained
+                {
+                    get => which == WHICH.Unconstrained ? Rewrap<unconstrained.WRITER>() : default;
+                }
+
+                public parameter.WRITER Parameter
+                {
+                    get => which == WHICH.Parameter ? Rewrap<parameter.WRITER>() : default;
+                }
+
+                public implicitMethodParameter.WRITER ImplicitMethodParameter
+                {
+                    get => which == WHICH.ImplicitMethodParameter ? Rewrap<implicitMethodParameter.WRITER>() : default;
+                }
+            }
+
+            [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x8e3b5f79fe593656UL)]
+            public class unconstrained : ICapnpSerializable
+            {
+                public const UInt64 typeId = 0x8e3b5f79fe593656UL;
+                public enum WHICH : ushort
+                {
+                    AnyKind = 0,
+                    Struct = 1,
+                    List = 2,
+                    Capability = 3,
+                    undefined = 65535
+                }
+
+                void ICapnpSerializable.Deserialize(DeserializerState arg_)
+                {
+                    var reader = READER.create(arg_);
+                    switch (reader.which)
+                    {
+                        case WHICH.AnyKind:
+                            which = reader.which;
+                            break;
+                        case WHICH.Struct:
+                            which = reader.which;
+                            break;
+                        case WHICH.List:
+                            which = reader.which;
+                            break;
+                        case WHICH.Capability:
+                            which = reader.which;
+                            break;
+                    }
+
+                    applyDefaults();
+                }
+
+                private WHICH _which = WHICH.undefined;
+                public WHICH which
+                {
+                    get => _which;
+                    set
+                    {
+                        if (value == _which)
+                            return;
+                        _which = value;
+                        switch (value)
+                        {
+                            case WHICH.AnyKind:
+                                break;
+                            case WHICH.Struct:
+                                break;
+                            case WHICH.List:
+                                break;
+                            case WHICH.Capability:
+                                break;
+                        }
+                    }
+                }
+
+                public void serialize(WRITER writer)
+                {
+                    writer.which = which;
+                    switch (which)
+                    {
+                        case WHICH.AnyKind:
+                            break;
+                        case WHICH.Struct:
+                            break;
+                        case WHICH.List:
+                            break;
+                        case WHICH.Capability:
+                            break;
+                    }
+                }
+
+                void ICapnpSerializable.Serialize(SerializerState arg_)
+                {
+                    serialize(arg_.Rewrap<WRITER>());
+                }
+
+                public void applyDefaults()
+                {
+                }
+
+                public struct READER
+                {
+                    readonly DeserializerState ctx;
+                    public READER(DeserializerState ctx)
+                    {
+                        this.ctx = ctx;
+                    }
+
+                    public static READER create(DeserializerState ctx) => new READER(ctx);
+                    public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                    public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                    public WHICH which => (WHICH)ctx.ReadDataUShort(80U, (ushort)0);
+                }
+
+                public class WRITER : SerializerState
+                {
+                    public WRITER()
+                    {
+                    }
+
+                    public WHICH which
+                    {
+                        get => (WHICH)this.ReadDataUShort(80U, (ushort)0);
+                        set => this.WriteData(80U, (ushort)value, (ushort)0);
+                    }
+                }
+            }
+
+            [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x9dd1f724f4614a85UL)]
+            public class parameter : ICapnpSerializable
+            {
+                public const UInt64 typeId = 0x9dd1f724f4614a85UL;
+                void ICapnpSerializable.Deserialize(DeserializerState arg_)
+                {
+                    var reader = READER.create(arg_);
+                    ScopeId = reader.ScopeId;
+                    ParameterIndex = reader.ParameterIndex;
+                    applyDefaults();
+                }
+
+                public void serialize(WRITER writer)
+                {
+                    writer.ScopeId = ScopeId;
+                    writer.ParameterIndex = ParameterIndex;
+                }
+
+                void ICapnpSerializable.Serialize(SerializerState arg_)
+                {
+                    serialize(arg_.Rewrap<WRITER>());
+                }
+
+                public void applyDefaults()
+                {
+                }
+
+                public ulong ScopeId
+                {
+                    get;
+                    set;
+                }
+
+                public ushort ParameterIndex
+                {
+                    get;
+                    set;
+                }
+
+                public struct READER
+                {
+                    readonly DeserializerState ctx;
+                    public READER(DeserializerState ctx)
+                    {
+                        this.ctx = ctx;
+                    }
+
+                    public static READER create(DeserializerState ctx) => new READER(ctx);
+                    public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                    public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                    public ulong ScopeId => ctx.ReadDataULong(128UL, 0UL);
+                    public ushort ParameterIndex => ctx.ReadDataUShort(80UL, (ushort)0);
+                }
+
+                public class WRITER : SerializerState
+                {
+                    public WRITER()
+                    {
+                    }
+
+                    public ulong ScopeId
+                    {
+                        get => this.ReadDataULong(128UL, 0UL);
+                        set => this.WriteData(128UL, value, 0UL);
+                    }
+
+                    public ushort ParameterIndex
+                    {
+                        get => this.ReadDataUShort(80UL, (ushort)0);
+                        set => this.WriteData(80UL, value, (ushort)0);
+                    }
+                }
+            }
+
+            [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xbaefc9120c56e274UL)]
+            public class implicitMethodParameter : ICapnpSerializable
+            {
+                public const UInt64 typeId = 0xbaefc9120c56e274UL;
+                void ICapnpSerializable.Deserialize(DeserializerState arg_)
+                {
+                    var reader = READER.create(arg_);
+                    ParameterIndex = reader.ParameterIndex;
+                    applyDefaults();
+                }
+
+                public void serialize(WRITER writer)
+                {
+                    writer.ParameterIndex = ParameterIndex;
+                }
+
+                void ICapnpSerializable.Serialize(SerializerState arg_)
+                {
+                    serialize(arg_.Rewrap<WRITER>());
+                }
+
+                public void applyDefaults()
+                {
+                }
+
+                public ushort ParameterIndex
+                {
+                    get;
+                    set;
+                }
+
+                public struct READER
+                {
+                    readonly DeserializerState ctx;
+                    public READER(DeserializerState ctx)
+                    {
+                        this.ctx = ctx;
+                    }
+
+                    public static READER create(DeserializerState ctx) => new READER(ctx);
+                    public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                    public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                    public ushort ParameterIndex => ctx.ReadDataUShort(80UL, (ushort)0);
+                }
+
+                public class WRITER : SerializerState
+                {
+                    public WRITER()
+                    {
+                    }
+
+                    public ushort ParameterIndex
+                    {
+                        get => this.ReadDataUShort(80UL, (ushort)0);
+                        set => this.WriteData(80UL, value, (ushort)0);
+                    }
+                }
+            }
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0x903455f06065422bUL)]
+    public class Brand : ICapnpSerializable
+    {
+        public const UInt64 typeId = 0x903455f06065422bUL;
+        void ICapnpSerializable.Deserialize(DeserializerState arg_)
+        {
+            var reader = READER.create(arg_);
+            Scopes = reader.Scopes?.ToReadOnlyList(_ => CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Brand.Scope>(_));
+            applyDefaults();
+        }
+
+        public void serialize(WRITER writer)
+        {
+            writer.Scopes.Init(Scopes, (_s1, _v1) => _v1?.serialize(_s1));
+        }
+
+        void ICapnpSerializable.Serialize(SerializerState arg_)
+        {
+            serialize(arg_.Rewrap<WRITER>());
+        }
+
+        public void applyDefaults()
+        {
+        }
+
+        public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Brand.Scope> Scopes
+        {
+            get;
+            set;
+        }
+
+        public struct READER
+        {
+            readonly DeserializerState ctx;
+            public READER(DeserializerState ctx)
+            {
+                this.ctx = ctx;
+            }
+
+            public static READER create(DeserializerState ctx) => new READER(ctx);
+            public static implicit operator DeserializerState(READER reader) => reader.ctx;
+            public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+            public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Brand.Scope.READER> Scopes => ctx.ReadList(0).Cast(CapnpC.CSharp.Generator.Schema.Brand.Scope.READER.create);
+        }
+
+        public class WRITER : SerializerState
+        {
+            public WRITER()
+            {
+                this.SetStruct(0, 1);
+            }
+
+            public ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Brand.Scope.WRITER> Scopes
+            {
+                get => BuildPointer<ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Brand.Scope.WRITER>>(0);
+                set => Link(0, value);
+            }
+        }
+
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xabd73485a9636bc9UL)]
+        public class Scope : ICapnpSerializable
+        {
+            public const UInt64 typeId = 0xabd73485a9636bc9UL;
+            public enum WHICH : ushort
+            {
+                Bind = 0,
+                Inherit = 1,
+                undefined = 65535
+            }
+
+            void ICapnpSerializable.Deserialize(DeserializerState arg_)
+            {
+                var reader = READER.create(arg_);
+                switch (reader.which)
+                {
+                    case WHICH.Bind:
+                        Bind = reader.Bind?.ToReadOnlyList(_ => CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Brand.Binding>(_));
+                        break;
+                    case WHICH.Inherit:
+                        which = reader.which;
+                        break;
+                }
+
+                ScopeId = reader.ScopeId;
+                applyDefaults();
+            }
+
+            private WHICH _which = WHICH.undefined;
+            private object _content;
+            public WHICH which
+            {
+                get => _which;
+                set
+                {
+                    if (value == _which)
+                        return;
+                    _which = value;
+                    switch (value)
+                    {
+                        case WHICH.Bind:
+                            _content = null;
+                            break;
+                        case WHICH.Inherit:
+                            break;
+                    }
+                }
+            }
+
+            public void serialize(WRITER writer)
+            {
+                writer.which = which;
+                switch (which)
+                {
+                    case WHICH.Bind:
+                        writer.Bind.Init(Bind, (_s1, _v1) => _v1?.serialize(_s1));
+                        break;
+                    case WHICH.Inherit:
+                        break;
+                }
+
+                writer.ScopeId = ScopeId;
+            }
+
+            void ICapnpSerializable.Serialize(SerializerState arg_)
+            {
+                serialize(arg_.Rewrap<WRITER>());
+            }
+
+            public void applyDefaults()
+            {
+            }
+
+            public ulong ScopeId
+            {
+                get;
+                set;
+            }
+
+            public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Brand.Binding> Bind
+            {
+                get => _which == WHICH.Bind ? (IReadOnlyList<CapnpC.CSharp.Generator.Schema.Brand.Binding>)_content : null;
+                set
+                {
+                    _which = WHICH.Bind;
+                    _content = value;
+                }
+            }
+
+            public struct READER
+            {
+                readonly DeserializerState ctx;
+                public READER(DeserializerState ctx)
+                {
+                    this.ctx = ctx;
+                }
+
+                public static READER create(DeserializerState ctx) => new READER(ctx);
+                public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                public WHICH which => (WHICH)ctx.ReadDataUShort(64U, (ushort)0);
+                public ulong ScopeId => ctx.ReadDataULong(0UL, 0UL);
+                public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Brand.Binding.READER> Bind => which == WHICH.Bind ? ctx.ReadList(0).Cast(CapnpC.CSharp.Generator.Schema.Brand.Binding.READER.create) : default;
+            }
+
+            public class WRITER : SerializerState
+            {
+                public WRITER()
+                {
+                    this.SetStruct(2, 1);
+                }
+
+                public WHICH which
+                {
+                    get => (WHICH)this.ReadDataUShort(64U, (ushort)0);
+                    set => this.WriteData(64U, (ushort)value, (ushort)0);
+                }
+
+                public ulong ScopeId
+                {
+                    get => this.ReadDataULong(0UL, 0UL);
+                    set => this.WriteData(0UL, value, 0UL);
+                }
+
+                public ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Brand.Binding.WRITER> Bind
+                {
+                    get => which == WHICH.Bind ? BuildPointer<ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Brand.Binding.WRITER>>(0) : default;
+                    set => Link(0, value);
+                }
+            }
+        }
+
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xc863cd16969ee7fcUL)]
+        public class Binding : ICapnpSerializable
+        {
+            public const UInt64 typeId = 0xc863cd16969ee7fcUL;
+            public enum WHICH : ushort
+            {
+                Unbound = 0,
+                Type = 1,
+                undefined = 65535
+            }
+
+            void ICapnpSerializable.Deserialize(DeserializerState arg_)
+            {
+                var reader = READER.create(arg_);
+                switch (reader.which)
+                {
+                    case WHICH.Unbound:
+                        which = reader.which;
+                        break;
+                    case WHICH.Type:
+                        Type = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Type>(reader.Type);
+                        break;
+                }
+
+                applyDefaults();
+            }
+
+            private WHICH _which = WHICH.undefined;
+            private object _content;
+            public WHICH which
+            {
+                get => _which;
+                set
+                {
+                    if (value == _which)
+                        return;
+                    _which = value;
+                    switch (value)
+                    {
+                        case WHICH.Unbound:
+                            break;
+                        case WHICH.Type:
+                            _content = null;
+                            break;
+                    }
+                }
+            }
+
+            public void serialize(WRITER writer)
+            {
+                writer.which = which;
+                switch (which)
+                {
+                    case WHICH.Unbound:
+                        break;
+                    case WHICH.Type:
+                        Type?.serialize(writer.Type);
+                        break;
+                }
+            }
+
+            void ICapnpSerializable.Serialize(SerializerState arg_)
+            {
+                serialize(arg_.Rewrap<WRITER>());
+            }
+
+            public void applyDefaults()
+            {
+            }
+
+            public CapnpC.CSharp.Generator.Schema.Type Type
+            {
+                get => _which == WHICH.Type ? (CapnpC.CSharp.Generator.Schema.Type)_content : null;
+                set
+                {
+                    _which = WHICH.Type;
+                    _content = value;
+                }
+            }
+
+            public struct READER
+            {
+                readonly DeserializerState ctx;
+                public READER(DeserializerState ctx)
+                {
+                    this.ctx = ctx;
+                }
+
+                public static READER create(DeserializerState ctx) => new READER(ctx);
+                public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                public WHICH which => (WHICH)ctx.ReadDataUShort(0U, (ushort)0);
+                public CapnpC.CSharp.Generator.Schema.Type.READER Type => which == WHICH.Type ? ctx.ReadStruct(0, CapnpC.CSharp.Generator.Schema.Type.READER.create) : default;
+            }
+
+            public class WRITER : SerializerState
+            {
+                public WRITER()
+                {
+                    this.SetStruct(1, 1);
+                }
+
+                public WHICH which
+                {
+                    get => (WHICH)this.ReadDataUShort(0U, (ushort)0);
+                    set => this.WriteData(0U, (ushort)value, (ushort)0);
+                }
+
+                public CapnpC.CSharp.Generator.Schema.Type.WRITER Type
+                {
+                    get => which == WHICH.Type ? BuildPointer<CapnpC.CSharp.Generator.Schema.Type.WRITER>(0) : default;
+                    set => Link(0, value);
+                }
+            }
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xce23dcd2d7b00c9bUL)]
+    public class Value : ICapnpSerializable
+    {
+        public const UInt64 typeId = 0xce23dcd2d7b00c9bUL;
+        public enum WHICH : ushort
+        {
+            Void = 0,
+            Bool = 1,
+            Int8 = 2,
+            Int16 = 3,
+            Int32 = 4,
+            Int64 = 5,
+            Uint8 = 6,
+            Uint16 = 7,
+            Uint32 = 8,
+            Uint64 = 9,
+            Float32 = 10,
+            Float64 = 11,
+            Text = 12,
+            Data = 13,
+            List = 14,
+            Enum = 15,
+            Struct = 16,
+            Interface = 17,
+            AnyPointer = 18,
+            undefined = 65535
+        }
+
+        void ICapnpSerializable.Deserialize(DeserializerState arg_)
+        {
+            var reader = READER.create(arg_);
+            switch (reader.which)
+            {
+                case WHICH.Void:
+                    which = reader.which;
+                    break;
+                case WHICH.Bool:
+                    Bool = reader.Bool;
+                    break;
+                case WHICH.Int8:
+                    Int8 = reader.Int8;
+                    break;
+                case WHICH.Int16:
+                    Int16 = reader.Int16;
+                    break;
+                case WHICH.Int32:
+                    Int32 = reader.Int32;
+                    break;
+                case WHICH.Int64:
+                    Int64 = reader.Int64;
+                    break;
+                case WHICH.Uint8:
+                    Uint8 = reader.Uint8;
+                    break;
+                case WHICH.Uint16:
+                    Uint16 = reader.Uint16;
+                    break;
+                case WHICH.Uint32:
+                    Uint32 = reader.Uint32;
+                    break;
+                case WHICH.Uint64:
+                    Uint64 = reader.Uint64;
+                    break;
+                case WHICH.Float32:
+                    Float32 = reader.Float32;
+                    break;
+                case WHICH.Float64:
+                    Float64 = reader.Float64;
+                    break;
+                case WHICH.Text:
+                    Text = reader.Text;
+                    break;
+                case WHICH.Data:
+                    Data = reader.Data;
+                    break;
+                case WHICH.List:
+                    List = CapnpSerializable.Create<object>(reader.List);
+                    break;
+                case WHICH.Enum:
+                    Enum = reader.Enum;
+                    break;
+                case WHICH.Struct:
+                    Struct = CapnpSerializable.Create<object>(reader.Struct);
+                    break;
+                case WHICH.Interface:
+                    which = reader.which;
+                    break;
+                case WHICH.AnyPointer:
+                    AnyPointer = CapnpSerializable.Create<object>(reader.AnyPointer);
+                    break;
+            }
+
+            applyDefaults();
+        }
+
+        private WHICH _which = WHICH.undefined;
+        private object _content;
+        public WHICH which
+        {
+            get => _which;
+            set
+            {
+                if (value == _which)
+                    return;
+                _which = value;
+                switch (value)
+                {
+                    case WHICH.Void:
+                        break;
+                    case WHICH.Bool:
+                        _content = false;
+                        break;
+                    case WHICH.Int8:
+                        _content = 0;
+                        break;
+                    case WHICH.Int16:
+                        _content = 0;
+                        break;
+                    case WHICH.Int32:
+                        _content = 0;
+                        break;
+                    case WHICH.Int64:
+                        _content = 0;
+                        break;
+                    case WHICH.Uint8:
+                        _content = 0;
+                        break;
+                    case WHICH.Uint16:
+                        _content = 0;
+                        break;
+                    case WHICH.Uint32:
+                        _content = 0;
+                        break;
+                    case WHICH.Uint64:
+                        _content = 0;
+                        break;
+                    case WHICH.Float32:
+                        _content = 0F;
+                        break;
+                    case WHICH.Float64:
+                        _content = 0;
+                        break;
+                    case WHICH.Text:
+                        _content = null;
+                        break;
+                    case WHICH.Data:
+                        _content = null;
+                        break;
+                    case WHICH.List:
+                        _content = null;
+                        break;
+                    case WHICH.Enum:
+                        _content = 0;
+                        break;
+                    case WHICH.Struct:
+                        _content = null;
+                        break;
+                    case WHICH.Interface:
+                        break;
+                    case WHICH.AnyPointer:
+                        _content = null;
+                        break;
+                }
+            }
+        }
+
+        public void serialize(WRITER writer)
+        {
+            writer.which = which;
+            switch (which)
+            {
+                case WHICH.Void:
+                    break;
+                case WHICH.Bool:
+                    writer.Bool = Bool.Value;
+                    break;
+                case WHICH.Int8:
+                    writer.Int8 = Int8.Value;
+                    break;
+                case WHICH.Int16:
+                    writer.Int16 = Int16.Value;
+                    break;
+                case WHICH.Int32:
+                    writer.Int32 = Int32.Value;
+                    break;
+                case WHICH.Int64:
+                    writer.Int64 = Int64.Value;
+                    break;
+                case WHICH.Uint8:
+                    writer.Uint8 = Uint8.Value;
+                    break;
+                case WHICH.Uint16:
+                    writer.Uint16 = Uint16.Value;
+                    break;
+                case WHICH.Uint32:
+                    writer.Uint32 = Uint32.Value;
+                    break;
+                case WHICH.Uint64:
+                    writer.Uint64 = Uint64.Value;
+                    break;
+                case WHICH.Float32:
+                    writer.Float32 = Float32.Value;
+                    break;
+                case WHICH.Float64:
+                    writer.Float64 = Float64.Value;
+                    break;
+                case WHICH.Text:
+                    writer.Text = Text;
+                    break;
+                case WHICH.Data:
+                    writer.Data.Init(Data);
+                    break;
+                case WHICH.List:
+                    writer.List.SetObject(List);
+                    break;
+                case WHICH.Enum:
+                    writer.Enum = Enum.Value;
+                    break;
+                case WHICH.Struct:
+                    writer.Struct.SetObject(Struct);
+                    break;
+                case WHICH.Interface:
+                    break;
+                case WHICH.AnyPointer:
+                    writer.AnyPointer.SetObject(AnyPointer);
+                    break;
+            }
+        }
+
+        void ICapnpSerializable.Serialize(SerializerState arg_)
+        {
+            serialize(arg_.Rewrap<WRITER>());
+        }
+
+        public void applyDefaults()
+        {
+        }
+
+        public bool? Bool
+        {
+            get => _which == WHICH.Bool ? (bool?)_content : null;
+            set
+            {
+                _which = WHICH.Bool;
+                _content = value;
+            }
+        }
+
+        public sbyte? Int8
+        {
+            get => _which == WHICH.Int8 ? (sbyte?)_content : null;
+            set
+            {
+                _which = WHICH.Int8;
+                _content = value;
+            }
+        }
+
+        public short? Int16
+        {
+            get => _which == WHICH.Int16 ? (short?)_content : null;
+            set
+            {
+                _which = WHICH.Int16;
+                _content = value;
+            }
+        }
+
+        public int? Int32
+        {
+            get => _which == WHICH.Int32 ? (int?)_content : null;
+            set
+            {
+                _which = WHICH.Int32;
+                _content = value;
+            }
+        }
+
+        public long? Int64
+        {
+            get => _which == WHICH.Int64 ? (long?)_content : null;
+            set
+            {
+                _which = WHICH.Int64;
+                _content = value;
+            }
+        }
+
+        public byte? Uint8
+        {
+            get => _which == WHICH.Uint8 ? (byte?)_content : null;
+            set
+            {
+                _which = WHICH.Uint8;
+                _content = value;
+            }
+        }
+
+        public ushort? Uint16
+        {
+            get => _which == WHICH.Uint16 ? (ushort?)_content : null;
+            set
+            {
+                _which = WHICH.Uint16;
+                _content = value;
+            }
+        }
+
+        public uint? Uint32
+        {
+            get => _which == WHICH.Uint32 ? (uint?)_content : null;
+            set
+            {
+                _which = WHICH.Uint32;
+                _content = value;
+            }
+        }
+
+        public ulong? Uint64
+        {
+            get => _which == WHICH.Uint64 ? (ulong?)_content : null;
+            set
+            {
+                _which = WHICH.Uint64;
+                _content = value;
+            }
+        }
+
+        public float? Float32
+        {
+            get => _which == WHICH.Float32 ? (float?)_content : null;
+            set
+            {
+                _which = WHICH.Float32;
+                _content = value;
+            }
+        }
+
+        public double? Float64
+        {
+            get => _which == WHICH.Float64 ? (double?)_content : null;
+            set
+            {
+                _which = WHICH.Float64;
+                _content = value;
+            }
+        }
+
+        public string Text
+        {
+            get => _which == WHICH.Text ? (string)_content : null;
+            set
+            {
+                _which = WHICH.Text;
+                _content = value;
+            }
+        }
+
+        public IReadOnlyList<byte> Data
+        {
+            get => _which == WHICH.Data ? (IReadOnlyList<byte>)_content : null;
+            set
+            {
+                _which = WHICH.Data;
+                _content = value;
+            }
+        }
+
+        public object List
+        {
+            get => _which == WHICH.List ? (object)_content : null;
+            set
+            {
+                _which = WHICH.List;
+                _content = value;
+            }
+        }
+
+        public ushort? Enum
+        {
+            get => _which == WHICH.Enum ? (ushort?)_content : null;
+            set
+            {
+                _which = WHICH.Enum;
+                _content = value;
+            }
+        }
+
+        public object Struct
+        {
+            get => _which == WHICH.Struct ? (object)_content : null;
+            set
+            {
+                _which = WHICH.Struct;
+                _content = value;
+            }
+        }
+
+        public object AnyPointer
+        {
+            get => _which == WHICH.AnyPointer ? (object)_content : null;
+            set
+            {
+                _which = WHICH.AnyPointer;
+                _content = value;
+            }
+        }
+
+        public struct READER
+        {
+            readonly DeserializerState ctx;
+            public READER(DeserializerState ctx)
+            {
+                this.ctx = ctx;
+            }
+
+            public static READER create(DeserializerState ctx) => new READER(ctx);
+            public static implicit operator DeserializerState(READER reader) => reader.ctx;
+            public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+            public WHICH which => (WHICH)ctx.ReadDataUShort(0U, (ushort)0);
+            public bool Bool => which == WHICH.Bool ? ctx.ReadDataBool(16UL, false) : default;
+            public sbyte Int8 => which == WHICH.Int8 ? ctx.ReadDataSByte(16UL, (sbyte)0) : default;
+            public short Int16 => which == WHICH.Int16 ? ctx.ReadDataShort(16UL, (short)0) : default;
+            public int Int32 => which == WHICH.Int32 ? ctx.ReadDataInt(32UL, 0) : default;
+            public long Int64 => which == WHICH.Int64 ? ctx.ReadDataLong(64UL, 0L) : default;
+            public byte Uint8 => which == WHICH.Uint8 ? ctx.ReadDataByte(16UL, (byte)0) : default;
+            public ushort Uint16 => which == WHICH.Uint16 ? ctx.ReadDataUShort(16UL, (ushort)0) : default;
+            public uint Uint32 => which == WHICH.Uint32 ? ctx.ReadDataUInt(32UL, 0U) : default;
+            public ulong Uint64 => which == WHICH.Uint64 ? ctx.ReadDataULong(64UL, 0UL) : default;
+            public float Float32 => which == WHICH.Float32 ? ctx.ReadDataFloat(32UL, 0F) : default;
+            public double Float64 => which == WHICH.Float64 ? ctx.ReadDataDouble(64UL, 0) : default;
+            public string Text => which == WHICH.Text ? ctx.ReadText(0, null) : default;
+            public IReadOnlyList<byte> Data => which == WHICH.Data ? ctx.ReadList(0).CastByte() : default;
+            public DeserializerState List => which == WHICH.List ? ctx.StructReadPointer(0) : default;
+            public ushort Enum => which == WHICH.Enum ? ctx.ReadDataUShort(16UL, (ushort)0) : default;
+            public DeserializerState Struct => which == WHICH.Struct ? ctx.StructReadPointer(0) : default;
+            public DeserializerState AnyPointer => which == WHICH.AnyPointer ? ctx.StructReadPointer(0) : default;
+        }
+
+        public class WRITER : SerializerState
+        {
+            public WRITER()
+            {
+                this.SetStruct(2, 1);
+            }
+
+            public WHICH which
+            {
+                get => (WHICH)this.ReadDataUShort(0U, (ushort)0);
+                set => this.WriteData(0U, (ushort)value, (ushort)0);
+            }
+
+            public bool Bool
+            {
+                get => which == WHICH.Bool ? this.ReadDataBool(16UL, false) : default;
+                set => this.WriteData(16UL, value, false);
+            }
+
+            public sbyte Int8
+            {
+                get => which == WHICH.Int8 ? this.ReadDataSByte(16UL, (sbyte)0) : default;
+                set => this.WriteData(16UL, value, (sbyte)0);
+            }
+
+            public short Int16
+            {
+                get => which == WHICH.Int16 ? this.ReadDataShort(16UL, (short)0) : default;
+                set => this.WriteData(16UL, value, (short)0);
+            }
+
+            public int Int32
+            {
+                get => which == WHICH.Int32 ? this.ReadDataInt(32UL, 0) : default;
+                set => this.WriteData(32UL, value, 0);
+            }
+
+            public long Int64
+            {
+                get => which == WHICH.Int64 ? this.ReadDataLong(64UL, 0L) : default;
+                set => this.WriteData(64UL, value, 0L);
+            }
+
+            public byte Uint8
+            {
+                get => which == WHICH.Uint8 ? this.ReadDataByte(16UL, (byte)0) : default;
+                set => this.WriteData(16UL, value, (byte)0);
+            }
+
+            public ushort Uint16
+            {
+                get => which == WHICH.Uint16 ? this.ReadDataUShort(16UL, (ushort)0) : default;
+                set => this.WriteData(16UL, value, (ushort)0);
+            }
+
+            public uint Uint32
+            {
+                get => which == WHICH.Uint32 ? this.ReadDataUInt(32UL, 0U) : default;
+                set => this.WriteData(32UL, value, 0U);
+            }
+
+            public ulong Uint64
+            {
+                get => which == WHICH.Uint64 ? this.ReadDataULong(64UL, 0UL) : default;
+                set => this.WriteData(64UL, value, 0UL);
+            }
+
+            public float Float32
+            {
+                get => which == WHICH.Float32 ? this.ReadDataFloat(32UL, 0F) : default;
+                set => this.WriteData(32UL, value, 0F);
+            }
+
+            public double Float64
+            {
+                get => which == WHICH.Float64 ? this.ReadDataDouble(64UL, 0) : default;
+                set => this.WriteData(64UL, value, 0);
+            }
+
+            public string Text
+            {
+                get => which == WHICH.Text ? this.ReadText(0, null) : default;
+                set => this.WriteText(0, value, null);
+            }
+
+            public ListOfPrimitivesSerializer<byte> Data
+            {
+                get => which == WHICH.Data ? BuildPointer<ListOfPrimitivesSerializer<byte>>(0) : default;
+                set => Link(0, value);
+            }
+
+            public DynamicSerializerState List
+            {
+                get => which == WHICH.List ? BuildPointer<DynamicSerializerState>(0) : default;
+                set => Link(0, value);
+            }
+
+            public ushort Enum
+            {
+                get => which == WHICH.Enum ? this.ReadDataUShort(16UL, (ushort)0) : default;
+                set => this.WriteData(16UL, value, (ushort)0);
+            }
+
+            public DynamicSerializerState Struct
+            {
+                get => which == WHICH.Struct ? BuildPointer<DynamicSerializerState>(0) : default;
+                set => Link(0, value);
+            }
+
+            public DynamicSerializerState AnyPointer
+            {
+                get => which == WHICH.AnyPointer ? BuildPointer<DynamicSerializerState>(0) : default;
+                set => Link(0, value);
+            }
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xf1c8950dab257542UL)]
+    public class Annotation : ICapnpSerializable
+    {
+        public const UInt64 typeId = 0xf1c8950dab257542UL;
+        void ICapnpSerializable.Deserialize(DeserializerState arg_)
+        {
+            var reader = READER.create(arg_);
+            Id = reader.Id;
+            Value = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Value>(reader.Value);
+            Brand = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Brand>(reader.Brand);
+            applyDefaults();
+        }
+
+        public void serialize(WRITER writer)
+        {
+            writer.Id = Id;
+            Value?.serialize(writer.Value);
+            Brand?.serialize(writer.Brand);
+        }
+
+        void ICapnpSerializable.Serialize(SerializerState arg_)
+        {
+            serialize(arg_.Rewrap<WRITER>());
+        }
+
+        public void applyDefaults()
+        {
+        }
+
+        public ulong Id
+        {
+            get;
+            set;
+        }
+
+        public CapnpC.CSharp.Generator.Schema.Value Value
+        {
+            get;
+            set;
+        }
+
+        public CapnpC.CSharp.Generator.Schema.Brand Brand
+        {
+            get;
+            set;
+        }
+
+        public struct READER
+        {
+            readonly DeserializerState ctx;
+            public READER(DeserializerState ctx)
+            {
+                this.ctx = ctx;
+            }
+
+            public static READER create(DeserializerState ctx) => new READER(ctx);
+            public static implicit operator DeserializerState(READER reader) => reader.ctx;
+            public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+            public ulong Id => ctx.ReadDataULong(0UL, 0UL);
+            public CapnpC.CSharp.Generator.Schema.Value.READER Value => ctx.ReadStruct(0, CapnpC.CSharp.Generator.Schema.Value.READER.create);
+            public CapnpC.CSharp.Generator.Schema.Brand.READER Brand => ctx.ReadStruct(1, CapnpC.CSharp.Generator.Schema.Brand.READER.create);
+        }
+
+        public class WRITER : SerializerState
+        {
+            public WRITER()
+            {
+                this.SetStruct(1, 2);
+            }
+
+            public ulong Id
+            {
+                get => this.ReadDataULong(0UL, 0UL);
+                set => this.WriteData(0UL, value, 0UL);
+            }
+
+            public CapnpC.CSharp.Generator.Schema.Value.WRITER Value
+            {
+                get => BuildPointer<CapnpC.CSharp.Generator.Schema.Value.WRITER>(0);
+                set => Link(0, value);
+            }
+
+            public CapnpC.CSharp.Generator.Schema.Brand.WRITER Brand
+            {
+                get => BuildPointer<CapnpC.CSharp.Generator.Schema.Brand.WRITER>(1);
                 set => Link(1, value);
+            }
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xd1958f7dba521926UL)]
+    public enum ElementSize : ushort
+    {
+        empty,
+        bit,
+        @byte,
+        twoBytes,
+        fourBytes,
+        eightBytes,
+        pointer,
+        inlineComposite
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xd85d305b7d839963UL)]
+    public class CapnpVersion : ICapnpSerializable
+    {
+        public const UInt64 typeId = 0xd85d305b7d839963UL;
+        void ICapnpSerializable.Deserialize(DeserializerState arg_)
+        {
+            var reader = READER.create(arg_);
+            Major = reader.Major;
+            Minor = reader.Minor;
+            Micro = reader.Micro;
+            applyDefaults();
+        }
+
+        public void serialize(WRITER writer)
+        {
+            writer.Major = Major;
+            writer.Minor = Minor;
+            writer.Micro = Micro;
+        }
+
+        void ICapnpSerializable.Serialize(SerializerState arg_)
+        {
+            serialize(arg_.Rewrap<WRITER>());
+        }
+
+        public void applyDefaults()
+        {
+        }
+
+        public ushort Major
+        {
+            get;
+            set;
+        }
+
+        public byte Minor
+        {
+            get;
+            set;
+        }
+
+        public byte Micro
+        {
+            get;
+            set;
+        }
+
+        public struct READER
+        {
+            readonly DeserializerState ctx;
+            public READER(DeserializerState ctx)
+            {
+                this.ctx = ctx;
+            }
+
+            public static READER create(DeserializerState ctx) => new READER(ctx);
+            public static implicit operator DeserializerState(READER reader) => reader.ctx;
+            public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+            public ushort Major => ctx.ReadDataUShort(0UL, (ushort)0);
+            public byte Minor => ctx.ReadDataByte(16UL, (byte)0);
+            public byte Micro => ctx.ReadDataByte(24UL, (byte)0);
+        }
+
+        public class WRITER : SerializerState
+        {
+            public WRITER()
+            {
+                this.SetStruct(1, 0);
+            }
+
+            public ushort Major
+            {
+                get => this.ReadDataUShort(0UL, (ushort)0);
+                set => this.WriteData(0UL, value, (ushort)0);
+            }
+
+            public byte Minor
+            {
+                get => this.ReadDataByte(16UL, (byte)0);
+                set => this.WriteData(16UL, value, (byte)0);
+            }
+
+            public byte Micro
+            {
+                get => this.ReadDataByte(24UL, (byte)0);
+                set => this.WriteData(24UL, value, (byte)0);
+            }
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xbfc546f6210ad7ceUL)]
+    public class CodeGeneratorRequest : ICapnpSerializable
+    {
+        public const UInt64 typeId = 0xbfc546f6210ad7ceUL;
+        void ICapnpSerializable.Deserialize(DeserializerState arg_)
+        {
+            var reader = READER.create(arg_);
+            Nodes = reader.Nodes?.ToReadOnlyList(_ => CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Node>(_));
+            RequestedFiles = reader.RequestedFiles?.ToReadOnlyList(_ => CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.CodeGeneratorRequest.RequestedFile>(_));
+            CapnpVersion = CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.CapnpVersion>(reader.CapnpVersion);
+            SourceInfo = reader.SourceInfo?.ToReadOnlyList(_ => CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.Node.SourceInfo>(_));
+            applyDefaults();
+        }
+
+        public void serialize(WRITER writer)
+        {
+            writer.Nodes.Init(Nodes, (_s1, _v1) => _v1?.serialize(_s1));
+            writer.RequestedFiles.Init(RequestedFiles, (_s1, _v1) => _v1?.serialize(_s1));
+            CapnpVersion?.serialize(writer.CapnpVersion);
+            writer.SourceInfo.Init(SourceInfo, (_s1, _v1) => _v1?.serialize(_s1));
+        }
+
+        void ICapnpSerializable.Serialize(SerializerState arg_)
+        {
+            serialize(arg_.Rewrap<WRITER>());
+        }
+
+        public void applyDefaults()
+        {
+        }
+
+        public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Node> Nodes
+        {
+            get;
+            set;
+        }
+
+        public IReadOnlyList<CapnpC.CSharp.Generator.Schema.CodeGeneratorRequest.RequestedFile> RequestedFiles
+        {
+            get;
+            set;
+        }
+
+        public CapnpC.CSharp.Generator.Schema.CapnpVersion CapnpVersion
+        {
+            get;
+            set;
+        }
+
+        public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Node.SourceInfo> SourceInfo
+        {
+            get;
+            set;
+        }
+
+        public struct READER
+        {
+            readonly DeserializerState ctx;
+            public READER(DeserializerState ctx)
+            {
+                this.ctx = ctx;
+            }
+
+            public static READER create(DeserializerState ctx) => new READER(ctx);
+            public static implicit operator DeserializerState(READER reader) => reader.ctx;
+            public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+            public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Node.READER> Nodes => ctx.ReadList(0).Cast(CapnpC.CSharp.Generator.Schema.Node.READER.create);
+            public IReadOnlyList<CapnpC.CSharp.Generator.Schema.CodeGeneratorRequest.RequestedFile.READER> RequestedFiles => ctx.ReadList(1).Cast(CapnpC.CSharp.Generator.Schema.CodeGeneratorRequest.RequestedFile.READER.create);
+            public CapnpC.CSharp.Generator.Schema.CapnpVersion.READER CapnpVersion => ctx.ReadStruct(2, CapnpC.CSharp.Generator.Schema.CapnpVersion.READER.create);
+            public IReadOnlyList<CapnpC.CSharp.Generator.Schema.Node.SourceInfo.READER> SourceInfo => ctx.ReadList(3).Cast(CapnpC.CSharp.Generator.Schema.Node.SourceInfo.READER.create);
+        }
+
+        public class WRITER : SerializerState
+        {
+            public WRITER()
+            {
+                this.SetStruct(0, 4);
+            }
+
+            public ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Node.WRITER> Nodes
+            {
+                get => BuildPointer<ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Node.WRITER>>(0);
+                set => Link(0, value);
+            }
+
+            public ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.CodeGeneratorRequest.RequestedFile.WRITER> RequestedFiles
+            {
+                get => BuildPointer<ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.CodeGeneratorRequest.RequestedFile.WRITER>>(1);
+                set => Link(1, value);
+            }
+
+            public CapnpC.CSharp.Generator.Schema.CapnpVersion.WRITER CapnpVersion
+            {
+                get => BuildPointer<CapnpC.CSharp.Generator.Schema.CapnpVersion.WRITER>(2);
+                set => Link(2, value);
+            }
+
+            public ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Node.SourceInfo.WRITER> SourceInfo
+            {
+                get => BuildPointer<ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.Node.SourceInfo.WRITER>>(3);
+                set => Link(3, value);
+            }
+        }
+
+        [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xcfea0eb02e810062UL)]
+        public class RequestedFile : ICapnpSerializable
+        {
+            public const UInt64 typeId = 0xcfea0eb02e810062UL;
+            void ICapnpSerializable.Deserialize(DeserializerState arg_)
+            {
+                var reader = READER.create(arg_);
+                Id = reader.Id;
+                Filename = reader.Filename;
+                Imports = reader.Imports?.ToReadOnlyList(_ => CapnpSerializable.Create<CapnpC.CSharp.Generator.Schema.CodeGeneratorRequest.RequestedFile.Import>(_));
+                applyDefaults();
+            }
+
+            public void serialize(WRITER writer)
+            {
+                writer.Id = Id;
+                writer.Filename = Filename;
+                writer.Imports.Init(Imports, (_s1, _v1) => _v1?.serialize(_s1));
+            }
+
+            void ICapnpSerializable.Serialize(SerializerState arg_)
+            {
+                serialize(arg_.Rewrap<WRITER>());
+            }
+
+            public void applyDefaults()
+            {
+            }
+
+            public ulong Id
+            {
+                get;
+                set;
+            }
+
+            public string Filename
+            {
+                get;
+                set;
+            }
+
+            public IReadOnlyList<CapnpC.CSharp.Generator.Schema.CodeGeneratorRequest.RequestedFile.Import> Imports
+            {
+                get;
+                set;
+            }
+
+            public struct READER
+            {
+                readonly DeserializerState ctx;
+                public READER(DeserializerState ctx)
+                {
+                    this.ctx = ctx;
+                }
+
+                public static READER create(DeserializerState ctx) => new READER(ctx);
+                public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                public ulong Id => ctx.ReadDataULong(0UL, 0UL);
+                public string Filename => ctx.ReadText(0, null);
+                public IReadOnlyList<CapnpC.CSharp.Generator.Schema.CodeGeneratorRequest.RequestedFile.Import.READER> Imports => ctx.ReadList(1).Cast(CapnpC.CSharp.Generator.Schema.CodeGeneratorRequest.RequestedFile.Import.READER.create);
+            }
+
+            public class WRITER : SerializerState
+            {
+                public WRITER()
+                {
+                    this.SetStruct(1, 2);
+                }
+
+                public ulong Id
+                {
+                    get => this.ReadDataULong(0UL, 0UL);
+                    set => this.WriteData(0UL, value, 0UL);
+                }
+
+                public string Filename
+                {
+                    get => this.ReadText(0, null);
+                    set => this.WriteText(0, value, null);
+                }
+
+                public ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.CodeGeneratorRequest.RequestedFile.Import.WRITER> Imports
+                {
+                    get => BuildPointer<ListOfStructsSerializer<CapnpC.CSharp.Generator.Schema.CodeGeneratorRequest.RequestedFile.Import.WRITER>>(1);
+                    set => Link(1, value);
+                }
+            }
+
+            [System.CodeDom.Compiler.GeneratedCode("capnpc-csharp", "1.3.0.0"), TypeId(0xae504193122357e5UL)]
+            public class Import : ICapnpSerializable
+            {
+                public const UInt64 typeId = 0xae504193122357e5UL;
+                void ICapnpSerializable.Deserialize(DeserializerState arg_)
+                {
+                    var reader = READER.create(arg_);
+                    Id = reader.Id;
+                    Name = reader.Name;
+                    applyDefaults();
+                }
+
+                public void serialize(WRITER writer)
+                {
+                    writer.Id = Id;
+                    writer.Name = Name;
+                }
+
+                void ICapnpSerializable.Serialize(SerializerState arg_)
+                {
+                    serialize(arg_.Rewrap<WRITER>());
+                }
+
+                public void applyDefaults()
+                {
+                }
+
+                public ulong Id
+                {
+                    get;
+                    set;
+                }
+
+                public string Name
+                {
+                    get;
+                    set;
+                }
+
+                public struct READER
+                {
+                    readonly DeserializerState ctx;
+                    public READER(DeserializerState ctx)
+                    {
+                        this.ctx = ctx;
+                    }
+
+                    public static READER create(DeserializerState ctx) => new READER(ctx);
+                    public static implicit operator DeserializerState(READER reader) => reader.ctx;
+                    public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
+                    public ulong Id => ctx.ReadDataULong(0UL, 0UL);
+                    public string Name => ctx.ReadText(0, null);
+                }
+
+                public class WRITER : SerializerState
+                {
+                    public WRITER()
+                    {
+                        this.SetStruct(1, 1);
+                    }
+
+                    public ulong Id
+                    {
+                        get => this.ReadDataULong(0UL, 0UL);
+                        set => this.WriteData(0UL, value, 0UL);
+                    }
+
+                    public string Name
+                    {
+                        get => this.ReadText(0, null);
+                        set => this.WriteText(0, value, null);
+                    }
+                }
             }
         }
     }

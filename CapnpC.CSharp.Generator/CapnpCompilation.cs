@@ -40,7 +40,7 @@ namespace CapnpC.CSharp.Generator
             {
                 var segments = Framing.ReadSegments(input);
                 var dec = DeserializerState.CreateRoot(segments);
-                var reader = Schema.CodeGeneratorRequest.Reader.Create(dec);
+                var reader = Schema.CodeGeneratorRequest.READER.create(dec);
                 var model = Model.SchemaModel.Create(reader);
                 var codeGen = new CodeGen.CodeGenerator(model, options ?? new CodeGen.GeneratorOptions());
                 return new GenerationResult(codeGen.Generate());

@@ -40,7 +40,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 EqualsValueClause(
                     LiteralExpression(
                         SyntaxKind.NumericLiteralExpression,
-                        Literal(Schema.Field.Reader.NoDiscriminant))));
+                        Literal(SchemaModel.NoDiscriminant))));
 
             whichEnum = whichEnum.AddMembers(ndecl);
 

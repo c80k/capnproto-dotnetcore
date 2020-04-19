@@ -664,6 +664,21 @@ this.ValidGeneratorOutput("NullableEnable2.capnp.bin", "false", "true", "success
 this.ValidGeneratorOutput("rpc-csharp.capnp.bin", "true", "true", "warnings", ((string[])(null)));
 #line hidden
         }
+        
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Valid generator output: Variant 16")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 16")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "schema-csharp.capnp.bin")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:nullablegen", "false")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:nullablesupp", "false")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:outcome", "success")]
+        public virtual void ValidGeneratorOutput_Variant16()
+        {
+#line 50
+this.ValidGeneratorOutput("schema-csharp.capnp.bin", "false", "false", "success", ((string[])(null)));
+#line hidden
+        }
     }
 }
 #pragma warning restore

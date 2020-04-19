@@ -412,7 +412,9 @@ namespace Capnp.Net.Runtime.Tests
         public void InitConsoleLogging()
         {
             Logging.LoggerFactory?.Dispose();
+#pragma warning disable CS0618 // Typ oder Element ist veraltet
             Logging.LoggerFactory = new LoggerFactory().AddConsole((msg, level) => true);
+#pragma warning restore CS0618 // Typ oder Element ist veraltet
             Logger = Logging.CreateLogger<TcpRpcStress>();
             if (Thread.CurrentThread.Name == null)
                 Thread.CurrentThread.Name = $"Test Thread {Thread.CurrentThread.ManagedThreadId}";

@@ -162,10 +162,12 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void ObsoleteGetAnswer()
         {
+#pragma warning disable CS0618
             var answer = new PromisedAnswerMock();
             Assert.ThrowsException<ArgumentException>(() => Impatient.GetAnswer(answer.WhenReturned));
             var t = Impatient.MakePipelineAware(answer, _ => _);
             Assert.AreEqual(answer, Impatient.GetAnswer(t));
+#pragma warning restore CS0618
         }
 
         [TestMethod]
@@ -182,8 +184,10 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void ObsoletePseudoEager()
         {
+#pragma warning disable CS0618
             var task = Task.FromResult<ITestInterface>(new TestInterfaceImpl2());
             Assert.IsTrue(task.PseudoEager() is Proxy proxy && proxy.WhenResolved.IsCompleted);
+#pragma warning restore CS0618
         }
 
         [TestMethod]
