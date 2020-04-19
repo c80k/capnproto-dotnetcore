@@ -88,7 +88,7 @@ test_script:
       vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Debug\netcoreapp2.1\Capnp.Net.Runtime.Tests.dll
       vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\netcoreapp2.1\Capnp.Net.Runtime.Tests.dll
       powershell -File .\scripts\measure-coverage.ps1
-      csmacnz.Coveralls --multiple -i "opencover=coverage\cov-Capnp.Net.Runtime.xml;opencover=coverage\cov-CapnpC.CSharp.Generator.xml" --repoToken %COVERALLS_REPO_TOKEN%
+      csmacnz.Coveralls --opencover -i "coverage\coverage.xml" --repoToken %COVERALLS_REPO_TOKEN%
 on_finish :
   # any cleanup in here
 deploy:
