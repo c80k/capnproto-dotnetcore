@@ -359,7 +359,8 @@ namespace Capnp.Net.Runtime.Tests
                 client.AttachTracer(new FrameTracing.RpcFrameTracer(Console.Out, false));
             if (options.HasFlag(TcpRpcTestOptions.ClientFluctStream))
                 client.InjectMidlayer(s => new FluctStream(s));
-            client.Connect("localhost", TcpPort);
+            if (!options.HasFlag(TcpRpcTestOptions.ClientNoConnect))
+                client.Connect("localhost", TcpPort);
             return client;
         }
 
@@ -368,7 +369,8 @@ namespace Capnp.Net.Runtime.Tests
         {
             None = 0,
             ClientTracer = 1,
-            ClientFluctStream = 2
+            ClientFluctStream = 2,
+            ClientNoConnect = 4
         }
 
         protected static TcpRpcServer SetupServer()

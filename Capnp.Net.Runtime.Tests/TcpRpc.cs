@@ -16,38 +16,9 @@ namespace Capnp.Net.Runtime.Tests
 
     [TestClass]
     [TestCategory("Coverage")]
-    public class TcpRpc
+    public class TcpRpc: TestBase
     {
-        public static int TcpPort = 49153;
-
-        (TcpRpcServer, TcpRpcClient) SetupClientServerPair()
-        {
-            var server = new TcpRpcServer(IPAddress.Any, TcpPort);
-            var client = new TcpRpcClient("localhost", TcpPort);
-            return (server, client);
-        }
-
-        bool ExpectingLogOutput { get; set; }
-
-        [TestInitialize]
-        public void InitConsoleLogging()
-        {
-            ExpectingLogOutput = true;
-
-            Logging.LoggerFactory?.Dispose();
-#pragma warning disable CS0618 // Typ oder Element ist veraltet
-            Logging.LoggerFactory = new LoggerFactory().AddConsole((msg, level) =>
-            {
-                if (!ExpectingLogOutput && level != LogLevel.Debug)
-                {
-                    Assert.Fail("Did not expect any logging output, but got this: " + msg);
-                }
-                return true;
-            });
-#pragma warning restore CS0618 // Typ oder Element ist veraltet
-        }
-
-        int MediumNonDbgTimeout => Debugger.IsAttached ? Timeout.Infinite : 2000;
+        bool ExpectingLogOutput { get; set; } = true;
 
         [TestMethod]
         public void CreateAndDispose()
@@ -720,9 +691,30 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
+        static void RobustStartAccepting(TcpRpcServer server)
+        {
+            int retry = 0;
+
+            do
+            {
+                try
+                {
+                    server.StartAccepting(IPAddress.Any, TcpPort);
+                    break;
+                }
+                catch (SocketException)
+                {
+                    if (retry++ == 100)
+                        throw;
+
+                    IncrementTcpPort();
+                }
+            } while (true);
+        }
+
         [TestMethod]
         public void Server1()
-        {
+        {            
             var cbb = new BufferBlock<IConnection>();
             var server = new TcpRpcServer();
             server.Main = new TestInterfaceImpl2();
@@ -757,7 +749,7 @@ namespace Capnp.Net.Runtime.Tests
 
             Assert.ThrowsException<InvalidOperationException>(() => server.StopListening());
 
-            server.StartAccepting(IPAddress.Any, TcpPort);
+            RobustStartAccepting(server);
             Assert.IsTrue(server.IsAlive);
             Assert.ThrowsException<InvalidOperationException>(() => server.StartAccepting(IPAddress.Any, TcpPort));
 
@@ -822,7 +814,7 @@ namespace Capnp.Net.Runtime.Tests
                 server.Dispose();
             };
 
-            server.StartAccepting(IPAddress.Any, TcpPort);
+            RobustStartAccepting(server);
 
             var client1 = new TcpRpcClient("localhost", TcpPort);
             Assert.IsTrue(client1.WhenConnected.Wait(MediumNonDbgTimeout), "Did not connect");
@@ -842,7 +834,7 @@ namespace Capnp.Net.Runtime.Tests
                     a.Connection.Close();
                 };
 
-                server.StartAccepting(IPAddress.Any, TcpPort);
+                RobustStartAccepting(server);
 
                 var client1 = new TcpRpcClient("localhost", TcpPort);
                 Assert.IsTrue(client1.WhenConnected.Wait(MediumNonDbgTimeout));
@@ -863,7 +855,7 @@ namespace Capnp.Net.Runtime.Tests
                 Assert.ThrowsException<InvalidOperationException>(() => client.GetMain<ITestInterface>());
                 Assert.ThrowsException<ArgumentNullException>(() => client.AttachTracer(null));
                 Assert.ThrowsException<ArgumentNullException>(() => client.InjectMidlayer(null));
-                server.StartAccepting(IPAddress.Any, TcpPort);
+                RobustStartAccepting(server);
                 client.Connect("localhost", TcpPort);
                 Assert.ThrowsException<InvalidOperationException>(() => client.Connect("localhost", TcpPort));
                 Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
