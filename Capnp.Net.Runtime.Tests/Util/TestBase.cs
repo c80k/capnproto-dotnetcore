@@ -276,7 +276,7 @@ namespace Capnp.Net.Runtime.Tests
             public void RunTest(Action<ITestbed> action)
             {
                 (_server, _client) = SetupClientServerPair(_options);
-                Assert.IsTrue(SpinWait.SpinUntil(() => _server.ConnectionCount > 0, MediumNonDbgTimeout));
+                Assert.IsTrue(SpinWait.SpinUntil(() => _server.ConnectionCount > 0, 2 * MediumNonDbgTimeout));
                 var conn = _server.Connections[0];
 
                 using (_server)
