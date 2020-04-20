@@ -1,4 +1,5 @@
 ﻿using Capnp.Net.Runtime.Tests.GenImpls;
+using Capnp.Net.Runtime.Tests.Util;
 using Capnp.Rpc;
 using Capnproto_test.Capnp.Test;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -16,7 +17,8 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void MultiConnect()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 var tcs = new TaskCompletionSource<int>();
@@ -24,7 +26,7 @@ namespace Capnp.Net.Runtime.Tests
 
                 for (int i = 1; i <= 10; i++)
                 {
-                    using (var client = SetupClient())
+                    using (var client = SetupClient(addr, port))
                     {
                         //client.WhenConnected.Wait();
 
@@ -54,13 +56,14 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void TwoClients()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
 
-                using (var client1 = SetupClient())
-                using (var client2 = SetupClient())
+                using (var client1 = SetupClient(addr, port))
+                using (var client2 = SetupClient(addr, port))
                 {
                     //Assert.IsTrue(client1.WhenConnected.Wait(MediumNonDbgTimeout));
                     //Assert.IsTrue(client2.WhenConnected.Wait(MediumNonDbgTimeout));
@@ -95,12 +98,13 @@ namespace Capnp.Net.Runtime.Tests
         {
             for (int i = 0; i < 100; i++)
             {
-                var server = SetupServer();
+                (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+                var server = SetupServer(addr, port);
                 var counters = new Counters();
                 var tcs = new TaskCompletionSource<int>();
                 server.Main = new TestInterfaceImpl(counters, tcs);
 
-                using (var client = SetupClient())
+                using (var client = SetupClient(addr, port))
                 {
                     client.WhenConnected.Wait();
 
@@ -125,12 +129,13 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void InheritFromGenericInterface()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 server.Main = new B2Impl();
 
-                using (var client = SetupClient())
+                using (var client = SetupClient(addr, port))
                 {
                     //client.WhenConnected.Wait();
 
@@ -148,11 +153,12 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void Issue25()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 server.Main = new Issue25BImpl();
 
-                using (var client = SetupClient())
+                using (var client = SetupClient(addr, port))
                 {
                     //client.WhenConnected.Wait();
 
@@ -177,12 +183,13 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void ExportCapToThirdParty()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl3();
 
-                using (var client = SetupClient())
+                using (var client = SetupClient(addr, port))
                 {
                     //Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
 
@@ -190,11 +197,13 @@ namespace Capnp.Net.Runtime.Tests
                     {
                         var held = main.GetHeld().Eager();
 
-                        using (var server2 = SetupServer())
+                        (addr, port) = TcpManager.Instance.GetLocalAddressAndPort();
+
+                        using (var server2 = SetupServer(addr, port))
                         {
                             server2.Main = new TestMoreStuffImpl2();
 
-                            using (var client2 = SetupClient())
+                            using (var client2 = SetupClient(addr, port))
                             {
                                 //Assert.IsTrue(client2.WhenConnected.Wait(MediumNonDbgTimeout));
 
@@ -215,11 +224,12 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void ExportTailCallCapToThirdParty()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 server.Main = new TestTailCallerImpl2();
 
-                using (var client = SetupClient())
+                using (var client = SetupClient(addr, port))
                 {
                     //Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
 
@@ -230,7 +240,7 @@ namespace Capnp.Net.Runtime.Tests
                         Assert.IsTrue(fooTask.Wait(MediumNonDbgTimeout));
 
                         using (var c = fooTask.Result.C)
-                        using (var client2 = SetupClient())
+                        using (var client2 = SetupClient(addr, port))
                         {
                             //Assert.IsTrue(client2.WhenConnected.Wait(MediumNonDbgTimeout));
 
@@ -249,11 +259,12 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void SalamiTactics()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 server.Main = new TestMoreStuffImpl3();
 
-                using (var client = SetupClient())
+                using (var client = SetupClient(addr, port))
                 {
                     //client.WhenConnected.Wait();
 

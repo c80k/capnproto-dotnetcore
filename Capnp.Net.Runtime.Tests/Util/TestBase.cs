@@ -1,4 +1,5 @@
-﻿using Capnp.Rpc;
+﻿using Capnp.Net.Runtime.Tests.Util;
+using Capnp.Rpc;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -344,14 +345,13 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        public static int TcpPort = 49152;
         public static int MediumNonDbgTimeout => Debugger.IsAttached ? Timeout.Infinite : 5000;
         public static int LargeNonDbgTimeout => Debugger.IsAttached ? Timeout.Infinite : 20000;
         public static int ShortTimeout => 500;
 
         protected ILogger Logger { get; set; }
 
-        protected static TcpRpcClient SetupClient(TcpRpcTestOptions options = TcpRpcTestOptions.None)
+        protected static TcpRpcClient SetupClient(IPAddress addr, int port, TcpRpcTestOptions options = TcpRpcTestOptions.None)
         {
             var client = new TcpRpcClient();
             client.AddBuffering();
@@ -360,7 +360,7 @@ namespace Capnp.Net.Runtime.Tests
             if (options.HasFlag(TcpRpcTestOptions.ClientFluctStream))
                 client.InjectMidlayer(s => new FluctStream(s));
             if (!options.HasFlag(TcpRpcTestOptions.ClientNoConnect))
-                client.Connect("localhost", TcpPort);
+                client.Connect(addr.ToString(), port);
             return client;
         }
 
@@ -373,36 +373,21 @@ namespace Capnp.Net.Runtime.Tests
             ClientNoConnect = 4
         }
 
-        protected static TcpRpcServer SetupServer()
+        protected static TcpRpcServer SetupServer(IPAddress addr, int port)
         {
-            int attempt = 0;
-
-            while (true)
-            {
-                try
-                {
-                    var server = new TcpRpcServer(IPAddress.Any, TcpPort);
-                    server.AddBuffering();
-                    return server;
-                }
-                catch (SocketException)
-                {
-                    // If the TCP listening port is occupied by some other process, retry with a different one
-                    // TIME_WAIT is 4min: http://blog.davidvassallo.me/2010/07/13/time_wait-and-port-reuse/
-                    if (attempt == 2400)
-                        throw;
-                }
-
-                IncrementTcpPort();
-                ++attempt;
-                Thread.Sleep(100);
-            }
+            var server = new TcpRpcServer();
+            server.AddBuffering();
+            server.StartAccepting(addr, port);
+            return server;
         }
 
         protected static (TcpRpcServer, TcpRpcClient) SetupClientServerPair(TcpRpcTestOptions options = TcpRpcTestOptions.None)
         {
-            var server = SetupServer();
-            var client = SetupClient(options);
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+
+            var server = SetupServer(addr, port);
+            var client = SetupClient(addr, port, options);
+
             return (server, client);
         }
 
@@ -411,14 +396,6 @@ namespace Capnp.Net.Runtime.Tests
             pair = new EnginePair(decisionTree);
             pair.Engine1.Main = main;
             return (CapabilityReflection.CreateProxy<T>(pair.Endpoint2.QueryMain()) as T);
-        }
-
-        public static void IncrementTcpPort()
-        {
-            if (++TcpPort > 49200)
-            {
-                TcpPort = 49152;
-            }
         }
 
         protected static DtbdctTestbed NewDtbdctTestbed() => new DtbdctTestbed();

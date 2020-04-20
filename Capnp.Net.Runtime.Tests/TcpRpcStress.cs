@@ -1,4 +1,5 @@
 ﻿using Capnp.Net.Runtime.Tests.GenImpls;
+using Capnp.Net.Runtime.Tests.Util;
 using Capnp.Rpc;
 using Capnproto_test.Capnp.Test;
 using Microsoft.Extensions.Logging;
@@ -20,7 +21,6 @@ namespace Capnp.Net.Runtime.Tests
             for (int i = 0; i < count; i++)
             {
                 Logger.LogTrace("Repetition {0}", i);
-                IncrementTcpPort();
                 action();
             }
         }
@@ -109,45 +109,36 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void ScatteredTransfer()
         {
-            for (int retry = 0; retry < 10; retry++)
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+
+            using (var server = new TcpRpcServer(addr, port))
+            using (var client = new TcpRpcClient())
             {
-                try
+                server.InjectMidlayer(s => new ScatteringStream(s, 7));
+                client.InjectMidlayer(s => new ScatteringStream(s, 10));
+                client.Connect(addr.ToString(), port);
+                //client.WhenConnected.Wait();
+
+                var counters = new Counters();
+                server.Main = new TestInterfaceImpl(counters);
+                using (var main = client.GetMain<ITestInterface>())
                 {
-                    using (var server = new TcpRpcServer(IPAddress.Any, TcpPort))
-                    using (var client = new TcpRpcClient())
+                    for (int i = 0; i < 100; i++)
                     {
-                        server.InjectMidlayer(s => new ScatteringStream(s, 7));
-                        client.InjectMidlayer(s => new ScatteringStream(s, 10));
-                        client.Connect("localhost", TcpPort);
-                        //client.WhenConnected.Wait();
+                        var request1 = main.Foo(123, true, default);
+                        var request3 = Assert.ThrowsExceptionAsync<RpcException>(() => main.Bar(default));
+                        var s = new TestAllTypes();
+                        Common.InitTestMessage(s);
+                        var request2 = main.Baz(s, default);
 
-                        var counters = new Counters();
-                        server.Main = new TestInterfaceImpl(counters);
-                        using (var main = client.GetMain<ITestInterface>())
-                        {
-                            for (int i = 0; i < 100; i++)
-                            {
-                                var request1 = main.Foo(123, true, default);
-                                var request3 = Assert.ThrowsExceptionAsync<RpcException>(() => main.Bar(default));
-                                var s = new TestAllTypes();
-                                Common.InitTestMessage(s);
-                                var request2 = main.Baz(s, default);
+                        Assert.IsTrue(request1.Wait(MediumNonDbgTimeout));
+                        Assert.IsTrue(request2.Wait(MediumNonDbgTimeout));
+                        Assert.IsTrue(request3.Wait(MediumNonDbgTimeout));
 
-                                Assert.IsTrue(request1.Wait(MediumNonDbgTimeout));
-                                Assert.IsTrue(request2.Wait(MediumNonDbgTimeout));
-                                Assert.IsTrue(request3.Wait(MediumNonDbgTimeout));
-
-                                Assert.AreEqual("foo", request1.Result);
-                                Assert.AreEqual(2, counters.CallCount);
-                                counters.CallCount = 0;
-                            }
-                        }
+                        Assert.AreEqual("foo", request1.Result);
+                        Assert.AreEqual(2, counters.CallCount);
+                        counters.CallCount = 0;
                     }
-                    return;
-                }
-                catch (SocketException)
-                {
-                    IncrementTcpPort();
                 }
             }
         }

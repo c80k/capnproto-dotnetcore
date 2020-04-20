@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Threading.Tasks.Dataflow;
 using Capnp.Net.Runtime.Tests.GenImpls;
 using Capnproto_test.Capnp.Test;
+using Capnp.Net.Runtime.Tests.Util;
 
 namespace Capnp.Net.Runtime.Tests
 {
@@ -56,7 +57,8 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void ConnectNoServer()
         {
-            using (var client = new TcpRpcClient("localhost", TcpPort))
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var client = new TcpRpcClient(addr.ToString(), port))
             {
                 Assert.IsTrue(Assert.ThrowsExceptionAsync<RpcException>(() => client.WhenConnected).Wait(10000));
             }
@@ -692,35 +694,15 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        static void RobustStartAccepting(TcpRpcServer server)
-        {
-            int retry = 0;
-
-            do
-            {
-                try
-                {
-                    server.StartAccepting(IPAddress.Any, TcpPort);
-                    break;
-                }
-                catch (SocketException)
-                {
-                    if (retry++ == 100)
-                        throw;
-
-                    IncrementTcpPort();
-                }
-            } while (true);
-        }
-
         [TestMethod]
         public void Server1()
-        {            
+        {
             var cbb = new BufferBlock<IConnection>();
             var server = new TcpRpcServer();
             server.Main = new TestInterfaceImpl2();
             bool init = true;
             var tracer = new FrameTracing.RpcFrameTracer(Console.Out);
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
             server.OnConnectionChanged += (s, a) =>
             {
                 var c = a.Connection;
@@ -734,7 +716,7 @@ namespace Capnp.Net.Runtime.Tests
                     Assert.IsFalse(c.IsWaitingForData);
                     Assert.AreEqual(ConnectionState.Initializing, c.State);
                     Assert.IsNotNull(c.RemotePort);
-                    Assert.AreEqual(TcpPort, c.LocalPort);
+                    Assert.AreEqual(port, c.LocalPort);
                     Assert.AreEqual(0L, c.RecvCount);
                     Assert.AreEqual(0L, c.SendCount);
                 }
@@ -750,14 +732,14 @@ namespace Capnp.Net.Runtime.Tests
 
             Assert.ThrowsException<InvalidOperationException>(() => server.StopListening());
 
-            RobustStartAccepting(server);
+            server.StartAccepting(addr, port);
             Assert.IsTrue(server.IsAlive);
-            Assert.ThrowsException<InvalidOperationException>(() => server.StartAccepting(IPAddress.Any, TcpPort));
+            Assert.ThrowsException<InvalidOperationException>(() => server.StartAccepting(addr, port));
 
             var server2 = new TcpRpcServer();
-            Assert.ThrowsException<SocketException>(() => server2.StartAccepting(IPAddress.Any, TcpPort));
+            Assert.ThrowsException<SocketException>(() => server2.StartAccepting(addr, port));
 
-            var client1 = new TcpRpcClient("localhost", TcpPort);
+            var client1 = new TcpRpcClient(addr.ToString(), port);
             var c1 = cbb.Receive(TimeSpan.FromMilliseconds(MediumNonDbgTimeout));
             Assert.IsNotNull(c1);
             Assert.AreEqual(1, server.ConnectionCount);
@@ -768,7 +750,7 @@ namespace Capnp.Net.Runtime.Tests
             Assert.IsTrue(c1.RecvCount > 0);
             Assert.IsTrue(c1.SendCount > 0);
 
-            var client2 = new TcpRpcClient("localhost", TcpPort);
+            var client2 = new TcpRpcClient(addr.ToString(), port);
             var c2 = cbb.Receive(TimeSpan.FromMilliseconds(MediumNonDbgTimeout));
             Assert.IsNotNull(c2);
             Assert.AreEqual(2, server.ConnectionCount);
@@ -795,7 +777,7 @@ namespace Capnp.Net.Runtime.Tests
 
             for (int i = 0; i < 100; i++)
             {
-                server.StartAccepting(IPAddress.Any, TcpPort);
+                server.StartAccepting(addr, port);
                 Assert.IsTrue(server.IsAlive);
                 server.StopListening();
                 Assert.IsFalse(server.IsAlive);
@@ -815,9 +797,10 @@ namespace Capnp.Net.Runtime.Tests
                 server.Dispose();
             };
 
-            RobustStartAccepting(server);
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            server.StartAccepting(addr, port);
 
-            var client1 = new TcpRpcClient("localhost", TcpPort);
+            var client1 = new TcpRpcClient(addr.ToString(), port);
             Assert.IsTrue(client1.WhenConnected.Wait(MediumNonDbgTimeout), "Did not connect");
             Assert.IsTrue(SpinWait.SpinUntil(() => client1.State == ConnectionState.Down, MediumNonDbgTimeout),
                 $"Connection did not go down: {client1.State}");
@@ -835,9 +818,10 @@ namespace Capnp.Net.Runtime.Tests
                     a.Connection.Close();
                 };
 
-                RobustStartAccepting(server);
+                (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+                server.StartAccepting(addr, port);
 
-                var client1 = new TcpRpcClient("localhost", TcpPort);
+                var client1 = new TcpRpcClient(addr.ToString(), port);
                 Assert.IsTrue(client1.WhenConnected.Wait(MediumNonDbgTimeout));
                 Assert.IsTrue(SpinWait.SpinUntil(() => client1.State == ConnectionState.Down, MediumNonDbgTimeout));
             }
@@ -856,13 +840,14 @@ namespace Capnp.Net.Runtime.Tests
                 Assert.ThrowsException<InvalidOperationException>(() => client.GetMain<ITestInterface>());
                 Assert.ThrowsException<ArgumentNullException>(() => client.AttachTracer(null));
                 Assert.ThrowsException<ArgumentNullException>(() => client.InjectMidlayer(null));
-                RobustStartAccepting(server);
-                client.Connect("localhost", TcpPort);
-                Assert.ThrowsException<InvalidOperationException>(() => client.Connect("localhost", TcpPort));
+                (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+                server.StartAccepting(addr, port);
+                client.Connect(addr.ToString(), port);
+                Assert.ThrowsException<InvalidOperationException>(() => client.Connect(addr.ToString(), port));
                 Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
                 Assert.ThrowsException<InvalidOperationException>(() => client.AttachTracer(new FrameTracing.RpcFrameTracer(Console.Out, false)));
                 Assert.ThrowsException<InvalidOperationException>(() => client.InjectMidlayer(_ => _));
-                Assert.AreEqual(TcpPort, client.RemotePort);
+                Assert.AreEqual(port, client.RemotePort);
                 Assert.IsTrue(client.LocalPort != 0);
                 Assert.AreEqual(0L, client.SendCount);
                 Assert.AreEqual(0L, client.RecvCount);
