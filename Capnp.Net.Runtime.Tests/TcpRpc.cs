@@ -132,7 +132,7 @@ namespace Capnp.Net.Runtime.Tests
                     result.WriteData(0, 654321);
                     mock.Return.SetResult(result);
 
-                    Assert.IsTrue(answer.WhenReturned.Wait(MediumNonDbgTimeout));
+                    Assert.IsTrue(answer.WhenReturned.WrappedTask.Wait(MediumNonDbgTimeout));
                     var outresult = answer.WhenReturned.Result;
                     Assert.AreEqual(ObjectKind.Struct, outresult.Kind);
                     Assert.AreEqual(654321, outresult.ReadDataInt(0));
@@ -170,7 +170,7 @@ namespace Capnp.Net.Runtime.Tests
 
                     mock.Return.SetCanceled();
 
-                    Assert.IsTrue(Assert.ThrowsExceptionAsync<TaskCanceledException>(() => answer.WhenReturned).Wait(MediumNonDbgTimeout));
+                    Assert.IsTrue(Assert.ThrowsExceptionAsync<TaskCanceledException>(async () => await answer.WhenReturned).Wait(MediumNonDbgTimeout));
                 }
             }
         }
@@ -266,7 +266,8 @@ namespace Capnp.Net.Runtime.Tests
 
                     // Even after the client cancelled the call, the server must still send
                     // a response.
-                    Assert.IsTrue(answer.WhenReturned.ContinueWith(t => { }).Wait(MediumNonDbgTimeout));
+                    async Task AwaitWhenReturned() => await answer.WhenReturned;
+                    Assert.IsTrue(AwaitWhenReturned().ContinueWith(t => { }).Wait(MediumNonDbgTimeout));
                 }
                 finally
                 {
@@ -312,7 +313,7 @@ namespace Capnp.Net.Runtime.Tests
 
                     mock.Return.SetException(new MyTestException());
 
-                    var exTask = Assert.ThrowsExceptionAsync<RpcException>(() => answer.WhenReturned);
+                    var exTask = Assert.ThrowsExceptionAsync<RpcException>(async () => await answer.WhenReturned);
                     Assert.IsTrue(exTask.Wait(MediumNonDbgTimeout));
                     Assert.IsTrue(exTask.Result.Message.Contains(new MyTestException().Message));
                 }
@@ -367,7 +368,7 @@ namespace Capnp.Net.Runtime.Tests
 
                         mock.Return.SetResult(result);
 
-                        Assert.IsTrue(answer.WhenReturned.Wait(MediumNonDbgTimeout));
+                        Assert.IsTrue(answer.WhenReturned.WrappedTask.Wait(MediumNonDbgTimeout));
                         Assert.IsFalse(ct.IsCancellationRequested);
 
                         Assert.IsTrue(mock2.WhenCalled.Wait(MediumNonDbgTimeout));
@@ -383,7 +384,7 @@ namespace Capnp.Net.Runtime.Tests
                         result2.WriteData(0, 222222);
                         mock2.Return.SetResult(result2);
 
-                        Assert.IsTrue(answer2.WhenReturned.Wait(MediumNonDbgTimeout));
+                        Assert.IsTrue(answer2.WhenReturned.WrappedTask.Wait(MediumNonDbgTimeout));
                         var outresult2 = answer2.WhenReturned.Result;
                         Assert.AreEqual(ObjectKind.Struct, outresult2.Kind);
                         Assert.AreEqual(222222, outresult2.ReadDataInt(0));
@@ -443,7 +444,7 @@ namespace Capnp.Net.Runtime.Tests
 
                         using (var answer2 = pipelined.Call(0x8765432187654321, 0x4444, args2))
                         {
-                            Assert.IsTrue(answer.WhenReturned.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(answer.WhenReturned.WrappedTask.Wait(MediumNonDbgTimeout));
                             Assert.IsTrue(mock2.WhenCalled.Wait(MediumNonDbgTimeout));
 
                             (var interfaceId2, var methodId2, var inargs2, var ct2) = mock2.WhenCalled.Result;
@@ -457,7 +458,7 @@ namespace Capnp.Net.Runtime.Tests
                             result2.WriteData(0, 222222);
                             mock2.Return.SetResult(result2);
 
-                            Assert.IsTrue(answer2.WhenReturned.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(answer2.WhenReturned.WrappedTask.Wait(MediumNonDbgTimeout));
                             var outresult2 = answer2.WhenReturned.Result;
                             Assert.AreEqual(ObjectKind.Struct, outresult2.Kind);
                             Assert.AreEqual(222222, outresult2.ReadDataInt(0));
@@ -521,7 +522,7 @@ namespace Capnp.Net.Runtime.Tests
 
                         mock.Return.SetResult(result);
 
-                        Assert.IsTrue(answer.WhenReturned.Wait(MediumNonDbgTimeout));
+                        Assert.IsTrue(answer.WhenReturned.WrappedTask.Wait(MediumNonDbgTimeout));
                         Assert.IsFalse(ct.IsCancellationRequested);
 
                         var args4 = DynamicSerializerState.CreateForRpc();
@@ -570,10 +571,10 @@ namespace Capnp.Net.Runtime.Tests
                             ret5.WriteData(0, -4);
                             call5.Result.Result.SetResult(ret5);
 
-                            Assert.IsTrue(answer2.WhenReturned.Wait(MediumNonDbgTimeout));
-                            Assert.IsTrue(answer3.WhenReturned.Wait(MediumNonDbgTimeout));
-                            Assert.IsTrue(answer4.WhenReturned.Wait(MediumNonDbgTimeout));
-                            Assert.IsTrue(answer5.WhenReturned.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(answer2.WhenReturned.WrappedTask.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(answer3.WhenReturned.WrappedTask.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(answer4.WhenReturned.WrappedTask.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(answer5.WhenReturned.WrappedTask.Wait(MediumNonDbgTimeout));
 
                             Assert.AreEqual(-1, answer2.WhenReturned.Result.ReadDataInt(0));
                             Assert.AreEqual(-2, answer3.WhenReturned.Result.ReadDataInt(0));
@@ -686,7 +687,7 @@ namespace Capnp.Net.Runtime.Tests
                     mock.Return.SetResult(result);
 
                     Assert.IsTrue(Assert.ThrowsExceptionAsync<TaskCanceledException>(
-                        () => answer2.WhenReturned).Wait(MediumNonDbgTimeout));
+                        async () => await answer2.WhenReturned).Wait(MediumNonDbgTimeout));
                 }
             }
         }

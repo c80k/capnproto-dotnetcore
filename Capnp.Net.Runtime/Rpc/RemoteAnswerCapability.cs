@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Capnp.Util;
+using System;
 using System.Threading.Tasks;
 
 namespace Capnp.Rpc
@@ -38,7 +39,7 @@ namespace Capnp.Rpc
         {
         }
 
-        async void ReAllowFinishWhenDone(Task task)
+        async void ReAllowFinishWhenDone(StrictlyOrderedAwaitTask task)
         {
             try
             {

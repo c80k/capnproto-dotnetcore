@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Capnp.Util
 {
-    internal class StrictlyOrderedAwaitTask: INotifyCompletion
+    public class StrictlyOrderedAwaitTask: INotifyCompletion
     {
         class Cover { }
         class Seal { }
@@ -99,7 +99,7 @@ namespace Capnp.Util
         public Task WrappedTask => _awaitedTask;
     }
 
-    internal class StrictlyOrderedAwaitTask<T> : StrictlyOrderedAwaitTask
+    public class StrictlyOrderedAwaitTask<T> : StrictlyOrderedAwaitTask
     {
         public StrictlyOrderedAwaitTask(Task<T> awaitedTask): base(awaitedTask)
         {
@@ -115,7 +115,7 @@ namespace Capnp.Util
     }
 
 
-    internal static class StrictlyOrderedTaskExtensions
+    public static class StrictlyOrderedTaskExtensions
     {
         public static StrictlyOrderedAwaitTask<T> EnforceAwaitOrder<T>(this Task<T> task)
         {

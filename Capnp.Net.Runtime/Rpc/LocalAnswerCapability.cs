@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Capnp.Util;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,7 +8,7 @@ namespace Capnp.Rpc
 
     class LocalAnswerCapability : RefCountingCapability, IResolvingCapability
     {
-        static async Task<Proxy> TransferOwnershipToDummyProxy(Task<DeserializerState> answer, MemberAccessPath access)
+        static async Task<Proxy> TransferOwnershipToDummyProxy(StrictlyOrderedAwaitTask<DeserializerState> answer, MemberAccessPath access)
         {
             var result = await answer;
             var cap = access.Eval(result);
@@ -23,7 +24,7 @@ namespace Capnp.Rpc
             _whenResolvedProxy = proxyTask;
         }
 
-        public LocalAnswerCapability(Task<DeserializerState> answer, MemberAccessPath access):
+        public LocalAnswerCapability(StrictlyOrderedAwaitTask<DeserializerState> answer, MemberAccessPath access):
             this(TransferOwnershipToDummyProxy(answer, access))
         {
 

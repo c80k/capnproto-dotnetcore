@@ -423,8 +423,8 @@ namespace Capnp.Net.Runtime.Tests
                             Assert.AreEqual(456u, promise.Result.I);
                             Assert.AreEqual("from TestTailCaller", promise.Result.T);
 
-                            var dependentCall1 = c.GetCallSequence(0, default);
-                            var dependentCall2 = c.GetCallSequence(0, default);
+                            var dependentCall1 = c.GetCallSequence(1, default);
+                            var dependentCall2 = c.GetCallSequence(2, default);
 
                             AssertOutput(stdout, "foo");
                             Assert.IsTrue(dependentCall0.Wait(MediumNonDbgTimeout));

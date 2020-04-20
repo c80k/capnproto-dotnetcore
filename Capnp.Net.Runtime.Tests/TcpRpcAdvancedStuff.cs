@@ -238,7 +238,7 @@ namespace Capnp.Net.Runtime.Tests
                             {
                                 var fooTask2 = main2.Foo(123, null);
                                 Assert.IsTrue(fooTask2.Wait(MediumNonDbgTimeout));
-                                Assert.IsTrue(fooTask2.C().GetCallSequence(1).Wait(MediumNonDbgTimeout));
+                                Assert.IsTrue(fooTask2.C().GetCallSequence(0).Wait(MediumNonDbgTimeout));
                             }
                         }
                     }

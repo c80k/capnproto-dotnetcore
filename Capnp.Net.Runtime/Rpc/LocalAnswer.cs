@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Capnp.Util;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,7 +12,7 @@ namespace Capnp.Rpc
         public LocalAnswer(CancellationTokenSource cts, Task<DeserializerState> call)
         {
             _cts = cts ?? throw new ArgumentNullException(nameof(cts));
-            WhenReturned = call ?? throw new ArgumentNullException(nameof(call));
+            WhenReturned = call?.EnforceAwaitOrder() ?? throw new ArgumentNullException(nameof(call));
 
             CleanupAfterReturn();
         }
@@ -23,7 +24,7 @@ namespace Capnp.Rpc
             finally { _cts.Dispose(); }
         }
 
-        public Task<DeserializerState> WhenReturned { get; }
+        public StrictlyOrderedAwaitTask<DeserializerState> WhenReturned { get; }
 
         public bool IsTailCall => false;
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Capnp.Util;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -72,7 +73,7 @@ namespace Capnp.Rpc
             return null;
         }
 
-        async void TrackCall(Task call)
+        async void TrackCall(StrictlyOrderedAwaitTask call)
         {
             try
             {

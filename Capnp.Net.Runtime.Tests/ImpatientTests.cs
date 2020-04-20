@@ -1,5 +1,6 @@
 ﻿using Capnp.Net.Runtime.Tests.GenImpls;
 using Capnp.Rpc;
+using Capnp.Util;
 using Capnproto_test.Capnp.Test;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -140,7 +141,12 @@ namespace Capnp.Net.Runtime.Tests
         class PromisedAnswerMock : IPromisedAnswer
         {
             readonly TaskCompletionSource<DeserializerState> _tcs = new TaskCompletionSource<DeserializerState>();
-            public Task<DeserializerState> WhenReturned => _tcs.Task;
+            public StrictlyOrderedAwaitTask<DeserializerState> WhenReturned { get; }
+
+            public PromisedAnswerMock()
+            {
+                WhenReturned = _tcs.Task.EnforceAwaitOrder();
+            }
 
             public bool IsTailCall => false;
 
@@ -164,7 +170,7 @@ namespace Capnp.Net.Runtime.Tests
         {
 #pragma warning disable CS0618
             var answer = new PromisedAnswerMock();
-            Assert.ThrowsException<ArgumentException>(() => Impatient.GetAnswer(answer.WhenReturned));
+            Assert.ThrowsException<ArgumentException>(() => Impatient.GetAnswer(Task.FromResult(new object())));
             var t = Impatient.MakePipelineAware(answer, _ => _);
             Assert.AreEqual(answer, Impatient.GetAnswer(t));
 #pragma warning restore CS0618
@@ -174,7 +180,8 @@ namespace Capnp.Net.Runtime.Tests
         public async Task Access()
         {
             var answer = new PromisedAnswerMock();
-            var cap = Impatient.Access(answer.WhenReturned, new MemberAccessPath(), Task.FromResult<IDisposable>(new TestInterfaceImpl2()));
+            async Task AwaitReturn() => await answer.WhenReturned;
+            var cap = Impatient.Access(AwaitReturn(), new MemberAccessPath(), Task.FromResult<IDisposable>(new TestInterfaceImpl2()));
             using (var proxy = new BareProxy(cap))
             {
                 await proxy.WhenResolved;

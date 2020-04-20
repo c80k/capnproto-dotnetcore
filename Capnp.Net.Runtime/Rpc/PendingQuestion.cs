@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Capnp.Util;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -53,6 +54,7 @@ namespace Capnp.Rpc
         }
 
         readonly TaskCompletionSource<DeserializerState> _tcs = new TaskCompletionSource<DeserializerState>();
+        readonly StrictlyOrderedAwaitTask<DeserializerState> _whenReturned;
         readonly uint _questionId;
         ConsumedCapability? _target;
         SerializerState? _inParams;
@@ -64,6 +66,8 @@ namespace Capnp.Rpc
             _questionId = id;
             _target = target;
             _inParams = inParams;
+            _whenReturned = _tcs.Task.EnforceAwaitOrder();
+
             StateFlags = inParams == null ? State.Sent : State.None;
 
             if (target != null)
@@ -81,7 +85,7 @@ namespace Capnp.Rpc
         /// <summary>
         /// Eventually returns the server answer
         /// </summary>
-        public Task<DeserializerState> WhenReturned => _tcs.Task;
+        public StrictlyOrderedAwaitTask<DeserializerState> WhenReturned => _whenReturned;
 
         /// <summary>
         /// Whether this question represents a tail call

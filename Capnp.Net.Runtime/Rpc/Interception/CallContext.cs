@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Capnp.Util;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,16 +19,17 @@ namespace Capnp.Rpc.Interception
             readonly CancellationTokenSource _cancelFromAlice = new CancellationTokenSource();
 
             public PromisedAnswer(CallContext callContext)
-            {
+            {                
                 _callContext = callContext;
+                WhenReturned = _futureResult.Task.EnforceAwaitOrder();
             }
 
-            public Task<DeserializerState> WhenReturned => _futureResult.Task;
+            public StrictlyOrderedAwaitTask<DeserializerState> WhenReturned { get; }
             public CancellationToken CancelFromAlice => _cancelFromAlice.Token;
 
             public ConsumedCapability Access(MemberAccessPath access)
             {
-                return _callContext._censorCapability.Policy.Attach<ConsumedCapability>(new LocalAnswerCapability(_futureResult.Task, access));
+                return _callContext._censorCapability.Policy.Attach<ConsumedCapability>(new LocalAnswerCapability(WhenReturned, access));
             }
 
             public ConsumedCapability Access(MemberAccessPath _, Task<IDisposable?> task)

@@ -48,7 +48,12 @@ namespace Capnp.Net.Runtime.Tests
         {
             readonly TaskCompletionSource<DeserializerState> _tcs = new TaskCompletionSource<DeserializerState>();
 
-            public Task<DeserializerState> WhenReturned => _tcs.Task;
+            public PromisedAnswerMock()
+            {
+                WhenReturned = _tcs.Task.EnforceAwaitOrder();
+            }
+
+            public StrictlyOrderedAwaitTask<DeserializerState> WhenReturned { get; }
 
             public void Return()
             {

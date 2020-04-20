@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Capnp.Util;
+using System;
 using System.Threading.Tasks;
 
 namespace Capnp.Rpc
@@ -15,7 +16,7 @@ namespace Capnp.Rpc
         /// <summary>
         /// Task which will complete when the RPC returns, delivering its result struct.
         /// </summary>
-        Task<DeserializerState> WhenReturned { get; }
+        StrictlyOrderedAwaitTask<DeserializerState> WhenReturned { get; }
 
         /// <summary>
         /// Creates a low-level capability for promise pipelining.

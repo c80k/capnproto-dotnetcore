@@ -608,6 +608,7 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
         {
             lock (_lock)
             {
+                Assert.AreEqual(expected, _counter);
                 return Task.FromResult(_counter++);
             }
         }
