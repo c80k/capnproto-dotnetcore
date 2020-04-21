@@ -240,6 +240,9 @@ namespace Capnp.Util
             }
         }
 
+        /// <summary>
+        /// Performance profiling statistics
+        /// </summary>
         public static readonly Statistics Stats = new Statistics();
 #endif
         /// <summary>

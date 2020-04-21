@@ -21,11 +21,27 @@ namespace CapnpProfile
             var payload = new byte[20];
             new Random().NextBytes(payload);
 
+#if SOTASK_PERF
+            int counter = 0;
+#endif
+
             while (true)
             {
                 var result = await echoer.Echo(payload);
                 if (result.Count != payload.Length)
                     throw new InvalidOperationException("Echo server malfunction");
+
+#if SOTASK_PERF
+                if (++counter == 1000)
+                {
+                    counter = 0;
+
+                    Console.WriteLine($"StrictlyOrderedTask performance statistics:");
+                    Console.WriteLine($"AwaitInternal: max. {Capnp.Util.StrictlyOrderedTaskExtensions.Stats.AwaitInternalMaxOuterIterations} outer iterations");
+                    Console.WriteLine($"AwaitInternal: max. {Capnp.Util.StrictlyOrderedTaskExtensions.Stats.AwaitInternalMaxInnerIterations} inner iterations");
+                    Console.WriteLine($"OnCompleted: max. {Capnp.Util.StrictlyOrderedTaskExtensions.Stats.OnCompletedMaxSpins} iterations");
+                }
+#endif
             }
         }
     }

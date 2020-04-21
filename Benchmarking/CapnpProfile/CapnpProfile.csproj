@@ -9,11 +9,12 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <PlatformTarget>x64</PlatformTarget>
+    <DefineConstants>SOTASK_PERF</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Capnp.Net.Runtime" Version="1.3.89-gdebe76be89" />
-    <PackageReference Include="CapnpC.CSharp.MsBuild.Generation" Version="1.3.89-gdebe76be89" />
+    <PackageReference Include="CapnpC.CSharp.MsBuild.Generation" Version="1.3.90-g65e87e5aa9" />
   </ItemGroup>
 
 </Project>
