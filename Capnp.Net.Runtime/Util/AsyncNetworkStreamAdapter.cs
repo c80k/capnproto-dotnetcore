@@ -7,13 +7,22 @@ namespace Capnp.Util
 {
     internal class AsyncNetworkStreamAdapter : Stream
     {
-        readonly NetworkStream _stream;
-        readonly object _reentrancyBlocker = new object();
-        //Exception? _bufferedException;
+        // Async I/O pays off for large payloads. Perf. profiling gave a threshold around 200kB
+        const int DefaultAsyncThreshold = 200000;
 
-        public AsyncNetworkStreamAdapter(Stream stream)
+        readonly NetworkStream _stream;
+        readonly int _asyncThreshold;
+        readonly object _reentrancyBlocker = new object();
+        Exception? _bufferedException;
+
+        public AsyncNetworkStreamAdapter(Stream stream, int asyncThreshold)
         {
+            _asyncThreshold = asyncThreshold;
             _stream = stream as NetworkStream ?? throw new ArgumentException("stream argument must be a NetworkStream");
+        }
+
+        public AsyncNetworkStreamAdapter(Stream stream): this(stream, DefaultAsyncThreshold)
+        {
         }
 
         public override bool CanRead => true;
@@ -32,7 +41,8 @@ namespace Capnp.Util
 
         public override void Flush()
         {
-            _stream.Flush();
+            _stream.FlushAsync();
+            //_stream.Flush();
         }
 
         public override int Read(byte[] buffer, int offset, int count)
@@ -73,7 +83,10 @@ namespace Capnp.Util
             //    throw exception;
             //}
 
-            //_stream.BeginWrite(buffer, offset, count, WriteCallback, null);
+            //if (count >= _asyncThreshold)
+            //    _stream.BeginWrite(buffer, offset, count, WriteCallback, null);
+            //else
+            //    _stream.Write(buffer, offset, count);
         }
 
         protected override void Dispose(bool disposing)

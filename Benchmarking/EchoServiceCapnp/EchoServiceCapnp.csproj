@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Capnp.Net.Runtime" Version="1.3.93-g73bd1de241" />
+    <PackageReference Include="Capnp.Net.Runtime" Version="1.3.94-g87575f12bf" />
     <PackageReference Include="CapnpC.CSharp.MsBuild.Generation" Version="1.3.92-gdb2d6bce2e" />
   </ItemGroup>
 
