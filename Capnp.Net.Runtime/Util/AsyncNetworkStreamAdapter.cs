@@ -1,28 +1,19 @@
 ﻿using System;
 using System.IO;
+using System.Net.Sockets;
+using System.Threading;
 
 namespace Capnp.Util
 {
-    internal class WriteBufferedStream : Stream
+    internal class AsyncNetworkStreamAdapter : Stream
     {
-        // A buffer size of 1024 bytes seems to be a good comprise, giving good performance 
-        // in TCP/IP-over-localhost scenarios for small to medium (200kiB) frame sizes.
-        const int DefaultBufferSize = 1024;
-
-        readonly Stream _readStream;
-        readonly BufferedStream _writeStream;
-        readonly int _bufferSize;
+        readonly NetworkStream _stream;
         readonly object _reentrancyBlocker = new object();
+        //Exception? _bufferedException;
 
-        public WriteBufferedStream(Stream stream, int bufferSize)
+        public AsyncNetworkStreamAdapter(Stream stream)
         {
-            _readStream = stream;
-            _writeStream = new BufferedStream(stream, bufferSize);
-            _bufferSize = bufferSize;
-        }
-
-        public WriteBufferedStream(Stream stream) : this(stream, DefaultBufferSize)
-        {
+            _stream = stream as NetworkStream ?? throw new ArgumentException("stream argument must be a NetworkStream");
         }
 
         public override bool CanRead => true;
@@ -41,12 +32,12 @@ namespace Capnp.Util
 
         public override void Flush()
         {
-            _writeStream.Flush();
+            _stream.Flush();
         }
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            return _readStream.Read(buffer, offset, count);
+            return _stream.Read(buffer, offset, count);
         }
 
         public override long Seek(long offset, SeekOrigin origin)
@@ -59,12 +50,30 @@ namespace Capnp.Util
             throw new NotSupportedException();
         }
 
+        //void WriteCallback(IAsyncResult ar)
+        //{
+        //    try
+        //    {
+        //        _stream.EndWrite(ar);
+        //    }
+        //    catch (Exception exception)
+        //    {
+        //        Volatile.Write(ref _bufferedException, exception);
+        //    }
+        //}
+
         public override void Write(byte[] buffer, int offset, int count)
         {
-            if (buffer.Length > _bufferSize) // avoid moiré-like timing effects
-                _writeStream.Flush();
+            _stream.WriteAsync(buffer, offset, count);
+            //var exception = Volatile.Read(ref _bufferedException);
+            
+            //if (exception != null)
+            //{
+            //    Dispose();
+            //    throw exception;
+            //}
 
-            _writeStream.Write(buffer, offset, count);
+            //_stream.BeginWrite(buffer, offset, count, WriteCallback, null);
         }
 
         protected override void Dispose(bool disposing)
@@ -75,14 +84,7 @@ namespace Capnp.Util
                 {
                     try
                     {
-                        _readStream.Dispose();
-                    }
-                    catch
-                    {
-                    }
-                    try
-                    {
-                        _writeStream.Dispose();
+                        _stream.Dispose();
                     }
                     catch
                     {

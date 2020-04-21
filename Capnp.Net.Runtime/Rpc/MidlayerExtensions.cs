@@ -17,7 +17,7 @@ namespace Capnp.Rpc
         /// <param name="bufferSize">Buffer size (bytes). You should choose it according to the maximum expected raw capnp frame size</param>
         public static void AddBuffering(this ISupportsMidlayers obj, int bufferSize)
         {
-            obj.InjectMidlayer(s => new Util.WriteBufferedStream(new Util.BufferedNetworkStreamAdapter(s, bufferSize), bufferSize));
+            obj.InjectMidlayer(s => new Util.DuplexBufferedStream(new Util.AsyncNetworkStreamAdapter(s), bufferSize));
         }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace Capnp.Rpc
         /// <param name="obj"><see cref="TcpRpcServer"/> or <see cref="TcpRpcClient"/></param>
         public static void AddBuffering(this ISupportsMidlayers obj)
         {
-            obj.InjectMidlayer(s => new Util.WriteBufferedStream(new Util.BufferedNetworkStreamAdapter(s)));
+            obj.InjectMidlayer(s => new Util.DuplexBufferedStream(new Util.AsyncNetworkStreamAdapter(s)));
         }
     }
 }
