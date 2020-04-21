@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <StartupObject>EchoService.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\Echo.proto" GrpcServices="Server" />
+    <Protobuf Include="..\Benchmark\Protos\Echo.proto" GrpcServices="Server">
+      <Link>Protos\Echo.proto</Link>
+    </Protobuf>
   </ItemGroup>
 
   <ItemGroup>

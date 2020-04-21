@@ -33,7 +33,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <DefineConstants>SOTASK_PERF</DefineConstants>
+    <DefineConstants></DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
