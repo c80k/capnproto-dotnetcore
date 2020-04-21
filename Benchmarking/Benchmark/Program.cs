@@ -11,8 +11,11 @@ namespace Benchmark
     {
         static void Main(string[] args)
         {
-            BenchmarkRunner.Run<GrpcBenchmark>();
-            BenchmarkRunner.Run<CapnpBenchmark>();
+            if (args.Length == 0 || args[0] == "grpc")
+                BenchmarkRunner.Run<GrpcBenchmark>();
+
+            if (args.Length == 0 || args[0] == "capnp")
+                BenchmarkRunner.Run<CapnpBenchmark>();
         }
     }
 }
