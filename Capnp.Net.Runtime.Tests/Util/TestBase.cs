@@ -1,5 +1,6 @@
 ﻿using Capnp.Net.Runtime.Tests.Util;
 using Capnp.Rpc;
+using Capnp.Util;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -351,6 +352,32 @@ namespace Capnp.Net.Runtime.Tests
 
         protected ILogger Logger { get; set; }
 
+        protected TestBase()
+        {
+            Logging.LoggerFactory?.Dispose();
+#pragma warning disable CS0618
+            Logging.LoggerFactory = new LoggerFactory().AddConsole((msg, level) => true);
+#pragma warning restore CS0618
+            Logger = Logging.CreateLogger<TcpRpcStress>();
+            if (Thread.CurrentThread.Name == null)
+                Thread.CurrentThread.Name = $"Test Thread {Thread.CurrentThread.ManagedThreadId}";
+
+#if SOTASK_PERF
+            StrictlyOrderedTaskExtensions.Stats.Reset();
+#endif
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+#if SOTASK_PERF
+            Console.WriteLine($"StrictlyOrderedTask performance statistics:");
+            Console.WriteLine($"AwaitInternal: max. {StrictlyOrderedTaskExtensions.Stats.AwaitInternalMaxOuterIterations} outer iterations");
+            Console.WriteLine($"AwaitInternal: max. {StrictlyOrderedTaskExtensions.Stats.AwaitInternalMaxInnerIterations} inner iterations");
+            Console.WriteLine($"OnCompleted: max. {StrictlyOrderedTaskExtensions.Stats.OnCompletedMaxSpins} iterations");
+#endif
+        }
+
         protected static TcpRpcClient SetupClient(IPAddress addr, int port, TcpRpcTestOptions options = TcpRpcTestOptions.None)
         {
             var client = new TcpRpcClient();
@@ -403,18 +430,6 @@ namespace Capnp.Net.Runtime.Tests
             new LocalhostTcpTestbed(options);
 
         protected static LocalTestbed NewLocalTestbed() => new LocalTestbed();
-
-        [TestInitialize]
-        public void InitConsoleLogging()
-        {
-            Logging.LoggerFactory?.Dispose();
-#pragma warning disable CS0618
-            Logging.LoggerFactory = new LoggerFactory().AddConsole((msg, level) => true);
-#pragma warning restore CS0618
-            Logger = Logging.CreateLogger<TcpRpcStress>();
-            if (Thread.CurrentThread.Name == null)
-                Thread.CurrentThread.Name = $"Test Thread {Thread.CurrentThread.ManagedThreadId}";
-        }
 
         /// <summary>
         /// Somewhat ugly helper method which ensures that both Tcp client and server

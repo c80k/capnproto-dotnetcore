@@ -53,7 +53,6 @@ namespace Capnp.Net.Runtime.Tests
         public void Cancel()
         {
             var t = new TcpRpcPorted();
-            t.InitConsoleLogging();
             Repeat(1000, t.Cancel);
         }
 
@@ -61,7 +60,6 @@ namespace Capnp.Net.Runtime.Tests
         public void Embargo()
         {
             var t = new TcpRpcPorted();
-            t.InitConsoleLogging();
             Repeat(100, 
                 () => 
                 NewLocalhostTcpTestbed(TcpRpcTestOptions.ClientTracer | TcpRpcTestOptions.ClientFluctStream)
@@ -72,7 +70,6 @@ namespace Capnp.Net.Runtime.Tests
         public void EmbargoServer()
         {
             var t2 = new TcpRpcInterop();
-            t2.InitConsoleLogging();
             Repeat(20, t2.EmbargoServer);
         }
 
@@ -82,11 +79,9 @@ namespace Capnp.Net.Runtime.Tests
             // Some code paths are really rare during this test, therefore increased repetition count.
 
             var t = new TcpRpcPorted();
-            t.InitConsoleLogging();
             Repeat(1000, t.EmbargoNull);
 
             var t2 = new TcpRpcInterop();
-            t2.InitConsoleLogging();
             Repeat(100, t2.EmbargoNullServer);
         }
 
@@ -94,7 +89,6 @@ namespace Capnp.Net.Runtime.Tests
         public void RetainAndRelease()
         {
             var t = new TcpRpcPorted();
-            t.InitConsoleLogging();
             Repeat(100, t.RetainAndRelease);
         }
 
@@ -102,7 +96,6 @@ namespace Capnp.Net.Runtime.Tests
         public void PipelineAfterReturn()
         {
             var t = new TcpRpc();
-            t.InitConsoleLogging();
             Repeat(100, t.PipelineAfterReturn);
         }
 

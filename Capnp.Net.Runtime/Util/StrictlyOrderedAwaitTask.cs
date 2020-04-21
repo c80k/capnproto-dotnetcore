@@ -53,18 +53,37 @@ namespace Capnp.Util
             }
             finally
             {
+#if SOTASK_PERF
+                long outerCount = 0, innerCount = 0;
+#endif
+
                 SpinWait.SpinUntil(() =>
                 {
                     Action? continuations;
-                    do
+
+                    while (true)
                     {
+#if SOTASK_PERF
+                        ++innerCount;
+#endif
+
                         continuations = (Action?)Interlocked.Exchange(ref _state, null);
-                        continuations?.Invoke();
 
-                    } while (continuations != null);
+                        if (continuations != null)
+                            continuations();
+                        else
+                            break;
+                    }
 
+#if SOTASK_PERF
+                    ++outerCount;
+#endif
                     return Interlocked.CompareExchange(ref _state, s_seal, null) == null;
                 });
+
+#if SOTASK_PERF
+                StrictlyOrderedTaskExtensions.Stats.UpdateAwaitInternal(outerCount, innerCount);
+#endif
             }
         }
 
@@ -75,7 +94,16 @@ namespace Capnp.Util
         {
             bool first = false;
 
+#if SOTASK_PERF
+            long spinCount = 0;
+#endif
+
             SpinWait.SpinUntil(() => {
+
+#if SOTASK_PERF
+                ++spinCount;
+#endif
+
                 object? cur, next;
                 cur = Volatile.Read(ref _state);
                 first = false;
@@ -101,6 +129,10 @@ namespace Capnp.Util
 
                 return Interlocked.CompareExchange(ref _state, next, cur) == cur;
             });
+
+#if SOTASK_PERF
+            StrictlyOrderedTaskExtensions.Stats.UpdateOnCompleted(spinCount);
+#endif
 
             if (first)
             {
@@ -168,6 +200,48 @@ namespace Capnp.Util
     /// </summary>
     public static class StrictlyOrderedTaskExtensions
     {
+#if SOTASK_PERF
+        public class Statistics
+        {
+            internal long _awaitInternalMaxOuterIterations;
+            internal long _awaitInternalMaxInnerIterations;
+            internal long _onCompletedMaxSpins;
+
+            public long AwaitInternalMaxOuterIterations => Volatile.Read(ref _awaitInternalMaxOuterIterations);
+            public long AwaitInternalMaxInnerIterations => Volatile.Read(ref _awaitInternalMaxInnerIterations);
+            public long OnCompletedMaxSpins => Volatile.Read(ref _onCompletedMaxSpins);
+
+            public void Reset()
+            {
+                Volatile.Write(ref _awaitInternalMaxOuterIterations, 0);
+                Volatile.Write(ref _awaitInternalMaxInnerIterations, 0);
+                Volatile.Write(ref _onCompletedMaxSpins, 0);
+            }
+
+            internal static void InterlockedMax(ref long current, long value)
+            {
+                long existing;
+                do
+                {
+                    existing = Volatile.Read(ref current);
+                    if (value <= existing) return;
+                } while (Interlocked.CompareExchange(ref current, value, existing) != existing);
+            }
+
+            internal void UpdateAwaitInternal(long outerCount, long innerCount)
+            {
+                InterlockedMax(ref _awaitInternalMaxOuterIterations, outerCount);
+                InterlockedMax(ref _awaitInternalMaxInnerIterations, innerCount);
+            }
+
+            internal void UpdateOnCompleted(long spinCount)
+            {
+                InterlockedMax(ref _onCompletedMaxSpins, spinCount);
+            }
+        }
+
+        public static readonly Statistics Stats = new Statistics();
+#endif
         /// <summary>
         /// Converts the task to a task-like object which enforces that all await operations from the same thread leave in the exact order they were issued.
         /// </summary>
