@@ -111,7 +111,7 @@ namespace Capnp.Util
         /// <summary>
         /// Whether the underlying task did complete and it is safe to skip continuation registration.
         /// </summary>
-        public bool IsCompleted => _awaitedTask.IsCompleted && _state == s_seal;
+        public bool IsCompleted => _awaitedTask.IsCompleted && (_state == s_cover || _state == s_seal);
 
         /// <summary>
         /// Part of await pattern implementation. Do not use directly.
