@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
@@ -117,8 +118,21 @@ namespace Capnp
 #endif
                     _writer.Write(bytes);
                 }
+            }
+        }
 
-                _writer.Flush();
+        public void Flush()
+        {
+            if (Monitor.TryEnter(_writeLock))
+            {
+                try
+                {
+                    _writer?.Flush();
+                }
+                finally
+                {
+                    Monitor.Exit(_writeLock);
+                }
             }
         }
 

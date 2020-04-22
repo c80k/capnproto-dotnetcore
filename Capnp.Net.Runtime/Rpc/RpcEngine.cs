@@ -66,8 +66,59 @@ namespace Capnp.Rpc
                 Dismissed
             }
 
+            class FlushContext
+            {
+                readonly FlushContext? _prev;
+                readonly RpcEndpoint _ep;
+                bool _requested;
+
+                public FlushContext(FlushContext? prev, RpcEndpoint ep)
+                {
+                    _prev = prev;
+                    _ep = ep;
+                    _requested = false;
+                }
+
+                public RpcEndpoint Ep => _ep;
+
+                public void Request()
+                {
+                    _requested = true;
+                }
+
+                public void Remove()
+                {
+                    _flushRequests.Value = _prev;
+
+                    if (_requested) 
+                        _ep._tx.Flush();
+                }
+            }
+
+            readonly struct FlushContextKeeper: IDisposable
+            {
+                readonly FlushContext _context;
+                readonly bool _owner;
+
+                public FlushContextKeeper(FlushContext context, bool owner)
+                {
+                    _context = context;
+                    _owner = owner;
+                }
+
+                public void Dispose()
+                {
+                    if (_owner)
+                    {
+                        _context.Remove();
+                    }
+                }
+
+            }
+
             static readonly ThreadLocal<PendingQuestion?> _deferredCall = new ThreadLocal<PendingQuestion?>();
             static readonly ThreadLocal<bool> _canDeferCalls = new ThreadLocal<bool>();
+            static readonly ThreadLocal<FlushContext?> _flushRequests = new ThreadLocal<FlushContext?>();
 
             ILogger Logger { get; } = Logging.CreateLogger<RpcEndpoint>();
 
@@ -138,6 +189,10 @@ namespace Capnp.Rpc
                 ProcessFrame(frame);
             }
 
+            void IEndpoint.Flush()
+            {
+            }
+
             /// <summary>
             /// Number of frames sent so far
             /// </summary>
@@ -204,11 +259,37 @@ namespace Capnp.Rpc
                 }
             }
 
+            FlushContextKeeper SetupFlushContext()
+            {
+                if (_flushRequests.Value?.Ep == this)
+                {
+                    return new FlushContextKeeper(_flushRequests.Value, false);
+                }
+                else
+                {
+                    _flushRequests.Value = new FlushContext(_flushRequests.Value, this);
+                    return new FlushContextKeeper(_flushRequests.Value, true);
+                }
+            }
+
+            void RequestFlush()
+            {
+                if (_flushRequests.Value?.Ep == this)
+                {
+                    _flushRequests.Value.Request();
+                }
+                else
+                {
+                    _tx.Flush();
+                }
+            }
+
             void Tx(WireFrame frame)
             {
                 try
                 {
                     _tx.Forward(frame);
+                    RequestFlush();
                     Interlocked.Increment(ref _sendCount);
                 }
                 catch (System.Exception exception)
@@ -235,6 +316,8 @@ namespace Capnp.Rpc
 
             void IRpcEndpoint.Resolve(uint preliminaryId, Skeleton preliminaryCap, Func<ConsumedCapability> resolvedCapGetter)
             {
+                using var fc = SetupFlushContext();
+
                 lock (_reentrancyBlocker)
                 {
                     if (!_exportTable.TryGetValue(preliminaryId, out var existing) ||
@@ -1168,6 +1251,7 @@ namespace Capnp.Rpc
                 req.Bootstrap!.QuestionId = pendingBootstrap.QuestionId;
 
                 Tx(mb.Frame);
+                _tx.Flush();
 
                 var main = new RemoteAnswerCapability(
                     pendingBootstrap,
@@ -1178,6 +1262,7 @@ namespace Capnp.Rpc
 
             void ProcessFrame(WireFrame frame)
             {
+                using var fc = SetupFlushContext();
                 var dec = DeserializerState.CreateRoot(frame);
                 var msg = Message.READER.create(dec);
 
@@ -1415,6 +1500,7 @@ namespace Capnp.Rpc
 
             PendingQuestion IRpcEndpoint.BeginQuestion(ConsumedCapability target, SerializerState inParams)
             {
+                using var fc = SetupFlushContext();
                 var question = AllocateQuestion(target, inParams);
 
                 if (_canDeferCalls.Value)
@@ -1458,11 +1544,14 @@ namespace Capnp.Rpc
 
             void IRpcEndpoint.Finish(uint questionId)
             {
+                using var fc = SetupFlushContext();
                 Finish(questionId);
             }
 
             void IRpcEndpoint.ReleaseImport(uint importId)
             {
+                using var fc = SetupFlushContext();
+
                 bool exists;
                 int count = 0;
 
@@ -1492,6 +1581,7 @@ namespace Capnp.Rpc
                     try
                     {
                         Tx(mb.Frame);
+                        RequestFlush();
                     }
                     catch (RpcException exception)
                     {
@@ -1502,6 +1592,8 @@ namespace Capnp.Rpc
 
             Task IRpcEndpoint.RequestSenderLoopback(Action<MessageTarget.WRITER> describe)
             {
+                using var fc = SetupFlushContext();
+
                 (var tcs, uint id) = AllocateDisembargo();
 
                 var mb = MessageBuilder.Create();
@@ -1520,6 +1612,8 @@ namespace Capnp.Rpc
 
             void IRpcEndpoint.DeleteQuestion(PendingQuestion question)
             {
+                using var fc = SetupFlushContext();
+
                 lock (_reentrancyBlocker)
                 {
                     if (!_questionTable.Remove(question.QuestionId))

@@ -10,6 +10,8 @@
         /// </summary>
         void Forward(WireFrame frame);
 
+        void Flush();
+
         /// <summary>
         /// Close this endpoint.
         /// </summary>

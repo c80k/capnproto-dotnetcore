@@ -36,6 +36,11 @@ namespace Capnp.Rpc
             {
                 _pump.Send(frame);
             }
+
+            public void Flush()
+            {
+                _pump.Flush();
+            }
         }
 
         readonly RpcEngine _rpcEngine;

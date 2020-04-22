@@ -57,6 +57,11 @@ namespace Capnp.Rpc
             {
                 _pump.Send(frame);
             }
+
+            public void Flush()
+            {
+                _pump.Flush();
+            }
         }
 
         class Connection: IConnection

@@ -45,6 +45,11 @@ namespace Capnp.Net.Runtime.Tests
                 _fromEnginePump.Send(frame);
             }
 
+            public void Flush()
+            {
+                _fromEnginePump.Flush();
+            }
+
             public WireFrame ReadNextFrame()
             {
                 var frame = _reader.ReadWireFrame();

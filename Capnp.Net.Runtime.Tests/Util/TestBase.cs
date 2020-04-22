@@ -104,6 +104,10 @@ namespace Capnp.Net.Runtime.Tests
                         return false;
                     }
                 }
+
+                void IEndpoint.Flush()
+                {
+                }
             }
 
             readonly DecisionTree _decisionTree;
