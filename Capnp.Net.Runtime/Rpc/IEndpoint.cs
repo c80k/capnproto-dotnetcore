@@ -10,6 +10,9 @@
         /// </summary>
         void Forward(WireFrame frame);
 
+        /// <summary>
+        /// Indicates that the endpoint should flush any buffered frames.
+        /// </summary>
         void Flush();
 
         /// <summary>

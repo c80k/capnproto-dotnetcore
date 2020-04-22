@@ -121,6 +121,9 @@ namespace Capnp
             }
         }
 
+        /// <summary>
+        /// Flushes all buffered frames.
+        /// </summary>
         public void Flush()
         {
             if (Monitor.TryEnter(_writeLock))
