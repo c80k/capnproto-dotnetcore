@@ -301,10 +301,10 @@ namespace Capnp.Net.Runtime.Tests
                 client.WhenConnected.Wait();
 
                 var counters = new Counters();
-                server.Main = new TestInterfaceImpl(counters);
-                using (var main = policy.Attach(client.GetMain<ITestInterface>()))
+                server.Main = new TestMoreStuffImpl(counters);
+                using (var main = policy.Attach(client.GetMain<ITestMoreStuff>()))
                 {
-                    var request1 = main.Foo(321, false, new CancellationToken(true));
+                    var request1 = main.NeverReturn(new TestInterfaceImpl(new Counters()), new CancellationToken(true));
                     Assert.IsTrue(policy.Calls.TryReceive(out var cc));
                     Assert.IsFalse(request1.IsCompleted);
                     Assert.IsTrue(cc.CancelFromAlice.IsCancellationRequested);
