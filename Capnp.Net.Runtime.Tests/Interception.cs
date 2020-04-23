@@ -310,8 +310,8 @@ namespace Capnp.Net.Runtime.Tests
                     Assert.IsTrue(cc.CancelFromAlice.IsCancellationRequested);
 
                     cc.ForwardToBob();
-                    Assert.IsTrue(policy.Returns.ReceiveAsync().Wait(MediumNonDbgTimeout));
-                    Assert.IsTrue(cc.ReturnCanceled);
+                    Assert.IsTrue(policy.Returns.ReceiveAsync().Wait(MediumNonDbgTimeout), "must return");
+                    Assert.IsTrue(cc.ReturnCanceled, "must be canceled");
                     cc.ReturnCanceled = false;
                     cc.Exception = "Cancelled";
 

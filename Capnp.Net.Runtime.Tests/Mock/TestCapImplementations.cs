@@ -432,6 +432,7 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
         public virtual Task<string> Foo(uint i, bool j, CancellationToken cancellationToken)
         {
             Interlocked.Increment(ref _counters.CallCount);
+            cancellationToken.ThrowIfCancellationRequested();
             Assert.AreEqual(123u, i);
             Assert.IsTrue(j);
             return Task.FromResult("foo");
