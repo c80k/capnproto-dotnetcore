@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Capnp.Util;
+using System.Threading.Tasks;
 
 namespace Capnp.Rpc
 {
@@ -10,7 +11,7 @@ namespace Capnp.Rpc
         /// <summary>
         /// Completes when the capability gets resolved.
         /// </summary>
-        Task WhenResolved { get; }
+        StrictlyOrderedAwaitTask WhenResolved { get; }
 
         /// <summary>
         /// Returns the resolved capability

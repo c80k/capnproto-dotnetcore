@@ -79,7 +79,7 @@ namespace Capnp.Net.Runtime.Tests
                 server.Main = new ProvidedCapabilityMock();
                 var main = client.GetMain<BareProxy>();
                 var resolving = main as IResolvingCapability;
-                Assert.IsTrue(resolving.WhenResolved.Wait(MediumNonDbgTimeout));
+                Assert.IsTrue(resolving.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
             }
         }
 
@@ -97,7 +97,7 @@ namespace Capnp.Net.Runtime.Tests
 
                 var main = client.GetMain<BareProxy>();
                 var resolving = main as IResolvingCapability;
-                Assert.IsTrue(Assert.ThrowsExceptionAsync<RpcException>(() => resolving.WhenResolved).Wait(MediumNonDbgTimeout));
+                Assert.IsTrue(Assert.ThrowsExceptionAsync<RpcException>(() => resolving.WhenResolved.WrappedTask).Wait(MediumNonDbgTimeout));
             }
         }
 
@@ -116,7 +116,7 @@ namespace Capnp.Net.Runtime.Tests
                 var mock = new ProvidedCapabilityMock();
                 server.Main = mock;
                 var main = client.GetMain<BareProxy>();
-                Assert.IsTrue(main.WhenResolved.Wait(MediumNonDbgTimeout));
+                Assert.IsTrue(main.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
@@ -157,7 +157,7 @@ namespace Capnp.Net.Runtime.Tests
                 var mock = new ProvidedCapabilityMock();
                 server.Main = mock;
                 var main = client.GetMain<BareProxy>();
-                Assert.IsTrue(main.WhenResolved.Wait(MediumNonDbgTimeout));
+                Assert.IsTrue(main.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
@@ -197,7 +197,7 @@ namespace Capnp.Net.Runtime.Tests
                     server.Main = mock;
                     var main = client.GetMain<BareProxy>();
                     var resolving = main as IResolvingCapability;
-                    Assert.IsTrue(resolving.WhenResolved.Wait(MediumNonDbgTimeout));
+                    Assert.IsTrue(resolving.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
                     var args = DynamicSerializerState.CreateForRpc();
                     args.SetStruct(1, 0);
                     args.WriteData(0, 123456);
@@ -240,7 +240,7 @@ namespace Capnp.Net.Runtime.Tests
                     var mock = new ProvidedCapabilityMock();
                     server.Main = mock;
                     var main = client.GetMain<BareProxy>();
-                    Assert.IsTrue(main.WhenResolved.Wait(MediumNonDbgTimeout));
+                    Assert.IsTrue(main.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
                     var args = DynamicSerializerState.CreateForRpc();
                     args.SetStruct(1, 0);
                     args.WriteData(0, 123456);
@@ -300,7 +300,7 @@ namespace Capnp.Net.Runtime.Tests
                 var mock = new ProvidedCapabilityMock();
                 server.Main = mock;
                 var main = client.GetMain<BareProxy>();
-                Assert.IsTrue(main.WhenResolved.Wait(MediumNonDbgTimeout));
+                Assert.IsTrue(main.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
@@ -337,7 +337,7 @@ namespace Capnp.Net.Runtime.Tests
                 var mock = new ProvidedCapabilityMock();
                 server.Main = mock;
                 var main = client.GetMain<BareProxy>();
-                Assert.IsTrue(main.WhenResolved.Wait(MediumNonDbgTimeout));
+                Assert.IsTrue(main.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
@@ -410,7 +410,7 @@ namespace Capnp.Net.Runtime.Tests
                 var mock = new ProvidedCapabilityMock();
                 server.Main = mock;
                 var main = client.GetMain<BareProxy>();
-                Assert.IsTrue(main.WhenResolved.Wait(MediumNonDbgTimeout));
+                Assert.IsTrue(main.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
@@ -486,7 +486,7 @@ namespace Capnp.Net.Runtime.Tests
                 var mock = new ProvidedCapabilityMock();
                 server.Main = mock;
                 var main = client.GetMain<BareProxy>();
-                Assert.IsTrue(main.WhenResolved.Wait(MediumNonDbgTimeout));
+                Assert.IsTrue(main.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
@@ -603,7 +603,7 @@ namespace Capnp.Net.Runtime.Tests
                 var mock = new ProvidedCapabilityMock();
                 server.Main = mock;
                 var main = client.GetMain<BareProxy>();
-                Assert.IsTrue(main.WhenResolved.Wait(MediumNonDbgTimeout));
+                Assert.IsTrue(main.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
@@ -650,7 +650,7 @@ namespace Capnp.Net.Runtime.Tests
                 var mock = new ProvidedCapabilityMock();
                 server.Main = mock;
                 var main = client.GetMain<BareProxy>();
-                Assert.IsTrue(main.WhenResolved.Wait(MediumNonDbgTimeout));
+                Assert.IsTrue(main.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
                 var args = DynamicSerializerState.CreateForRpc();
                 args.SetStruct(1, 0);
                 args.WriteData(0, 123456);
@@ -746,7 +746,7 @@ namespace Capnp.Net.Runtime.Tests
             Assert.AreEqual(c1, server.Connections[0]);
             Assert.AreEqual(ConnectionState.Active, c1.State);
             var proxy = client1.GetMain<ITestInterface>();
-            Assert.IsTrue(proxy is IResolvingCapability r && r.WhenResolved.Wait(MediumNonDbgTimeout));
+            Assert.IsTrue(proxy is IResolvingCapability r && r.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
             Assert.IsTrue(c1.RecvCount > 0);
             Assert.IsTrue(c1.SendCount > 0);
 

@@ -116,7 +116,7 @@ namespace Capnp.Net.Runtime.Tests
 
                         try
                         {
-                            Assert.IsTrue(((IResolvingCapability)main).WhenResolved.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(((IResolvingCapability)main).WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
                         }
                         catch (AggregateException)
                         {

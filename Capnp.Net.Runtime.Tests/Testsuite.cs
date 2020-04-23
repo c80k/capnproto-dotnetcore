@@ -65,7 +65,7 @@ namespace Capnp.Net.Runtime.Tests
             using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
             {
                 if (main is IResolvingCapability resolving)
-                    testbed.MustComplete(resolving.WhenResolved);
+                    testbed.MustComplete(resolving.WhenResolved.WrappedTask);
 
                 var cap = new TestCallOrderImpl();
                 cap.CountToDispose = 6;
@@ -92,20 +92,12 @@ namespace Capnp.Net.Runtime.Tests
                         var call4 = pipeline.GetCallSequence(4, default);
                         var call5 = pipeline.GetCallSequence(5, default);
 
-                        try
-                        {
-                            testbed.MustComplete(call0);
-                            testbed.MustComplete(call1);
-                            testbed.MustComplete(call2);
-                            testbed.MustComplete(call3);
-                            testbed.MustComplete(call4);
-                            testbed.MustComplete(call5);
-                        }
-                        catch (System.Exception)
-                        {
-                            cap.CountToDispose = null;
-                            throw;
-                        }
+                        testbed.MustComplete(call0);
+                        testbed.MustComplete(call1);
+                        testbed.MustComplete(call2);
+                        testbed.MustComplete(call3);
+                        testbed.MustComplete(call4);
+                        testbed.MustComplete(call5);
 
                         Assert.AreEqual(0u, call0.Result);
                         Assert.AreEqual(1u, call1.Result);
@@ -113,6 +105,7 @@ namespace Capnp.Net.Runtime.Tests
                         Assert.AreEqual(3u, call3.Result);
                         Assert.AreEqual(4u, call4.Result);
                         Assert.AreEqual(5u, call5.Result);
+                        Assert.AreEqual(cap.Count, cap.CountToDispose, "counter must have reached number of calls");
                     }
                 }
             }
@@ -182,7 +175,7 @@ namespace Capnp.Net.Runtime.Tests
             using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
             {
                 if (main is IResolvingCapability resolving)
-                    testbed.MustComplete(resolving.WhenResolved);
+                    testbed.MustComplete(resolving.WhenResolved.WrappedTask);
 
                 var cap = new TaskCompletionSource<ITestCallOrder>();
 
@@ -223,7 +216,7 @@ namespace Capnp.Net.Runtime.Tests
             using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
             {
                 if (main is IResolvingCapability resolving)
-                    testbed.MustComplete(resolving.WhenResolved);
+                    testbed.MustComplete(resolving.WhenResolved.WrappedTask);
 
                 var promise = main.GetNull(default);
 
@@ -250,7 +243,7 @@ namespace Capnp.Net.Runtime.Tests
             using (var main = testbed.ConnectMain<ITestMoreStuff>(impl))
             {
                 if (main is IResolvingCapability resolving)
-                    testbed.MustComplete(resolving.WhenResolved);
+                    testbed.MustComplete(resolving.WhenResolved.WrappedTask);
 
                 var tcs = new TaskCompletionSource<ITestInterface>();
 
@@ -770,7 +763,7 @@ namespace Capnp.Net.Runtime.Tests
 
                 peer.EnableEcho();
 
-                testbed.MustComplete(r.WhenResolved);
+                testbed.MustComplete(r.WhenResolved.WrappedTask);
 
                 heldTask.Result.Dispose();
             }

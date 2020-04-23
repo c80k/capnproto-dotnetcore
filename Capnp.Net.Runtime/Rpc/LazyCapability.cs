@@ -18,7 +18,7 @@ namespace Capnp.Rpc
             return new LazyCapability(Task.FromCanceled<ConsumedCapability>(token));
         }
 
-        readonly Task<Proxy>? _proxyTask;
+        readonly StrictlyOrderedAwaitTask<Proxy>? _proxyTask;
         readonly StrictlyOrderedAwaitTask<ConsumedCapability> _capTask;
 
         public LazyCapability(Task<ConsumedCapability> capabilityTask)
@@ -28,7 +28,7 @@ namespace Capnp.Rpc
 
         public LazyCapability(Task<Proxy> proxyTask)
         {
-            _proxyTask = proxyTask;
+            _proxyTask = proxyTask.EnforceAwaitOrder();
 
             async Task<ConsumedCapability> AwaitCap() => (await _proxyTask!).ConsumedCap;
 
@@ -37,7 +37,7 @@ namespace Capnp.Rpc
 
         internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {
-            if (WhenResolved.ReplacementTaskIsCompletedSuccessfully())
+            if (WhenResolved.IsCompleted && WhenResolved.WrappedTask.ReplacementTaskIsCompletedSuccessfully())
             {
                 using var proxy = GetResolvedCapability<BareProxy>()!;
                 return proxy.Export(endpoint, writer);
@@ -62,9 +62,7 @@ namespace Capnp.Rpc
             }
         }
 
-        async Task AwaitWhenResolved() => await _capTask;
-
-        public Task WhenResolved => AwaitWhenResolved();
+        public StrictlyOrderedAwaitTask WhenResolved => _capTask;
 
         public T? GetResolvedCapability<T>() where T: class
         {

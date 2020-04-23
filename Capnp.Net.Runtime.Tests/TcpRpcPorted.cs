@@ -49,7 +49,7 @@ namespace Capnp.Net.Runtime.Tests
                 server.Main = new TestMoreStuffImpl(counters);
                 using (var main = client.GetMain<ITestMoreStuff>())
                 {
-                    ((Proxy)main).WhenResolved.Wait(MediumNonDbgTimeout);
+                    ((Proxy)main).WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout);
 
                     // Since we have a threaded model, there is no way to deterministically provoke the situation
                     // where Cancel and Finish message cross paths. Instead, we'll do a lot of such requests and
@@ -158,7 +158,7 @@ namespace Capnp.Net.Runtime.Tests
                 {
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
-                        ((Proxy)main).WhenResolved.Wait(MediumNonDbgTimeout);
+                        ((Proxy)main).WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout);
                     }
                     Assert.IsFalse(impl.IsDisposed);
                 }

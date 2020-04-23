@@ -10,7 +10,7 @@ namespace Capnp.Rpc
         readonly uint _remoteId;
         readonly object _reentrancyBlocker = new object();
         readonly TaskCompletionSource<ConsumedCapability> _resolvedCap = new TaskCompletionSource<ConsumedCapability>();
-        readonly Task<Proxy> _whenResolvedProxy;
+        readonly StrictlyOrderedAwaitTask<Proxy> _whenResolvedProxy;
         bool _released;
 
         public PromisedCapability(IRpcEndpoint ep, uint remoteId): base(ep)
@@ -18,11 +18,11 @@ namespace Capnp.Rpc
             _remoteId = remoteId;
 
             async Task<Proxy> AwaitProxy() => new Proxy(await _resolvedCap.Task);
-            _whenResolvedProxy = AwaitProxy();
+            _whenResolvedProxy = AwaitProxy().EnforceAwaitOrder();
         }
 
-        public override Task WhenResolved => _resolvedCap.Task;
-        public override T? GetResolvedCapability<T>() where T: class => _whenResolvedProxy.GetResolvedCapability<T>();
+        public override StrictlyOrderedAwaitTask WhenResolved => _whenResolvedProxy;
+        public override T? GetResolvedCapability<T>() where T: class => _whenResolvedProxy.WrappedTask.GetResolvedCapability<T>();
 
         internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {

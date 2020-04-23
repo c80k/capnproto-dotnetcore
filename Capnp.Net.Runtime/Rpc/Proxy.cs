@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Capnp.Util;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -31,12 +32,12 @@ namespace Capnp.Rpc
         /// <summary>
         /// Completes when the capability gets resolved.
         /// </summary>
-        public Task WhenResolved
+        public StrictlyOrderedAwaitTask WhenResolved
         {
             get
             {
                 return ConsumedCap is IResolvingCapability resolving ?
-                    resolving.WhenResolved : Task.CompletedTask;
+                    resolving.WhenResolved : Task.CompletedTask.EnforceAwaitOrder();
             }
         }
 

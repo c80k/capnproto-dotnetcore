@@ -1284,7 +1284,7 @@ namespace Capnp.Net.Runtime.Tests
                 Assert.AreEqual(Message.WHICH.Finish, _.which);
             });
             Assert.IsTrue(proxy.WhenResolved.IsCompleted);
-            Assert.IsTrue(proxy.WhenResolved.IsFaulted);
+            Assert.IsTrue(proxy.WhenResolved.WrappedTask.IsFaulted);
             tester.ExpectAbort();
         }
 

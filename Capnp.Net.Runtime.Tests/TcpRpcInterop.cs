@@ -310,7 +310,7 @@ namespace Capnp.Net.Runtime.Tests
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
-                        ((Proxy)main).WhenResolved.Wait(MediumNonDbgTimeout);
+                        ((Proxy)main).WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout);
 
                         async Task VerifyOutput()
                         {
@@ -896,7 +896,7 @@ namespace Capnp.Net.Runtime.Tests
 
                         try
                         {
-                            success = resolving.WhenResolved.Wait(MediumNonDbgTimeout);
+                            success = resolving.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout);
                         }
                         catch
                         {
@@ -986,7 +986,7 @@ namespace Capnp.Net.Runtime.Tests
                 using (var main = client.GetMain<ITestMoreStuff>())
                 {
                     var resolving = main as IResolvingCapability;
-                    Assert.IsTrue(resolving.WhenResolved.Wait(MediumNonDbgTimeout));
+                    Assert.IsTrue(resolving.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
 
                     var cap = new TaskCompletionSource<ITestCallOrder>();
 
@@ -1088,7 +1088,7 @@ namespace Capnp.Net.Runtime.Tests
 
                         try
                         {
-                            success = resolving.WhenResolved.Wait(MediumNonDbgTimeout);
+                            success = resolving.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout);
                         }
                         catch
                         {
@@ -1158,7 +1158,7 @@ namespace Capnp.Net.Runtime.Tests
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
                         var resolving = main as IResolvingCapability;
-                        Assert.IsTrue(resolving.WhenResolved.Wait(MediumNonDbgTimeout));
+                        Assert.IsTrue(resolving.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
 
                         var tcs = new TaskCompletionSource<ITestInterface>();
 

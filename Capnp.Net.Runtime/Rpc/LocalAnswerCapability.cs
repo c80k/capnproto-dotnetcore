@@ -17,11 +17,11 @@ namespace Capnp.Rpc
             return proxy;
         }
 
-        readonly Task<Proxy> _whenResolvedProxy;
+        readonly StrictlyOrderedAwaitTask<Proxy> _whenResolvedProxy;
 
         public LocalAnswerCapability(Task<Proxy> proxyTask)
         {
-            _whenResolvedProxy = proxyTask;
+            _whenResolvedProxy = proxyTask.EnforceAwaitOrder();
         }
 
         public LocalAnswerCapability(StrictlyOrderedAwaitTask<DeserializerState> answer, MemberAccessPath access):
@@ -30,9 +30,9 @@ namespace Capnp.Rpc
 
         }
 
-        public Task WhenResolved => _whenResolvedProxy;
+        public StrictlyOrderedAwaitTask WhenResolved => _whenResolvedProxy;
 
-        public T? GetResolvedCapability<T>() where T : class => _whenResolvedProxy.GetResolvedCapability<T>();
+        public T? GetResolvedCapability<T>() where T : class => _whenResolvedProxy.WrappedTask.GetResolvedCapability<T>();
 
         internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {

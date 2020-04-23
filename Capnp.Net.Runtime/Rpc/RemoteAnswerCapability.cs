@@ -17,13 +17,13 @@ namespace Capnp.Rpc
 
         readonly PendingQuestion _question;
         readonly MemberAccessPath _access;
-        readonly Task<Proxy> _whenResolvedProxy;
+        readonly StrictlyOrderedAwaitTask<Proxy> _whenResolvedProxy;
 
         public RemoteAnswerCapability(PendingQuestion question, MemberAccessPath access, Task<Proxy> proxyTask) : base(question.RpcEndpoint)
         {
             _question = question ?? throw new ArgumentNullException(nameof(question));
             _access = access ?? throw new ArgumentNullException(nameof(access));
-            _whenResolvedProxy = proxyTask ?? throw new ArgumentNullException(nameof(proxyTask));
+            _whenResolvedProxy = (proxyTask ?? throw new ArgumentNullException(nameof(proxyTask))).EnforceAwaitOrder();
         }
 
         static async Task<Proxy> TransferOwnershipToDummyProxy(PendingQuestion question, MemberAccessPath access)
@@ -85,9 +85,9 @@ namespace Capnp.Rpc
             }
         }
 
-        public override Task WhenResolved => _whenResolvedProxy;
+        public override StrictlyOrderedAwaitTask WhenResolved => _whenResolvedProxy;
 
-        public override T? GetResolvedCapability<T>() where T: class => _whenResolvedProxy.GetResolvedCapability<T>();
+        public override T? GetResolvedCapability<T>() where T: class => _whenResolvedProxy.WrappedTask.GetResolvedCapability<T>();
 
         protected override void GetMessageTarget(MessageTarget.WRITER wr)
         {

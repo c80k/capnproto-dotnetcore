@@ -43,7 +43,7 @@ namespace Capnp.Net.Runtime.Tests
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
                         var resolving = main as IResolvingCapability;
-                        Assert.IsTrue(resolving.WhenResolved.Wait(MediumNonDbgTimeout));
+                        Assert.IsTrue(resolving.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
                     }
                 }
             });
