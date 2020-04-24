@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Capnp.Util;
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,7 +10,7 @@ namespace Capnp.Rpc
     {
         readonly CancellationTokenSource? _cts;
         readonly TaskCompletionSource<AnswerOrCounterquestion> _cancelCompleter;
-        readonly Task<AnswerOrCounterquestion> _answerTask;
+        readonly StrictlyOrderedAwaitTask<AnswerOrCounterquestion> _answerTask;
 
         public PendingAnswer(Task<AnswerOrCounterquestion> callTask, CancellationTokenSource? cts)
         {
@@ -22,10 +24,57 @@ namespace Capnp.Rpc
 
             _cts = cts;
             _cancelCompleter = new TaskCompletionSource<AnswerOrCounterquestion>();
-            _answerTask = CancelableAwaitWhenReady();
+            _answerTask = CancelableAwaitWhenReady().EnforceAwaitOrder();
+
+            TakeCapTableOwnership();
+        }
+
+        async void TakeCapTableOwnership()
+        {
+            try
+            {
+                var aorcq = await _answerTask;
+
+                if (aorcq.Answer != null)
+                {
+                    if (aorcq.Answer.Caps != null)
+                    {
+                        foreach (var cap in aorcq.Answer.Caps)
+                        {
+                            cap.AddRef();
+                        }
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        async void ReleaseCapTableOwnership()
+        {
+            try
+            {
+                var aorcq = await _answerTask;
+                if (aorcq.Answer != null)
+                {
+                    if (aorcq.Answer.Caps != null)
+                    {
+                        foreach (var cap in aorcq.Answer.Caps)
+                        {
+                            cap?.Release();
+                        }
+                    }
+                }
+            }
+            catch
+            {
+            }
         }
 
         public CancellationToken CancellationToken => _cts?.Token ?? CancellationToken.None;
+
+        public IReadOnlyList<CapDescriptor.WRITER>? CapTable { get; set; }
 
         public void Cancel()
         {
@@ -33,81 +82,78 @@ namespace Capnp.Rpc
             _cancelCompleter.SetCanceled();
         }
 
-        public void Chain(Action<Task<AnswerOrCounterquestion>> func)
+        public void Chain(Action<StrictlyOrderedAwaitTask<AnswerOrCounterquestion>> func)
         {
             func(_answerTask);
         }
 
         public void Chain(PromisedAnswer.READER rd, Action<Task<Proxy>> func)
         {
-            Chain(t =>
+            async Task<Proxy> EvaluateProxy()
             {
-                async Task<Proxy> EvaluateProxy()
+                var aorcq = await _answerTask;
+
+                if (aorcq.Answer != null)
                 {
-                    var aorcq = await t;
+                    DeserializerState cur = aorcq.Answer;
 
-                    if (aorcq.Answer != null)
+                    foreach (var op in rd.Transform)
                     {
-                        DeserializerState cur = aorcq.Answer;
-
-                        foreach (var op in rd.Transform)
+                        switch (op.which)
                         {
-                            switch (op.which)
-                            {
-                                case PromisedAnswer.Op.WHICH.GetPointerField:
-                                    try
-                                    {
-                                        cur = cur.StructReadPointer(op.GetPointerField);
-                                    }
-                                    catch (System.Exception)
-                                    {
-                                        throw new ArgumentOutOfRangeException("Illegal pointer field in transformation operation");
-                                    }
-                                    break;
-
-                                case PromisedAnswer.Op.WHICH.Noop:
-                                    break;
-
-                                default:
-                                    throw new ArgumentOutOfRangeException("Unknown transformation operation");
-                            }
-                        }
-
-                        Proxy proxy;
-
-                        switch (cur.Kind)
-                        {
-                            case ObjectKind.Capability:
+                            case PromisedAnswer.Op.WHICH.GetPointerField:
                                 try
                                 {
-                                    var cap = aorcq.Answer.Caps![(int)cur.CapabilityIndex];
-                                    proxy = new Proxy(cap ?? LazyCapability.Null);
+                                    cur = cur.StructReadPointer(op.GetPointerField);
                                 }
-                                catch (ArgumentOutOfRangeException)
+                                catch (System.Exception)
                                 {
-                                    throw new ArgumentOutOfRangeException("Bad capability table in internal answer - internal error?");
+                                    throw new RpcException("Illegal pointer field in transformation operation");
                                 }
-                                return proxy;
+                                break;
+
+                            case PromisedAnswer.Op.WHICH.Noop:
+                                break;
 
                             default:
-                                throw new ArgumentOutOfRangeException("Transformation did not result in a capability");
+                                throw new ArgumentOutOfRangeException("Unknown transformation operation");
                         }
                     }
-                    else
+
+                    switch (cur.Kind)
                     {
-                        var path = MemberAccessPath.Deserialize(rd);
-                        var cap = new RemoteAnswerCapability(aorcq.Counterquestion!, path);
-                        return new Proxy(cap);
+                        case ObjectKind.Capability:
+                            try
+                            {
+                                return new Proxy(aorcq.Answer.Caps![(int)cur.CapabilityIndex]);
+                            }
+                            catch (ArgumentOutOfRangeException)
+                            {
+                                throw new RpcException("Capability index out of range");
+                            }
+
+                        case ObjectKind.Nil:
+                            return new Proxy(NullCapability.Instance);
+
+                        default:
+                            throw new ArgumentOutOfRangeException("Transformation did not result in a capability");
                     }
                 }
+                else
+                {
+                    var path = MemberAccessPath.Deserialize(rd);
+                    var cap = new RemoteAnswerCapability(aorcq.Counterquestion!, path);
+                    return new Proxy(cap);
+                }
+            }
 
-                func(EvaluateProxy());
-            });
+            func(EvaluateProxy());
         }
 
         public void Dispose()
         {
             _cts?.Dispose();
+            ReleaseCapTableOwnership();
         }
     }
 }

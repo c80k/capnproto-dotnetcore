@@ -1,15 +1,18 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Capnp.Rpc;
+using Capnp.Util;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 
 namespace Capnp.Net.Runtime.Tests
 {
     [TestClass]
-    public class General
+    public class General: TestBase
     {
         [TestMethod]
         public void AwaitOrderTest()
@@ -41,31 +44,174 @@ namespace Capnp.Net.Runtime.Tests
             Task.WhenAll(tasks).Wait();
         }
 
-        [TestMethod]
-        public void AwaitOrderTest2()
+        class PromisedAnswerMock : IPromisedAnswer
         {
-            int returnCounter = 0;
+            readonly TaskCompletionSource<DeserializerState> _tcs = new TaskCompletionSource<DeserializerState>();
 
-            async Task ExpectCount(Task task, int count)
+            public PromisedAnswerMock()
             {
-                await task;
-                Assert.AreEqual(count, returnCounter++);
+                WhenReturned = _tcs.Task.EnforceAwaitOrder();
             }
 
-            var tcs = new TaskCompletionSource<int>();
-            var cts = new CancellationTokenSource();
+            public StrictlyOrderedAwaitTask<DeserializerState> WhenReturned { get; }
 
-            var tasks =
-                from i in Enumerable.Range(0, 100)
-                select ExpectCount(tcs.Task.ContinueWith(
-                    t => t, 
-                    cts.Token,
-                    TaskContinuationOptions.ExecuteSynchronously,
-                    TaskScheduler.Current), i);
+            public void Return()
+            {
+                _tcs.SetResult(default);
+            }
 
-            tcs.SetResult(0);
+            public void Cancel()
+            {
+                _tcs.SetCanceled();
+            }
 
-            Task.WhenAll(tasks).Wait();
+            public void Fault()
+            {
+                _tcs.SetException(new InvalidOperationException("test fault"));
+            }
+
+            public ConsumedCapability Access(MemberAccessPath access)
+            {
+                throw new NotImplementedException();
+            }
+
+            public ConsumedCapability Access(MemberAccessPath access, Task<IDisposable> proxyTask)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool IsTailCall => false;
+
+            public void Dispose()
+            {
+            }
+        }
+
+        [TestMethod]
+        public void MakePipelineAwareOnFastPath()
+        {
+            var mock = new PromisedAnswerMock();
+            mock.Return();
+            for (int i = 0; i < 100; i++)
+            {
+                var t = Impatient.MakePipelineAware(mock, _ => (object)null);
+                Assert.IsTrue(t.IsCompleted);
+            };
+        }
+
+        [TestMethod]
+        [TestCategory("Coverage")]
+        public void SafeJoinCompletedThread()
+        {
+            var thread = new Thread(() =>
+            {
+            });
+            thread.Start();
+            thread.SafeJoin(null, 200);
+        }
+
+        [TestMethod]
+        [TestCategory("Coverage")]
+        public void SafeJoinBusyThread()
+        {
+            var thread = new Thread(() =>
+            {
+                try
+                {
+                    while (true) ;
+                }
+                catch (ThreadInterruptedException)
+                {
+                    Console.WriteLine("Interrupted");
+                }
+                catch (ThreadAbortException)
+                {
+                    Console.WriteLine("Aborted");
+                }
+            });
+            thread.Start();
+            thread.SafeJoin(null, 5);
+        }
+
+        [TestMethod]
+        [TestCategory("Coverage")]
+        public void SafeJoinSleepingThread()
+        {
+            var thread = new Thread(() =>
+            {
+                try
+                {
+                    Thread.Sleep(Timeout.Infinite);
+                }
+                catch (ThreadInterruptedException)
+                {
+                    Console.WriteLine("Interrupted");
+                }
+                catch (ThreadAbortException)
+                {
+                    Console.WriteLine("Aborted");
+                }
+            });
+
+            thread.Start();
+            thread.SafeJoin(null, 5);
+        }
+
+        [TestMethod]
+        [TestCategory("Coverage")]
+        public void SafeJoinDeadlockedThread()
+        {
+            var lk = new object();
+
+            lock (lk)
+            {
+                var thread = new Thread(() =>
+                {
+                    try
+                    {
+                        lock (lk)
+                        {
+                        }
+                    }
+                    catch (ThreadInterruptedException)
+                    {
+                        Console.WriteLine("Interrupted");
+                    }
+                    catch (ThreadAbortException)
+                    {
+                        Console.WriteLine("Aborted");
+                    }
+                });
+
+                thread.Start();
+                thread.SafeJoin(null, 5);
+            }
+        }
+
+        [TestMethod]
+        [TestCategory("Coverage")]
+        public void SafeJoinDefensiveThread()
+        {
+            var thread = new Thread(() =>
+            {
+                for (; ; )
+                {
+                    try
+                    {
+                        Thread.Sleep(Timeout.Infinite);
+                    }
+                    catch (ThreadInterruptedException)
+                    {
+                        Console.WriteLine("Interrupted");
+                    }
+                    catch (ThreadAbortException)
+                    {
+                        Console.WriteLine("Aborted");
+                    }
+                }
+            });
+            thread.Start();
+            thread.SafeJoin(null, 5);
         }
     }
 }

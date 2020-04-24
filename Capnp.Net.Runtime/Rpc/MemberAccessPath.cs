@@ -132,7 +132,7 @@ namespace Capnp.Rpc
             {
                 if (state.Kind == ObjectKind.Nil)
                 {
-                    return default(DeserializerState);
+                    return default;
                 }
 
                 if (state.Kind != ObjectKind.Struct)
@@ -169,7 +169,7 @@ namespace Capnp.Rpc
         /// <param name="rpcState">The object (usually "params struct") on which to evaluate this path.</param>
         /// <returns>Resulting low-level capability</returns>
         /// <exception cref="DeserializationException">Evaluation of this path did not give a capability</exception>
-        public ConsumedCapability? Eval(DeserializerState rpcState)
+        public ConsumedCapability Eval(DeserializerState rpcState)
         {
             var cur = rpcState;
 
@@ -181,7 +181,7 @@ namespace Capnp.Rpc
             switch (cur.Kind)
             {
                 case ObjectKind.Nil:
-                    return null;
+                    return NullCapability.Instance;
 
                 case ObjectKind.Capability:
                     return rpcState.Caps![(int)cur.CapabilityIndex];

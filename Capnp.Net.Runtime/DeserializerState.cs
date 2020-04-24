@@ -9,7 +9,7 @@ namespace Capnp
     /// Although it is public, you should not use it directly. Instead, use the reader, writer, and domain class adapters which are produced
     /// by the code generator.
     /// </summary>
-    public struct DeserializerState: IStructDeserializer
+    public struct DeserializerState: IStructDeserializer, IDisposable
     {
         /// <summary>
         /// A wire message is essentially a collection of memory blocks.
@@ -45,12 +45,13 @@ namespace Capnp
         /// The kind of object this state currently represents.
         /// </summary>
         public ObjectKind Kind { get; set; }
+        bool _disposed;
         /// <summary>
         /// The capabilities imported from the capability table. Only valid in RPC context.
         /// </summary>
-        public IList<Rpc.ConsumedCapability?>? Caps { get; set; }
+        public IList<Rpc.ConsumedCapability>? Caps { get; set; }
         /// <summary>
-        /// Current segment (essentially Segments[CurrentSegmentIndex]
+        /// Current segment (essentially Segments[CurrentSegmentIndex])
         /// </summary>
         public ReadOnlySpan<ulong> CurrentSegment => Segments != null ? Segments[(int)CurrentSegmentIndex].Span : default;
 
@@ -65,6 +66,7 @@ namespace Capnp
             StructPtrCount = 1;
             Kind = ObjectKind.Struct;
             Caps = null;
+            _disposed = false;
         }
 
         /// <summary>
@@ -158,7 +160,6 @@ namespace Capnp
         /// Memory span which represents this struct's data section (given this state actually represents a struct)
         /// </summary>
         public ReadOnlySpan<ulong> StructDataSection => CurrentSegment.Slice(Offset, StructDataCount);
-        ReadOnlySpan<ulong> StructPtrSection => CurrentSegment.Slice(Offset + StructDataCount, StructPtrCount);
 
         ReadOnlySpan<ulong> GetRawBits() => CurrentSegment.Slice(Offset, (ListElementCount + 63) / 64);
         ReadOnlySpan<ulong> GetRawBytes() => CurrentSegment.Slice(Offset, (ListElementCount + 7) / 8);
@@ -172,26 +173,15 @@ namespace Capnp
         {
             get
             {
-                switch (Kind)
+                return Kind switch
                 {
-                    case ObjectKind.ListOfBits:
-                        return GetRawBits();
-
-                    case ObjectKind.ListOfBytes:
-                        return GetRawBytes();
-
-                    case ObjectKind.ListOfShorts:
-                        return GetRawShorts();
-
-                    case ObjectKind.ListOfInts:
-                        return GetRawInts();
-
-                    case ObjectKind.ListOfLongs:
-                        return GetRawLongs();
-
-                    default:
-                        return default;
-                }
+                    ObjectKind.ListOfBits => GetRawBits(),
+                    ObjectKind.ListOfBytes => GetRawBytes(),
+                    ObjectKind.ListOfShorts => GetRawShorts(),
+                    ObjectKind.ListOfInts => GetRawInts(),
+                    ObjectKind.ListOfLongs => GetRawLongs(),
+                    _ => default,
+                };
             }
         }
 
@@ -211,6 +201,10 @@ namespace Capnp
 
                     case ObjectKind.ListOfBytes:
                         GetRawBytes();
+                        break;
+
+                    case ObjectKind.ListOfShorts:
+                        GetRawShorts();
                         break;
 
                     case ObjectKind.ListOfInts:
@@ -313,6 +307,8 @@ namespace Capnp
 
                             case ListKind.ListOfStructs:
                                 {
+                                    if (Offset >= CurrentSegment.Length)
+                                        throw new DeserializationException("List of composites pointer exceeds segment bounds");
                                     WirePointer tag = CurrentSegment[Offset];
                                     if (tag.Kind != PointerKind.Struct)
                                         throw new DeserializationException("Unexpected: List of composites with non-struct type tag");
@@ -333,9 +329,16 @@ namespace Capnp
 
                     case PointerKind.Far:
 
+                        if (pointer.TargetSegmentIndex >= Segments.Count)
+                            throw new DeserializationException("Error decoding pointer: Invalid target segment index");
+
+                        CurrentSegmentIndex = pointer.TargetSegmentIndex;
+
                         if (pointer.IsDoubleFar)
                         {
-                            CurrentSegmentIndex = pointer.TargetSegmentIndex;
+                            if (pointer.LandingPadOffset >= CurrentSegment.Length - 1)
+                                throw new DeserializationException("Error decoding double-far pointer: exceeds segment bounds");
+
                             Offset = 0;
 
                             WirePointer pointer1 = CurrentSegment[pointer.LandingPadOffset];
@@ -347,15 +350,18 @@ namespace Capnp
                                 throw new DeserializationException("Error decoding double-far pointer: not followed by intra-segment pointer");
 
                             CurrentSegmentIndex = pointer1.TargetSegmentIndex;
-                            Offset = 0;
+                            Offset = pointer1.LandingPadOffset;
                             pointer = pointer2;
                             offset = -1;
                         }
                         else
                         {
-                            CurrentSegmentIndex = pointer.TargetSegmentIndex;
                             Offset = 0;
                             offset = pointer.LandingPadOffset;
+
+                            if (pointer.LandingPadOffset >= CurrentSegment.Length)
+                                throw new DeserializationException("Error decoding pointer: exceeds segment bounds");
+
                             pointer = CurrentSegment[pointer.LandingPadOffset];
                         }
                         continue;
@@ -383,14 +389,14 @@ namespace Capnp
         /// </summary>
         /// <param name="offset">Offset relative to this.Offset within current segment</param>
         /// <returns>the low-level capability object, or null if it is a null pointer</returns>
-        /// <exception cref="IndexOutOfRangeException">offset negative or out of range</exception>
+        /// <exception cref="ArgumentOutOfRangeException">offset negative or out of range</exception>
         /// <exception cref="InvalidOperationException">capability table not set</exception>
         /// <exception cref="Rpc.RpcException">not a capability pointer or invalid capability index</exception>
-        internal Rpc.ConsumedCapability? DecodeCapPointer(int offset)
+        internal Rpc.ConsumedCapability DecodeCapPointer(int offset)
         {
             if (offset < 0)
             {
-                throw new IndexOutOfRangeException(nameof(offset));
+                throw new ArgumentOutOfRangeException(nameof(offset));
             }
 
             if (Caps == null)
@@ -404,7 +410,7 @@ namespace Capnp
             {
                 // Despite this behavior is not officially specified, 
                 // the official C++ implementation seems to send null pointers for null caps.
-                return null;
+                return Rpc.NullCapability.Instance;
             }
 
             if (pointer.Kind != PointerKind.Other)
@@ -496,13 +502,13 @@ namespace Capnp
             return state;
         }
 
-        internal Rpc.ConsumedCapability? StructReadRawCap(int index)
+        internal Rpc.ConsumedCapability StructReadRawCap(int index)
         {
             if (Kind != ObjectKind.Struct && Kind != ObjectKind.Nil)
                 throw new InvalidOperationException("Allowed on structs only");
 
             if (index >= StructPtrCount)
-                return null;
+                return Rpc.NullCapability.Instance;
 
             return DecodeCapPointer(index + StructDataCount);
         }
@@ -646,20 +652,14 @@ namespace Capnp
         /// </summary>
         /// <typeparam name="T">Capability interface</typeparam>
         /// <param name="index">index within this struct's pointer table</param>
-        /// <param name="memberName">debugging aid</param>
-        /// <param name="sourceFilePath">debugging aid</param>
-        /// <param name="sourceLineNumber">debugging aid</param>
         /// <returns>capability instance or null if pointer was null</returns>
         /// <exception cref="IndexOutOfRangeException">negative index</exception>
         /// <exception cref="DeserializationException">state does not represent a struct, invalid pointer,
         /// non-capability pointer, traversal limit exceeded</exception>
-        public T? ReadCap<T>(int index,
-            [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0) where T: class
+        public T? ReadCap<T>(int index) where T: class
         {
             var cap = StructReadRawCap(index);
-            return Rpc.CapabilityReflection.CreateProxy<T>(cap, memberName, sourceFilePath, sourceLineNumber) as T;
+            return Rpc.CapabilityReflection.CreateProxy<T>(cap) as T;
         }
 
         /// <summary>
@@ -693,9 +693,26 @@ namespace Capnp
                 throw new DeserializationException("Expected a capability");
 
             if (Caps == null)
-                throw new InvalidOperationException("Capability table not set. This is a bug.");
+                throw new InvalidOperationException("Capability table not set");
 
             return (Rpc.CapabilityReflection.CreateProxy<T>(Caps[(int)CapabilityIndex]) as T)!;
+        }
+
+        /// <summary>
+        /// Releases the capability table
+        /// </summary>
+        public void Dispose()
+        {
+            if (Caps != null && !_disposed)
+            {
+                foreach (var cap in Caps)
+                {
+                    cap.Release();
+                }
+
+                Caps = null;
+                _disposed = true;
+            }
         }
     }
 }

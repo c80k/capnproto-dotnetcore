@@ -5,7 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\Echo.proto" GrpcServices="Server" />
+    <Protobuf Include="..\Benchmark\Protos\Echo.proto" GrpcServices="Server">
+      <Link>Protos\Echo.proto</Link>
+    </Protobuf>
   </ItemGroup>
 
   <ItemGroup>

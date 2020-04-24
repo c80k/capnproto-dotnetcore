@@ -18,38 +18,13 @@ namespace Capnp.Rpc
             public SkeletonRelinquisher(Skeleton skeleton)
             {
                 _skeleton = skeleton;
+                _skeleton.Claim();
             }
 
             public void Dispose()
             {
                 _skeleton.Relinquish();
             }
-        }
-
-#if DEBUG_DISPOSE
-        const int NoDisposeFlag = 0x4000000;
-#endif
-
-        static readonly ConditionalWeakTable<object, Skeleton> _implMap =
-            new ConditionalWeakTable<object, Skeleton>();
-
-        internal static Skeleton GetOrCreateSkeleton<T>(T impl, bool addRef)
-            where T: class
-        {
-            if (impl == null)
-                throw new ArgumentNullException(nameof(impl));
-
-            if (impl is Skeleton skel)
-                return skel;
-
-            skel = _implMap.GetValue(impl, _ => CapabilityReflection.CreateSkeleton(_));
-
-            if (addRef)
-            {
-                skel.Claim();
-            }
-
-            return skel;
         }
 
         /// <summary>
@@ -60,33 +35,8 @@ namespace Capnp.Rpc
         /// <returns>A disposable object. Calling Dispose() on the returned instance relinquishes ownership again.</returns>
         public static IDisposable Claim<T>(T impl) where T: class
         {
-            return new SkeletonRelinquisher(GetOrCreateSkeleton(impl, true));
+            return new SkeletonRelinquisher(CapabilityReflection.CreateSkeletonInternal(impl));
         }
-
-#if DEBUG_DISPOSE
-        /// <summary>
-        /// This DEBUG-only diagnostic method states that the Skeleton corresponding to a given capability is not expected to
-        /// be disposed until the next call to EndAssertNotDisposed().
-        /// </summary>
-        /// <typeparam name="T">Capability interface</typeparam>
-        /// <param name="impl">Capability implementation</param>
-        public static void BeginAssertNotDisposed<T>(T impl) where T : class
-        {
-            GetOrCreateSkeleton(impl, false).BeginAssertNotDisposed();
-        }
-
-        /// <summary>
-        /// This DEBUG-only diagnostic method ends a non-disposal period started with BeginAssertNotDisposed.
-        /// </summary>
-        /// <typeparam name="T">Capability interface</typeparam>
-        /// <param name="impl">Capability implementation</param>
-        public static void EndAssertNotDisposed<T>(T impl) where T : class
-        {
-            GetOrCreateSkeleton(impl, false).EndAssertNotDisposed();
-        }
-#endif
-
-        int _refCount = 0;
 
         /// <summary>
         /// Calls an interface method of this capability.
@@ -98,43 +48,8 @@ namespace Capnp.Rpc
         /// <returns>A Task which will resolve to the call result</returns>
         public abstract Task<AnswerOrCounterquestion> Invoke(ulong interfaceId, ushort methodId, DeserializerState args, CancellationToken cancellationToken = default);
 
-        internal void Claim()
-        {
-            Interlocked.Increment(ref _refCount);
-        }
-
-#if DEBUG_DISPOSE
-        internal void BeginAssertNotDisposed()
-        {
-            if ((Interlocked.Add(ref _refCount, NoDisposeFlag) & NoDisposeFlag) == 0)
-            {
-                throw new InvalidOperationException("Flag already set. State is now broken.");
-            }
-        }
-        internal void EndAssertNotDisposed()
-        {
-            if ((Interlocked.Add(ref _refCount, -NoDisposeFlag) & NoDisposeFlag) != 0)
-            {
-                throw new InvalidOperationException("Flag already cleared. State is now broken.");
-            }
-        }
-#endif
-
-        internal void Relinquish()
-        {
-            int count = Interlocked.Decrement(ref _refCount);
-
-            if (0 == count)
-            {
-#if DEBUG_DISPOSE
-                if ((count & NoDisposeFlag) != 0)
-                    throw new InvalidOperationException("Unexpected Skeleton disposal");
-#endif
-
-                Dispose(true);
-                GC.SuppressFinalize(this);
-            }
-        }
+        internal abstract void Claim();
+        internal abstract void Relinquish();
 
         internal void Relinquish(int count)
         {
@@ -145,41 +60,21 @@ namespace Capnp.Rpc
                 Relinquish();
         }
 
-        /// <summary>
-        /// Dispose pattern implementation
-        /// </summary>
-        protected virtual void Dispose(bool disposing)
-        {
-        }
-
-        /// <summary>
-        /// Finalizer
-        /// </summary>
-        ~Skeleton()
-        {
-            Dispose(false);
-        }
-
         internal virtual void Bind(object impl)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException("Cannot bind");
         }
+
+        internal abstract ConsumedCapability AsCapability();
     }
 
     /// <summary>
     /// Skeleton for a specific capability interface.
     /// </summary>
     /// <typeparam name="T">Capability interface</typeparam>
-    public abstract class Skeleton<T> : Skeleton, IMonoSkeleton
+    public abstract class Skeleton<T> : RefCountingSkeleton, IMonoSkeleton
     {
-#if DebugEmbargos
-        ILogger Logger { get; } = Logging.CreateLogger<Skeleton<T>>();
-#endif
-
         Func<DeserializerState, CancellationToken, Task<AnswerOrCounterquestion>>[] _methods = null!;
-        CancellationTokenSource? _disposed = new CancellationTokenSource();
-        readonly object _reentrancyBlocker = new object();
-        int _pendingCalls;
 
         /// <summary>
         /// Constructs an instance.
@@ -225,45 +120,7 @@ namespace Capnp.Rpc
             if (methodId >= _methods.Length)
                 throw new NotImplementedException("Wrong method id");
 
-            lock (_reentrancyBlocker)
-            {
-                if (_disposed == null || _disposed.IsCancellationRequested)
-                {
-                    throw new ObjectDisposedException(nameof(Skeleton<T>));
-                }
-
-                ++_pendingCalls;
-            }
-
-            var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(_disposed.Token, cancellationToken);
-
-            try
-            {
-                return await _methods[methodId](args, linkedSource.Token);
-            }
-            catch (System.Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                lock (_reentrancyBlocker)
-                {
-                    --_pendingCalls;
-                }
-
-                linkedSource.Dispose();
-                CheckCtsDisposal();
-            }
-        }
-
-        void CheckCtsDisposal()
-        {
-            if (_pendingCalls == 0 && _disposed != null && _disposed.IsCancellationRequested)
-            {
-                _disposed.Dispose();
-                _disposed = null;
-            }
+            return await _methods[methodId](args, cancellationToken);
         }
 
         /// <summary>
@@ -271,17 +128,7 @@ namespace Capnp.Rpc
         /// </summary>
         protected override void Dispose(bool disposing)
         {
-            lock (_reentrancyBlocker)
-            {
-                if (_disposed == null || _disposed.IsCancellationRequested)
-                    return;
-
-                _disposed.Cancel();
-
-                CheckCtsDisposal();
-            }
-
-            if (Impl is IDisposable disposable)
+            if (disposing && Impl is IDisposable disposable)
             {
                 disposable.Dispose();
             }

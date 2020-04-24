@@ -1,4 +1,5 @@
 ﻿using Capnp.Net.Runtime.Tests.GenImpls;
+using Capnp.Net.Runtime.Tests.Util;
 using Capnp.Rpc;
 using Capnproto_test.Capnp.Test;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -10,12 +11,14 @@ using System.Threading.Tasks;
 namespace Capnp.Net.Runtime.Tests
 {
     [TestClass]
+    [TestCategory("Coverage")]
     public class TcpRpcAdvancedStuff : TestBase
     {
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void MultiConnect()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 var tcs = new TaskCompletionSource<int>();
@@ -23,9 +26,9 @@ namespace Capnp.Net.Runtime.Tests
 
                 for (int i = 1; i <= 10; i++)
                 {
-                    using (var client = SetupClient())
+                    using (var client = SetupClient(addr, port))
                     {
-                        client.WhenConnected.Wait();
+                        //client.WhenConnected.Wait();
 
                         using (var main = client.GetMain<ITestInterface>())
                         {
@@ -50,19 +53,20 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void TwoClients()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
 
-                using (var client1 = SetupClient())
-                using (var client2 = SetupClient())
+                using (var client1 = SetupClient(addr, port))
+                using (var client2 = SetupClient(addr, port))
                 {
-                    Assert.IsTrue(client1.WhenConnected.Wait(MediumNonDbgTimeout));
-                    Assert.IsTrue(client2.WhenConnected.Wait(MediumNonDbgTimeout));
+                    //Assert.IsTrue(client1.WhenConnected.Wait(MediumNonDbgTimeout));
+                    //Assert.IsTrue(client2.WhenConnected.Wait(MediumNonDbgTimeout));
 
                     using (var main = client1.GetMain<ITestMoreStuff>())
                     {
@@ -89,17 +93,18 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void ClosingServerWhileRequestingBootstrap()
         {
             for (int i = 0; i < 100; i++)
             {
-                var server = SetupServer();
+                (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+                var server = SetupServer(addr, port);
                 var counters = new Counters();
                 var tcs = new TaskCompletionSource<int>();
                 server.Main = new TestInterfaceImpl(counters, tcs);
 
-                using (var client = SetupClient())
+                using (var client = SetupClient(addr, port))
                 {
                     client.WhenConnected.Wait();
 
@@ -111,7 +116,7 @@ namespace Capnp.Net.Runtime.Tests
 
                         try
                         {
-                            Assert.IsTrue(((IResolvingCapability)main).WhenResolved.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(((IResolvingCapability)main).WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
                         }
                         catch (AggregateException)
                         {
@@ -124,14 +129,15 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void InheritFromGenericInterface()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 server.Main = new B2Impl();
 
-                using (var client = SetupClient())
+                using (var client = SetupClient(addr, port))
                 {
-                    client.WhenConnected.Wait();
+                    //client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<CapnpGen.IB2>())
                     {
@@ -147,13 +153,14 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void Issue25()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 server.Main = new Issue25BImpl();
 
-                using (var client = SetupClient())
+                using (var client = SetupClient(addr, port))
                 {
-                    client.WhenConnected.Wait();
+                    //client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<CapnpGen.IIssue25B>())
                     {
@@ -171,6 +178,135 @@ namespace Capnp.Net.Runtime.Tests
                     }
                 }
             }
+        }
+
+        [TestMethod]
+        public void ExportCapToThirdParty()
+        {
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
+            {
+                var counters = new Counters();
+                server.Main = new TestMoreStuffImpl3();
+
+                using (var client = SetupClient(addr, port))
+                {
+                    //Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+
+                    using (var main = client.GetMain<ITestMoreStuff>())
+                    {
+                        var held = main.GetHeld().Eager();
+
+                        (addr, port) = TcpManager.Instance.GetLocalAddressAndPort();
+
+                        using (var server2 = SetupServer(addr, port))
+                        {
+                            server2.Main = new TestMoreStuffImpl2();
+
+                            using (var client2 = SetupClient(addr, port))
+                            {
+                                //Assert.IsTrue(client2.WhenConnected.Wait(MediumNonDbgTimeout));
+
+                                using (var main2 = client2.GetMain<ITestMoreStuff>())
+                                {
+                                    var fooTask = main2.CallFoo(held);
+                                    Assert.IsTrue(main.Hold(new TestInterfaceImpl(new Counters())).Wait(MediumNonDbgTimeout));
+                                    Assert.IsTrue(fooTask.Wait(MediumNonDbgTimeout));
+                                    Assert.AreEqual("bar", fooTask.Result);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void ExportTailCallCapToThirdParty()
+        {
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
+            {
+                server.Main = new TestTailCallerImpl2();
+
+                using (var client = SetupClient(addr, port))
+                {
+                    //Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+
+                    using (var main = client.GetMain<ITestTailCaller>())
+                    {
+                        var callee = new TestTailCalleeImpl(new Counters());
+                        var fooTask = main.Foo(123, callee);
+                        Assert.IsTrue(fooTask.Wait(MediumNonDbgTimeout));
+
+                        using (var c = fooTask.Result.C)
+                        using (var client2 = SetupClient(addr, port))
+                        {
+                            //Assert.IsTrue(client2.WhenConnected.Wait(MediumNonDbgTimeout));
+
+                            using (var main2 = client2.GetMain<ITestTailCaller>())
+                            {
+                                var fooTask2 = main2.Foo(123, null);
+                                Assert.IsTrue(fooTask2.Wait(MediumNonDbgTimeout));
+                                Assert.IsTrue(fooTask2.C().GetCallSequence(0).Wait(MediumNonDbgTimeout));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void SalamiTactics()
+        {
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
+            {
+                server.Main = new TestMoreStuffImpl3();
+
+                using (var client = SetupClient(addr, port))
+                {
+                    //client.WhenConnected.Wait();
+
+                    using (var main = client.GetMain<ITestMoreStuff>())
+                    {
+                        var echoTask = main.Echo(Proxy.Share<ITestCallOrder>(main));
+                        Assert.IsTrue(echoTask.Wait(MediumNonDbgTimeout));
+                        using (var echo = echoTask.Result)
+                        {
+                            var list = new Task<uint>[200];
+                            for (uint i = 0; i < list.Length; i++)
+                            {
+                                list[i] = echo.GetCallSequence(i);
+                            }
+                            Assert.IsTrue(Task.WaitAll(list, MediumNonDbgTimeout));
+                            for (uint i = 0; i < list.Length; i++)
+                            {
+                                Assert.AreEqual(i, list[i].Result);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        [TestMethod]
+        public void NoTailCallMt()
+        {
+            NewLocalhostTcpTestbed().RunTest(Testsuite.NoTailCallMt);
+        }
+
+        [TestMethod]
+        public void CallAfterFinish1()
+        {
+            NewLocalhostTcpTestbed().RunTest(Testsuite.CallAfterFinish1);
+        }
+
+        [TestMethod]
+        public void CallAfterFinish2()
+        {
+            NewLocalhostTcpTestbed().RunTest(Testsuite.CallAfterFinish2);
         }
     }
 }

@@ -11,17 +11,21 @@ install:
   - vcpkg install capnproto
   - cd %APPVEYOR_BUILD_FOLDER%
   - dotnet tool install -g nbgv
+  - choco install opencover --version=4.7.922 --force -y
+  - choco install reportgenerator.portable --version=2.5.0.0 --force -y
+  - dotnet tool install -g coveralls.net --version 1.0.0
 init:
   # Good practise, because Windows line endings are different from Unix/Linux ones
   - cmd: git config --global core.autocrlf true
+environment:
+  COVERALLS_REPO_TOKEN:
+    secure: mwxwOymoS7vB56iQN5Obbt8+oMqbRpK8Ei2GZUI7Mm46C8asDR/Wu0RAXYlhp85Q
 before_build:
   - cmd: nbgv cloud
   - cmd: dotnet --version
   - cmd: msbuild -ver
   - cmd: dotnet restore ./Capnp.Net.Runtime/Capnp.Net.Runtime.csproj --verbosity m
-  - cmd: dotnet restore ./Capnp.Net.Runtime.Core21/Capnp.Net.Runtime.Core21.csproj --verbosity m
-  - cmd: dotnet restore ./Capnp.Net.Runtime.Tests/Capnp.Net.Runtime.Tests.Std20.csproj --verbosity m
-  - cmd: dotnet restore ./Capnp.Net.Runtime.Tests.Core21/Capnp.Net.Runtime.Tests.Core21.csproj --verbosity m
+  - cmd: dotnet restore ./Capnp.Net.Runtime.Tests/Capnp.Net.Runtime.Tests.csproj --verbosity m
   - cmd: dotnet restore ./CapnpC.CSharp.Generator/CapnpC.CSharp.Generator.csproj --verbosity m  
   - cmd: dotnet restore ./CapnpC.CSharp.Generator.Tests/CapnpC.CSharp.Generator.Tests.csproj --verbosity m  
   - cmd: dotnet restore ./CapnpC.CSharp.MsBuild.Generation/CapnpC.CSharp.MsBuild.Generation.csproj --verbosity m  
@@ -51,6 +55,9 @@ artifacts:
  - path: capnpc-csharp\nupkg\*.nupkg
    name: capnpc-csharp
    type: NuGetPackage
+ - path: coverage\report
+   name: Coverage report
+   type: zip
 test_script:
   - cmd: |
       nbgv get-version -v NuGetPackageVersion >> version.txt
@@ -76,10 +83,12 @@ test_script:
       vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.MsBuild.Generation.Tests\bin\Release\netcoreapp3.0\CapnpC.CSharp.MsBuild.Generation.Tests.dll
       msbuild -t:restore ./MsBuildGenerationTest/MsBuildGenerationTest.csproj /p:Configuration="Debug" /p:PackageReferenceVersion="%VERSION%"
       msbuild ./MsBuildGenerationTest/MsBuildGenerationTest.sln /p:Configuration="Debug" /p:PackageReferenceVersion="%VERSION%"
-      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Debug\net471\Capnp.Net.Runtime.Tests.Std20.dll
-      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\net471\Capnp.Net.Runtime.Tests.Std20.dll
-      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests.Core21\bin\Debug\netcoreapp2.1\Capnp.Net.Runtime.Tests.Core21.dll
-      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests.Core21\bin\Release\netcoreapp2.1\Capnp.Net.Runtime.Tests.Core21.dll
+      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Debug\net471\Capnp.Net.Runtime.Tests.dll
+      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\net471\Capnp.Net.Runtime.Tests.dll
+      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Debug\netcoreapp2.1\Capnp.Net.Runtime.Tests.dll
+      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\netcoreapp2.1\Capnp.Net.Runtime.Tests.dll
+      powershell -File .\scripts\measure-coverage.ps1
+      csmacnz.Coveralls --opencover -i "coverage\coverage.xml" --repoToken %COVERALLS_REPO_TOKEN%
 on_finish :
   # any cleanup in here
 deploy:

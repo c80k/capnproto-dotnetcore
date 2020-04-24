@@ -61,7 +61,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 {
                     foreach (var arg in method.Params)
                     {
-                        list.Add(Parameter(_names.GetCodeIdentifier(arg).Identifier)
+                        list.Add(Parameter(Identifier(_names.GetCodeIdentifierLowerCamel(arg)))
                             .WithType(_names.MakeTypeSyntax(arg.Type, method.DeclaringInterface, TypeUsage.DomainClass, Nullability.NullableRef)));
                     }
                 }
@@ -99,9 +99,8 @@ namespace CapnpC.CSharp.Generator.CodeGen
             var ifaceDecl = InterfaceDeclaration(_names.MakeTypeName(type, NameUsage.Interface).Identifier)
                 .AddModifiers(Public)
                 .AddAttributeLists(
-                    AttributeList()
+                    _names.MakeTypeDecorationAttributes(type.Id)
                         .AddAttributes(
-                            CommonSnippetGen.MakeTypeIdAttribute(type.Id),
                             Attribute(IdentifierName("Proxy"))
                                 .AddArgumentListArguments(
                                     AttributeArgument(
@@ -195,8 +194,8 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
                 yield return AssignmentExpression(
                     SyntaxKind.SimpleAssignmentExpression,
-                    _names.GetCodeIdentifier(field).IdentifierName,
-                    _names.GetCodeIdentifier(methodParam).IdentifierName);
+                    _names.GetCodeIdentifier(methodParam).IdentifierName,
+                    IdentifierName(_names.GetCodeIdentifierLowerCamel(field)));
             }
         }
 
@@ -285,6 +284,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
         public MemberDeclarationSyntax MakeProxy(TypeDefinition type)
         {
             var classDecl = ClassDeclaration(_names.MakeTypeName(type, NameUsage.Proxy).Identifier)
+                .AddAttributeLists(_names.MakeTypeDecorationAttributes(type.Id))
                 .AddModifiers(Public)
                 .AddBaseListTypes(
                     SimpleBaseType(_names.Type<Capnp.Rpc.Proxy>(Nullability.NonNullable)),
@@ -404,8 +404,11 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                 Argument(SimpleLambdaExpression(
                                     Parameter(_names.DeserializerLocal.Identifier),
                                     Block(
-                                        MakeProxyCreateResult(method), 
-                                        MakeProxyReturnResult(method)))));
+                                        UsingStatement(
+                                            Block(  
+                                                MakeProxyCreateResult(method), 
+                                                MakeProxyReturnResult(method)))
+                                        .WithExpression(_names.DeserializerLocal.IdentifierName)))));
 
                     bodyStmts.Add(ReturnStatement(pipelineAwareCall));
                 }
@@ -422,19 +425,18 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         call,
                         IdentifierName(nameof(Capnp.Rpc.IPromisedAnswer.WhenReturned)));
 
-                    var assignAwaited = LocalDeclarationStatement(
-                        VariableDeclaration(
+                    bodyStmts.Add(UsingStatement(
+                        Block(
+                            MakeProxyCreateResult(method),
+                            MakeProxyReturnResult(method)))
+                        .WithDeclaration(VariableDeclaration(
                             IdentifierName("var"))
-                        .AddVariables(
-                            VariableDeclarator(
-                                _names.DeserializerLocal.Identifier)
-                            .WithInitializer(
-                                EqualsValueClause(
-                                    AwaitExpression(whenReturned)))));
-
-                    bodyStmts.Add(assignAwaited);
-                    bodyStmts.Add(MakeProxyCreateResult(method));
-                    bodyStmts.Add(MakeProxyReturnResult(method));
+                                .AddVariables(
+                                    VariableDeclarator(
+                                        _names.DeserializerLocal.Identifier)
+                                    .WithInitializer(
+                                        EqualsValueClause(
+                                            AwaitExpression(whenReturned))))));
                 }
 
                 if (method.GenericParameters.Count > 0)
@@ -479,7 +481,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 yield return AssignmentExpression(
                     SyntaxKind.SimpleAssignmentExpression,
                     _names.GetCodeIdentifier(arg).IdentifierName,
-                    IdentifierName(IdentifierRenamer.ToNonKeyword(arg.Name)));
+                    IdentifierName(_names.GetCodeIdentifierLowerCamel(arg)));
             }
         }
 
@@ -649,7 +651,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                     if (method.Results.Count == 1)
                     {
                         lambdaArg = SimpleLambdaExpression(
-                            Parameter(Identifier(method.Results.Single().Name)),
+                            Parameter(Identifier(_names.GetCodeIdentifierLowerCamel(method.Results.Single()))),
                             MakeMaybeTailCallLambdaBody(method));
                     }
                     else
@@ -661,7 +663,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         {
                             if (paramList.Count > 0)
                                 paramList.Add(Token(SyntaxKind.CommaToken));
-                            paramList.Add(Parameter(Identifier(arg.Name)));
+                            paramList.Add(Parameter(Identifier(_names.GetCodeIdentifierLowerCamel(arg))));
                         }
                         lambdaArg = ParenthesizedLambdaExpression(
                             ParameterList(
@@ -703,7 +705,10 @@ namespace CapnpC.CSharp.Generator.CodeGen
                         Parameter(_names.CancellationTokenParameter.Identifier)
                             .WithType(_names.Type<CancellationToken>(Nullability.NonNullable)))
                     .AddBodyStatements(
-                        MakeSkeletonMethodBody(method).ToArray());
+                        UsingStatement(
+                            Block(
+                                MakeSkeletonMethodBody(method).ToArray()))
+                            .WithExpression(_names.DeserializerLocal.IdentifierName));
 
                 if (method.Results.Count == 0)
                 {
@@ -725,6 +730,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
         {
             var name = _names.MakeTypeName(type, NameUsage.Skeleton).Identifier;
             var classDecl = ClassDeclaration(name)
+                .AddAttributeLists(_names.MakeTypeDecorationAttributes(type.Id))
                 .AddModifiers(Public)
                 .AddBaseListTypes(
                     SimpleBaseType(
@@ -808,6 +814,59 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         readonly HashSet<(string, string)> _existingExtensionMethods = new HashSet<(string, string)>();
 
+        LocalFunctionStatementSyntax MakeLocalAwaitProxyFunction(Method method, IReadOnlyList<Field> path)
+        {
+            var members = new List<Name>();
+            IEnumerable<Field> fields = path;
+
+            if (method.Results.Count >= 2)
+            {
+                int index = Array.IndexOf(method.ResultStruct.Fields.ToArray(), path[0]) + 1;
+                members.Add(new Name($"Item{index}"));
+                fields = path.Skip(1);
+            }
+
+            foreach (var field in fields)
+            {
+                members.Add(_names.GetCodeIdentifier(field));
+            }
+
+            ExpressionSyntax memberAccess = 
+                ParenthesizedExpression(
+                    AwaitExpression(
+                        _names.TaskParameter.IdentifierName));
+
+            memberAccess = MemberAccessExpression(
+                SyntaxKind.SimpleMemberAccessExpression,
+                memberAccess,
+                members.First().IdentifierName);
+
+            foreach (var member in members.Skip(1))
+            {
+                memberAccess = ConditionalAccessExpression(
+                    memberAccess,
+                    MemberBindingExpression(member.IdentifierName));
+            }
+
+            var idisposable = _names.MakeNullableRefType(IdentifierName(nameof(IDisposable)));
+
+            return LocalFunctionStatement(
+                    GenericName(
+                        Identifier(nameof(Task)))
+                    .WithTypeArgumentList(
+                        TypeArgumentList(
+                            SingletonSeparatedList<TypeSyntax>(
+                                idisposable))),
+                    _names.AwaitProxy.Identifier)
+                .WithModifiers(
+                    TokenList(
+                        Token(SyntaxKind.AsyncKeyword)))
+                .WithExpressionBody(
+                    ArrowExpressionClause(memberAccess))
+                .WithSemicolonToken(
+                    Token(SyntaxKind.SemicolonToken));
+        }
+
         public IEnumerable<MemberDeclarationSyntax> MakePipeliningSupport(TypeDefinition type)
         {
             foreach (var method in type.Methods)
@@ -856,6 +915,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                             .AddModifiers(This)
                             .WithType(TransformReturnType(method)))
                         .AddBodyStatements(
+                            MakeLocalAwaitProxyFunction(method, path),
                             ReturnStatement(
                                 CastExpression(
                                     capTypeSyntax,
@@ -872,18 +932,16 @@ namespace CapnpC.CSharp.Generator.CodeGen
                                             InvocationExpression(
                                                 MemberAccessExpression(
                                                     SyntaxKind.SimpleMemberAccessExpression,
+                                                    IdentifierName(nameof(Capnp.Rpc.Impatient)),
+                                                    IdentifierName(nameof(Capnp.Rpc.Impatient.Access))))
+                                            .AddArgumentListArguments(
+                                                Argument(
+                                                    _names.TaskParameter.IdentifierName),
+                                                Argument(
+                                                    accessPath.IdentifierName),
+                                                Argument(
                                                     InvocationExpression(
-                                                        MemberAccessExpression(
-                                                            SyntaxKind.SimpleMemberAccessExpression,
-                                                            IdentifierName(nameof(Capnp.Rpc.Impatient)),
-                                                            IdentifierName(nameof(Capnp.Rpc.Impatient.GetAnswer))))
-                                                    .AddArgumentListArguments(
-                                                        Argument(
-                                                            _names.TaskParameter.IdentifierName)),
-                                                    IdentifierName(nameof(Capnp.Rpc.IPromisedAnswer.Access))))
-                                                .AddArgumentListArguments(
-                                                    Argument(
-                                                        accessPath.IdentifierName)))))));
+                                                        _names.AwaitProxy.IdentifierName))))))));
 
                     yield return pathDecl;
                     yield return methodDecl;

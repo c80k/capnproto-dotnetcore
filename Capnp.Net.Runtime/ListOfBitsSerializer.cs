@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Capnp
 {
@@ -10,7 +11,6 @@ namespace Capnp
     /// </summary>
     public class ListOfBitsSerializer: SerializerState, IReadOnlyList<bool>
     {
-
         /// <summary>
         /// Gets or sets the element at given index.
         /// </summary>
@@ -22,6 +22,8 @@ namespace Capnp
         {
             get
             {
+                ListSerializerHelper.EnsureAllocated(this);
+
                 if (index < 0 || index >= Count)
                     throw new IndexOutOfRangeException();
 
@@ -32,6 +34,8 @@ namespace Capnp
             }
             set
             {
+                ListSerializerHelper.EnsureAllocated(this);
+
                 if (index < 0 || index >= Count)
                     throw new IndexOutOfRangeException();
 
@@ -88,11 +92,17 @@ namespace Capnp
             }
         }
 
+        IEnumerable<bool> Enumerate()
+        {
+            for (int i = 0; i < Count; i++)
+                yield return this[i];
+        }
+
         /// <summary>
         /// Implements <see cref="IEnumerable{Boolean}"/>
         /// </summary>
-        public IEnumerator<bool> GetEnumerator() => (IEnumerator<bool>)this.ToArray().GetEnumerator();
+        public IEnumerator<bool> GetEnumerator() => Enumerate().GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() => this.ToArray().GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

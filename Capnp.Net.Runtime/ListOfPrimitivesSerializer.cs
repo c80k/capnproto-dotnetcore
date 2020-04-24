@@ -29,9 +29,9 @@ namespace Capnp
         }
 
         /// <summary>
-        /// Retrieves the underlying memory span of the represented items.
+        /// The list's data
         /// </summary>
-        public Span<T> Span => MemoryMarshal.Cast<ulong, T>(RawData);
+        public Span<T> Data => MemoryMarshal.Cast<ulong, T>(RawData).Slice(0, Count);
 
         /// <summary>
         /// Gets or sets the value at given index.
@@ -40,8 +40,16 @@ namespace Capnp
         /// <returns>Element value</returns>
         public T this[int index]
         {
-            get => Span[index];
-            set => Span[index] = value;
+            get
+            {
+                ListSerializerHelper.EnsureAllocated(this);
+                return Data[index];
+            }
+            set
+            {
+                ListSerializerHelper.EnsureAllocated(this);
+                Data[index] = value;
+            }
         }
 
         /// <summary>
@@ -84,19 +92,19 @@ namespace Capnp
             switch (items)
             {
                 case T[] array:
-                    array.CopyTo(Span);
+                    array.CopyTo(Data);
                     break;
 
                 case ArraySegment<T> segment:
-                    segment.AsSpan().CopyTo(Span);
+                    segment.AsSpan().CopyTo(Data);
                     break;
 
                 case ListOfPrimitivesDeserializer<T> deser:
-                    deser.Span.CopyTo(Span);
+                    deser.Span.CopyTo(Data);
                     break;
 
                 case ListOfPrimitivesSerializer<T> ser:
-                    ser.Span.CopyTo(Span);
+                    ser.Data.CopyTo(Data);
                     break;
 
                 default:
@@ -108,11 +116,18 @@ namespace Capnp
             }
         }
 
+        IEnumerable<T> Enumerate()
+        {
+            for (int i = 0; i < Count; i++)
+                yield return Data[i];
+        }
+
         /// <summary>
         /// Implements <see cref="IEnumerable{T}"/>.
         /// </summary>
-        public IEnumerator<T> GetEnumerator() => (IEnumerator<T>)Span.ToArray().GetEnumerator();
+        /// <returns></returns>
+        public IEnumerator<T> GetEnumerator() => Enumerate().GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() => Span.ToArray().GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

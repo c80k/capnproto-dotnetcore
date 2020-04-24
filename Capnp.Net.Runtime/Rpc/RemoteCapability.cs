@@ -13,6 +13,8 @@ namespace Capnp.Rpc
             _ep = ep;
         }
 
+        internal IRpcEndpoint Endpoint => _ep;
+
         internal override IPromisedAnswer DoCall(ulong interfaceId, ushort methodId, DynamicSerializerState args)
         {
             var call = SetupMessage(args, interfaceId, methodId);
@@ -29,7 +31,7 @@ namespace Capnp.Rpc
 
             callMsg.which = Message.WHICH.Call;
 
-            var call = callMsg.Call;
+            var call = callMsg.Call!;
             call.AllowThirdPartyTailCall = false;
             call.InterfaceId = interfaceId;
             call.MethodId = methodId;

@@ -1,9 +1,12 @@
 ﻿using Capnp.Rpc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
 
 namespace Capnp.Net.Runtime.Tests
 {
     [TestClass]
+    [TestCategory("Coverage")]
     public class RpcSchemaTests
     {
         [TestMethod]
@@ -364,6 +367,407 @@ namespace Capnp.Net.Runtime.Tests
                 Assert.AreEqual(Resolve.WHICH.Exception, r.Unimplemented.Resolve.which);
                 Assert.AreEqual("reason", r.Unimplemented.Resolve.Exception.Reason);
             }
+        }
+
+        void ConstructReconstructTest<TD, TW>(Func<TD> construct, Action<TD> verify)
+            where TD : class, ICapnpSerializable, new()
+            where TW: SerializerState, new()
+        {
+            var obj = construct();
+
+            var mb = MessageBuilder.Create();
+            var root = mb.BuildRoot<TW>();
+            obj.Serialize(root);
+            using (var tr = new FrameTracing.RpcFrameTracer(Console.Out))
+            {
+                tr.TraceFrame(FrameTracing.FrameDirection.Tx, mb.Frame);
+            }
+            var d = (DeserializerState)root;
+            var obj2 = new TD();
+            obj2.Deserialize(d);
+
+            verify(obj2);
+        }
+
+        [TestMethod]
+        public void DcMessageAbort()
+        {
+            ConstructReconstructTest<Message, Message.WRITER>(
+                () => new Message()
+                {
+                    Abort = new Rpc.Exception()
+                    {
+                        Reason = "problem"
+                    }
+                },
+                msg =>
+                {
+                    Assert.IsNotNull(msg.Abort);
+                    Assert.IsNull(msg.Accept);
+                    Assert.AreEqual("problem", msg.Abort.Reason);
+                }
+                );
+        }
+
+        [TestMethod]
+        public void DcMessageAccept()
+        {
+            ConstructReconstructTest<Message, Message.WRITER>(
+                () => new Message()
+                {
+                    Accept = new Accept()
+                    {
+                        QuestionId = 123u,
+                        Embargo = true
+                    }
+                },
+                msg =>
+                {
+                    Assert.IsNotNull(msg.Accept);
+                    Assert.AreEqual(123u, msg.Accept.QuestionId);
+                    Assert.IsTrue(msg.Accept.Embargo);
+                }
+                );
+        }
+
+        [TestMethod]
+        public void DcMessageUnimplementedJoin()
+        {
+            ConstructReconstructTest<Message, Message.WRITER>(
+                () => new Message()
+                {
+                    Unimplemented = new Message()
+                    {
+                        Join = new Join()
+                        {
+                            QuestionId = 456u,
+                            Target = new MessageTarget()
+                            {
+                                ImportedCap = 789u
+                            }
+                        }
+                    }
+                },
+                msg =>
+                {
+                    Assert.IsNotNull(msg.Unimplemented);
+                    Assert.IsNotNull(msg.Unimplemented.Join);
+                    Assert.AreEqual(456u, msg.Unimplemented.Join.QuestionId);
+                    Assert.IsNotNull(msg.Unimplemented.Join.Target);
+                    Assert.AreEqual(789u, msg.Unimplemented.Join.Target.ImportedCap);
+                }
+                );
+        }
+
+        [TestMethod]
+        public void DcMessageCall()
+        {
+            ConstructReconstructTest<Message, Message.WRITER>(
+                () => new Message()
+                {
+                    Call = new Call()
+                    {
+                        AllowThirdPartyTailCall = true,
+                        InterfaceId = 0x12345678abcdef,
+                        MethodId = 0x5555,
+                        Params = new Payload()
+                        {
+                            CapTable = new List<CapDescriptor>()
+                            {
+                                new CapDescriptor()
+                                {
+                                    ReceiverAnswer = new PromisedAnswer()
+                                    {
+                                        QuestionId = 42u,
+                                        Transform = new List<PromisedAnswer.Op>()
+                                        {
+                                            new PromisedAnswer.Op()
+                                            {
+                                                GetPointerField = 3
+                                            }
+                                        }
+                                    },
+                                },
+                                new CapDescriptor()
+                                {
+                                    ReceiverHosted = 7u
+                                },
+                                new CapDescriptor()
+                                {
+                                    SenderHosted = 8u
+                                },
+                                new CapDescriptor()
+                                {
+                                    SenderPromise = 9u
+                                },
+                                new CapDescriptor()
+                                {
+                                    ThirdPartyHosted = new ThirdPartyCapDescriptor()
+                                    {
+                                        VineId = 10u
+                                    }
+                                }
+                            }
+                        },
+                        QuestionId = 57u, 
+                        SendResultsTo = new Call.sendResultsTo()
+                        {
+                            which = Call.sendResultsTo.WHICH.Caller
+                        },
+                        Target = new MessageTarget()
+                        {
+                            PromisedAnswer = new PromisedAnswer()
+                            {
+                                QuestionId = 12u
+                            }
+                        }
+                    }
+                },
+                msg =>
+                {
+                    Assert.IsNotNull(msg.Call);
+                    Assert.IsTrue(msg.Call.AllowThirdPartyTailCall);
+                    Assert.AreEqual(0x12345678abcdeful, msg.Call.InterfaceId);
+                    Assert.AreEqual(0x5555u, msg.Call.MethodId);
+                    Assert.IsNotNull(msg.Call.Params);
+                    Assert.IsNotNull(msg.Call.Params.CapTable);
+                    Assert.AreEqual(5, msg.Call.Params.CapTable.Count);
+                    Assert.IsNotNull(msg.Call.Params.CapTable[0].ReceiverAnswer);
+                    Assert.AreEqual(42u, msg.Call.Params.CapTable[0].ReceiverAnswer.QuestionId);
+                    Assert.IsNotNull(msg.Call.Params.CapTable[0].ReceiverAnswer.Transform);
+                    Assert.AreEqual(1, msg.Call.Params.CapTable[0].ReceiverAnswer.Transform.Count);
+                    Assert.AreEqual((ushort)3, msg.Call.Params.CapTable[0].ReceiverAnswer.Transform[0].GetPointerField);
+                    Assert.AreEqual(7u, msg.Call.Params.CapTable[1].ReceiverHosted);
+                    Assert.AreEqual(8u, msg.Call.Params.CapTable[2].SenderHosted);
+                    Assert.AreEqual(9u, msg.Call.Params.CapTable[3].SenderPromise);
+                    Assert.IsNotNull(msg.Call.Params.CapTable[4].ThirdPartyHosted);
+                    Assert.AreEqual(10u, msg.Call.Params.CapTable[4].ThirdPartyHosted.VineId);
+                    Assert.AreEqual(57u, msg.Call.QuestionId);
+                    Assert.IsNotNull(msg.Call.SendResultsTo);
+                    Assert.AreEqual(Call.sendResultsTo.WHICH.Caller, msg.Call.SendResultsTo.which);
+                    Assert.IsNotNull(msg.Call.Target);
+                    Assert.IsNotNull(msg.Call.Target.PromisedAnswer);
+                    Assert.AreEqual(12u, msg.Call.Target.PromisedAnswer.QuestionId);
+                }
+                );
+        }
+
+        [TestMethod]
+        public void DcMessageReturnResults()
+        {
+            ConstructReconstructTest<Message, Message.WRITER>(
+                () => new Message()
+                {
+                    Return = new Return()
+                    { 
+                        AnswerId = 123u,
+                        ReleaseParamCaps = false,
+                        Results = new Payload()
+                        {
+                            CapTable = new List<CapDescriptor>()
+                        }
+                    }
+                },
+                msg =>
+                {
+                    Assert.IsNotNull(msg.Return);
+                    Assert.AreEqual(123u, msg.Return.AnswerId);
+                    Assert.IsFalse(msg.Return.ReleaseParamCaps);
+                    Assert.IsNotNull(msg.Return.Results);
+                    Assert.IsNotNull(msg.Return.Results.CapTable);
+                    Assert.AreEqual(0, msg.Return.Results.CapTable.Count);
+                }
+                );
+        }
+
+        [TestMethod]
+        public void DcMessageReturnException()
+        {
+            ConstructReconstructTest<Message, Message.WRITER>(
+                () => new Message()
+                {
+                    Return = new Return()
+                    {
+                        AnswerId = 123u,
+                        ReleaseParamCaps = true,
+                        Exception = new Rpc.Exception()
+                        {
+                            Reason = "bad",
+                            TheType = Rpc.Exception.Type.overloaded
+                        }
+                    }
+                },
+                msg =>
+                {
+                    Assert.IsNotNull(msg.Return);
+                    Assert.AreEqual(123u, msg.Return.AnswerId);
+                    Assert.IsTrue(msg.Return.ReleaseParamCaps);
+                    Assert.IsNotNull(msg.Return.Exception);
+                    Assert.AreEqual("bad", msg.Return.Exception.Reason);
+                    Assert.AreEqual(Rpc.Exception.Type.overloaded, msg.Return.Exception.TheType);
+                }
+                );
+        }
+
+        [TestMethod]
+        public void DcMessageReturnTakeFromOtherQuestion()
+        {
+            ConstructReconstructTest<Message, Message.WRITER>(
+                () => new Message()
+                {
+                    Return = new Return()
+                    {
+                        AnswerId = 123u,
+                        ReleaseParamCaps = true,
+                        TakeFromOtherQuestion = 321u                        
+                    }
+                },
+                msg =>
+                {
+                    Assert.IsNotNull(msg.Return);
+                    Assert.AreEqual(123u, msg.Return.AnswerId);
+                    Assert.IsTrue(msg.Return.ReleaseParamCaps);
+                    Assert.AreEqual(321u, msg.Return.TakeFromOtherQuestion);
+                }
+                );
+        }
+
+        [TestMethod]
+        public void DcMessageFinish()
+        {
+            ConstructReconstructTest<Message, Message.WRITER>(
+                () => new Message()
+                {
+                    Finish = new Finish()
+                    {
+                        QuestionId = 321u,
+                        ReleaseResultCaps = true
+                    }
+                },
+                msg =>
+                {
+                    Assert.IsNotNull(msg.Finish);
+                    Assert.AreEqual(321u, msg.Finish.QuestionId);
+                    Assert.IsTrue(msg.Finish.ReleaseResultCaps);
+                }
+                );
+        }
+
+        [TestMethod]
+        public void DcMessageResolve()
+        {
+            ConstructReconstructTest<Message, Message.WRITER>(
+                () => new Message()
+                {
+                    Resolve = new Resolve()
+                    {
+                        PromiseId = 555u,
+                        Exception = new Rpc.Exception()
+                        {
+                            Reason = "error",
+                            TheType = Rpc.Exception.Type.failed
+                        }
+                    }
+                },
+                msg =>
+                {
+                    Assert.IsNotNull(msg.Resolve);
+                    Assert.AreEqual(555u, msg.Resolve.PromiseId);
+                    Assert.AreEqual("error", msg.Resolve.Exception.Reason);
+                    Assert.AreEqual(Rpc.Exception.Type.failed, msg.Resolve.Exception.TheType);
+                }
+                );
+        }
+
+        [TestMethod]
+        public void DcMessageRelease()
+        {
+            ConstructReconstructTest<Message, Message.WRITER>(
+                () => new Message()
+                {
+                    Release = new Release()
+                    { 
+                        Id = 6000u, 
+                        ReferenceCount = 6u
+                    }
+                },
+                msg =>
+                {
+                    Assert.IsNotNull(msg.Release);
+                    Assert.AreEqual(6000u, msg.Release.Id);
+                    Assert.AreEqual(6u, msg.Release.ReferenceCount);
+                }
+                );
+        }
+
+        [TestMethod]
+        public void DcMessageBootstrap()
+        {
+            ConstructReconstructTest<Message, Message.WRITER>(
+                () => new Message()
+                {
+                    Bootstrap = new Bootstrap()
+                    {
+                        QuestionId = 99u
+                    }
+                },
+                msg =>
+                {
+                    Assert.IsNotNull(msg.Bootstrap);
+                    Assert.AreEqual(99u, msg.Bootstrap.QuestionId);
+                }
+                );
+        }
+
+        [TestMethod]
+        public void DcMessageProvide()
+        {
+            ConstructReconstructTest<Message, Message.WRITER>(
+                () => new Message()
+                {
+                    Provide = new Provide()
+                    { 
+                        Target = new MessageTarget()
+                        {
+                             ImportedCap = 7u
+                        }
+                    }
+                },
+                msg =>
+                {
+                    Assert.IsNotNull(msg.Provide);
+                    Assert.IsNotNull(msg.Provide.Target);
+                    Assert.AreEqual(7u, msg.Provide.Target.ImportedCap);
+                }
+                );
+        }
+
+        [TestMethod]
+        public void DcMessageDisembargo()
+        {
+            ConstructReconstructTest<Message, Message.WRITER>(
+                () => new Message()
+                {
+                    Disembargo = new Disembargo()
+                    {
+                        Context = new Disembargo.context()
+                        {
+                            ReceiverLoopback = 900u
+                        }, 
+                        Target = new MessageTarget()
+                    }
+                },
+                msg =>
+                {
+                    Assert.IsNotNull(msg.Disembargo);
+                    Assert.IsNotNull(msg.Disembargo.Context);
+                    Assert.AreEqual(900u, msg.Disembargo.Context.ReceiverLoopback);
+                    Assert.IsNotNull(msg.Disembargo.Target);
+                    Assert.IsNull(msg.Disembargo.Target.ImportedCap);
+                    Assert.IsNull(msg.Disembargo.Target.PromisedAnswer);
+                    Assert.AreEqual(MessageTarget.WHICH.undefined, msg.Disembargo.Target.which);
+                }
+                );
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Capnp.Net.Runtime.Tests.GenImpls;
+using Capnp.Net.Runtime.Tests.Util;
 using Capnp.Rpc;
 using Capnproto_test.Capnp.Test;
 using Microsoft.Extensions.Logging;
@@ -6,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
@@ -19,7 +21,6 @@ namespace Capnp.Net.Runtime.Tests
             for (int i = 0; i < count; i++)
             {
                 Logger.LogTrace("Repetition {0}", i);
-                IncrementTcpPort();
                 action();
             }
         }
@@ -34,7 +35,7 @@ namespace Capnp.Net.Runtime.Tests
                 using (server)
                 using (client)
                 {
-                    client.WhenConnected.Wait();
+                    //client.WhenConnected.Wait();
 
                     var counters = new Counters();
                     var impl = new TestMoreStuffImpl(counters);
@@ -42,7 +43,7 @@ namespace Capnp.Net.Runtime.Tests
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
                         var resolving = main as IResolvingCapability;
-                        Assert.IsTrue(resolving.WhenResolved.Wait(MediumNonDbgTimeout));
+                        Assert.IsTrue(resolving.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
                     }
                 }
             });
@@ -59,10 +60,17 @@ namespace Capnp.Net.Runtime.Tests
         public void Embargo()
         {
             var t = new TcpRpcPorted();
-            Repeat(100, t.Embargo);
+            Repeat(100, 
+                () => 
+                NewLocalhostTcpTestbed(TcpRpcTestOptions.ClientTracer | TcpRpcTestOptions.ClientFluctStream)
+                    .RunTest(Testsuite.EmbargoOnPromisedAnswer));
+        }
 
+        [TestMethod]
+        public void EmbargoServer()
+        {
             var t2 = new TcpRpcInterop();
-            Repeat(100, t2.EmbargoServer);
+            Repeat(20, t2.EmbargoServer);
         }
 
         [TestMethod]
@@ -94,14 +102,15 @@ namespace Capnp.Net.Runtime.Tests
         [TestMethod]
         public void ScatteredTransfer()
         {
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
 
-            using (var server = new TcpRpcServer(IPAddress.Any, TcpPort))
+            using (var server = new TcpRpcServer(addr, port))
             using (var client = new TcpRpcClient())
             {
                 server.InjectMidlayer(s => new ScatteringStream(s, 7));
                 client.InjectMidlayer(s => new ScatteringStream(s, 10));
-                client.Connect("localhost", TcpPort);
-                client.WhenConnected.Wait();
+                client.Connect(addr.ToString(), port);
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestInterfaceImpl(counters);

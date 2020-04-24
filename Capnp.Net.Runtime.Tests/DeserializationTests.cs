@@ -1,8 +1,15 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Capnp.Net.Runtime.Tests.GenImpls;
+using Capnproto_test.Capnp.Test;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using static Capnproto_test.Capnp.Test.TestStructUnion;
 
 namespace Capnp.Net.Runtime.Tests
 {
     [TestClass]
+    [TestCategory("Coverage")]
     public class DeserializationTests
     {
         [TestMethod]
@@ -144,6 +151,9 @@ namespace Capnp.Net.Runtime.Tests
             Assert.AreEqual(2, asListOfStructs.Count);
             Assert.AreEqual(0ul, asListOfStructs[0].ReadDataULong(0));
             Assert.AreEqual(ulong.MaxValue, asListOfStructs[1].ReadDataULong(0));
+            Assert.ThrowsException<IndexOutOfRangeException>(() => asListOfStructs[-1].ReadDataUShort(0));
+            Assert.ThrowsException<IndexOutOfRangeException>(() => asListOfStructs[3].ReadDataUShort(0));
+            CollectionAssert.AreEqual(new ulong[] { 0, ulong.MaxValue }, asListOfStructs.Select(_ => _.ReadDataULong(0)).ToArray());
         }
 
         [TestMethod]
@@ -205,6 +215,22 @@ namespace Capnp.Net.Runtime.Tests
             Assert.AreEqual(double.NaN, asListOfStructs[3].ReadDataDouble(0));
             Assert.AreEqual(double.NegativeInfinity, asListOfStructs[4].ReadDataDouble(0));
             Assert.AreEqual(double.PositiveInfinity, asListOfStructs[5].ReadDataDouble(0));
+        }
+
+        [TestMethod]
+        public void ListOfStructsAsListOfBools()
+        {
+            var ds = new DynamicSerializerState(MessageBuilder.Create(128));
+            ds.SetListOfStructs(3, 1, 0);
+            ds.ListBuildStruct(1).WriteData(0, false);
+            ds.ListBuildStruct(2).WriteData(0, true);
+
+            DeserializerState d = ds;
+            var asListOfBools = d.RequireList().CastBool();
+            Assert.AreEqual(3, asListOfBools.Count);
+            Assert.AreEqual(false, asListOfBools[0]);
+            Assert.AreEqual(false, asListOfBools[1]);
+            Assert.AreEqual(true, asListOfBools[2]);
         }
 
         [TestMethod]
@@ -352,6 +378,600 @@ namespace Capnp.Net.Runtime.Tests
             Assert.AreEqual(2, asListOfDoubles.Count);
             Assert.AreEqual(double.NegativeInfinity, asListOfDoubles[0]);
             Assert.AreEqual(double.MaxValue, asListOfDoubles[1]);
+        }
+
+        [TestMethod]
+        public void NestedLists()
+        {
+            var expected = new int[][] {
+                new int[] { 1, 2, 3 },
+                new int[] { 4, 5 },
+                new int[] { 6 } };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            Assert.ThrowsException<NotSupportedException>(() => ld.CastText());
+            var result = ld.Cast2D<int>();
+            Assert.AreEqual(3, result.Count);
+            for (int i = 0; i < result.Count; i++)
+            {
+                CollectionAssert.AreEqual(expected[i], result[i].ToArray());
+            }
+
+            Assert.ThrowsException<NotSupportedException>(() => ld.Cast2D<decimal>());
+        }
+
+        [TestMethod]
+        public void LinearListWrongUse()
+        {
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(new int[] { 1, 2, 3 });
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            Assert.ThrowsException<NotSupportedException>(() => ld.CastList());
+            Assert.ThrowsException<NotSupportedException>(() => ld.CastCapList<ITestInterface>());
+        }
+
+        [TestMethod]
+        public void NestedLists3D()
+        {
+            var expected = new int[][][] {
+                new int[][]
+                {
+                    new int[] { 1, 2, 3 },
+                    new int[] { 4, 5 },
+                    new int[] { 6 }
+                },
+                new int[][]
+                {
+                    new int[] { 1, 2, 3 },
+                    new int[0]
+                },
+                new int[0][]
+            };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            var result = ld.Cast3D<int>();
+            Assert.AreEqual(3, result.Count);
+            for (int i = 0; i < result.Count; i++)
+            {
+                var inner = result[i];
+                Assert.AreEqual(expected[i].Length, inner.Count);
+
+                for (int j = 0; j < expected[i].Length; j++)
+                {
+                    var inner2 = inner[j];
+                    CollectionAssert.AreEqual(expected[i][j], inner2.ToArray());
+                }
+            }
+        }
+
+        [TestMethod]
+        public void NestedListsND()
+        {
+            var expected = new int[][][] {
+                new int[][]
+                {
+                    new int[] { 1, 2, 3 },
+                    new int[] { 4, 5 },
+                    new int[] { 6 } 
+                },
+                new int[][]
+                {
+                    new int[] { 1, 2, 3 },
+                    new int[0]
+                },
+                new int[0][] 
+            };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();            
+            var result = (IReadOnlyList<object>)ld.CastND<int>(3);
+            Assert.AreEqual(3, result.Count);
+            for (int i = 0; i < result.Count; i++)
+            {
+                var inner = (IReadOnlyList<object>)result[i];
+                Assert.AreEqual(expected[i].Length, inner.Count);
+
+                for (int j = 0; j < expected[i].Length; j++)
+                {
+                    var inner2 = (IReadOnlyList<int>)inner[j];
+                    CollectionAssert.AreEqual(expected[i][j], inner2.ToArray());
+                }
+            }
+        }
+
+        [TestMethod]
+        public void NestedLists3DStruct()
+        {
+            var expected = new List<List<List<SomeStruct.WRITER>>>();
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            for (int i = 0; i < 3; i++)
+            {
+                expected.Add(new List<List<SomeStruct.WRITER>>());
+
+                for (int j = 0; j <= i; j++)
+                {
+                    expected[i].Add(new List<SomeStruct.WRITER>());
+
+                    for (int k = 0; k <= j; k++)
+                    {
+                        var x = b.CreateObject<SomeStruct.WRITER>();
+                        x.SomeText = $"{i}, {j}, {k}";
+                        expected[i][j].Add(x);
+                    }
+                }
+            }
+
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            var result = ld.Cast3D<SomeStruct.READER>(_ => new SomeStruct.READER(_));
+            Assert.AreEqual(3, result.Count);
+            for (int i = 0; i < result.Count; i++)
+            {
+                var inner = result[i];
+                Assert.AreEqual(i + 1, inner.Count);
+
+                for (int j = 0; j < inner.Count; j++)
+                {
+                    var inner2 = inner[j];
+                    Assert.AreEqual(j + 1, inner2.Count);
+
+                    for (int k = 0; k < inner2.Count; k++)
+                    {
+                        Assert.AreEqual($"{i}, {j}, {k}", inner2[k].SomeText);
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void NestedListsNDStruct()
+        {
+            var expected = new List<List<List<SomeStruct.WRITER>>>();
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            for (int i = 0; i < 3; i++)
+            {
+                expected.Add(new List<List<SomeStruct.WRITER>>());
+
+                for (int j = 0; j <= i; j++)
+                {
+                    expected[i].Add(new List<SomeStruct.WRITER>());
+
+                    for (int k = 0; k <= j; k++)
+                    {
+                        var x = b.CreateObject<SomeStruct.WRITER>();
+                        x.SomeText = $"{i}, {j}, {k}";
+                        expected[i][j].Add(x);
+                    }
+                }
+            }
+
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            var result = (IReadOnlyList<object>)ld.CastND<SomeStruct.READER>(3, _ => new SomeStruct.READER(_));
+            Assert.AreEqual(3, result.Count);
+            for (int i = 0; i < result.Count; i++)
+            {
+                var inner = (IReadOnlyList<object>)result[i];
+                Assert.AreEqual(i + 1, inner.Count);
+
+                for (int j = 0; j < inner.Count; j++)
+                {
+                    var inner2 = (IReadOnlyList<SomeStruct.READER>)inner[j];
+                    Assert.AreEqual(j + 1, inner2.Count);
+
+                    for (int k = 0; k < inner2.Count; k++)
+                    {
+                        Assert.AreEqual($"{i}, {j}, {k}", inner2[k].SomeText);
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void NestedLists2DStruct()
+        {
+            var expected = new List<List<SomeStruct.WRITER>>();
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            for (int i = 0; i < 3; i++)
+            {
+                expected.Add(new List<SomeStruct.WRITER>());
+
+                for (int j = 0; j <= i; j++)
+                {
+                    var x = b.CreateObject<SomeStruct.WRITER>();
+                    x.SomeText = $"{i}, {j}";
+                    expected[i].Add(x);
+                }
+            }
+
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            var result = ld.Cast2D(_ => new SomeStruct.READER(_));
+            Assert.AreEqual(3, result.Count);
+            for (int i = 0; i < result.Count; i++)
+            {
+                var inner = result[i];
+                Assert.AreEqual(i + 1, inner.Count);
+
+                for (int j = 0; j < inner.Count; j++)
+                {
+                    Assert.AreEqual($"{i}, {j}", inner[j].SomeText);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void ListOfEnums()
+        {
+            var expected = new TestEnum[] { TestEnum.bar, TestEnum.baz, TestEnum.corge };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            var result = ld.CastEnums(_ => (TestEnum)_);
+            CollectionAssert.AreEqual(expected, result.ToArray());
+        }
+
+        [TestMethod]
+        public void NestedLists2DEnum()
+        {
+            var expected = new TestEnum[][]
+            {
+                new TestEnum[] { TestEnum.bar, TestEnum.baz, TestEnum.corge },
+                new TestEnum[] { TestEnum.corge, TestEnum.foo, TestEnum.garply }
+            };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            var result = ld.CastEnums2D(_ => (TestEnum)_);
+            Assert.AreEqual(expected.Length, result.Count);
+            for (int i = 0; i < result.Count; i++)
+            {
+                CollectionAssert.AreEqual(expected[i], result[i].ToArray());
+            }
+        }
+
+        [TestMethod]
+        public void NestedLists3DEnum()
+        {
+            var expected = new TestEnum[][][] {
+                new TestEnum[][]
+                {
+                    new TestEnum[] { TestEnum.qux, TestEnum.quux, TestEnum.grault },
+                    new TestEnum[] { TestEnum.garply, TestEnum.foo },
+                    new TestEnum[] { TestEnum.corge }
+                },
+                new TestEnum[][]
+                {
+                    new TestEnum[] { TestEnum.baz, TestEnum.bar },
+                    new TestEnum[0]
+                },
+                new TestEnum[0][]
+            };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            var result = ld.CastEnums3D(_ => (TestEnum)_);
+            Assert.AreEqual(3, result.Count);
+            for (int i = 0; i < result.Count; i++)
+            {
+                var inner = result[i];
+                Assert.AreEqual(expected[i].Length, inner.Count);
+
+                for (int j = 0; j < expected[i].Length; j++)
+                {
+                    var inner2 = inner[j];
+                    CollectionAssert.AreEqual(expected[i][j], inner2.ToArray());
+                }
+            }
+        }
+
+        [TestMethod]
+        public void NestedListsNDEnum()
+        {
+            var expected = new TestEnum[][][] {
+                new TestEnum[][]
+                {
+                    new TestEnum[] { TestEnum.qux, TestEnum.quux, TestEnum.grault },
+                    new TestEnum[] { TestEnum.garply, TestEnum.foo },
+                    new TestEnum[] { TestEnum.corge }
+                },
+                new TestEnum[][]
+                {
+                    new TestEnum[] { TestEnum.baz, TestEnum.bar },
+                    new TestEnum[0]
+                },
+                new TestEnum[0][]
+            };
+
+            var b = MessageBuilder.Create();
+            var dss = b.CreateObject<DynamicSerializerState>();
+            dss.SetObject(expected);
+            DeserializerState d = dss;
+            var ld = d.RequireList();
+            var result = (IReadOnlyList<object>)ld.CastEnumsND(3, _ => (TestEnum)_);
+            Assert.AreEqual(3, result.Count);
+            for (int i = 0; i < result.Count; i++)
+            {
+                var inner = (IReadOnlyList<object>)result[i];
+                Assert.AreEqual(expected[i].Length, inner.Count);
+
+                for (int j = 0; j < expected[i].Length; j++)
+                {
+                    var inner2 = (IReadOnlyList<TestEnum>)inner[j];
+                    CollectionAssert.AreEqual(expected[i][j], inner2.ToArray());
+                }
+            }
+        }
+
+        [TestMethod]
+        public void NestedLists2DVoid()
+        {
+            var b = MessageBuilder.Create();
+            var s = b.CreateObject<ListOfPointersSerializer<ListOfEmptySerializer>>();
+            s.Init(3);
+            s[0].Init(4);
+            s[1].Init(5);
+            s[2].Init(6);
+            DeserializerState d = s;
+            var voids = d.RequireList().CastVoid2D();
+            CollectionAssert.AreEqual(new int[] { 4, 5, 6 }, voids.ToArray());
+        }
+
+        [TestMethod]
+        public void NestedLists3DVoid()
+        {
+            var expected = new int[][] {
+                new int[] { 1, 2, 3 },
+                new int[] { 4, 5 },
+                new int[] { 6 } };
+
+            var b = MessageBuilder.Create();
+            var s = b.CreateObject<ListOfPointersSerializer<ListOfPointersSerializer<ListOfEmptySerializer>>>();
+            s.Init(expected.Length);
+            for (int i = 0; i < expected.Length; i++)
+            {
+                s[i].Init(expected[i], (l, j) => l.Init(j));
+            }
+            DeserializerState d = s;
+            var voids = d.RequireList().CastVoid3D();
+            Assert.AreEqual(expected.Length, voids.Count);
+            for (int i = 0; i < expected.Length; i++)
+            {
+                CollectionAssert.AreEqual(expected[i], voids[i].ToArray());
+            }
+        }
+
+        [TestMethod]
+        public void ListOfEmpty()
+        {
+            var expected = new TestEnum[] { TestEnum.bar, TestEnum.baz, TestEnum.corge };
+
+            var b = MessageBuilder.Create();
+            var loes = b.CreateObject<ListOfEmptySerializer>();
+            loes.Init(12345678);
+            DeserializerState d = loes;
+            var ld = d.RequireList();
+            Assert.AreEqual(ListKind.ListOfEmpty, ld.Kind);
+            if (!(ld is ListOfEmptyDeserializer loed))
+            {
+                Assert.Fail("List did not deserialize back to ListOfEmptyDeserializer");
+                return;
+            }
+            Assert.AreEqual(12345678, loed.Count);
+            Assert.ThrowsException<IndexOutOfRangeException>(() => { var _ = loed[-1]; });
+            Assert.ThrowsException<IndexOutOfRangeException>(() => { var _ = loed[12345678]; });
+            _ = loed[12345677];
+            var kind = loed.Cast(_ => _.Kind).Take(1).Single();
+            Assert.AreEqual(ObjectKind.Nil, kind);
+        }
+
+        [TestMethod]
+        public void DeserializerStateBadConv()
+        {
+            SerializerState s = null;
+            Assert.ThrowsException<ArgumentNullException>(() => (DeserializerState)s);
+            s = new DynamicSerializerState();
+            Assert.ThrowsException<InvalidOperationException>(() => (DeserializerState)s);
+        }
+
+        [TestMethod]
+        public void BadPointers()
+        {
+            var data = new ulong[1];
+            var wf = new WireFrame(new Memory<ulong>[] { new Memory<ulong>(data) });
+            var d0 = DeserializerState.CreateRoot(wf);
+            Assert.AreEqual(ObjectKind.Nil, d0.Kind);
+            WirePointer p = default;
+            p.BeginStruct(1, 0);
+            p.Offset = 0;
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.BeginList(ListKind.ListOfBits, 64);
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.BeginList(ListKind.ListOfBytes, 8);
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.BeginList(ListKind.ListOfEmpty, 6400);
+            data[0] = p;
+            var d1 = DeserializerState.CreateRoot(wf);
+            p.BeginList(ListKind.ListOfInts, 2);
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.BeginList(ListKind.ListOfLongs, 1);
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.BeginList(ListKind.ListOfPointers, 1);
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.BeginList(ListKind.ListOfShorts, 4);
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.BeginList(ListKind.ListOfStructs, 1);
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.SetFarPointer(0, 0, false);
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.SetFarPointer(1, 0, false);
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.SetFarPointer(0, 1, false);
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+            p.SetFarPointer(0, 0, true);
+            data[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf));
+
+            var data2 = new ulong[3];
+            var wf2 = new WireFrame(new Memory<ulong>[] { new Memory<ulong>(data2) });
+            p.BeginList(ListKind.ListOfStructs, 1);
+            data2[0] = p;
+            data2[1] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf2));
+
+            p.SetFarPointer(0, 1, true);
+            data2[0] = p;
+            data2[1] = 0;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf2));
+
+            p.SetFarPointer(0, 1, false);
+            data2[1] = p;
+            data2[2] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf2));
+
+            p.SetFarPointer(0, 2, true);
+            data2[0] = p;
+            Assert.ThrowsException<DeserializationException>(() => DeserializerState.CreateRoot(wf2));
+        }
+
+        [TestMethod]
+        public void ReadCap1()
+        {
+            var mb = MessageBuilder.Create();
+            var dss = mb.CreateObject<DynamicSerializerState>();
+            dss.SetStruct(0, 1);
+            DeserializerState ds = dss;
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => ds.ReadCap(-1));
+            Assert.ThrowsException<InvalidOperationException>(() => ds.ReadCap(0));
+        }
+
+        [TestMethod]
+        public void ReadCap2()
+        {
+            var mb = MessageBuilder.Create();
+            mb.InitCapTable();
+            var dss1 = mb.CreateObject<DynamicSerializerState>();
+            var dss2 = mb.CreateObject<DynamicSerializerState>();
+            dss2.SetStruct(1, 1);
+            dss1.SetStruct(0, 2);
+            dss1.Link(0, dss2);
+            dss1.LinkToCapability(1, 7);
+            var d = (DeserializerState)dss1;
+            Assert.ThrowsException<Rpc.RpcException>(() => d.ReadCap(0));
+            Assert.ThrowsException<Rpc.RpcException>(() => d.ReadCap(1));
+        }
+
+        [TestMethod]
+        public void Read1()
+        {
+            var mb = MessageBuilder.Create();
+            var dss = mb.CreateObject<DynamicSerializerState>();
+            dss.SetStruct(1, 0);
+            dss.WriteData(0, ulong.MaxValue);
+            var d = (DeserializerState)dss;
+            Assert.AreEqual(ushort.MaxValue, d.ReadDataUShort(48));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => d.ReadDataUShort(49));
+            Assert.AreEqual((ushort)0, d.ReadDataUShort(64));
+            Assert.IsNotNull(d.StructReadPointer(7));
+            Assert.ThrowsException<DeserializationException>(() => d.RequireCapList<ITestInterface>());
+        }
+
+        [TestMethod]
+        public void Read2()
+        {
+            var mb = MessageBuilder.Create();
+            var dss = mb.CreateObject<ListOfBitsSerializer>();
+            dss.Init(50);
+            var d = (DeserializerState)dss;
+            Assert.ThrowsException<DeserializationException>(() => d.ReadDataUInt(0));
+            Assert.ThrowsException<DeserializationException>(() => d.StructReadPointer(0));
+        }
+
+        [TestMethod]
+        public void ReadCapList()
+        {
+            var mb = MessageBuilder.Create();
+            mb.InitCapTable();
+            var dss = mb.CreateObject<DynamicSerializerState>();
+            dss.SetStruct(0, 1);
+            var loc = mb.CreateObject<ListOfCapsSerializer<ITestInterface>>();
+            loc.Init(1);
+            loc[0] = new TestInterfaceImpl2();
+            dss.LinkObject(0, loc);
+            var d = (DeserializerState)dss;
+            var cl = d.ReadCapList<ITestInterface>(0);
+            Assert.AreEqual(1, cl.Count);
+            Assert.IsNotNull(cl[0]);
+        }
+
+        [TestMethod]
+        public void ReadCap()
+        {
+            var dss = DynamicSerializerState.CreateForRpc();
+            dss.SetStruct(0, 1);
+            dss.LinkObject<ITestInterface>(0, new TestInterfaceImpl2());
+            var d = (DeserializerState)dss;
+            Assert.IsNotNull(d.ReadCap(0));
+            Assert.IsNotNull(d.ReadCap<ITestInterface>(0));
+        }
+
+        [TestMethod]
+        public void RequireCap1()
+        {
+            var dss = DynamicSerializerState.CreateForRpc();
+            dss.SetStruct(1, 1);
+            var d = (DeserializerState)dss;
+            Assert.ThrowsException<DeserializationException>(() => d.RequireCap<ITestInterface>());
+        }
+
+        [TestMethod]
+        public void RequireCap2()
+        {
+            DeserializerState d = default;
+            d.Kind = ObjectKind.Capability;
+            Assert.ThrowsException<InvalidOperationException>(() => d.RequireCap<ITestInterface>());
         }
     }
 }

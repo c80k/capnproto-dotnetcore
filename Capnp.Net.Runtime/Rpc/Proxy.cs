@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Capnp.Util;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,53 +13,70 @@ namespace Capnp.Rpc
     /// </summary>
     public class Proxy : IDisposable, IResolvingCapability
     {
-#if DebugFinalizers
-        ILogger Logger { get; } = Logging.CreateLogger<Proxy>();
-#endif
+        /// <summary>
+        /// Creates a new proxy object for an existing implementation or proxy, sharing its ownership.
+        /// </summary>
+        /// <typeparam name="T">Capability interface</typeparam>
+        /// <param name="obj">instance to share</param>
+        /// <returns></returns>
+        public static T Share<T>(T obj) where T : class
+        {
+            if (obj is Proxy proxy)
+                return proxy.Cast<T>(false);
+            else
+                return BareProxy.FromImpl(obj).Cast<T>(true);
+        }
 
         bool _disposedValue = false;
 
         /// <summary>
-        /// Will eventually give the resolved capability, if this is a promised capability.
+        /// Completes when the capability gets resolved.
         /// </summary>
-        public Task<Proxy> WhenResolved
+        public StrictlyOrderedAwaitTask WhenResolved
         {
             get
             {
-                if (ConsumedCap is IResolvingCapability resolving)
-                {
-                    return resolving.WhenResolved;
-                }
-                else
-                {
-                    return Task.FromResult(this);
-                }
+                return ConsumedCap is IResolvingCapability resolving ?
+                    resolving.WhenResolved : Task.CompletedTask.EnforceAwaitOrder();
             }
         }
 
         /// <summary>
+        /// Returns the resolved capability
+        /// </summary>
+        /// <typeparam name="T">Capability interface or <see cref="BareProxy"/></typeparam>
+        /// <returns>the resolved capability, or null if it did not resolve yet</returns>
+        public T? GetResolvedCapability<T>() where T : class
+        {
+            if (ConsumedCap is IResolvingCapability resolving)
+                return resolving.GetResolvedCapability<T>();
+            else
+                return CapabilityReflection.CreateProxy<T>(ConsumedCap) as T;
+        }
+
+        ConsumedCapability _consumedCap = NullCapability.Instance;
+
+        /// <summary>
         /// Underlying low-level capability
         /// </summary>
-        protected internal ConsumedCapability? ConsumedCap { get; private set; }
+        public ConsumedCapability ConsumedCap => _disposedValue ?
+            throw new ObjectDisposedException(nameof(Proxy)) : _consumedCap;
 
         /// <summary>
         /// Whether is this a broken capability.
         /// </summary>
-        public bool IsNull => ConsumedCap == null;
+        public bool IsNull => _consumedCap == NullCapability.Instance;
+
+        /// <summary>
+        /// Whether <see cref="Dispose()"/> was called on this Proxy.
+        /// </summary>
+        public bool IsDisposed => _disposedValue;
 
         static async void DisposeCtrWhenReturned(CancellationTokenRegistration ctr, IPromisedAnswer answer)
         {
-            try
-            {
-                await answer.WhenReturned;
-            }
-            catch
-            {
-            }
-            finally
-            {
-                ctr.Dispose();
-            }
+            try { await answer.WhenReturned; }
+            catch { }
+            finally { ctr.Dispose(); }
         }
 
         /// <summary>
@@ -76,10 +96,10 @@ namespace Capnp.Rpc
             bool obsoleteAndIgnored, CancellationToken cancellationToken = default)
         {
             if (_disposedValue)
+            {
+                args.Dispose();
                 throw new ObjectDisposedException(nameof(Proxy));
-
-            if (ConsumedCap == null)
-                throw new InvalidOperationException("Cannot call null capability");
+            }
 
             var answer = ConsumedCap.DoCall(interfaceId, methodId, args);
 
@@ -96,38 +116,34 @@ namespace Capnp.Rpc
         /// </summary>
         public Proxy()
         {
+#if DebugFinalizers
+            CreatorStackTrace = Environment.StackTrace;
+#endif
         }
 
-        internal Proxy(ConsumedCapability? cap)
+        internal Proxy(ConsumedCapability cap): this()
         {
             Bind(cap);
         }
 
-        internal void Bind(ConsumedCapability? cap)
+        internal void Bind(ConsumedCapability cap)
         {
-            if (ConsumedCap != null)
+            if (ConsumedCap != NullCapability.Instance)
                 throw new InvalidOperationException("Proxy was already bound");
 
-            if (cap == null)
-                return;
-
-            ConsumedCap = cap;
+            _consumedCap = cap ?? throw new ArgumentNullException(nameof(cap));
             cap.AddRef();
+
+#if DebugFinalizers
+            if (_consumedCap != null)
+                _consumedCap.OwningProxy = this;
+#endif
         }
 
-        internal IProvidedCapability? GetProvider()
+        internal async Task<Skeleton> GetProvider()
         {
-            switch (ConsumedCap)
-            {
-                case LocalCapability lcap:
-                    return lcap.ProvidedCap;
-
-                case null:
-                    return null;
-
-                default:
-                    return Vine.Create(ConsumedCap);
-            }
+            var unwrapped = await ConsumedCap.Unwrap();
+            return unwrapped.AsSkeleton();
         }
 
         /// <summary>
@@ -139,20 +155,15 @@ namespace Capnp.Rpc
             {
                 if (disposing)
                 {
-                    ConsumedCap?.Release();
+                    _consumedCap.Release();
                 }
                 else
                 {
                     // When called from the Finalizer, we must not throw.
                     // But when reference counting goes wrong, ConsumedCapability.Release() will throw an InvalidOperationException.
                     // The only option here is to suppress that exception.
-                    try
-                    {
-                        ConsumedCap?.Release();
-                    }
-                    catch
-                    {
-                    }
+                    try { _consumedCap?.Release(); }
+                    catch { }
                 }
 
                 _disposedValue = true;
@@ -165,7 +176,7 @@ namespace Capnp.Rpc
         ~Proxy()
         {
 #if DebugFinalizers
-            Logger.LogWarning($"Caught orphaned Proxy, created from {CreatorMemberName} in {CreatorFilePath}, line {CreatorLineNumber}.");
+            Debugger.Log(0, "DebugFinalizers", $"Caught orphaned Proxy, created from here: {CreatorStackTrace}.");
 #endif
 
             Dispose(false);
@@ -187,54 +198,37 @@ namespace Capnp.Rpc
         /// <param name="disposeThis">Whether to Dispose() this Proxy instance</param>
         /// <returns>Proxy for desired capability interface</returns>
         /// <exception cref="InvalidCapabilityInterfaceException"><typeparamref name="T"/> did not qualify as capability interface.</exception>
-        /// <exception cref="InvalidOperationException">This capability is broken, or mismatch between generic type arguments (if capability interface is generic).</exception>
+        /// <exception cref="InvalidOperationException">Mismatch between generic type arguments (if capability interface is generic).</exception>
         /// <exception cref="ArgumentException">Mismatch between generic type arguments (if capability interface is generic).</exception>
         /// <exception cref="System.Reflection.TargetInvocationException">Problem with instatiating the Proxy (constructor threw exception).</exception>
         /// <exception cref="MemberAccessException">Caller does not have permission to invoke the Proxy constructor.</exception>
         /// <exception cref="TypeLoadException">Problem with building the Proxy type, or problem with loading some dependent class.</exception>
         public T Cast<T>(bool disposeThis) where T: class
         {
-            if (IsNull)
-                throw new InvalidOperationException("Capability is broken");
-
             using (disposeThis ? this : null)
             {
                 return (CapabilityReflection.CreateProxy<T>(ConsumedCap) as T)!;
             }
         }
 
-        internal void Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
+        internal Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {
             if (_disposedValue)
                 throw new ObjectDisposedException(nameof(Proxy));
 
             if (ConsumedCap == null)
+            {
                 writer.which = CapDescriptor.WHICH.None;
+                return null;
+            }
             else
-                ConsumedCap.Export(endpoint, writer);
-        }
-
-        internal void Freeze(out IRpcEndpoint? boundEndpoint)
-        {
-            if (_disposedValue)
-                throw new ObjectDisposedException(nameof(Proxy));
-
-            boundEndpoint = null;
-            ConsumedCap?.Freeze(out boundEndpoint);
-        }
-
-        internal void Unfreeze()
-        {
-            if (_disposedValue)
-                throw new ObjectDisposedException(nameof(Proxy));
-
-            ConsumedCap?.Unfreeze();
+            {
+                return ConsumedCap.Export(endpoint, writer);
+            }
         }
 
 #if DebugFinalizers
-        public string CreatorMemberName { get; set; }
-        public string CreatorFilePath { get; set; }
-        public int CreatorLineNumber { get; set; }
+        string CreatorStackTrace { get; set; }
 #endif
     }
 }

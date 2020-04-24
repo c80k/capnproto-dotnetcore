@@ -1,13 +1,16 @@
 ﻿using Capnp.FrameTracing;
 using Capnp.Net.Runtime.Tests.GenImpls;
+using Capnp.Net.Runtime.Tests.Util;
 using Capnp.Rpc;
 using Capnproto_test.Capnp.Test;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,7 +39,7 @@ namespace Capnp.Net.Runtime.Tests
 
         Process _currentProcess;
 
-        bool TryLaunchCompatTestProcess(string whichTest, Action<StreamReader> test)
+        bool TryLaunchCompatTestProcess(IPAddress addr, int port, string whichTest, Action<StreamReader> test)
         {
             string myPath = Path.GetDirectoryName(typeof(TcpRpcInterop).Assembly.Location);
             string config;
@@ -47,7 +50,7 @@ namespace Capnp.Net.Runtime.Tests
 #endif
             string path = Path.Combine(myPath, $@"..\..\..\..\{config}\CapnpCompatTest.exe");
             path = Path.GetFullPath(path);
-            string arguments = $"{whichTest} 127.0.0.1:{TcpPort}";
+            string arguments = $"{whichTest} {addr}:{port}";
             var startInfo = new ProcessStartInfo(path, arguments)
             {
                 UseShellExecute = false,
@@ -63,20 +66,24 @@ namespace Capnp.Net.Runtime.Tests
 
                 try
                 {
-                    _currentProcess.StandardError.ReadToEndAsync().ContinueWith(t => Console.Error.WriteLine(t.Result));
-                    var firstLine = _currentProcess.StandardOutput.ReadLineAsync();
-                    Assert.IsTrue(firstLine.Wait(MediumNonDbgTimeout), "Problem after launching test process");
-                    Assert.IsNotNull(firstLine.Result, "Problem after launching test process");
-                    Assert.IsTrue(firstLine.Result.StartsWith("Listening") || firstLine.Result.StartsWith("Connecting"), 
-                        "Problem after launching test process");
+                    try
+                    {
+                        _currentProcess.StandardError.ReadToEndAsync().ContinueWith(t => Console.Error.WriteLine(t.Result));
+                        var firstLine = _currentProcess.StandardOutput.ReadLineAsync();
+                        Assert.IsTrue(firstLine.Wait(MediumNonDbgTimeout), "Problem after launching test process");
+                        Assert.IsNotNull(firstLine.Result, "Problem after launching test process");
+                        Assert.IsTrue(firstLine.Result.StartsWith("Listening") || firstLine.Result.StartsWith("Connecting"),
+                            "Problem after launching test process");
+                    }
+                    catch (AssertFailedException exception)
+                    {
+                        Logger.LogError(exception.Message);
+                        return false;
+                    }
 
                     test(_currentProcess.StandardOutput);
 
                     return true;
-                }
-                catch (AssertFailedException)
-                {
-                    return false;
                 }
                 finally
                 {
@@ -91,15 +98,13 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        void LaunchCompatTestProcess(string whichTest, Action<StreamReader> test)
+        void LaunchCompatTestProcess(string whichTest, IPAddress addr, int port, Action<StreamReader> test)
         {
             for (int retry = 0; retry < 5; retry++)
             {
-                if (TryLaunchCompatTestProcess(whichTest, test))
+                if (TryLaunchCompatTestProcess(addr, port, whichTest, test))
                     return;
 
-                if (whichTest.StartsWith("server:"))
-                    PrepareNextTest();
             }
 
             Assert.Fail("Problem after launching test process");
@@ -117,20 +122,15 @@ namespace Capnp.Net.Runtime.Tests
             Assert.AreEqual(expected, line.Result);
         }
 
-        [TestInitialize]
-        public void PrepareNextTest()
-        {
-            IncrementTcpPort();
-        }
-
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void BasicClient()
         {
-            LaunchCompatTestProcess("server:Interface", stdout =>
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            LaunchCompatTestProcess("server:Interface", addr, port, stdout =>
             {
-                using (var client = new TcpRpcClient("localhost", TcpPort))
+                using (var client = new TcpRpcClient(addr.ToString(), port))
                 {
-                    client.WhenConnected.Wait();
+                    //client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestInterface>())
                     {
@@ -154,15 +154,16 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void BasicServer()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 server.Main = new TestInterfaceImpl(counters);
 
-                LaunchCompatTestProcess("client:Basic", stdout =>
+                LaunchCompatTestProcess("client:Basic", addr, port, stdout =>
                 {
                     AssertOutput(stdout, "Basic test start");
                     AssertOutput(stdout, "Basic test end");
@@ -171,16 +172,17 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void PipelineClient()
         {
-            LaunchCompatTestProcess("server:Pipeline", stdout =>
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            LaunchCompatTestProcess("server:Pipeline", addr, port, stdout =>
             {
                 stdout.ReadToEndAsync().ContinueWith(t => Console.WriteLine(t.Result));
 
-                using (var client = new TcpRpcClient("localhost", TcpPort))
+                using (var client = new TcpRpcClient(addr.ToString(), port))
                 {
-                    client.WhenConnected.Wait();
+                    //client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestPipeline>())
                     {
@@ -208,32 +210,35 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void PipelineServer()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 server.Main = new TestPipelineImpl(counters);
 
-                LaunchCompatTestProcess("client:Pipelining", stdout =>
+                LaunchCompatTestProcess("client:Pipelining", addr, port, stdout =>
                 {
                     AssertOutput(stdout, "Pipelining test start");
                     AssertOutput(stdout, "foo 123 1");
+                    AssertOutput(stdout, "~");
                     AssertOutput(stdout, "Pipelining test end");
                     Assert.AreEqual(3, counters.CallCount);
                 });
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void ReleaseClient()
         {
-            LaunchCompatTestProcess("server:MoreStuff", stdout =>
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            LaunchCompatTestProcess("server:MoreStuff", addr, port, stdout =>
             {
-                using (var client = new TcpRpcClient("localhost", TcpPort))
+                using (var client = new TcpRpcClient(addr.ToString(), port))
                 {
-                    client.WhenConnected.Wait();
+                    //client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
@@ -259,15 +264,16 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void ReleaseServer()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
 
-                LaunchCompatTestProcess("client:Release", stdout =>
+                LaunchCompatTestProcess("client:Release", addr, port, stdout =>
                 {
                     AssertOutput(stdout, "Release test start");
                     AssertOutput(stdout, "sync");
@@ -295,15 +301,16 @@ namespace Capnp.Net.Runtime.Tests
             // later on verify that the handle count is 0.
             int iterationCount = 5000;
 
-            LaunchCompatTestProcess("server:MoreStuff", stdout =>
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            LaunchCompatTestProcess("server:MoreStuff", addr, port, stdout =>
             {
-                using (var client = new TcpRpcClient("localhost", TcpPort))
+                using (var client = new TcpRpcClient(addr.ToString(), port))
                 {
-                    client.WhenConnected.Wait();
+                    //client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
-                        ((Proxy)main).WhenResolved.Wait(MediumNonDbgTimeout);
+                        ((Proxy)main).WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout);
 
                         async Task VerifyOutput()
                         {
@@ -342,17 +349,19 @@ namespace Capnp.Net.Runtime.Tests
                         for (int i = 0; i < iterationCount; i++)
                         {
                             var task = main.GetHandle(default);
-                            taskList.Add(task.ContinueWith(t =>
+                            async Task TerminateAnswer()
                             {
                                 try
                                 {
-                                    t.Result.Dispose();
+                                    using (var proxy = await task)
+                                    {
+                                    }
                                 }
-                                catch (AggregateException ex) when (ex.InnerException is TaskCanceledException)
+                                catch (TaskCanceledException)
                                 {
                                 }
-                            }));
-                            Impatient.GetAnswer(task).Dispose();
+                            }
+                            taskList.Add(TerminateAnswer());
                         }
 
                         // Ensure that all answers return (probably in canceled state)
@@ -369,15 +378,16 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void ReleaseOnCancelServer()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
 
-                LaunchCompatTestProcess("client:ReleaseOnCancel", stdout =>
+                LaunchCompatTestProcess("client:ReleaseOnCancel", addr, port, stdout =>
                 {
                     AssertOutput(stdout, "ReleaseOnCancel test start");
                     AssertOutput(stdout, "ReleaseOnCancel test end");
@@ -387,18 +397,20 @@ namespace Capnp.Net.Runtime.Tests
         }
 
         [TestMethod]
+        [TestCategory("Coverage")]
         public void TestTailCallClient()
         {
-            LaunchCompatTestProcess("server:TailCaller", stdout =>
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            LaunchCompatTestProcess("server:TailCaller", addr, port, stdout =>
             {
                 using (var client = new TcpRpcClient())
                 {
                     var tracer = new RpcFrameTracer(Console.Out);
 
                     client.AttachTracer(tracer);
-                    client.Connect("localhost", TcpPort);
+                    client.Connect(addr.ToString(), port);
 
-                    client.WhenConnected.Wait();
+                    //client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestTailCaller>())
                     {
@@ -406,20 +418,22 @@ namespace Capnp.Net.Runtime.Tests
                         var callee = new TestTailCalleeImpl(calleeCallCount);
 
                         var promise = main.Foo(456, callee, default);
-                        var dependentCall0 = promise.C().GetCallSequence(0, default);
+                        using (var c = promise.C())
+                        {
+                            var dependentCall0 = c.GetCallSequence(0, default);
 
-                        Assert.IsTrue(promise.Wait(MediumNonDbgTimeout));
-                        Assert.AreEqual(456u, promise.Result.I);
-                        Assert.AreEqual("from TestTailCaller", promise.Result.T);
+                            Assert.IsTrue(promise.Wait(MediumNonDbgTimeout));
+                            Assert.AreEqual(456u, promise.Result.I);
+                            Assert.AreEqual("from TestTailCaller", promise.Result.T);
 
-                        var dependentCall1 = promise.C().GetCallSequence(0, default);
-                        var dependentCall2 = promise.C().GetCallSequence(0, default);
+                            var dependentCall1 = c.GetCallSequence(1, default);
+                            var dependentCall2 = c.GetCallSequence(2, default);
 
-                        AssertOutput(stdout, "foo");
-                        Assert.IsTrue(dependentCall0.Wait(MediumNonDbgTimeout));
-                        Assert.IsTrue(dependentCall1.Wait(MediumNonDbgTimeout));
-                        Assert.IsTrue(dependentCall2.Wait(MediumNonDbgTimeout));
-
+                            AssertOutput(stdout, "foo");
+                            Assert.IsTrue(dependentCall0.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(dependentCall1.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(dependentCall2.Wait(MediumNonDbgTimeout));
+                        }
                         Assert.AreEqual(1, calleeCallCount.CallCount);
                     }
                 }
@@ -430,8 +444,8 @@ namespace Capnp.Net.Runtime.Tests
         // For details on why this test is ignored, see https://github.com/capnproto/capnproto/issues/876
         public void TestTailCallServer()
         {
-
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var tracer = new RpcFrameTracer(Console.Out);
 
@@ -444,7 +458,7 @@ namespace Capnp.Net.Runtime.Tests
                 var counters = new Counters();
                 server.Main = new TestTailCallerImpl(counters);
 
-                LaunchCompatTestProcess("client:TailCall", stdout =>
+                LaunchCompatTestProcess("client:TailCall", addr, port, stdout =>
                 {
                     AssertOutput(stdout, "TailCall test start");
                     AssertOutput(stdout, "foo");
@@ -455,16 +469,17 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void CancelationServer()
         {
-            LaunchCompatTestProcess("server:MoreStuff", stdout =>
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            LaunchCompatTestProcess("server:MoreStuff", addr, port, stdout =>
             {
                 stdout.ReadToEndAsync().ContinueWith(t => Console.WriteLine(t.Result));
 
-                using (var client = new TcpRpcClient("localhost", TcpPort))
+                using (var client = new TcpRpcClient(addr.ToString(), port))
                 {
-                    client.WhenConnected.Wait();
+                    //client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
@@ -485,15 +500,16 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void CancelationClient()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
 
-                LaunchCompatTestProcess("client:Cancelation", stdout =>
+                LaunchCompatTestProcess("client:Cancelation", addr, port, stdout =>
                 {
                     AssertOutput(stdout, "Cancelation test start");
                     AssertOutput(stdout, "~");
@@ -502,40 +518,43 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void PromiseResolveServer()
         {
-            LaunchCompatTestProcess("server:MoreStuff", stdout =>
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            LaunchCompatTestProcess("server:MoreStuff", addr, port, stdout =>
             {
-                using (var client = new TcpRpcClient("localhost", TcpPort))
+                using (var client = new TcpRpcClient(addr.ToString(), port))
                 {
-                    client.WhenConnected.Wait();
+                    //client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
                         var tcs = new TaskCompletionSource<ITestInterface>();
-                        var eager = tcs.Task.Eager(true);
+                        using (var eager = tcs.Task.Eager(true))
+                        {
+                            var request = main.CallFoo(Proxy.Share(eager), default);
+                            AssertOutput(stdout, "callFoo");
+                            var request2 = main.CallFooWhenResolved(Proxy.Share(eager), default);
+                            AssertOutput(stdout, "callFooWhenResolved");
 
-                        var request = main.CallFoo(eager, default);
-                        AssertOutput(stdout, "callFoo");
-                        var request2 = main.CallFooWhenResolved(eager, default);
-                        AssertOutput(stdout, "callFooWhenResolved");
+                            var gcs = main.GetCallSequence(0, default);
+                            AssertOutput(stdout, "getCallSequence");
+                            Assert.IsTrue(gcs.Wait(MediumNonDbgTimeout));
+                            Assert.AreEqual(2u, gcs.Result);
 
-                        var gcs = main.GetCallSequence(0, default);
-                        AssertOutput(stdout, "getCallSequence");
-                        Assert.IsTrue(gcs.Wait(MediumNonDbgTimeout));
-                        Assert.AreEqual(2u, gcs.Result);
+                            var chainedCallCount = new Counters();
+                            var tiimpl = new TestInterfaceImpl(chainedCallCount);
+                            tcs.SetResult(tiimpl);
 
-                        var chainedCallCount = new Counters();
-                        var tiimpl = new TestInterfaceImpl(chainedCallCount);
-                        tcs.SetResult(tiimpl);
+                            Assert.IsTrue(request.Wait(MediumNonDbgTimeout));
+                            Assert.IsTrue(request2.Wait(MediumNonDbgTimeout));
 
-                        Assert.IsTrue(request.Wait(MediumNonDbgTimeout));
-                        Assert.IsTrue(request2.Wait(MediumNonDbgTimeout));
+                            Assert.AreEqual("bar", request.Result);
+                            Assert.AreEqual("bar", request2.Result);
+                            Assert.AreEqual(2, chainedCallCount.CallCount);
 
-                        Assert.AreEqual("bar", request.Result);
-                        Assert.AreEqual("bar", request2.Result);
-                        Assert.AreEqual(2, chainedCallCount.CallCount);
+                        }
 
                         AssertOutput(stdout, "fin");
                         AssertOutput(stdout, "fin");
@@ -544,38 +563,41 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void PromiseResolveClient()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
 
-                LaunchCompatTestProcess("client:PromiseResolve", stdout =>
+                LaunchCompatTestProcess("client:PromiseResolve", addr, port, stdout =>
                 {
                     AssertOutput(stdout, "PromiseResolve test start");
                     AssertOutput(stdout, "foo 123 1");
                     AssertOutput(stdout, "foo 123 1");
+                    AssertOutput(stdout, "~");
                     AssertOutput(stdout, "PromiseResolve test end");
                     Assert.AreEqual(3, counters.CallCount);
                 });
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void RetainAndReleaseServer()
         {
             var destructionPromise = new TaskCompletionSource<int>();
             var destructionTask = destructionPromise.Task;
 
-            LaunchCompatTestProcess("server:MoreStuff", stdout =>
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            LaunchCompatTestProcess("server:MoreStuff", addr, port, stdout =>
             {
                 stdout.ReadToEndAsync().ContinueWith(t => Console.WriteLine(t.Result));
 
-                using (var client = new TcpRpcClient("localhost", TcpPort))
+                using (var client = new TcpRpcClient(addr.ToString(), port))
                 {
-                    client.WhenConnected.Wait();
+                    //client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
@@ -641,15 +663,16 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void RetainAndReleaseClient()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
 
-                LaunchCompatTestProcess("client:RetainAndRelease", stdout =>
+                LaunchCompatTestProcess("client:RetainAndRelease", addr, port, stdout =>
                 {
                     AssertOutput(stdout, "RetainAndRelease test start");
                     AssertOutput(stdout, "foo 123 1");
@@ -661,14 +684,15 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void CancelServer()
         {
-            LaunchCompatTestProcess("server:MoreStuff", stdout =>
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            LaunchCompatTestProcess("server:MoreStuff", addr, port, stdout =>
             {
-                using (var client = new TcpRpcClient("localhost", TcpPort))
+                using (var client = new TcpRpcClient(addr.ToString(), port))
                 {
-                    client.WhenConnected.Wait();
+                    //client.WhenConnected.Wait();
 
                     var destructionPromise = new TaskCompletionSource<int>();
                     var destructionTask = destructionPromise.Task;
@@ -702,15 +726,16 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void CancelClient()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
 
-                LaunchCompatTestProcess("client:Cancel", stdout =>
+                LaunchCompatTestProcess("client:Cancel", addr, port, stdout =>
                 {
                     AssertOutput(stdout, "Cancel test start");
                     AssertOutput(stdout, "~");
@@ -719,14 +744,15 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void SendTwiceServer()
         {
-            LaunchCompatTestProcess("server:MoreStuff", stdout =>
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            LaunchCompatTestProcess("server:MoreStuff", addr, port, stdout =>
             {
-                using (var client = new TcpRpcClient("localhost", TcpPort))
+                using (var client = new TcpRpcClient(addr.ToString(), port))
                 {
-                    client.WhenConnected.Wait();
+                    //client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
@@ -763,15 +789,16 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void SendTwiceClient()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
 
-                LaunchCompatTestProcess("client:SendTwice", stdout =>
+                LaunchCompatTestProcess("client:SendTwice", addr, port, stdout =>
                 {
                     AssertOutput(stdout, "SendTwice test start");
                     AssertOutput(stdout, "foo 123 1");
@@ -783,41 +810,21 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void EmbargoServer()
         {
-            LaunchCompatTestProcess("server:MoreStuff", stdout =>
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            LaunchCompatTestProcess("server:MoreStuff", addr, port, stdout =>
             {
-                int retry = 0;
-
-                label:
-                using (var client = new TcpRpcClient("localhost", TcpPort))
+                using (var client = new TcpRpcClient(addr.ToString(), port))
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout), "client connect");
+                    //Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout), "client connect");
 
-                    using (var main = client.GetMain<ITestMoreStuff>())
+                    using (var wrapped = client.GetMain<ITestMoreStuff>())
                     {
-                        var resolving = main as IResolvingCapability;
-
-                        bool success;
-
-                        try
-                        {
-                            success = resolving.WhenResolved.Wait(MediumNonDbgTimeout);
-                        }
-                        catch
-                        {
-                            success = false;
-                        }
-
-                        if (!success)
-                        {
-                            if (++retry == 5)
-                            {
-                                Assert.Fail("Attempting to obtain bootstrap interface failed. Bailing out.");
-                            }
-                            goto label;
-                        }
+                        var unwrap = wrapped.Unwrap();
+                        Assert.IsTrue(unwrap.Wait(MediumNonDbgTimeout));
+                        var main = unwrap.Result;
 
                         var cap = new TestCallOrderImpl();
                         cap.CountToDispose = 6;
@@ -868,17 +875,18 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void EmbargoServer2()
         {
-            LaunchCompatTestProcess("server:MoreStuff", stdout =>
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            LaunchCompatTestProcess("server:MoreStuff", addr, port, stdout =>
             {
                 int retry = 0;
 
                 label:
-                using (var client = new TcpRpcClient("localhost", TcpPort))
+                using (var client = new TcpRpcClient(addr.ToString(), port))
                 {
-                    Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout), "client connect");
+                    //Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout), "client connect");
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
@@ -888,7 +896,7 @@ namespace Capnp.Net.Runtime.Tests
 
                         try
                         {
-                            success = resolving.WhenResolved.Wait(MediumNonDbgTimeout);
+                            success = resolving.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout);
                         }
                         catch
                         {
@@ -951,15 +959,16 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void EmbargoClient()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
 
-                LaunchCompatTestProcess("client:Embargo", stdout =>
+                LaunchCompatTestProcess("client:Embargo", addr, port, stdout =>
                 {
                     AssertOutput(stdout, "Embargo test start");
                     AssertOutput(stdout, "Embargo test end");
@@ -967,17 +976,17 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        public void EmbargoErrorImpl(StreamReader stdout)
+        public void EmbargoErrorImpl(IPAddress addr, int port, StreamReader stdout)
         {
-            using (var client = new TcpRpcClient("localhost", TcpPort))
+            using (var client = new TcpRpcClient(addr.ToString(), port))
             {
 
-                Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
+                //Assert.IsTrue(client.WhenConnected.Wait(MediumNonDbgTimeout));
 
                 using (var main = client.GetMain<ITestMoreStuff>())
                 {
                     var resolving = main as IResolvingCapability;
-                    Assert.IsTrue(resolving.WhenResolved.Wait(MediumNonDbgTimeout));
+                    Assert.IsTrue(resolving.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
 
                     var cap = new TaskCompletionSource<ITestCallOrder>();
 
@@ -1021,33 +1030,36 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void EmbargoErrorServer()
         {
-            LaunchCompatTestProcess("server:MoreStuff", EmbargoErrorImpl);
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            LaunchCompatTestProcess("server:MoreStuff", addr, port, r => EmbargoErrorImpl(addr, port, r));
         }
 
         [TestMethod, Timeout(240000)]
         public void RepeatedEmbargoError()
         {
-            LaunchCompatTestProcess("server:MoreStuff", stdout =>
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            LaunchCompatTestProcess("server:MoreStuff", addr, port, stdout =>
             {
-                for (int i = 0; i < 100; i++)
+                for (int i = 0; i < 20; i++)
                 {
-                    EmbargoErrorImpl(stdout);
+                    EmbargoErrorImpl(addr, port, stdout);
                 }
             });
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void EmbargoErrorClient()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
 
-                LaunchCompatTestProcess("client:EmbargoError", stdout =>
+                LaunchCompatTestProcess("client:EmbargoError", addr, port, stdout =>
                 {
                     AssertOutput(stdout, "EmbargoError test start");
                     AssertOutput(stdout, "EmbargoError test end");
@@ -1055,17 +1067,18 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void EmbargoNullServer()
         {
-            LaunchCompatTestProcess("server:MoreStuff", stdout =>
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            LaunchCompatTestProcess("server:MoreStuff", addr, port, stdout =>
             {
                 int retry = 0;
 
                 label:
-                using (var client = new TcpRpcClient("localhost", TcpPort))
+                using (var client = new TcpRpcClient(addr.ToString(), port))
                 {
-                    client.WhenConnected.Wait();
+                    //client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
@@ -1075,7 +1088,7 @@ namespace Capnp.Net.Runtime.Tests
 
                         try
                         {
-                            success = resolving.WhenResolved.Wait(MediumNonDbgTimeout);
+                            success = resolving.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout);
                         }
                         catch
                         {
@@ -1115,15 +1128,16 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void EmbargoNullClient()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
 
-                LaunchCompatTestProcess("client:EmbargoNull", stdout =>
+                LaunchCompatTestProcess("client:EmbargoNull", addr, port, stdout =>
                 {
                     AssertOutput(stdout, "EmbargoNull test start");
                     AssertOutput(stdout, "EmbargoNull test end");
@@ -1131,19 +1145,20 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void CallBrokenPromiseServer()
         {
-            LaunchCompatTestProcess("server:MoreStuff", stdout =>
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            LaunchCompatTestProcess("server:MoreStuff", addr, port, stdout =>
             {
-                using (var client = new TcpRpcClient("localhost", TcpPort))
+                using (var client = new TcpRpcClient(addr.ToString(), port))
                 {
-                    client.WhenConnected.Wait();
+                    //client.WhenConnected.Wait();
 
                     using (var main = client.GetMain<ITestMoreStuff>())
                     {
                         var resolving = main as IResolvingCapability;
-                        Assert.IsTrue(resolving.WhenResolved.Wait(MediumNonDbgTimeout));
+                        Assert.IsTrue(resolving.WhenResolved.WrappedTask.Wait(MediumNonDbgTimeout));
 
                         var tcs = new TaskCompletionSource<ITestInterface>();
 
@@ -1168,15 +1183,16 @@ namespace Capnp.Net.Runtime.Tests
             });
         }
 
-        [TestMethod, Timeout(10000)]
+        [TestMethod]
         public void CallBrokenPromiseClient()
         {
-            using (var server = SetupServer())
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
             {
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
 
-                LaunchCompatTestProcess("client:CallBrokenPromise", stdout =>
+                LaunchCompatTestProcess("client:CallBrokenPromise", addr, port, stdout =>
                 {
                     AssertOutput(stdout, "CallBrokenPromise test start");
                     AssertOutput(stdout, "CallBrokenPromise test end");

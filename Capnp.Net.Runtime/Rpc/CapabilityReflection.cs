@@ -94,6 +94,8 @@ namespace Capnp.Rpc
             new ConditionalWeakTable<Type, ProxyFactory>();
         static ConditionalWeakTable<Type, SkeletonFactory> _skeletonMap =
             new ConditionalWeakTable<Type, SkeletonFactory>();
+        static ConditionalWeakTable<object, Skeleton> _implMap =
+            new ConditionalWeakTable<object, Skeleton>();
 
         static CapabilityReflection()
         {
@@ -155,15 +157,23 @@ namespace Capnp.Rpc
         /// <exception cref="System.Reflection.TargetInvocationException">Problem with instatiating the Skeleton (constructor threw exception).</exception>
         /// <exception cref="MemberAccessException">Caller does not have permission to invoke the Skeleton constructor.</exception>
         /// <exception cref="TypeLoadException">Problem with building the Skeleton type, or problem with loading some dependent class.</exception>
-        public static Skeleton CreateSkeleton(object obj)
+        [Obsolete("Do not use this method directly. Instead, pass objects directly or use Proxy.Share<T>(). This method will be removed with next release.")]
+        public static Skeleton CreateSkeleton(object obj) => CreateSkeletonInternal(obj);
+
+        internal static Skeleton CreateSkeletonInternal(object obj)
         {
             if (obj == null)
                 throw new ArgumentNullException(nameof(obj));
 
-            var factory = GetSkeletonFactory(obj.GetType());
-            var skeleton = factory.NewSkeleton();
-            skeleton.Bind(obj);
-            return skeleton;
+            var result = _implMap.GetValue(obj, _ =>
+            {
+                var factory = GetSkeletonFactory(_.GetType());
+                var skeleton = factory.NewSkeleton();
+                skeleton.Bind(obj);
+                return skeleton;
+            });
+
+            return result;
         }
 
         static ProxyFactory GetProxyFactory(Type type)
@@ -229,7 +239,7 @@ namespace Capnp.Rpc
         }
 
         /// <summary>
-        /// Checkes whether a given type qualifies as cpapbility interface./> on failure.
+        /// Checks whether a given type qualifies as capability interface.
         /// </summary>
         /// <param name="interfaceType">type to check</param>
         /// <returns>true when <paramref name="interfaceType"/> is a capability interface</returns>
@@ -251,9 +261,6 @@ namespace Capnp.Rpc
         /// </summary>
         /// <typeparam name="TInterface">Capability interface. Must be annotated with <see cref="ProxyAttribute"/>.</typeparam>
         /// <param name="cap">low-level capability</param>
-        /// <param name="memberName">debugging aid</param>
-        /// <param name="sourceFilePath">debugging aid</param>
-        /// <param name="sourceLineNumber">debugging aid</param>
         /// <returns>The Proxy instance which implements <typeparamref name="TInterface"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="cap"/> is null.</exception>
         /// <exception cref="InvalidCapabilityInterfaceException"><typeparamref name="TInterface"/> did not qualify as capability interface.</exception>
@@ -262,25 +269,11 @@ namespace Capnp.Rpc
         /// <exception cref="System.Reflection.TargetInvocationException">Problem with instatiating the Proxy (constructor threw exception).</exception>
         /// <exception cref="MemberAccessException">Caller does not have permission to invoke the Proxy constructor.</exception>
         /// <exception cref="TypeLoadException">Problem with building the Proxy type, or problem with loading some dependent class.</exception>
-        public static Proxy CreateProxy<TInterface>(ConsumedCapability? cap,
-            [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0)
+        public static Proxy CreateProxy<TInterface>(ConsumedCapability cap)
         {
             var factory = GetProxyFactory(typeof(TInterface));
             var proxy = factory.NewProxy();
             proxy.Bind(cap);
-#if DebugFinalizers
-            proxy.CreatorMemberName = memberName;
-            proxy.CreatorFilePath = sourceFilePath;
-            proxy.CreatorLineNumber = sourceLineNumber;
-            if (cap != null)
-            {
-                cap.CreatorFilePath = proxy.CreatorFilePath;
-                cap.CreatorLineNumber = proxy.CreatorLineNumber;
-                cap.CreatorMemberName = proxy.CreatorMemberName;
-            }
-#endif
             return proxy;
         }
     }

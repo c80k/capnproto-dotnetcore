@@ -14,6 +14,7 @@ using System.Threading.Tasks.Dataflow;
 namespace Capnp.Net.Runtime.Tests
 {
     [TestClass]
+    [TestCategory("Coverage")]
     public class Interception: TestBase
     {
         class MyPolicy : IInterceptionPolicy
@@ -66,9 +67,8 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
-
                 var counters = new Counters();
+
                 server.Main = policy.Attach<ITestInterface>(new TestInterfaceImpl(counters));
                 using (var main = client.GetMain<ITestInterface>())
                 {
@@ -77,13 +77,13 @@ namespace Capnp.Net.Runtime.Tests
                     Assert.IsTrue(fcc.Wait(MediumNonDbgTimeout));
                     var cc = fcc.Result;
 
-                    var pr = new Capnproto_test.Capnp.Test.TestInterface.Params_foo.READER(cc.InArgs);
+                    var pr = new Capnproto_test.Capnp.Test.TestInterface.Params_Foo.READER(cc.InArgs);
                     Assert.AreEqual(123u, pr.I);
 
                     cc.ForwardToBob();
 
                     Assert.IsTrue(policy.Returns.ReceiveAsync().Wait(MediumNonDbgTimeout));
-                    var rr = new Capnproto_test.Capnp.Test.TestInterface.Result_foo.READER(cc.OutArgs);
+                    var rr = new Capnproto_test.Capnp.Test.TestInterface.Result_Foo.READER(cc.OutArgs);
                     Assert.AreEqual("foo", rr.X);
 
                     cc.ReturnToAlice();
@@ -92,6 +92,46 @@ namespace Capnp.Net.Runtime.Tests
 
                     Assert.AreEqual("foo", request1.Result);
                 }
+            }
+        }
+
+        [TestMethod]
+        public void InterceptServerSideRedirectCall()
+        {
+            var policy = new MyPolicy("a");
+
+            (var server, var client) = SetupClientServerPair();
+
+            using (server)
+            using (client)
+            {
+                //client.WhenConnected.Wait();
+
+                var counters = new Counters();
+                server.Main = policy.Attach<ITestInterface>(new TestInterfaceImpl(counters));
+                var redirTarget = new TestInterfaceImpl2();
+                using (var main = client.GetMain<ITestInterface>())
+                using (redirTarget)
+                {
+                    var request1 = main.Foo(123, true, default);
+                    var fcc = policy.Calls.ReceiveAsync();
+                    Assert.IsTrue(fcc.Wait(MediumNonDbgTimeout));
+                    var cc = fcc.Result;
+
+                    Assert.ThrowsException<ArgumentNullException>(() => cc.Bob = null);
+                    cc.Bob = redirTarget;
+                    cc.ForwardToBob();
+
+                    Assert.IsTrue(policy.Returns.ReceiveAsync().Wait(MediumNonDbgTimeout));
+
+                    cc.ReturnToAlice();
+
+                    Assert.IsTrue(request1.Wait(MediumNonDbgTimeout));
+
+                    Assert.AreEqual("bar", request1.Result);
+                }
+                Assert.IsTrue(redirTarget.IsDisposed);
+                Assert.AreEqual(0, counters.CallCount);
             }
         }
 
@@ -105,7 +145,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestInterfaceImpl(counters);
@@ -116,11 +156,11 @@ namespace Capnp.Net.Runtime.Tests
 
                     Assert.AreEqual(InterceptionState.RequestedFromAlice, cc.State);
 
-                    var pr = new Capnproto_test.Capnp.Test.TestInterface.Params_foo.READER(cc.InArgs);
+                    var pr = new Capnproto_test.Capnp.Test.TestInterface.Params_Foo.READER(cc.InArgs);
                     Assert.AreEqual(321u, pr.I);
                     Assert.AreEqual(false, pr.J);
 
-                    var pw = cc.InArgs.Rewrap<Capnproto_test.Capnp.Test.TestInterface.Params_foo.WRITER>();
+                    var pw = cc.InArgs.Rewrap<Capnproto_test.Capnp.Test.TestInterface.Params_Foo.WRITER>();
                     pw.I = 123u;
                     pw.J = true;
 
@@ -129,15 +169,15 @@ namespace Capnp.Net.Runtime.Tests
                     var rx = policy.Returns.ReceiveAsync();
 
                     // Racing against Bob's answer
-                    Assert.IsTrue(cc.State == InterceptionState.ForwardedToBob || rx.IsCompleted);
+                    Assert.IsTrue(cc.State == InterceptionState.ForwardedToBob || cc.State == InterceptionState.ReturnedFromBob);
 
                     Assert.IsTrue(rx.Wait(MediumNonDbgTimeout));
-                    var rr = new Capnproto_test.Capnp.Test.TestInterface.Result_foo.READER(cc.OutArgs);
+                    var rr = new Capnproto_test.Capnp.Test.TestInterface.Result_Foo.READER(cc.OutArgs);
                     Assert.AreEqual("foo", rr.X);
 
                     Assert.IsFalse(request1.IsCompleted);
 
-                    var rw = ((DynamicSerializerState)cc.OutArgs).Rewrap<Capnproto_test.Capnp.Test.TestInterface.Result_foo.WRITER>();
+                    var rw = ((DynamicSerializerState)cc.OutArgs).Rewrap<Capnproto_test.Capnp.Test.TestInterface.Result_Foo.WRITER>();
                     rw.X = "bar";
                     cc.OutArgs = rw;
 
@@ -163,7 +203,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestInterfaceImpl(counters);
@@ -173,7 +213,7 @@ namespace Capnp.Net.Runtime.Tests
                     Assert.IsTrue(policy.Calls.TryReceive(out var cc));
                     Assert.IsFalse(request1.IsCompleted);
 
-                    var rw = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Result_foo.WRITER>();
+                    var rw = SerializerState.CreateForRpc<Capnproto_test.Capnp.Test.TestInterface.Result_Foo.WRITER>();
                     rw.X = "bar";
                     cc.OutArgs = rw;
 
@@ -196,7 +236,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestInterfaceImpl(counters);
@@ -227,7 +267,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestInterfaceImpl(counters);
@@ -261,17 +301,17 @@ namespace Capnp.Net.Runtime.Tests
                 client.WhenConnected.Wait();
 
                 var counters = new Counters();
-                server.Main = new TestInterfaceImpl(counters);
-                using (var main = policy.Attach(client.GetMain<ITestInterface>()))
+                server.Main = new TestMoreStuffImpl(counters);
+                using (var main = policy.Attach(client.GetMain<ITestMoreStuff>()))
                 {
-                    var request1 = main.Foo(321, false, new CancellationToken(true));
+                    var request1 = main.NeverReturn(new TestInterfaceImpl(new Counters()), new CancellationToken(true));
                     Assert.IsTrue(policy.Calls.TryReceive(out var cc));
                     Assert.IsFalse(request1.IsCompleted);
                     Assert.IsTrue(cc.CancelFromAlice.IsCancellationRequested);
 
                     cc.ForwardToBob();
-                    Assert.IsTrue(policy.Returns.ReceiveAsync().Wait(MediumNonDbgTimeout));
-                    Assert.IsTrue(cc.ReturnCanceled);
+                    Assert.IsTrue(policy.Returns.ReceiveAsync().Wait(MediumNonDbgTimeout), "must return");
+                    Assert.IsTrue(cc.ReturnCanceled, "must be canceled");
                     cc.ReturnCanceled = false;
                     cc.Exception = "Cancelled";
 
@@ -279,6 +319,41 @@ namespace Capnp.Net.Runtime.Tests
 
                     Assert.IsTrue(request1.IsCompleted);
                     Assert.IsTrue(request1.IsFaulted);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void InterceptClientSideOverrideFaultedCall()
+        {
+            var policy = new MyPolicy("a");
+
+            (var server, var client) = SetupClientServerPair();
+
+            using (server)
+            using (client)
+            {
+                //client.WhenConnected.Wait();
+
+                var counters = new Counters();
+                server.Main = new TestInterfaceImpl(counters);
+                using (var main = policy.Attach(client.GetMain<ITestInterface>()))
+                {
+                    var request1 = main.Bar();
+                    Assert.IsTrue(policy.Calls.TryReceive(out var cc));
+                    Assert.IsFalse(request1.IsCompleted);
+
+                    cc.ForwardToBob();
+                    Assert.IsTrue(policy.Returns.ReceiveAsync().Wait(MediumNonDbgTimeout));
+                    Assert.IsNotNull(cc.Exception);
+                    cc.ReturnCanceled = false;
+                    cc.Exception = null;
+
+                    cc.ReturnToAlice();
+                    Assert.ThrowsException<InvalidOperationException>(() => cc.ReturnToAlice());
+
+                    Assert.IsTrue(request1.IsCompleted);
+                    Assert.IsFalse(request1.IsFaulted);
                 }
             }
         }
@@ -293,7 +368,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestInterfaceImpl(counters);
@@ -321,6 +396,44 @@ namespace Capnp.Net.Runtime.Tests
         }
 
         [TestMethod]
+        public void InterceptClientSideModifyPipelinedCall()
+        {
+            var policy = new MyPolicy("a");
+
+            (var server, var client) = SetupClientServerPair(TcpRpcTestOptions.ClientTracer);
+
+            using (server)
+            using (client)
+            {
+                var counters = new Counters();
+                var impl = new TestMoreStuffImpl(counters);
+                server.Main = impl;
+                using (var main = policy.Attach(client.GetMain<ITestMoreStuff>()))
+                {
+                    var req = main.GetNull().Eager().GetCallSequence(0);
+                    Assert.IsTrue(policy.Calls.TryReceive(out var ccGetNull));
+                    Assert.IsTrue(policy.Calls.TryReceive(out var ccGetCallSequence));
+
+                    ccGetNull.ForwardToBob();
+
+                    Assert.IsTrue(policy.Returns.ReceiveAsync().Wait(MediumNonDbgTimeout));
+
+                    ccGetNull.ReturnToAlice();
+
+                    ccGetCallSequence.Bob = Proxy.Share<ITestMoreStuff>(impl);
+                    ccGetCallSequence.ForwardToBob();
+
+                    Assert.IsTrue(policy.Returns.ReceiveAsync().Wait(MediumNonDbgTimeout));
+
+                    ccGetCallSequence.ReturnToAlice();
+
+                    Assert.IsTrue(req.IsCompleted && !req.IsFaulted && !req.IsCanceled);
+                    Assert.AreEqual(0u, req.Result);
+                }
+            }
+        }
+
+        [TestMethod]
         public void InterfaceAndMethodId()
         {
             var policy = new MyPolicy("a");
@@ -330,7 +443,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestInterfaceImpl(counters);
@@ -355,7 +468,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestTailCallerImpl(counters);
@@ -387,7 +500,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
@@ -427,7 +540,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = policy.Attach<ITestMoreStuff>(new TestMoreStuffImpl(counters));
@@ -484,7 +597,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
@@ -552,7 +665,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 var counters = new Counters();
                 server.Main = new TestMoreStuffImpl(counters);
@@ -592,7 +705,7 @@ namespace Capnp.Net.Runtime.Tests
             using (server)
             using (client)
             {
-                client.WhenConnected.Wait();
+                //client.WhenConnected.Wait();
 
                 server.Main = implAc;
                 using (var main = client.GetMain<ITestInterface>())
@@ -620,5 +733,35 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
+        [TestMethod]
+        public void AttachWrongUse()
+        {
+            var impl = new TestInterfaceImpl2();
+            Assert.ThrowsException<ArgumentNullException>(() => default(IInterceptionPolicy).Attach(impl));
+            Assert.ThrowsException<ArgumentNullException>(() => new MyPolicy("x").Attach(default(ITestInterface)));
+        }
+
+        [TestMethod]
+        public void DetachWrongUse()
+        {
+            var impl = new TestInterfaceImpl2();
+            Assert.ThrowsException<ArgumentNullException>(() => default(IInterceptionPolicy).Detach(impl));
+            Assert.ThrowsException<ArgumentNullException>(() => new MyPolicy("x").Detach(default(ITestInterface)));
+        }
+
+        [TestMethod]
+        public void AttachDetach()
+        {
+            ConsumedCapability GetCap(object obj) => ((Proxy)obj).ConsumedCap;
+
+            var a = new MyPolicy("a");
+            var b = new MyPolicy("b");
+            var c = new MyPolicy("c");
+            var proxy = Proxy.Share<ITestInterface>(new TestInterfaceImpl2());
+            var attached = a.Attach(b.Attach(c.Attach(proxy)));
+            Assert.AreEqual(GetCap(attached), GetCap(b.Attach(attached)));
+            var detached = c.Detach(a.Detach(b.Detach(attached)));
+            Assert.AreEqual(GetCap(proxy), GetCap(detached));
+        }
     }
 }

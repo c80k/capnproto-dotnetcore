@@ -45,6 +45,7 @@ namespace CapnpC.CSharp.Generator.Tests.Util
                     MetadataReference.CreateFromFile(Path.Combine(assemblyRoot, "mscorlib.dll")),
                     MetadataReference.CreateFromFile(Path.Combine(assemblyRoot, "System.dll")),
                     MetadataReference.CreateFromFile(Path.Combine(assemblyRoot, "System.Core.dll")),
+                    MetadataReference.CreateFromFile(Path.Combine(assemblyRoot, "System.Diagnostics.Tools.dll")),
                     MetadataReference.CreateFromFile(Path.Combine(assemblyRoot, "System.Runtime.dll")),
                     MetadataReference.CreateFromFile(Path.Combine(assemblyRoot, "System.Private.CoreLib.dll")),
                     MetadataReference.CreateFromFile(capnpRuntimePath) },

@@ -1,4 +1,5 @@
 ﻿using Capnp.FrameTracing;
+using Capnp.Util;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -56,10 +57,17 @@ namespace Capnp.Rpc
             {
                 _pump.Send(frame);
             }
+
+            public void Flush()
+            {
+                _pump.Flush();
+            }
         }
 
         class Connection: IConnection
         {
+            ILogger Logger { get; } = Logging.CreateLogger<Connection>();
+
             readonly List<IFrameTracer> _tracers = new List<IFrameTracer>();
             readonly TcpRpcServer _server;
             Stream _stream;
@@ -95,6 +103,10 @@ namespace Capnp.Rpc
 
                         Pump.Run();
                     }
+                    catch (ThreadInterruptedException)
+                    {
+                        Logger.LogError($"{Thread.CurrentThread.Name} interrupted at {Environment.StackTrace}");
+                    }
                     finally
                     {
                         OutboundEp.Dismiss();
@@ -110,6 +122,7 @@ namespace Capnp.Rpc
                         }
                     }
                 });
+                PumpRunner.Start();
             }
 
             public ConnectionState State { get; set; } = ConnectionState.Initializing;
@@ -191,8 +204,6 @@ namespace Capnp.Rpc
                         OnConnectionChanged?.Invoke(this, new ConnectionEventArgs(connection));
                         connection.Start();
                     }
-
-                    connection.PumpRunner!.Start();
                 }
             }
             catch (SocketException)
@@ -200,44 +211,16 @@ namespace Capnp.Rpc
                 // Listener was stopped. Maybe a little bit rude, but this is
                 // our way of shutting down the acceptor thread.
             }
+            catch (ThreadInterruptedException)
+            {
+                Logger.LogError($"{Thread.CurrentThread.Name} interrupted at {Environment.StackTrace}");
+            }
             catch (System.Exception exception)
             {
                 // Any other exception might be due to some other problem.
                 Logger.LogError(exception.Message);
             }
         }
-
-        void SafeJoin(Thread? thread)
-        {
-            if (thread == null)
-            {
-                return;
-            }
-
-            for (int retry = 0; retry < 5; ++retry)
-            {
-                try
-                {
-                    if (!thread.Join(500))
-                    {
-                        Logger.LogError($"Unable to join {thread.Name} within timeout");
-                    }
-                    break;
-                }
-                catch (ThreadStateException)
-                {
-                    // In rare cases it happens that despite thread.Start() was called, the thread did not actually start yet.
-                    Logger.LogDebug("Waiting for thread to start in order to join it");
-                    Thread.Sleep(100);
-                }
-                catch (System.Exception exception)
-                {
-                    Logger.LogError($"Unable to join {thread.Name}: {exception.Message}");
-                    break;
-                }
-            }
-        }
-
 
         /// <summary>
         /// Stops accepting incoming attempts and closes all existing connections.
@@ -260,8 +243,10 @@ namespace Capnp.Rpc
             {
                 connection.Client.Dispose();
                 connection.Pump?.Dispose();
-                SafeJoin(connection.PumpRunner);
+                connection.PumpRunner?.SafeJoin(Logger);
             }
+
+            _rpcEngine.BootstrapCap = null;
 
             GC.SuppressFinalize(this);
         }
@@ -284,7 +269,8 @@ namespace Capnp.Rpc
             finally
             {
                 _listener = null;
-                SafeJoin(_acceptorThread);
+                if (Thread.CurrentThread != _acceptorThread)
+                    _acceptorThread?.Join();
                 _acceptorThread = null;
             }
         }
@@ -391,7 +377,7 @@ namespace Capnp.Rpc
         /// </summary>
         public object Main
         {
-            set { _rpcEngine.BootstrapCap = Skeleton.GetOrCreateSkeleton(value, false); }
+            set { _rpcEngine.Main = value; }
         }
 
         /// <summary>

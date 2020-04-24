@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,7 +9,7 @@ namespace Capnp.Rpc
     /// <summary>
     /// Combines multiple skeletons to represent objects which implement multiple interfaces.
     /// </summary>
-    public class PolySkeleton: Skeleton
+    public class PolySkeleton: RefCountingSkeleton
     {
         readonly Dictionary<ulong, Skeleton> _ifmap = new Dictionary<ulong, Skeleton>();
 
@@ -24,8 +25,9 @@ namespace Capnp.Rpc
             if (skeleton == null)
                 throw new ArgumentNullException(nameof(skeleton));
 
-            skeleton.Claim();
             _ifmap.Add(interfaceId, skeleton);
+            if (_ifmap.Count == 1) // Claiming only the first one is sufficient
+                skeleton.Claim();
         }
 
         internal void AddInterface(Skeleton skeleton)
@@ -54,17 +56,16 @@ namespace Capnp.Rpc
         /// </summary>
         protected override void Dispose(bool disposing)
         {
-            foreach (var cap in _ifmap.Values)
+            foreach (var cap in _ifmap.Values.Take(1))
+            // releasing first skeleton is sufficient. Avoid double-Dispose!
             {
                 cap.Relinquish();
             }
-
-            base.Dispose(disposing);
         }
 
         internal override void Bind(object impl)
         {
-            foreach (Skeleton skel in _ifmap.Values)
+            foreach (Skeleton skel in _ifmap.Values) 
             {
                 skel.Bind(impl);
             }

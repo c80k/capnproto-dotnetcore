@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Capnp.Util;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,36 +19,23 @@ namespace Capnp.Rpc.Interception
             readonly CancellationTokenSource _cancelFromAlice = new CancellationTokenSource();
 
             public PromisedAnswer(CallContext callContext)
-            {
+            {                
                 _callContext = callContext;
+                WhenReturned = _futureResult.Task.EnforceAwaitOrder();
             }
 
-            public Task<DeserializerState> WhenReturned => _futureResult.Task;
+            public StrictlyOrderedAwaitTask<DeserializerState> WhenReturned { get; }
             public CancellationToken CancelFromAlice => _cancelFromAlice.Token;
 
-            async Task<Proxy> AccessWhenReturned(MemberAccessPath access)
+            public ConsumedCapability Access(MemberAccessPath access)
             {
-                await WhenReturned;
-                return new Proxy(Access(access));
+                return _callContext._censorCapability.Policy.Attach<ConsumedCapability>(new LocalAnswerCapability(WhenReturned, access));
             }
 
-            public ConsumedCapability? Access(MemberAccessPath access)
+            public ConsumedCapability Access(MemberAccessPath _, Task<IDisposable?> task)
             {
-                if (_futureResult.Task.IsCompleted)
-                {
-                    try
-                    {
-                        return access.Eval(WhenReturned.Result);
-                    }
-                    catch (AggregateException exception)
-                    {
-                        throw exception.InnerException!;
-                    }
-                }
-                else
-                {
-                    return new LazyCapability(AccessWhenReturned(access));
-                }
+                var proxyTask = task.AsProxyTask();
+                return _callContext._censorCapability.Policy.Attach<ConsumedCapability>(new LocalAnswerCapability(proxyTask));
             }
 
             public void Dispose()
@@ -84,6 +72,8 @@ namespace Capnp.Rpc.Interception
                     _cancelFromAlice.Dispose();
                 }
             }
+
+            public bool IsTailCall => false;
         }
 
         /// <summary>
@@ -101,10 +91,16 @@ namespace Capnp.Rpc.Interception
         /// </summary>
         public InterceptionState State { get; private set; }
 
+        SerializerState _inArgs;
+
         /// <summary>
         /// Input arguments
         /// </summary>
-        public SerializerState? InArgs { get; set; }
+        public SerializerState InArgs 
+        {
+            get => _inArgs;
+            set { _inArgs = value ?? throw new ArgumentNullException(nameof(value)); }
+        }
 
         /// <summary>
         /// Output arguments ("return value")
@@ -150,45 +146,47 @@ namespace Capnp.Rpc.Interception
         /// <item><description>A <see cref="Proxy"/>-derived object</description></item>
         /// <item><description>A <see cref="Skeleton"/>-derived object</description></item>
         /// <item><description>A <see cref="ConsumedCapability"/>-derived object (low level capability)</description></item>
-        /// <item><description>null</description></item>
         /// </list>
         /// </summary>
-        public object? Bob 
+        /// <remarks>
+        /// Note that getting/setting this property does NOT transfer ownership.
+        /// </remarks>
+        public object Bob 
         {
             get => _bob;
             set
             {
                 if (value != _bob)
                 {
-                    BobProxy?.Dispose();
-                    BobProxy = null;
-
-                    _bob = value;
-
                     switch (value)
                     {
+                        case null:
+                            throw new ArgumentNullException(nameof(value));
+
                         case Proxy proxy:
-                            BobProxy = proxy;
+                            BobProxy = proxy.Cast<BareProxy>(false);
+                            break;
+
+                        case ConsumedCapability cap: 
+                            using (var temp = CapabilityReflection.CreateProxy<object>(cap)) 
+                            {
+                                Bob = temp; 
+                            }
                             break;
 
                         case Skeleton skeleton:
-                            BobProxy = CapabilityReflection.CreateProxy<object>(
-                                LocalCapability.Create(skeleton));
-                            break;
-
-                        case ConsumedCapability cap:
-                            BobProxy = CapabilityReflection.CreateProxy<object>(cap);
-                            break;
-
-                        case null:
+                            using (var nullProxy = new Proxy())
+                            {
+                                Bob = (object?)skeleton.AsCapability() ?? nullProxy;
+                            }
                             break;
 
                         default:
-                            BobProxy = CapabilityReflection.CreateProxy<object>(
-                                LocalCapability.Create(
-                                    Skeleton.GetOrCreateSkeleton(value, false)));
+                            Bob = CapabilityReflection.CreateSkeletonInternal(value);
                             break;
                     }
+
+                    _bob = value;
                 }
             }
         }
@@ -197,7 +195,7 @@ namespace Capnp.Rpc.Interception
 
         readonly CensorCapability _censorCapability;
         PromisedAnswer _promisedAnswer;
-        object? _bob;
+        object _bob;
 
         internal IPromisedAnswer Answer => _promisedAnswer;
 
@@ -205,13 +203,14 @@ namespace Capnp.Rpc.Interception
         {
             _censorCapability = censorCapability;
             _promisedAnswer = new PromisedAnswer(this);
+            _inArgs = inArgs;
+            _bob = null!; // Will be initialized later here
 
             CancelFromAlice = _promisedAnswer.CancelFromAlice;
             CancelToBob = CancelFromAlice;
             Bob = censorCapability.InterceptedCapability;
             InterfaceId = interfaceId;
             MethodId = methodId;
-            InArgs = inArgs;
             State = InterceptionState.RequestedFromAlice;
         }
 
@@ -253,12 +252,8 @@ namespace Capnp.Rpc.Interception
         /// Intercepts all capabilies inside the input arguments
         /// </summary>
         /// <param name="policyOverride">Policy to use, or null to further use present policy</param>
-        /// <exception cref="InvalidOperationException">InArgs not set</exception>
         public void InterceptInCaps(IInterceptionPolicy? policyOverride = null)
         {
-            if (InArgs == null)
-                throw new InvalidOperationException("InArgs not set");
-
             InterceptCaps(InArgs, policyOverride ?? _censorCapability.Policy);
         }
 
@@ -275,12 +270,8 @@ namespace Capnp.Rpc.Interception
         /// Unintercepts all capabilies inside the input arguments
         /// </summary>
         /// <param name="policyOverride">Policy to remove, or null to remove present policy</param>
-        /// <exception cref="InvalidOperationException">InArgs not set</exception>
         public void UninterceptInCaps(IInterceptionPolicy? policyOverride = null)
         {
-            if (InArgs == null)
-                throw new InvalidOperationException("InArgs not set");
-
             UninterceptCaps(InArgs, policyOverride ?? _censorCapability.Policy);
         }
 
@@ -296,15 +287,8 @@ namespace Capnp.Rpc.Interception
         /// <summary>
         /// Forwards this intercepted call to the target capability ("Bob").
         /// </summary>
-        /// <exception cref="InvalidOperationException">Bob/InArgs not set</exception>
         public void ForwardToBob()
         {
-            if (Bob == null)
-                throw new InvalidOperationException("Bob is null");
-
-            if (InArgs == null)
-                throw new InvalidOperationException("InArgs not set");
-
             var answer = BobProxy!.Call(InterfaceId, MethodId, InArgs.Rewrap<DynamicSerializerState>(), default, CancelToBob);
 
             State = InterceptionState.ForwardedToBob;

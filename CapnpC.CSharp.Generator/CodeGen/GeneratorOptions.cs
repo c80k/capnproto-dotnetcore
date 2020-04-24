@@ -11,7 +11,6 @@
         public string ReaderContextFieldName { get; set; } = "ctx";
         public string ContextParameterName { get; set; } = "ctx";
         public string GroupReaderContextArgName { get; set; } = "ctx";
-        public string GroupWriterContextArgName { get; set; } = "ctx";
         public string UnionDiscriminatorEnumName { get; set; } = "WHICH";
         public string UnionDiscriminatorPropName { get; set; } = "which";
         public string UnionDiscriminatorFieldName { get; set; } = "_which";
@@ -28,15 +27,16 @@
         public string ParamsStructFormat { get; set; } = "Params_{0}";
         public string ResultStructFormat { get; set; } = "Result_{0}";
         public string PropertyNamedLikeTypeRenameFormat { get; set; } = "The{0}";
-        public string InstLocalName { get; set; } = "inst";
         public string GenericTypeParameterFormat { get; set; } = "T{0}";
         public string PipeliningExtensionsClassFormat { get; set; } = "PipeliningSupportExtensions_{0}";
         public string ProxyClassFormat { get; set; } = "{0}_Proxy";
         public string SkeletonClassFormat { get; set; } = "{0}_Skeleton";
         public string MemberAccessPathNameFormat { get; set; } = "Path_{0}_{1}_{2}_{3}";
         public string TaskParameterName { get; set; } = "task";
-        public string EagerMethodName { get; set; } = "Eager";
         public string TypeIdFieldName { get; set; } = "typeId";
+        public string AwaitProxyName { get; set; } = "AwaitProxy";
         public bool NullableEnableDefault { get; set; } = false;
+        public string GeneratorToolName { get; set; } = "capnpc-csharp";
+        public string GeneratorToolVersion = ThisAssembly.AssemblyVersion;
     }
 }

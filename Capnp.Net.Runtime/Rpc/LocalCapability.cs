@@ -7,17 +7,6 @@ namespace Capnp.Rpc
 {
     class LocalCapability : ConsumedCapability
     {
-        static readonly ConditionalWeakTable<Skeleton, LocalCapability> _localCaps =
-            new ConditionalWeakTable<Skeleton, LocalCapability>();
-
-        public static ConsumedCapability Create(Skeleton skeleton)
-        {
-            if (skeleton is Vine vine)
-                return vine.Proxy.ConsumedCap!;
-            else
-                return _localCaps.GetValue(skeleton, _ => new LocalCapability(_));
-        }
-
         static async Task<DeserializerState> AwaitAnswer(Task<AnswerOrCounterquestion> call)
         {
             var aorcq = await call;
@@ -26,7 +15,9 @@ namespace Capnp.Rpc
 
         public Skeleton ProvidedCap { get; }
 
-        LocalCapability(Skeleton providedCap)
+        internal override Skeleton AsSkeleton() => ProvidedCap;
+
+        public LocalCapability(Skeleton providedCap)
         {
             ProvidedCap = providedCap ?? throw new ArgumentNullException(nameof(providedCap));
         }
@@ -36,10 +27,7 @@ namespace Capnp.Rpc
             ProvidedCap.Claim();
         }
 
-        internal override void Release(
-            [System.Runtime.CompilerServices.CallerMemberName] string methodName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string filePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int lineNumber = 0)
+        internal override void Release()
         {
             ProvidedCap.Relinquish();
         }
@@ -51,19 +39,11 @@ namespace Capnp.Rpc
             return new LocalAnswer(cts, AwaitAnswer(call));
         }
 
-        internal override void Export(IRpcEndpoint endpoint, CapDescriptor.WRITER capDesc)
+        internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER capDesc)
         {
             capDesc.which = CapDescriptor.WHICH.SenderHosted;
             capDesc.SenderHosted = endpoint.AllocateExport(ProvidedCap, out bool _);
-        }
-
-        internal override void Freeze(out IRpcEndpoint? boundEndpoint)
-        {
-            boundEndpoint = null;
-        }
-
-        internal override void Unfreeze()
-        {
+            return null;
         }
 
         protected override void ReleaseRemotely()

@@ -7,6 +7,7 @@ namespace Capnp.Rpc
     abstract class RefCountingCapability: ConsumedCapability
     {
         readonly object _reentrancyBlocker = new object();
+        Vine? _vine;
 
         // Note on reference counting: Works in analogy to COM. AddRef() adds a reference,
         // Release() removes it. When the reference count reaches zero, the capability must be
@@ -26,16 +27,24 @@ namespace Capnp.Rpc
         // Value 0 has the special meaning of being in state C.
         long _refCount = 1;
 
-#if DebugCapabilityLifecycle
+#if DebugFinalizers
         ILogger Logger { get; } = Logging.CreateLogger<RefCountingCapability>();
-
-        string? _releasingMethodName;
-        string? _releasingFilePath;
-        int _releasingLineNumber;
+        string CreatorStackTrace { get; set; }
 #endif
+
+        public RefCountingCapability()
+        {
+#if DebugFinalizers
+            CreatorStackTrace = Environment.StackTrace;
+#endif
+        }
 
         ~RefCountingCapability()
         {
+#if DebugFinalizers
+            Logger?.LogWarning($"Caught orphaned capability, created from here: {CreatorStackTrace}.");
+#endif
+
             Dispose(false);
         }
 
@@ -46,13 +55,8 @@ namespace Capnp.Rpc
         {
             if (disposing)
             {
-                try
-                {
-                    ReleaseRemotely();
-                }
-                catch
-                {
-                }
+                try { ReleaseRemotely(); }
+                catch { }
             }
             else
             {
@@ -60,19 +64,14 @@ namespace Capnp.Rpc
                 {
                     Task.Run(() =>
                     {
-                        try
-                        {
-                            ReleaseRemotely();
-                        }
-                        catch
-                        {
-                        }
+                        try { ReleaseRemotely(); }
+                        catch { }
                     });
                 }
             }
         }
 
-        internal sealed override void AddRef()
+        internal override void AddRef()
         {
             lock (_reentrancyBlocker)
             {
@@ -90,10 +89,7 @@ namespace Capnp.Rpc
             }
         }
 
-        internal sealed override void Release(
-            [System.Runtime.CompilerServices.CallerMemberName] string methodName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string filePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int lineNumber = 0)
+        internal override void Release()
         {
             lock (_reentrancyBlocker)
             {
@@ -102,12 +98,6 @@ namespace Capnp.Rpc
                     case 1: // initial state, actually ref. count 0
                     case 2: // actually ref. count 1
                         _refCount = 0;
-
-#if DebugCapabilityLifecycle
-                        _releasingMethodName = methodName;
-                        _releasingFilePath = filePath;
-                        _releasingLineNumber = lineNumber;
-#endif
 
                         Dispose(true);
                         GC.SuppressFinalize(this);
@@ -131,6 +121,16 @@ namespace Capnp.Rpc
                 {
                     throw new ObjectDisposedException(ToString(), "Validation failed, capability is already disposed");
                 }
+            }
+        }
+
+        internal override Skeleton AsSkeleton()
+        {
+            lock (_reentrancyBlocker)
+            {
+                if (_vine == null)
+                    _vine = new Vine(this);
+                return _vine;
             }
         }
     }

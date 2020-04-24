@@ -336,3 +336,6 @@ ASALocalRun/
 # Capnp code behind
 *.capnp.cs
 /globalPackages
+
+# Coverage results folder
+coverage/

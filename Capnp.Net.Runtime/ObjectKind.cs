@@ -4,9 +4,7 @@ namespace Capnp
 {
     /// <summary>
     /// The different kinds of Cap'n Proto objects.
-    /// Despite this is a [Flags] enum, it does not make sense to mutually combine literals.
     /// </summary>
-    [Flags]
     public enum ObjectKind: byte
     {
         /// <summary>

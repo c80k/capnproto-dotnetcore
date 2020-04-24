@@ -61,9 +61,18 @@
 
         IEnumerable<MemberDeclarationSyntax> TransformStruct(TypeDefinition def)
         {
-            var topDecl = ClassDeclaration(_names.MakeTypeName(def).Identifier)                
-                .AddModifiers(Public)
-                .AddBaseListTypes(SimpleBaseType(_names.Type<Capnp.ICapnpSerializable>(Nullability.NonNullable)));
+            var topDecl = ClassDeclaration(_names.MakeTypeName(def).Identifier)
+                .AddModifiers(_names.TypeVisibilityModifier);
+
+            if (_names.EmitDomainClassesAndInterfaces)
+            {
+                topDecl = topDecl.AddBaseListTypes(SimpleBaseType(_names.Type<Capnp.ICapnpSerializable>(Nullability.NonNullable)));
+            }
+            else
+            {
+                topDecl = topDecl.AddModifiers(Static);
+            }
+                
 
             if (def.GenericParameters.Count > 0)
             {
@@ -72,17 +81,23 @@
                     .AddConstraintClauses(MakeTypeParameterConstraints(def).ToArray());
             }
 
-            topDecl = topDecl.AddMembers(CommonSnippetGen.MakeTypeIdConst(def.Id, _names));
-            topDecl = topDecl.WithAttributeLists(CommonSnippetGen.MakeTypeIdAttributeLists(def.Id));
+            topDecl = topDecl
+                .AddMembers(_names.MakeTypeIdConst(def.Id))
+                .AddAttributeLists(_names.MakeTypeDecorationAttributes(def.Id));
 
             if (def.UnionInfo != null)
             {
                 topDecl = topDecl.AddMembers(_commonGen.MakeUnionSelectorEnum(def));
             }
 
-            topDecl = topDecl.AddMembers(_domClassGen.MakeDomainClassMembers(def));
-            topDecl = topDecl.AddMembers(_readerGen.MakeReaderStruct(def));
-            topDecl = topDecl.AddMembers(_writerGen.MakeWriterStruct(def));
+            if (_names.EmitDomainClassesAndInterfaces)
+            {
+                topDecl = topDecl.AddMembers(_domClassGen.MakeDomainClassMembers(def));
+            }
+
+            topDecl = topDecl.AddMembers(
+                _readerGen.MakeReaderStruct(def),
+                _writerGen.MakeWriterStruct(def));
 
             foreach (var nestedGroup in def.NestedGroups)
             {
@@ -99,6 +114,9 @@
 
         IEnumerable<MemberDeclarationSyntax> TransformInterface(TypeDefinition def)
         {
+            if (!_names.EmitDomainClassesAndInterfaces)
+                yield break;
+
             yield return _interfaceGen.MakeInterface(def);
             yield return _interfaceGen.MakeProxy(def);
             yield return _interfaceGen.MakeSkeleton(def);
@@ -168,7 +186,7 @@
                         if (classDecl == null)
                         {
                             classDecl = ClassDeclaration(_names.MakePipeliningSupportExtensionClassName(file).Identifier)
-                                        .AddModifiers(Public, Static, Partial);
+                                        .AddModifiers(_names.TypeVisibilityModifier, Static, Partial);
                         }
 
                         classDecl = classDecl.AddMembers(members);
@@ -187,6 +205,8 @@
         internal string Transform(GenFile file)
         {
             _names.NullableEnable = file.NullableEnable ?? _options.NullableEnableDefault;
+            _names.EmitDomainClassesAndInterfaces = file.EmitDomainClassesAndInterfaces;
+            _names.TypeVisibility = file.TypeVisibility;
 
             NameSyntax topNamespace = GenNames.NamespaceName(file.Namespace) ?? _names.TopNamespace;
 
@@ -211,17 +231,21 @@
                 ns = ns.AddMembers(Transform(def).ToArray());
             }
 
-            var psc = TransformForPipeliningSupport(file);
-
-            if (psc != null)
+            if (_names.EmitDomainClassesAndInterfaces)
             {
-                ns = ns.AddMembers(psc);
+                var psc = TransformForPipeliningSupport(file);
+
+                if (psc != null)
+                {
+                    ns = ns.AddMembers(psc);
+                }
             }
 
             var cu = CompilationUnit().AddUsings(
                 UsingDirective(ParseName("Capnp")),
                 UsingDirective(ParseName("Capnp.Rpc")),
                 UsingDirective(ParseName("System")),
+                UsingDirective(ParseName("System.CodeDom.Compiler")),
                 UsingDirective(ParseName("System.Collections.Generic")));
 
             if (_names.NullableEnable)
@@ -236,7 +260,14 @@
 
             cu = cu.AddMembers(ns);
 
-            return cu.NormalizeWhitespace("    ", Environment.NewLine).ToFullString();
+            string content = cu.NormalizeWhitespace("    ", Environment.NewLine).ToFullString();
+
+            if (!string.IsNullOrWhiteSpace(file.HeaderText))
+            {
+                content = file.HeaderText + content;
+            }
+
+            return content;
         }
 
         public IReadOnlyList<FileGenerationResult> Generate()

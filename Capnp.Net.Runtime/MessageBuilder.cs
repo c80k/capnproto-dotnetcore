@@ -10,7 +10,7 @@ namespace Capnp
     {
         readonly ISegmentAllocator _allocator;
         readonly DynamicSerializerState _rootPtrBuilder;
-        List<Rpc.ConsumedCapability?>? _capTable;
+        List<Rpc.ConsumedCapability>? _capTable;
 
         MessageBuilder(ISegmentAllocator allocator)
         {
@@ -64,7 +64,7 @@ namespace Capnp
         /// <summary>
         /// Creates an object and sets it as root object.
         /// </summary>
-        /// <typeparam name="TS">Serializer state specialization</typeparam>
+        /// <typeparam name="TS">Serializer state specialization (must be a struct)</typeparam>
         /// <returns>Serializer state instance representing the new object</returns>
         public TS BuildRoot<TS>() where TS: SerializerState, new()
         {
@@ -72,6 +72,9 @@ namespace Capnp
                 throw new InvalidOperationException("Root already set");
 
             var root = CreateObject<TS>();
+            if (root.Kind != ObjectKind.Struct)
+                throw new InvalidOperationException("Root object must be a struct");
+
             Root = root;
             return root;
         }
@@ -89,13 +92,13 @@ namespace Capnp
             if (_capTable != null)
                 throw new InvalidOperationException("Capability table was already initialized");
 
-            _capTable = new List<Rpc.ConsumedCapability?>();
+            _capTable = new List<Rpc.ConsumedCapability>();
         }
 
         /// <summary>
         /// Returns this message builder's segment allocator.
         /// </summary>
         public ISegmentAllocator Allocator => _allocator;
-        internal List<Rpc.ConsumedCapability?>? Caps => _capTable;
+        internal List<Rpc.ConsumedCapability>? Caps => _capTable;
     }
 }

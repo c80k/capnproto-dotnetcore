@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Capnp.Util;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -8,78 +9,30 @@ namespace Capnp.Rpc
     {
         readonly uint _remoteId;
         readonly object _reentrancyBlocker = new object();
-        readonly TaskCompletionSource<Proxy> _resolvedCap = new TaskCompletionSource<Proxy>();
+        readonly TaskCompletionSource<ConsumedCapability> _resolvedCap = new TaskCompletionSource<ConsumedCapability>();
+        readonly StrictlyOrderedAwaitTask<Proxy> _whenResolvedProxy;
         bool _released;
 
         public PromisedCapability(IRpcEndpoint ep, uint remoteId): base(ep)
         {
             _remoteId = remoteId;
+
+            async Task<Proxy> AwaitProxy() => new Proxy(await _resolvedCap.Task);
+            _whenResolvedProxy = AwaitProxy().EnforceAwaitOrder();
         }
 
-        public override Task<Proxy> WhenResolved => _resolvedCap.Task;
+        public override StrictlyOrderedAwaitTask WhenResolved => _whenResolvedProxy;
+        public override T? GetResolvedCapability<T>() where T: class => _whenResolvedProxy.WrappedTask.GetResolvedCapability<T>();
 
-        internal override void Freeze(out IRpcEndpoint? boundEndpoint)
-        {
-            lock (_reentrancyBlocker)
-            {
-                if (_resolvedCap.Task.IsCompleted && _pendingCallsOnPromise == 0)
-                {
-                    try
-                    {
-                        _resolvedCap.Task.Result.Freeze(out boundEndpoint);
-                    }
-                    catch (AggregateException exception)
-                    {
-                        throw exception.InnerException!;
-                    }
-                }
-                else
-                {
-                    Debug.Assert(!_released);
-                    ++_pendingCallsOnPromise;
-
-                    boundEndpoint = _ep;
-                }
-            }
-        }
-
-        internal override void Unfreeze()
-        {
-            bool release = false;
-
-            lock (_reentrancyBlocker)
-            {
-                if (_pendingCallsOnPromise == 0)
-                {
-                    _resolvedCap.Task.Result.Unfreeze();
-                }
-                else
-                {
-                    Debug.Assert(_pendingCallsOnPromise > 0);
-                    Debug.Assert(!_released);
-
-                    if (--_pendingCallsOnPromise == 0 && _resolvedCap.Task.IsCompleted)
-                    {
-                        release = true;
-                        _released = true;
-                    }
-                }
-            }
-
-            if (release)
-            {
-                _ep.ReleaseImport(_remoteId);
-            }
-        }
-
-        internal override void Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
+        internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {
             lock (_reentrancyBlocker)
             {
                 
                 if (_resolvedCap.Task.ReplacementTaskIsCompletedSuccessfully())
                 {
-                    _resolvedCap.Task.Result.Export(endpoint, writer);
+                    using var proxy = new Proxy(_resolvedCap.Task.Result);
+                    proxy.Export(endpoint, writer);
                 }
                 else
                 {
@@ -91,7 +44,7 @@ namespace Capnp.Rpc
                         Debug.Assert(!_released);
                         ++_pendingCallsOnPromise;
 
-                        _ep.RequestPostAction(() =>
+                        return () =>
                         {
                             bool release = false;
 
@@ -108,7 +61,7 @@ namespace Capnp.Rpc
                             {
                                 _ep.ReleaseImport(_remoteId);
                             }
-                        });
+                        };
                     }
                     else
                     {
@@ -116,9 +69,11 @@ namespace Capnp.Rpc
                     }
                 }
             }
+
+            return null;
         }
 
-        async void TrackCall(Task call)
+        async void TrackCall(StrictlyOrderedAwaitTask call)
         {
             try
             {
@@ -147,7 +102,7 @@ namespace Capnp.Rpc
             }
         }
 
-        protected override Proxy? ResolvedCap
+        protected override ConsumedCapability? ResolvedCap
         {
             get
             {
@@ -194,7 +149,11 @@ namespace Capnp.Rpc
 
             lock (_reentrancyBlocker)
             {
-                _resolvedCap.SetResult(new Proxy(resolvedCap));
+#if DebugFinalizers
+                if (resolvedCap != null)
+                    resolvedCap.ResolvingCap = this;
+#endif
+                _resolvedCap.SetResult(resolvedCap!);
 
                 if (_pendingCallsOnPromise == 0)
                 {
@@ -218,7 +177,7 @@ namespace Capnp.Rpc
 #if false
                 _resolvedCap.SetException(new RpcException(message));
 #else
-                _resolvedCap.SetResult(new Proxy(LazyCapability.CreateBrokenCap(message)));
+                _resolvedCap.SetResult(LazyCapability.CreateBrokenCap(message));
 #endif
 
                 if (_pendingCallsOnPromise == 0)
@@ -234,16 +193,16 @@ namespace Capnp.Rpc
             }
         }
 
-        protected override void ReleaseRemotely()
+        protected async override void ReleaseRemotely()
         {
             if (!_released)
             {
+                _released = true;
                 _ep.ReleaseImport(_remoteId);
             }
 
-            _ep.ReleaseImport(_remoteId);
-
-            this.DisposeWhenResolved();
+            try { using var _ = await _whenResolvedProxy; }
+            catch { }
         }
 
         protected override Call.WRITER SetupMessage(DynamicSerializerState args, ulong interfaceId, ushort methodId)

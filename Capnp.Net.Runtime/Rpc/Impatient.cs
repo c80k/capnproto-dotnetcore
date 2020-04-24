@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace Capnp.Rpc
     public static class Impatient
     {
         static readonly ConditionalWeakTable<Task, IPromisedAnswer> _taskTable = new ConditionalWeakTable<Task, IPromisedAnswer>();
-        static readonly ThreadLocal<IRpcEndpoint?> _askingEndpoint = new ThreadLocal<IRpcEndpoint?>();
+        static readonly ThreadLocal<Stack<IRpcEndpoint>> _askingEndpoint = new ThreadLocal<Stack<IRpcEndpoint>>(() => new Stack<IRpcEndpoint>());
 
         /// <summary>
         /// Attaches a continuation to the given promise and registers the resulting task for pipelining.
@@ -26,45 +27,20 @@ namespace Capnp.Rpc
         {
             async Task<T> AwaitAnswer()
             {
-                return then(await promise.WhenReturned);
+                var result = await promise.WhenReturned;
+                if (promise.IsTailCall)
+                    throw new NoResultsException();
+
+                return then(result);
             }
 
             var rtask = AwaitAnswer();
 
-            try
-            {
-                // Really weird: We'd expect AwaitAnswer() to initialize a new Task instance upon each invocation.
-                // However, this does not seem to be always true (as indicated by CI test suite). An explanation might be
-                // that the underlying implementation recycles Task instances (um, really? doesn't make sense. But the
-                // observation doesn't make sense, either).
-
-                _taskTable.Add(rtask, promise);
-            }
-            catch (ArgumentException)
-            {
-                if (rtask.IsCompleted)
-                {
-                    // Force .NET to create a new Task instance
-                    if (rtask.IsCanceled)
-                    {
-                        rtask = Task.FromCanceled<T>(new CancellationToken(true));
-                    }
-                    else if (rtask.IsFaulted)
-                    {
-                        rtask = Task.FromException<T>(rtask.Exception!.InnerException!);
-                    }
-                    else
-                    {
-                        rtask = Task.FromResult<T>(rtask.Result);
-                    }
-                    
-                    _taskTable.Add(rtask, promise);
-                }
-                else
-                {
-                    throw new InvalidOperationException("What the heck is wrong with Task?");
-                }
-            }
+            // Rare situation: .NET maintains a cache of some pre-computed tasks for standard results (such as (int)0, (object)null).
+            // AwaitAnswer() might indeed have chosen a fast-path optimization, such that rtask is a cached object instead of a new instance.
+            // Once this happens the second time, and we return the same rtask for a different promise. GetAnswer()/TryGetAnswer() may return the "wrong"
+            // promise! Fortunately, this does not really matter, since the "wrong" promise is guaranteed to return exactly the same answer. :-)
+            _taskTable.GetValue(rtask, _ => promise);
 
             return rtask;
         }
@@ -76,6 +52,7 @@ namespace Capnp.Rpc
         /// <returns>The underlying promise</returns>
         /// <exception cref="ArgumentNullException"><paramref name="task"/> is null.</exception>
         /// <exception cref="ArgumentException">The task was not registered using MakePipelineAware.</exception>
+        [Obsolete("Please re-generate capnp code-behind. GetAnswer(task).Access(...) was replaced by Access(task, ...)")]
         public static IPromisedAnswer GetAnswer(Task task)
         {
             if (!_taskTable.TryGetValue(task, out var answer))
@@ -92,22 +69,18 @@ namespace Capnp.Rpc
             return answer;
         }
 
-        static async Task<Proxy> AwaitProxy<T>(Task<T> task) where T: class
+        /// <summary>
+        /// Returns a promise-pipelined capability for a remote method invocation Task.
+        /// </summary>
+        /// <param name="task">remote method invocation task</param>
+        /// <param name="access">path to the desired capability</param>
+        /// <param name="proxyTask">task returning a proxy to the desired capability</param>
+        /// <returns>Pipelined low-level capability</returns>
+        public static ConsumedCapability Access(Task task, MemberAccessPath access, Task<IDisposable?> proxyTask)
         {
-            var item = await task;
-
-            switch (item)
-            {
-                case Proxy proxy:
-                    return proxy;
-
-                case null:
-                    return CapabilityReflection.CreateProxy<T>(null);
-            }
-
-            var skel = Skeleton.GetOrCreateSkeleton(item!, false);
-            var localCap = LocalCapability.Create(skel);
-            return CapabilityReflection.CreateProxy<T>(localCap);
+            var answer = TryGetAnswer(task);
+            if (answer != null) return answer.Access(access, proxyTask);
+            return new LazyCapability(proxyTask.AsProxyTask());
         }
 
         /// <summary>
@@ -116,22 +89,16 @@ namespace Capnp.Rpc
         /// </summary>
         /// <typeparam name="TInterface">Capability interface type</typeparam>
         /// <param name="task">The task</param>
-        /// <param name="memberName">debugging aid</param>
-        /// <param name="sourceFilePath">debugging aid</param>
-        /// <param name="sourceLineNumber">debugging aid</param>
         /// <returns>A proxy for the given task.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="task"/> is null.</exception>
         /// <exception cref="InvalidCapabilityInterfaceException"><typeparamref name="TInterface"/> did not
         /// quality as capability interface.</exception>
         [Obsolete("Call Eager<TInterface>(task, true) instead")]
-        public static TInterface PseudoEager<TInterface>(this Task<TInterface> task,
-            [System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-            [System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
-            [System.Runtime.CompilerServices.CallerLineNumber] int sourceLineNumber = 0)
-            where TInterface : class
+        public static TInterface PseudoEager<TInterface>(this Task<TInterface> task)
+            where TInterface : class, IDisposable
         {
-            var lazyCap = new LazyCapability(AwaitProxy(task));
-            return (CapabilityReflection.CreateProxy<TInterface>(lazyCap, memberName, sourceFilePath, sourceLineNumber) as TInterface)!;
+            var lazyCap = new LazyCapability(task.AsProxyTask());
+            return (CapabilityReflection.CreateProxy<TInterface>(lazyCap) as TInterface)!;
         }
 
         static readonly MemberAccessPath Path_OneAndOnly = new MemberAccessPath(0U);
@@ -157,7 +124,7 @@ namespace Capnp.Rpc
         /// <exception cref="MemberAccessException">Caller does not have permission to invoke the Proxy constructor.</exception>
         /// <exception cref="TypeLoadException">Problem with building the Proxy type, or problem with loading some dependent class.</exception>
         public static TInterface Eager<TInterface>(this Task<TInterface> task, bool allowNoPipeliningFallback = false)
-            where TInterface : class
+            where TInterface : class, IDisposable
         {
             var answer = TryGetAnswer(task);
             if (answer == null)
@@ -167,19 +134,65 @@ namespace Capnp.Rpc
                     throw new ArgumentException("The task was not returned from a remote method invocation. See documentation for details.");
                 }
 
-                var lazyCap = new LazyCapability(AwaitProxy(task));
-                return (CapabilityReflection.CreateProxy<TInterface>(lazyCap) as TInterface)!;
+                var proxyTask = task.AsProxyTask();
+                if (proxyTask.ReplacementTaskIsCompletedSuccessfully())
+                {
+                    return proxyTask.Result.Cast<TInterface>(true);
+                }
+                else
+                {
+                    var lazyCap = new LazyCapability(proxyTask);
+                    return (CapabilityReflection.CreateProxy<TInterface>(lazyCap) as TInterface)!;
+                }
             }
             else
             {
-                return (CapabilityReflection.CreateProxy<TInterface>(answer.Access(Path_OneAndOnly)) as TInterface)!;
+                async Task<IDisposable?> AsDisposableTask()
+                {
+                    return await task;
+                }
+
+                return (CapabilityReflection.CreateProxy<TInterface>(answer.Access(Path_OneAndOnly, AsDisposableTask())) as TInterface)!;
             }
+        }
+
+        /// <summary>
+        /// Unwraps given capability. Unwrapping walks the chain of promised capabilities and awaits their resolutions,
+        /// until we get the finally resolved capability. If it is the capability, the method returns a null reference.
+        /// If the capability is broken (resolved to exception, dependent answer faulted or cancelled, RPC endpoint closed),
+        /// it throws an exception.
+        /// </summary>
+        /// <typeparam name="TInterface">Capability interface</typeparam>
+        /// <param name="cap">capability to unwrap</param>
+        /// <returns>Task returning the eventually resolved capability</returns>
+        /// <exception cref="RpcException">Capability is broken</exception>
+        public static async Task<TInterface?> Unwrap<TInterface>(this TInterface cap) where TInterface: class, IDisposable
+        {
+            using var proxy = cap as Proxy;
+
+            if (proxy == null)
+                return cap;
+
+            var unwrapped = await proxy.ConsumedCap.Unwrap();
+            if (unwrapped == null || unwrapped == NullCapability.Instance)
+                return null;
+
+            return ((CapabilityReflection.CreateProxy<TInterface>(unwrapped)) as TInterface)!;
         }
 
         internal static IRpcEndpoint? AskingEndpoint
         {
-            get => _askingEndpoint.Value;
-            set { _askingEndpoint.Value = value; }
+            get => _askingEndpoint.Value!.Count > 0 ? _askingEndpoint.Value.Peek() : null;
+        }
+
+        internal static void PushAskingEndpoint(IRpcEndpoint endpoint)
+        {
+            _askingEndpoint.Value!.Push(endpoint);
+        }
+
+        internal static void PopAskingEndpoint()
+        {
+            _askingEndpoint.Value!.Pop();
         }
 
         /// <summary>

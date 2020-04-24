@@ -40,7 +40,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 EqualsValueClause(
                     LiteralExpression(
                         SyntaxKind.NumericLiteralExpression,
-                        Literal(Schema.Field.Reader.NoDiscriminant))));
+                        Literal(SchemaModel.NoDiscriminant))));
 
             whichEnum = whichEnum.AddMembers(ndecl);
 
@@ -50,8 +50,8 @@ namespace CapnpC.CSharp.Generator.CodeGen
         public EnumDeclarationSyntax MakeEnum(TypeDefinition def)
         {
             var decl = EnumDeclaration(_names.GetCodeIdentifier(def))
-                .WithAttributeLists(MakeTypeIdAttributeLists(def.Id))
-                .AddModifiers(Public)
+                .AddAttributeLists(_names.MakeTypeDecorationAttributes(def.Id))
+                .AddModifiers(_names.TypeVisibilityModifier)
                 .AddBaseListTypes(SimpleBaseType(_names.Type<ushort>(Nullability.NonNullable)));
 
             foreach (var enumerant in def.Enumerants.OrderBy(e => e.CodeOrder))
@@ -87,39 +87,5 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 yield return expr;
             }
         }
-
-        static LiteralExpressionSyntax HexLiteral(ulong id) =>
-            LiteralExpression(
-                SyntaxKind.NumericLiteralExpression,
-                Literal($"0x{id:x}UL", id));
-
-        public static FieldDeclarationSyntax MakeTypeIdConst(ulong id, GenNames names) =>
-            FieldDeclaration(
-                VariableDeclaration(
-                    IdentifierName("UInt64"))
-                .WithVariables(
-                    SingletonSeparatedList<VariableDeclaratorSyntax>(
-                        VariableDeclarator(names.TypeIdField.Identifier)
-                        .WithInitializer(
-                            EqualsValueClause(HexLiteral(id))))))
-                .WithModifiers(
-                    TokenList(
-                        new[]{
-                            Token(SyntaxKind.PublicKeyword),
-                            Token(SyntaxKind.ConstKeyword)}));
-
-        public static AttributeSyntax MakeTypeIdAttribute(ulong id) =>
-            Attribute(
-                IdentifierName("TypeId"))
-            .WithArgumentList(
-                AttributeArgumentList(
-                    SingletonSeparatedList<AttributeArgumentSyntax>(
-                        AttributeArgument(HexLiteral(id)))));
-
-        public static SyntaxList<AttributeListSyntax> MakeTypeIdAttributeLists(ulong id) =>
-            SingletonList<AttributeListSyntax>(
-                AttributeList(
-                    SingletonSeparatedList<AttributeSyntax>(
-                        CommonSnippetGen.MakeTypeIdAttribute(id))));
     }
 }

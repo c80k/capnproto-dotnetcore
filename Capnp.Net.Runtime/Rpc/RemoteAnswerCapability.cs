@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Capnp.Util;
+using System;
 using System.Threading.Tasks;
 
 namespace Capnp.Rpc
@@ -16,17 +17,29 @@ namespace Capnp.Rpc
 
         readonly PendingQuestion _question;
         readonly MemberAccessPath _access;
-        Proxy? _resolvedCap;
+        readonly StrictlyOrderedAwaitTask<Proxy> _whenResolvedProxy;
 
-        public RemoteAnswerCapability(PendingQuestion question, MemberAccessPath access): base(question.RpcEndpoint)
+        public RemoteAnswerCapability(PendingQuestion question, MemberAccessPath access, Task<Proxy> proxyTask) : base(question.RpcEndpoint)
         {
             _question = question ?? throw new ArgumentNullException(nameof(question));
             _access = access ?? throw new ArgumentNullException(nameof(access));
-
-            _ = AwaitWhenResolved();
+            _whenResolvedProxy = (proxyTask ?? throw new ArgumentNullException(nameof(proxyTask))).EnforceAwaitOrder();
         }
 
-        async void ReAllowFinishWhenDone(Task task)
+        static async Task<Proxy> TransferOwnershipToDummyProxy(PendingQuestion question, MemberAccessPath access)
+        {
+            var result = await question.WhenReturned;
+            var cap = access.Eval(result);
+            var proxy = new Proxy(cap);
+            cap?.Release();
+            return proxy;
+        }
+
+        public RemoteAnswerCapability(PendingQuestion question, MemberAccessPath access) : this(question, access, TransferOwnershipToDummyProxy(question, access))
+        {
+        }
+
+        async void ReAllowFinishWhenDone(StrictlyOrderedAwaitTask task)
         {
             try
             {
@@ -47,57 +60,39 @@ namespace Capnp.Rpc
             }
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-
-            lock (_question.ReentrancyBlocker)
-            {
-                _resolvedCap?.Dispose();
-            }
-        }
-
-        protected override Proxy? ResolvedCap
+        protected override ConsumedCapability? ResolvedCap
         {
             get
             {
                 lock (_question.ReentrancyBlocker)
                 {
-                    if (_resolvedCap == null && !_question.IsTailCall && _question.IsReturned)
+                    if (!_question.IsTailCall && _question.StateFlags.HasFlag(PendingQuestion.State.Returned))
                     {
-                        DeserializerState result;
                         try
                         {
-                            result = _question.WhenReturned.Result;
+                            return _whenResolvedProxy.Result.ConsumedCap;
                         }
                         catch (AggregateException exception)
                         {
                             throw exception.InnerException!;
                         }
-
-                        _resolvedCap = new Proxy(_access.Eval(result));
                     }
-                    return _resolvedCap;
+                    else
+                    {
+                        return null;
+                    }
                 }
             }
         }
 
-        async Task<Proxy> AwaitWhenResolved()
-        {
-            await _question.WhenReturned;
+        public override StrictlyOrderedAwaitTask WhenResolved => _whenResolvedProxy;
 
-            if (_question.IsTailCall)
-                throw new InvalidOperationException("Question is a tail call, so won't resolve back.");
-
-            return ResolvedCap!;
-        }
-
-        public override Task<Proxy> WhenResolved => AwaitWhenResolved();
+        public override T? GetResolvedCapability<T>() where T: class => _whenResolvedProxy.WrappedTask.GetResolvedCapability<T>();
 
         protected override void GetMessageTarget(MessageTarget.WRITER wr)
         {
             wr.which = MessageTarget.WHICH.PromisedAnswer;
-            wr.PromisedAnswer.QuestionId = _question.QuestionId;
+            wr.PromisedAnswer!.QuestionId = _question.QuestionId;
             _access.Serialize(wr.PromisedAnswer);
         }
 
@@ -105,14 +100,9 @@ namespace Capnp.Rpc
         {
             lock (_question.ReentrancyBlocker)
             {
-                if (_question.StateFlags.HasFlag(PendingQuestion.State.Returned) &&
-                    !_question.StateFlags.HasFlag(PendingQuestion.State.TailCall))
+                if (!_question.StateFlags.HasFlag(PendingQuestion.State.TailCall) &&
+                     _question.StateFlags.HasFlag(PendingQuestion.State.Returned))
                 {
-                    if (ResolvedCap == null)
-                    {
-                        throw new RpcException("Answer did not resolve to expected capability");
-                    }
-
                     return CallOnResolution(interfaceId, methodId, args);
                 }
                 else
@@ -120,14 +110,11 @@ namespace Capnp.Rpc
 #if DebugEmbargos
                     Logger.LogDebug("Call by proxy");
 #endif
-                    if (_question.StateFlags.HasFlag(PendingQuestion.State.Disposed))
+                    if (_question.StateFlags.HasFlag(PendingQuestion.State.CanceledByDispose) ||
+                        _question.StateFlags.HasFlag(PendingQuestion.State.FinishRequested))
                     {
+                        args.Dispose();
                         throw new ObjectDisposedException(nameof(PendingQuestion));
-                    }
-
-                    if (_question.StateFlags.HasFlag(PendingQuestion.State.FinishRequested))
-                    {
-                        throw new InvalidOperationException("Finish request was already sent");
                     }
 
                     _question.DisallowFinish();
@@ -164,61 +151,22 @@ namespace Capnp.Rpc
             var call = base.SetupMessage(args, interfaceId, methodId);
 
             call.Target.which = MessageTarget.WHICH.PromisedAnswer;
-            call.Target.PromisedAnswer.QuestionId = _question.QuestionId;
+            call.Target.PromisedAnswer!.QuestionId = _question.QuestionId;
             _access.Serialize(call.Target.PromisedAnswer);
 
             return call;
         }
 
-        internal override void Freeze(out IRpcEndpoint? boundEndpoint)
+        internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {
             lock (_question.ReentrancyBlocker)
             {
-                if (_question.StateFlags.HasFlag(PendingQuestion.State.Returned) &&
-                    _pendingCallsOnPromise == 0)
-                {
-                    if (ResolvedCap == null)
-                    {
-                        throw new RpcException("Answer did not resolve to expected capability");
-                    }
-
-                    ResolvedCap.Freeze(out boundEndpoint);
-                }
-                else
-                {
-                    ++_pendingCallsOnPromise;
-                    _question.DisallowFinish();
-                    boundEndpoint = _ep;
-                }
-            }
-        }
-
-        internal override void Unfreeze()
-        {
-            lock (_question.ReentrancyBlocker)
-            {
-                if (_pendingCallsOnPromise > 0)
-                {
-                    --_pendingCallsOnPromise;
-                    _question.AllowFinish();
-                }
-                else
-                {
-                    ResolvedCap?.Unfreeze();
-                }
-            }
-        }
-
-        internal override void Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
-        {
-            lock (_question.ReentrancyBlocker)
-            {
-                if (_question.StateFlags.HasFlag(PendingQuestion.State.Disposed))
+                if (_question.StateFlags.HasFlag(PendingQuestion.State.CanceledByDispose))
                     throw new ObjectDisposedException(nameof(PendingQuestion));
 
-                if (_question.StateFlags.HasFlag(PendingQuestion.State.Returned))
+                if (_question.StateFlags.HasFlag(PendingQuestion.State.Returned) && !_question.IsTailCall)
                 {
-                    ResolvedCap?.Export(endpoint, writer);
+                    ResolvedCap!.Export(endpoint, writer);
                 }
                 else
                 {
@@ -228,32 +176,45 @@ namespace Capnp.Rpc
                     if (endpoint == _ep)
                     {
                         writer.which = CapDescriptor.WHICH.ReceiverAnswer;
-                        _access.Serialize(writer.ReceiverAnswer);
-                        writer.ReceiverAnswer.QuestionId = _question.QuestionId;
+                        _access.Serialize(writer.ReceiverAnswer!);
+                        writer.ReceiverAnswer!.QuestionId = _question.QuestionId;
                     }
                     else if (_question.IsTailCall)
                     {
-                        // FIXME: Resource management! We should prevent finishing this
-                        // cap as long as it is exported. Unfortunately, we cannot determine
-                        // when it gets removed from the export table.
-
-                        var vine = Vine.Create(this);
-                        uint id = endpoint.AllocateExport(vine, out bool first);
+                        uint id = endpoint.AllocateExport(AsSkeleton(), out bool first);
 
                         writer.which = CapDescriptor.WHICH.SenderHosted;
                         writer.SenderHosted = id;
                     }
                     else
                     {
-                        this.ExportAsSenderPromise(endpoint, writer);
+                        return this.ExportAsSenderPromise(endpoint, writer);
                     }
                 }
             }
+
+            return null;
         }
 
-        protected override void ReleaseRemotely()
+        protected async override void ReleaseRemotely()
         {
-            this.DisposeWhenResolved();
+            if (!_question.IsTailCall)
+            {
+                try { using var _ = await _whenResolvedProxy; }
+                catch { }
+            }
+        }
+
+        internal override void AddRef()
+        {
+            base.AddRef();
+            _question.AddRef();
+        }
+
+        internal override void Release()
+        {
+            _question.Release();
+            base.Release();
         }
     }
 }

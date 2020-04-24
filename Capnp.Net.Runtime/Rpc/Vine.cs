@@ -1,70 +1,48 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Capnp.Rpc
 {
+
     class Vine : Skeleton
     {
-        public static Skeleton Create(ConsumedCapability cap)
+        public Vine(ConsumedCapability consumedCap)
         {
-            if (cap is LocalCapability lcap)
-                return lcap.ProvidedCap;
-            else
-                return new Vine(cap);
+            Cap = consumedCap;
         }
 
-        Vine(ConsumedCapability consumedCap)
+        public ConsumedCapability Cap { get; }
+
+        internal override ConsumedCapability AsCapability() => Cap;
+
+        internal override void Claim()
         {
-            Proxy = new Proxy(consumedCap ?? throw new ArgumentNullException(nameof(consumedCap)));
+            Cap.AddRef();
         }
 
-        internal override void Bind(object impl)
+        internal override void Relinquish()
         {
-            throw new NotImplementedException();
+            Cap.Release();
         }
-
-        public Proxy Proxy { get; }
 
         public async override Task<AnswerOrCounterquestion> Invoke(
             ulong interfaceId, ushort methodId, DeserializerState args, 
             CancellationToken cancellationToken = default)
         {
-            var promisedAnswer = Proxy.Call(interfaceId, methodId, (DynamicSerializerState)args, default);
+            using var proxy = new Proxy(Cap);
+            var promisedAnswer = proxy.Call(interfaceId, methodId, (DynamicSerializerState)args, false, cancellationToken);
 
             if (promisedAnswer is PendingQuestion pendingQuestion && pendingQuestion.RpcEndpoint == Impatient.AskingEndpoint)
             {
-                async void SetupCancellation()
-                {
-                    try
-                    {
-                        using (var registration = cancellationToken.Register(promisedAnswer.Dispose))
-                        {
-                            await promisedAnswer.WhenReturned;
-                        }
-                    }
-                    catch
-                    {
-                    }
-                }
-
-                SetupCancellation();
-
                 return pendingQuestion;
             }
             else
             {
-                using (var registration = cancellationToken.Register(promisedAnswer.Dispose))
-                {
-                    return (DynamicSerializerState)await promisedAnswer.WhenReturned;
-                }
+                using var registration = cancellationToken.Register(promisedAnswer.Dispose);
+                return (DynamicSerializerState)await promisedAnswer.WhenReturned;
             }
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            Proxy.Dispose();
-            base.Dispose(disposing);
         }
     }
 }

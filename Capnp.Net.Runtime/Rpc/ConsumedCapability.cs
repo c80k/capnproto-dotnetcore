@@ -1,4 +1,6 @@
-﻿namespace Capnp.Rpc
+﻿using System;
+
+namespace Capnp.Rpc
 {
     /// <summary>
     /// Base class for a low-level capability at consumer side. It is created by the <see cref="RpcEngine"/>. An application does not directly interact with it
@@ -13,20 +15,14 @@
         /// which usually also means to remove it from the remote peer's export table.
         /// </summary>
         protected abstract void ReleaseRemotely();
-        internal abstract void Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer);
-        internal abstract void Freeze(out IRpcEndpoint? boundEndpoint);
-        internal abstract void Unfreeze();
-
+        internal abstract Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer);
         internal abstract void AddRef();
-        internal abstract void Release(
-            [System.Runtime.CompilerServices.CallerMemberName] string methodName = "", 
-            [System.Runtime.CompilerServices.CallerFilePath] string filePath = "", 
-            [System.Runtime.CompilerServices.CallerLineNumber] int lineNumber = 0);
+        internal abstract void Release();
+        internal abstract Skeleton AsSkeleton();
 
 #if DebugFinalizers
-        public string CreatorMemberName { get; set; }
-        public string CreatorFilePath { get; set; }
-        public int CreatorLineNumber { get; set; }
+        internal Proxy? OwningProxy { get; set; }
+        internal ConsumedCapability? ResolvingCap { get; set; }
 #endif
     }
 }

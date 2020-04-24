@@ -9,9 +9,6 @@ namespace Capnp.Rpc.Interception
     /// </summary>
     public static class Interceptor
     {
-        static readonly ConditionalWeakTable<ConsumedCapability, CensorCapability> _interceptMap =
-            new ConditionalWeakTable<ConsumedCapability, CensorCapability>();
-
         /// <summary>
         /// Attach this policy to given capability.
         /// </summary>
@@ -45,16 +42,16 @@ namespace Capnp.Rpc.Interception
             switch (cap)
             {
                 case Proxy proxy:
-                    return (CapabilityReflection.CreateProxy<TCap>(Attach(policy, proxy.ConsumedCap!)) as TCap)!;
+                    return (CapabilityReflection.CreateProxy<TCap>(
+                        Attach(policy, proxy.ConsumedCap!)) as TCap)!;
 
                 case ConsumedCapability ccap:
                     return (new CensorCapability(ccap, policy) as TCap)!;
 
                 default:
-                    return (Attach(policy, 
-                        (CapabilityReflection.CreateProxy<TCap>(
-                            LocalCapability.Create(
-                                Skeleton.GetOrCreateSkeleton(cap, false))) as TCap)!));
+                    var temp = (CapabilityReflection.CreateProxy<TCap>(
+                                CapabilityReflection.CreateSkeletonInternal(cap).AsCapability())) as TCap;
+                    return Attach(policy, temp!)!;
             }
         }
 

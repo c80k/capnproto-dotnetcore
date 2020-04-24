@@ -21,7 +21,7 @@
 
 @0xd508eebdc2dc42b8;
 
-using Cxx = import "c++.capnp";
+using Cxx = import "/capnp/c++.capnp";
 
 # Use a namespace likely to cause trouble if the generated code doesn't use fully-qualified
 # names for stuff in the capnproto namespace.

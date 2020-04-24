@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Capnp.Util;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -48,36 +50,25 @@ namespace Capnp.Rpc
             /// <summary>
             /// Question object was disposed.
             /// </summary>
-            Disposed = 16,
-
-            /// <summary>
-            /// Question object was finalized by GC. 
-            /// This flag should only be observable when debugging the finalizer itself.
-            /// </summary>
-            Finalized = 32
+            CanceledByDispose = 16
         }
 
         readonly TaskCompletionSource<DeserializerState> _tcs = new TaskCompletionSource<DeserializerState>();
+        readonly StrictlyOrderedAwaitTask<DeserializerState> _whenReturned;
         readonly uint _questionId;
         ConsumedCapability? _target;
         SerializerState? _inParams;
-        int _inhibitFinishCounter;
+        int _inhibitFinishCounter, _refCounter;
 
-        internal PendingQuestion(IRpcEndpoint ep, uint id, ConsumedCapability? target, SerializerState? inParams)
+        internal PendingQuestion(IRpcEndpoint ep, uint id, ConsumedCapability target, SerializerState? inParams)
         {
             RpcEndpoint = ep ?? throw new ArgumentNullException(nameof(ep));
             _questionId = id;
             _target = target;
             _inParams = inParams;
-            StateFlags = inParams == null ? State.Sent : State.None;
+            _whenReturned = _tcs.Task.EnforceAwaitOrder();
 
-            if (inParams != null)
-            {
-                foreach (var cap in inParams.Caps!)
-                {
-                    cap?.AddRef();
-                }
-            }
+            StateFlags = inParams == null ? State.Sent : State.None;
 
             if (target != null)
             {
@@ -89,16 +80,20 @@ namespace Capnp.Rpc
         internal object ReentrancyBlocker { get; } = new object();
         internal uint QuestionId => _questionId;
         internal State StateFlags { get; private set; }
+        internal IReadOnlyList<CapDescriptor.WRITER>? CapTable { get; set; }
 
         /// <summary>
         /// Eventually returns the server answer
         /// </summary>
-        public Task<DeserializerState> WhenReturned => _tcs.Task;
+        public StrictlyOrderedAwaitTask<DeserializerState> WhenReturned => _whenReturned;
 
-        internal bool IsTailCall
+        /// <summary>
+        /// Whether this question represents a tail call
+        /// </summary>
+        public bool IsTailCall
         {
             get => StateFlags.HasFlag(State.TailCall);
-            set
+            internal set
             {
                 if (value)
                     StateFlags |= State.TailCall;
@@ -106,7 +101,6 @@ namespace Capnp.Rpc
                     StateFlags &= ~State.TailCall;
             }
         }
-        internal bool IsReturned => StateFlags.HasFlag(State.Returned);
 
         internal void DisallowFinish()
         {
@@ -119,7 +113,25 @@ namespace Capnp.Rpc
             AutoFinish();
         }
 
+        internal void AddRef()
+        {
+            lock (ReentrancyBlocker)
+            {
+                ++_refCounter;
+            }
+        }
+
+        internal void Release()
+        {
+            lock (ReentrancyBlocker)
+            {
+                --_refCounter;
+                AutoFinish();
+            }
+        }
+
         const string ReturnDespiteTailCallMessage = "Peer sent actual results despite the question was sent as tail call. This was not expected and is a protocol error.";
+        const string UnexpectedTailCallReturnMessage = "Peer sent the results of this questions somewhere else. This was not expected and is a protocol error.";
 
         internal void OnReturn(DeserializerState results)
         {
@@ -131,6 +143,7 @@ namespace Capnp.Rpc
             if (StateFlags.HasFlag(State.TailCall))
             {
                 _tcs.TrySetException(new RpcException(ReturnDespiteTailCallMessage));
+                throw new RpcProtocolErrorException(ReturnDespiteTailCallMessage);
             }
             else
             {
@@ -150,7 +163,8 @@ namespace Capnp.Rpc
 
             if (!StateFlags.HasFlag(State.TailCall))
             {
-                _tcs.TrySetException(new RpcException("Peer sent the results of this questions somewhere else. This was not expected and is a protocol error."));
+                _tcs.TrySetException(new RpcException(UnexpectedTailCallReturnMessage));
+                throw new RpcProtocolErrorException(UnexpectedTailCallReturnMessage);
             }
             else
             {
@@ -165,7 +179,7 @@ namespace Capnp.Rpc
                 SetReturned();
             }
 
-            _tcs.TrySetException(new RpcException(exception.Reason));
+            _tcs.TrySetException(new RpcException(exception.Reason ?? "unknown reason"));
         }
 
         internal void OnException(System.Exception exception)
@@ -193,11 +207,6 @@ namespace Capnp.Rpc
             RpcEndpoint.DeleteQuestion(this);
         }
 
-        internal void RequestFinish()
-        {
-            RpcEndpoint.Finish(_questionId);
-        }
-
         void AutoFinish()
         {
             if (StateFlags.HasFlag(State.FinishRequested))
@@ -205,12 +214,13 @@ namespace Capnp.Rpc
                 return;
             }
 
-            if ((_inhibitFinishCounter == 0 && StateFlags.HasFlag(State.Returned) && !StateFlags.HasFlag(State.TailCall)) 
-                || StateFlags.HasFlag(State.Disposed))
+            if ((!IsTailCall && _inhibitFinishCounter == 0 && StateFlags.HasFlag(State.Returned)) || 
+                ( IsTailCall && _refCounter == 0 && StateFlags.HasFlag(State.Returned)) ||
+                 StateFlags.HasFlag(State.CanceledByDispose))
             {
                 StateFlags |= State.FinishRequested;
 
-                RequestFinish();
+                RpcEndpoint.Finish(_questionId);
             }
         }
 
@@ -234,50 +244,27 @@ namespace Capnp.Rpc
         /// <param name="access">Access path</param>
         /// <returns>Low-level capability</returns>
         /// <exception cref="DeserializationException">The referenced member does not exist or does not resolve to a capability pointer.</exception>
-        public ConsumedCapability? Access(MemberAccessPath access)
-        {
-            lock (ReentrancyBlocker)
-            {
-                if ( StateFlags.HasFlag(State.Returned) && 
-                    !StateFlags.HasFlag(State.TailCall))
-                {
-                    try
-                    {
-                        return access.Eval(WhenReturned.Result);
-                    }
-                    catch (AggregateException exception)
-                    {
-                        throw exception.InnerException!;
-                    }
-                }
-                else
-                {
-                    return new RemoteAnswerCapability(this, access);
-                }
-            }
-        }
+        public ConsumedCapability Access(MemberAccessPath access) => new RemoteAnswerCapability(this, access);
 
-        static void ReleaseCaps(ConsumedCapability? target, SerializerState? inParams)
+        /// <summary>
+        /// Refer to a (possibly nested) member of this question's (possibly future) result and return
+        /// it as a capability.
+        /// </summary>
+        /// <param name="access">Access path</param>
+        /// <param name="task">promises the cap whose ownership is transferred to this object</param>
+        /// <returns>Low-level capability</returns>
+        /// <exception cref="DeserializationException">The referenced member does not exist or does not resolve to a capability pointer.</exception>
+        public ConsumedCapability Access(MemberAccessPath access, Task<IDisposable?> task)
         {
-            if (inParams != null)
-            {
-                foreach (var cap in inParams.Caps!)
-                {
-                    cap?.Release();
-                }
-            }
-
-            if (target != null)
-            {
-                target.Release();
-            }
+            var proxyTask = task.AsProxyTask();
+            return new RemoteAnswerCapability(this, access, proxyTask);
         }
 
         static void ReleaseOutCaps(DeserializerState outParams)
         {
             foreach (var cap in outParams.Caps!)
             {
-                cap?.Release();
+                cap.Release();
             }
         }
 
@@ -299,70 +286,24 @@ namespace Capnp.Rpc
             }
 
             var msg = (Message.WRITER)inParams!.MsgBuilder!.Root!;
-            Debug.Assert(msg.Call.Target.which != MessageTarget.WHICH.undefined);
+            Debug.Assert(msg.Call!.Target.which != MessageTarget.WHICH.undefined);
             var call = msg.Call;
             call.QuestionId = QuestionId;
-            call.SendResultsTo.which = IsTailCall ? 
-                Call.sendResultsTo.WHICH.Yourself : 
+            call.SendResultsTo.which = IsTailCall ?
+                Call.sendResultsTo.WHICH.Yourself :
                 Call.sendResultsTo.WHICH.Caller;
 
             try
             {
                 RpcEndpoint.SendQuestion(inParams, call.Params);
+                CapTable = call.Params.CapTable;
             }
             catch (System.Exception exception)
             {
                 OnException(exception);
             }
 
-            ReleaseCaps(target!, inParams);
-        }
-
-        #region IDisposable Support
-
-        void Dispose(bool disposing)
-        {
-            SerializerState? inParams;
-            ConsumedCapability? target;
-            bool justDisposed = false;
-
-            lock (ReentrancyBlocker)
-            {
-                inParams = _inParams;
-                _inParams = null;
-                target = _target;
-                _target = null;
-
-                if (disposing)
-                {
-                    if (!StateFlags.HasFlag(State.Disposed))
-                    {
-                        StateFlags |= State.Disposed;
-                        justDisposed = true;
-
-                        AutoFinish();
-                    }
-                }
-                else
-                {
-                    StateFlags |= State.Finalized;
-                }
-            }
-
-            ReleaseCaps(target, inParams);
-
-            if (justDisposed)
-            {
-                _tcs.TrySetCanceled();
-            }
-        }
-
-        /// <summary>
-        /// Finalizer
-        /// </summary>
-        ~PendingQuestion()
-        {
-            Dispose(false);
+            target?.Release();
         }
 
         /// <summary>
@@ -370,9 +311,23 @@ namespace Capnp.Rpc
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            bool justDisposed = false;
+
+            lock (ReentrancyBlocker)
+            {
+                if (!StateFlags.HasFlag(State.CanceledByDispose))
+                {
+                    StateFlags |= State.CanceledByDispose;
+                    justDisposed = true;
+
+                    AutoFinish();
+                }
+            }
+
+            if (justDisposed)
+            {
+                _tcs.TrySetCanceled();
+            }
         }
-        #endregion
     }
 }

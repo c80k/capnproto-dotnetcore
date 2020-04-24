@@ -11,6 +11,9 @@ namespace Capnp
         static class GenericCasts<T>
         {
             public static Func<ListDeserializer, T>? CastFunc;
+
+            public static Func<ListDeserializer, T> GetCastFunc() => CastFunc ??
+                throw new NotSupportedException("Requested cast is not supported");
         }
 
         static ListDeserializer()
@@ -26,7 +29,7 @@ namespace Capnp
             GenericCasts<IReadOnlyList<ulong>>.CastFunc = _ => _.CastULong();
             GenericCasts<IReadOnlyList<float>>.CastFunc = _ => _.CastFloat();
             GenericCasts<IReadOnlyList<double>>.CastFunc = _ => _.CastDouble();
-            GenericCasts<string>.CastFunc = _ => _.CastText();
+            GenericCasts<string>.CastFunc = _ => _.CastText()!; // it *may* return null, but how to express this syntactically correct?
         }
 
         /// <summary>
@@ -45,12 +48,7 @@ namespace Capnp
 
         T Cast<T>()
         {
-            var func = GenericCasts<T>.CastFunc;
-
-            if (func == null)
-                throw new NotSupportedException("Requested cast is not supported");
-
-            return func(this);
+            return GenericCasts<T>.GetCastFunc()(this);
         }
 
         /// <summary>
@@ -89,9 +87,9 @@ namespace Capnp
         /// <returns>Capability list representation</returns>
         /// <exception cref="NotSupportedException">If this kind of list cannot be represented as list of capabilities (because it is a list of non-pointers)</exception>
         /// <exception cref="Rpc.InvalidCapabilityInterfaceException">If <typeparamref name="T"/> does not qualify as capability interface.</exception>
-        public virtual IReadOnlyList<ListOfCapsDeserializer<T>> CastCapList<T>() where T: class
+        public virtual IReadOnlyList<T> CastCapList<T>() where T: class
         {
-            throw new NotSupportedException("This kind of list does not contain nested lists");
+            throw new NotSupportedException("This kind of list cannot be represented as list of capabilities");
         }
 
         object CastND(int n, Func<ListDeserializer, object> func)
@@ -158,6 +156,7 @@ namespace Capnp
         /// <exception cref="NotSupportedException">If this list cannot be represented in the desired manner.</exception>
         public IReadOnlyList<IReadOnlyList<T>> Cast2D<T>()
         {
+            GenericCasts<IReadOnlyList<T>>.GetCastFunc(); // Probe to avoid lazy NotSupportedException
             return CastList().LazyListSelect(ld => ld.Cast<IReadOnlyList<T>>());
         }
 
@@ -269,7 +268,7 @@ namespace Capnp
         /// </summary>
         /// <returns>The desired representation</returns>
         /// <exception cref="NotSupportedException">If this list cannot be represented in the desired manner.</exception>
-        public IReadOnlyList<string> CastText2() => CastList().LazyListSelect(ld => ld.CastText());
+        public IReadOnlyList<string?> CastText2() => CastList().LazyListSelect(ld => ld.CastText());
 
         /// <summary>
         /// Represents this list as Text. For representing it as List(Text), use <seealso cref="CastText2"/>.
@@ -285,7 +284,7 @@ namespace Capnp
         /// </remarks>
         /// <returns>The decoded text</returns>
         /// <exception cref="NotSupportedException">If this list cannot be represented in the desired manner.</exception>
-        public virtual string CastText()
+        public virtual string? CastText()
         {
             throw new NotSupportedException("This kind of list does not represent text");
         }

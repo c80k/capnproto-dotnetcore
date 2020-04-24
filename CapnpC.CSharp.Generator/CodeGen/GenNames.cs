@@ -1,4 +1,5 @@
 ﻿using CapnpC.CSharp.Generator.Model;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
@@ -46,7 +47,6 @@ namespace CapnpC.CSharp.Generator.CodeGen
         public Name ReaderContextField { get; }
         public Name ContextParameter { get; }
         public Name GroupReaderContextArg { get; }
-        public Name GroupWriterContextArg { get; }
         public Name UnionDiscriminatorEnum { get; }
         public Name UnionDiscriminatorProp { get; }
         public Name UnionDiscriminatorUndefined { get; }
@@ -60,19 +60,23 @@ namespace CapnpC.CSharp.Generator.CodeGen
         public Name ResultLocal { get; }
         public Name SerializeMethod { get; }
         public Name ApplyDefaultsMethod { get; }
-        public Name InstLocalName { get; }
         public string ParamsStructFormat { get; }
         public string ResultStructFormat { get; }
         public string PropertyNamedLikeTypeRenameFormat { get; }
         public string GenericTypeParameterFormat { get; }
         public string MemberAccessPathNameFormat { get; }
         public Name TaskParameter { get; }
-        public Name EagerMethod { get; }
         public Name TypeIdField { get; }
         public string PipeliningExtensionsClassFormat { get; }
         public string ProxyClassFormat { get; }
         public string SkeletonClassFormat { get; }
+        public Name AwaitProxy { get; }
         public bool NullableEnable { get; set; }
+        public bool EmitDomainClassesAndInterfaces { get; set; }
+        public SupportedAnnotations.TypeVisibility TypeVisibility { get; set; }
+        public string GeneratorToolName { get; }
+        public string GeneratorToolVersion { get; }
+
         public GenNames(GeneratorOptions options)
         {
             TopNamespace = new Name(options.TopNamespaceName).IdentifierName;
@@ -84,7 +88,6 @@ namespace CapnpC.CSharp.Generator.CodeGen
             ReaderContextField = new Name(options.ReaderContextFieldName);
             ContextParameter = new Name(options.ContextParameterName);
             GroupReaderContextArg = new Name(options.GroupReaderContextArgName);
-            GroupWriterContextArg = new Name(options.GroupWriterContextArgName);
             UnionDiscriminatorEnum = new Name(options.UnionDiscriminatorEnumName);
             UnionDiscriminatorProp = new Name(options.UnionDiscriminatorPropName);
             UnionDiscriminatorUndefined = new Name(options.UnionDiscriminatorUndefinedName);
@@ -98,18 +101,19 @@ namespace CapnpC.CSharp.Generator.CodeGen
             DeserializerLocal = new Name(options.DeserializerLocalName);
             SerializerLocal = new Name(options.SerializerLocalName);
             ResultLocal = new Name(options.ResultLocalName);
-            InstLocalName = new Name(options.InstLocalName);
             ParamsStructFormat = options.ParamsStructFormat;
             ResultStructFormat = options.ResultStructFormat;
             PropertyNamedLikeTypeRenameFormat = options.PropertyNamedLikeTypeRenameFormat;
             GenericTypeParameterFormat = options.GenericTypeParameterFormat;
             MemberAccessPathNameFormat = options.MemberAccessPathNameFormat;
             TaskParameter = new Name(options.TaskParameterName);
-            EagerMethod = new Name(options.EagerMethodName);
             TypeIdField = new Name(options.TypeIdFieldName);
             PipeliningExtensionsClassFormat = options.PipeliningExtensionsClassFormat;
             ProxyClassFormat = options.ProxyClassFormat;
             SkeletonClassFormat = options.SkeletonClassFormat;
+            AwaitProxy = new Name(options.AwaitProxyName);
+            GeneratorToolName = options.GeneratorToolName;
+            GeneratorToolVersion = options.GeneratorToolVersion;
         }
 
         public Name MakeTypeName(TypeDefinition def, NameUsage usage = NameUsage.Default)
@@ -387,6 +391,23 @@ namespace CapnpC.CSharp.Generator.CodeGen
             }
         }
 
+        public Nullability GetDefaultElementTypeNullability(Model.Type type)
+        {
+            switch (type.Tag)
+            {
+                case TypeTag.Data:
+                case TypeTag.Text:
+                case TypeTag.Interface:
+                case TypeTag.List:
+                case TypeTag.ListPointer:
+                case TypeTag.StructPointer:
+                    return Nullability.NullableRef;
+
+                default:
+                    return Nullability.NonNullable;
+            }
+        }
+
         public TypeSyntax MakeTypeSyntax(Model.Type type, TypeDefinition scope, TypeUsage usage, Nullability nullability)
         {
             switch (type.Tag)
@@ -483,11 +504,13 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
                         case TypeUsage.Reader:
                             return MaybeNullableRefType(GenericName(Identifier("IReadOnlyList"))
-                                .AddTypeArgumentListArguments(MakeTypeSyntax(type.ElementType, scope, TypeUsage.Reader, Nullability.NonNullable)), nullability);
+                                .AddTypeArgumentListArguments(MakeTypeSyntax(type.ElementType, scope, TypeUsage.Reader,
+                                    GetDefaultElementTypeNullability(type.ElementType))), nullability);
 
                         case TypeUsage.DomainClass:
                             return MaybeNullableRefType(GenericName(Identifier("IReadOnlyList"))
-                                .AddTypeArgumentListArguments(MakeTypeSyntax(type.ElementType, scope, TypeUsage.DomainClass, Nullability.NullableRef)), nullability);
+                                .AddTypeArgumentListArguments(MakeTypeSyntax(type.ElementType, scope, TypeUsage.DomainClass,
+                                    GetDefaultElementTypeNullability(type.ElementType))), nullability);
 
                         default:
                             throw new NotImplementedException();
@@ -565,7 +588,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
         }
 
         string GetCodeIdentifierUpperCamel(Field field) => field.CsName ?? SyntaxHelpers.MakeUpperCamel(field.Name);
-        string GetCodeIdentifierLowerCamel(Field field) => field.CsName ?? IdentifierRenamer.ToNonKeyword(SyntaxHelpers.MakeLowerCamel(field.Name));
+        public string GetCodeIdentifierLowerCamel(Field field) => field.CsName ?? IdentifierRenamer.ToNonKeyword(SyntaxHelpers.MakeLowerCamel(field.Name));
 
         public Name GetCodeIdentifier(Field field)
         {
@@ -575,13 +598,6 @@ namespace CapnpC.CSharp.Generator.CodeGen
             }
 
             var def = field.DeclaringType;
-
-            if (def == null)
-            {
-                // Method parameters are internally represented with the same class "Field".
-                // They do not have a declaring type. Anyway, they don't suffer from the field-name-equals-nested-type-name problem.
-                return new Name(GetCodeIdentifierLowerCamel(field));
-            }
 
             var typeNames = new HashSet<Name>(def.NestedTypes.Select(t => MakeTypeName(t)));
             typeNames.Add(MakeTypeName(def));
@@ -618,10 +634,7 @@ namespace CapnpC.CSharp.Generator.CodeGen
 
         public Name MakePipeliningSupportExtensionMethodName(IReadOnlyList<Field> path)
         {
-            if (path.Count == 1 && path[0].Offset == 0)
-                return EagerMethod;
-            else
-                return new Name(string.Join("_", path.Select(f => GetCodeIdentifier(f).ToString())));
+            return new Name(string.Join("_", path.Select(f => GetCodeIdentifier(f).ToString())));
         }
 
         public Name MakePipeliningSupportExtensionClassName(GenFile file)
@@ -687,5 +700,66 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 PostfixUnaryExpression(SyntaxKind.SuppressNullableWarningExpression, expression) :
                 expression;
         }
+
+        public SyntaxToken TypeVisibilityModifier
+        {
+            get
+            {
+                switch (TypeVisibility)
+                {
+                    case SupportedAnnotations.TypeVisibility.Public:
+                        return Token(SyntaxKind.PublicKeyword);
+
+                    case SupportedAnnotations.TypeVisibility.Internal:
+                        return Token(SyntaxKind.InternalKeyword);
+
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+        }
+
+        static LiteralExpressionSyntax HexLiteral(ulong id) =>
+            LiteralExpression(
+                SyntaxKind.NumericLiteralExpression,
+                Literal($"0x{id:x}UL", id));
+
+        static LiteralExpressionSyntax StringLiteral(string text) =>
+            LiteralExpression(
+                SyntaxKind.StringLiteralExpression,
+                Literal(text));
+
+        public FieldDeclarationSyntax MakeTypeIdConst(ulong id) =>
+            FieldDeclaration(
+                VariableDeclaration(
+                    IdentifierName("UInt64"))
+                .WithVariables(
+                    SingletonSeparatedList<VariableDeclaratorSyntax>(
+                        VariableDeclarator(TypeIdField.Identifier)
+                        .WithInitializer(
+                            EqualsValueClause(HexLiteral(id))))))
+                .WithModifiers(
+                    TokenList(
+                        new[]{
+                            Token(SyntaxKind.PublicKeyword),
+                            Token(SyntaxKind.ConstKeyword)}));
+
+        static AttributeSyntax MakeTypeIdAttribute(ulong id) =>
+            Attribute(
+                IdentifierName("TypeId"))
+            .WithArgumentList(
+                AttributeArgumentList(
+                    SingletonSeparatedList<AttributeArgumentSyntax>(
+                        AttributeArgument(HexLiteral(id)))));
+
+        public AttributeSyntax MakeGeneratedCodeAttribute() =>
+            Attribute(
+                IdentifierName("System.CodeDom.Compiler.GeneratedCode"))
+            .AddArgumentListArguments(
+                AttributeArgument(StringLiteral(GeneratorToolName)),
+                AttributeArgument(StringLiteral(GeneratorToolVersion)));
+
+        public AttributeListSyntax MakeTypeDecorationAttributes(ulong typeId) =>
+            AttributeList().AddAttributes(MakeGeneratedCodeAttribute(), MakeTypeIdAttribute(typeId));
     }
 }

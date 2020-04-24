@@ -1,4 +1,5 @@
 ﻿using Capnp.FrameTracing;
+using Capnp.Util;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
@@ -19,12 +20,10 @@ namespace Capnp.Rpc
 
         class OutboundTcpEndpoint : IEndpoint
         {
-            readonly TcpRpcClient _client;
             readonly FramePump _pump;
 
-            public OutboundTcpEndpoint(TcpRpcClient client, FramePump pump)
+            public OutboundTcpEndpoint(FramePump pump)
             {
-                _client = client;
                 _pump = pump;
             }
 
@@ -36,6 +35,11 @@ namespace Capnp.Rpc
             public void Forward(WireFrame frame)
             {
                 _pump.Send(frame);
+            }
+
+            public void Flush()
+            {
+                _pump.Flush();
             }
         }
 
@@ -84,7 +88,7 @@ namespace Capnp.Rpc
             var stream = _createLayers(_client.GetStream());
             _pump = new FramePump(stream);
             _attachTracerAction?.Invoke();
-            _outboundEndpoint = new OutboundTcpEndpoint(this, _pump);
+            _outboundEndpoint = new OutboundTcpEndpoint(_pump);
             _inboundEndpoint = _rpcEngine.AddEndpoint(_outboundEndpoint);
             _pumpThread = new Thread(() =>
             {
@@ -93,6 +97,10 @@ namespace Capnp.Rpc
                     Thread.CurrentThread.Name = $"TCP RPC Client Thread {Thread.CurrentThread.ManagedThreadId}";
 
                     _pump.Run();
+                }
+                catch (ThreadInterruptedException)
+                {
+                    Logger.LogError($"{Thread.CurrentThread.Name} interrupted at {Environment.StackTrace}");
                 }
                 finally
                 {
@@ -153,24 +161,20 @@ namespace Capnp.Rpc
         /// <typeparam name="TProxy">Bootstrap capability interface</typeparam>
         /// <returns>A proxy for the bootstrap capability</returns>
         /// <exception cref="InvalidOperationException">Not connected</exception>
-        public TProxy GetMain<TProxy>() where TProxy: class
+        public TProxy GetMain<TProxy>() where TProxy: class, IDisposable
         {
             if (WhenConnected == null)
             {
                 throw new InvalidOperationException("Not connecting");
             }
 
-            if (!WhenConnected.IsCompleted)
+            async Task<TProxy> GetMainAsync()
             {
-                throw new InvalidOperationException("Connection not yet established");
+                await WhenConnected!;
+                return (CapabilityReflection.CreateProxy<TProxy>(_inboundEndpoint!.QueryMain()) as TProxy)!;
             }
 
-            if (!WhenConnected.ReplacementTaskIsCompletedSuccessfully())
-            {
-                throw new InvalidOperationException("Connection not successfully established");
-            }
-
-            return (CapabilityReflection.CreateProxy<TProxy>(_inboundEndpoint!.QueryMain()) as TProxy)!;
+            return GetMainAsync().Eager(true);
         }
 
         /// <summary>
@@ -192,10 +196,7 @@ namespace Capnp.Rpc
                 Logger.LogError(e, "Failure disposing client");
             }
 
-            if (_pumpThread != null && !_pumpThread.Join(500))
-            {
-                Logger.LogError("Unable to join pump thread within timeout");
-            }
+            _pumpThread?.SafeJoin(Logger);
 
             GC.SuppressFinalize(this);
         }

@@ -1,78 +1,77 @@
-﻿using System;
+﻿using Capnp.Util;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Capnp.Rpc
 {
+
     class LocalAnswerCapability : RefCountingCapability, IResolvingCapability
     {
-        readonly Task<DeserializerState> _answer;
-        readonly MemberAccessPath _access;
-
-        public LocalAnswerCapability(Task<DeserializerState> answer, MemberAccessPath access)
+        static async Task<Proxy> TransferOwnershipToDummyProxy(StrictlyOrderedAwaitTask<DeserializerState> answer, MemberAccessPath access)
         {
-            _answer = answer;
-            _access = access;
+            var result = await answer;
+            var cap = access.Eval(result);
+            var proxy = new Proxy(cap);
+            cap?.Release();
+            return proxy;
         }
 
-        internal override void Freeze(out IRpcEndpoint? boundEndpoint)
+        readonly StrictlyOrderedAwaitTask<Proxy> _whenResolvedProxy;
+
+        public LocalAnswerCapability(Task<Proxy> proxyTask)
         {
-            boundEndpoint = null;
+            _whenResolvedProxy = proxyTask.EnforceAwaitOrder();
         }
 
-        internal override void Unfreeze()
+        public LocalAnswerCapability(StrictlyOrderedAwaitTask<DeserializerState> answer, MemberAccessPath access):
+            this(TransferOwnershipToDummyProxy(answer, access))
         {
+
         }
 
-        async Task<Proxy> AwaitResolved()
-        {
-            var state = await _answer;
-            return new Proxy(_access.Eval(state));
-        }
+        public StrictlyOrderedAwaitTask WhenResolved => _whenResolvedProxy;
 
-        public Task<Proxy> WhenResolved => AwaitResolved();
+        public T? GetResolvedCapability<T>() where T : class => _whenResolvedProxy.WrappedTask.GetResolvedCapability<T>();
 
-        internal override void Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
+        internal override Action? Export(IRpcEndpoint endpoint, CapDescriptor.WRITER writer)
         {
-            if (_answer.IsCompleted)
+            if (_whenResolvedProxy.IsCompleted)
             {
-                DeserializerState result;
                 try
                 {
-                    result = _answer.Result;
+                    _whenResolvedProxy.Result.Export(endpoint, writer);
                 }
                 catch (AggregateException exception)
                 {
                     throw exception.InnerException!;
                 }
 
-                using (var proxy = new Proxy(_access.Eval(result)))
-                {
-                    proxy.Export(endpoint, writer);
-                }
+                return null;
             }
             else
             {
-                this.ExportAsSenderPromise(endpoint, writer);
+                return this.ExportAsSenderPromise(endpoint, writer);
             }
         }
 
         async Task<DeserializerState> CallImpl(ulong interfaceId, ushort methodId, DynamicSerializerState args, CancellationToken cancellationToken)
         {
-            var cap = await AwaitResolved();
+            var proxy = await _whenResolvedProxy;
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (cap == null)
+            if (proxy.IsNull)
+            {
+                args.Dispose();
                 throw new RpcException("Broken capability");
+            }
 
-            var call = cap.Call(interfaceId, methodId, args, default);
+            var call = proxy.Call(interfaceId, methodId, args, default);
             var whenReturned = call.WhenReturned;
 
-            using (var registration = cancellationToken.Register(() => call.Dispose()))
-            {
-                return await whenReturned;
-            }
+            using var registration = cancellationToken.Register(() => call.Dispose());
+            return await whenReturned;
         }
 
         internal override IPromisedAnswer DoCall(ulong interfaceId, ushort methodId, DynamicSerializerState args)
@@ -81,9 +80,10 @@ namespace Capnp.Rpc
             return new LocalAnswer(cts, CallImpl(interfaceId, methodId, args, cts.Token));
         }
 
-        protected override void ReleaseRemotely()
+        protected async override void ReleaseRemotely()
         {
-            this.DisposeWhenResolved();
+            try { using var _ = await _whenResolvedProxy; }
+            catch { }
         }
     }
 }

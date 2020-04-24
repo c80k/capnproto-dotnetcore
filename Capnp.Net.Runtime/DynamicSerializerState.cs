@@ -42,7 +42,9 @@ namespace Capnp
         {
             var mb = MessageBuilder.Create();
             if (state.Caps != null)
+            {
                 mb.InitCapTable();
+            }
             var sstate = mb.CreateObject<DynamicSerializerState>();
             Reserializing.DeepCopy(state, sstate);
 
@@ -77,7 +79,7 @@ namespace Capnp
         /// <item><description>This state does neither describe a struct, nor a list of pointers</description></item>
         /// <item><description>Another state is already linked to the specified position (sorry, no overwrite allowed)</description></item></list>
         /// </exception>
-        public new void LinkToCapability(int slot, uint capabilityIndex) => base.LinkToCapability(slot, capabilityIndex);
+        public new void LinkToCapability(int slot, uint? capabilityIndex) => base.LinkToCapability(slot, capabilityIndex);
 
         /// <summary>
         /// Determines the underlying object to be a struct.
@@ -86,6 +88,13 @@ namespace Capnp
         /// <param name="ptrCount">Desired size of the struct's pointer section, in words</param>
         /// <exception cref="InvalidOperationException">The object type was already set to something different</exception>
         public new void SetStruct(ushort dataCount, ushort ptrCount) => base.SetStruct(dataCount, ptrCount);
+
+        /// <summary>
+        /// Determines the underyling object to be a capability.
+        /// </summary>
+        /// <param name="capabilityIndex">Capability table index, or null to encode a null pointer</param>
+        /// <exception cref="InvalidOperationException">The object type was already set to something different</exception>
+        public new void SetCapability(uint? capabilityIndex) => base.SetCapability(capabilityIndex);
 
         /// <summary>
         /// Determines the underlying object to be a list of (primitive) values.
@@ -121,31 +130,27 @@ namespace Capnp
         /// <param name="obj">Object representation. Must be one of the following:
         /// <list type="bullet">
         /// <item><description>An instance implementing <see cref="ICapnpSerializable"/></description></item>
-        /// <item><description>null</description></item>
-        /// <item><description>A <see cref="String"/></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<byte>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<sbyte>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<ushort>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<short>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<int>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<uint>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<long>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<ulong>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<float>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<double>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<bool>]]></code></description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<string>]]></code></description></item>
-        /// <item><description>Another <see cref="DeserializerState"/></description></item>
-        /// <item><description>Another <see cref="SerializerState"/></description></item>
+        /// <item><description>null</description>, <see cref="String"/></item>
+        /// <item><description><c>IReadOnlyList&lt;byte&gt;</c>, <c>IReadOnlyList&lt;sbyte&gt;</c>, <c>IReadOnlyList&lt;ushort&gt;</c>, <c>IReadOnlyList&lt;short&gt;</c></description></item>
+        /// <item><description><c>IReadOnlyList&lt;int&gt;</c>, <c>IReadOnlyList&lt;uint&gt;</c>, <c>IReadOnlyList&lt;long&gt;</c>, <c>IReadOnlyList&lt;ulong&gt;</c></description></item>
+        /// <item><description><c>IReadOnlyList&lt;float&gt;</c>, <c>IReadOnlyList&lt;double&gt;</c>, <c>IReadOnlyList&lt;bool&gt;</c>, <c>IReadOnlyList&lt;string&gt;</c></description></item>
+        /// <item><description>Another <see cref="DeserializerState"/> or <see cref="SerializerState"/></description></item>
         /// <item><description>Low-level capability object (<see cref="Rpc.ConsumedCapability"/>)</description></item>
         /// <item><description>Proxy object (<see cref="Rpc.Proxy"/>)</description></item>
         /// <item><description>Skeleton object (<see cref="Rpc.Skeleton"/>)</description></item>
         /// <item><description>Capability interface implementation</description></item>
-        /// <item><description>A <code><![CDATA[IReadOnlyList<object>]]></code> whereby each list item is one of the things listed here.</description></item>
+        /// <item><description><c>IReadOnlyList&lt;object&gt;</c>, whereby each list item is one of the things listed here.</description></item>
         /// </list>
         /// </param>
         public void SetObject(object? obj)
         {
+            void RewrapAndInheritBack<T>(Action<T> init) where T : SerializerState, new()
+            {
+                var r = Rewrap<T>();
+                init(r);
+                InheritFrom(r);
+            }
+
             switch (obj)
             {
                 case ICapnpSerializable serializable:
@@ -157,55 +162,55 @@ namespace Capnp
                     break;
 
                 case IReadOnlyList<byte> bytes:
-                    Rewrap<ListOfPrimitivesSerializer<byte>>().Init(bytes);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<byte>>(_ => _.Init(bytes));
                     break;
 
                 case IReadOnlyList<sbyte> sbytes:
-                    Rewrap<ListOfPrimitivesSerializer<sbyte>>().Init(sbytes);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<sbyte>>(_ => _.Init(sbytes));
                     break;
 
                 case IReadOnlyList<ushort> ushorts:
-                    Rewrap<ListOfPrimitivesSerializer<ushort>>().Init(ushorts);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<ushort>>(_ => _.Init(ushorts));
                     break;
 
                 case IReadOnlyList<short> shorts:
-                    Rewrap<ListOfPrimitivesSerializer<short>>().Init(shorts);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<short>>(_ => _.Init(shorts));
                     break;
 
                 case IReadOnlyList<uint> uints:
-                    Rewrap<ListOfPrimitivesSerializer<uint>>().Init(uints);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<uint>>(_ => _.Init(uints));
                     break;
 
                 case IReadOnlyList<int> ints:
-                    Rewrap<ListOfPrimitivesSerializer<int>>().Init(ints);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<int>>(_ => _.Init(ints));
                     break;
 
                 case IReadOnlyList<ulong> ulongs:
-                    Rewrap<ListOfPrimitivesSerializer<ulong>>().Init(ulongs);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<ulong>>(_ => _.Init(ulongs));
                     break;
 
                 case IReadOnlyList<long> longs:
-                    Rewrap<ListOfPrimitivesSerializer<long>>().Init(longs);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<long>>(_ => _.Init(longs));
                     break;
 
                 case IReadOnlyList<float> floats:
-                    Rewrap<ListOfPrimitivesSerializer<float>>().Init(floats);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<float>>(_ => _.Init(floats));
                     break;
 
                 case IReadOnlyList<double> doubles:
-                    Rewrap<ListOfPrimitivesSerializer<double>>().Init(doubles);
+                    RewrapAndInheritBack<ListOfPrimitivesSerializer<double>>(_ => _.Init(doubles));
                     break;
 
                 case IReadOnlyList<bool> bools:
-                    Rewrap<ListOfBitsSerializer>().Init(bools);
+                    RewrapAndInheritBack<ListOfBitsSerializer>(_ => _.Init(bools));
                     break;
 
                 case IReadOnlyList<string> strings:
-                    Rewrap<ListOfTextSerializer>().Init(strings);
+                    RewrapAndInheritBack<ListOfTextSerializer>(_ => _.Init(strings));
                     break;
 
                 case IReadOnlyList<object> objects:
-                    Rewrap<ListOfPointersSerializer<DynamicSerializerState>>().Init(objects, (s, o) => s.SetObject(o));
+                    RewrapAndInheritBack<ListOfPointersSerializer<DynamicSerializerState>>(_ => _.Init(objects, (s, o) => s.SetObject(o)));
                     break;
 
                 case DeserializerState ds:

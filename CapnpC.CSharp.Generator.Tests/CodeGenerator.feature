@@ -71,3 +71,5 @@ Examples:
     | NullableDisable2.capnp.bin  | false       | true         | success  |
     | NullableEnable2.capnp.bin   | false       | false        | errors   |
 	| NullableEnable2.capnp.bin   | false       | true         | success  |
+	| rpc-csharp.capnp.bin        | true        | true         | warnings |
+	| schema-csharp.capnp.bin     | false       | false        | success  |
