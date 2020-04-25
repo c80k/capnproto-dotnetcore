@@ -7,7 +7,6 @@
     <NoPackageAnalysis>true</NoPackageAnalysis>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
 
     <NuspecFile>$(MSBuildThisFileDirectory)CapnpC.CSharp.MsBuild.Generation.nuspec</NuspecFile>
@@ -42,6 +41,7 @@
     <PackageReference Update="Microsoft.VisualStudio.Threading" Version="16.3.52" />
     <PackageReference Update="Microsoft.Xaml" Version="4.0.0.1" />
     <PackageReference Update="System.Collections.Immutable" Version="1.5.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>

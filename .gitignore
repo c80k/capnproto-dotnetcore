@@ -339,3 +339,4 @@ ASALocalRun/
 
 # Coverage results folder
 coverage/
+*.snupkg

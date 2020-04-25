@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CapnpC.CSharp.Generator.Model
 {
-    public class IdentifierRenamer
+    class IdentifierRenamer
     {
         public static bool IsAnyKeyword(string str)
         {

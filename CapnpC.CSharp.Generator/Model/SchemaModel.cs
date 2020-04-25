@@ -741,7 +741,7 @@ namespace CapnpC.CSharp.Generator.Model
         }
     }
 
-    public enum NodeKind
+    enum NodeKind
     {
         Unknown,
         Annotation,
@@ -753,7 +753,7 @@ namespace CapnpC.CSharp.Generator.Model
         Group
     }
 
-    public static class SchemaExtensions
+    static class SchemaExtensions
     {
         public static string StrId(this Schema.Node.READER node)
             => $"0x{node.Id:X}";
