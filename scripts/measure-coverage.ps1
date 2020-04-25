@@ -7,7 +7,7 @@ $vsTestConsole = where.exe vstest.console
 $coverageOutput = "$coverageDir\coverage.xml"
 
 $runtimeTests = "$rootDir\Capnp.Net.Runtime.Tests\bin\Release\netcoreapp2.1\Capnp.Net.Runtime.Tests.dll"
-$generatorTests = "$rootDir\CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp3.0\CapnpC.CSharp.Generator.Tests.dll"
+$generatorTests = "$rootDir\CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp3.1\CapnpC.CSharp.Generator.Tests.dll"
 
 If(!(test-path $coverageDir))
 {

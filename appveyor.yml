@@ -62,14 +62,14 @@ test_script:
   - cmd: |
       nbgv get-version -v NuGetPackageVersion >> version.txt
       set /P VERSION=< version.txt
-      vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp3.0\CapnpC.CSharp.Generator.Tests.dll
+      vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp3.1\CapnpC.CSharp.Generator.Tests.dll
       choco install capnproto --source="https://chocolatey.org/api/v2" --force -y
       cd %APPVEYOR_BUILD_FOLDER%\capnpc-csharp
       dotnet tool install --global --add-source ./nupkg capnpc-csharp --version %VERSION%
       cd %APPVEYOR_BUILD_FOLDER%\install-test
       compile-test
       cd %APPVEYOR_BUILD_FOLDER%
-      vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp3.0\CapnpC.CSharp.Generator.Tests.dll
+      vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp3.1\CapnpC.CSharp.Generator.Tests.dll
       dotnet tool uninstall --global capnpc-csharp
       cd %APPVEYOR_BUILD_FOLDER%\install-test
       notinstalled-test
@@ -80,7 +80,7 @@ test_script:
       choco uninstall capnpc-csharp-win-x86 -y
       notinstalled-test
       cd %APPVEYOR_BUILD_FOLDER%
-      vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.MsBuild.Generation.Tests\bin\Release\netcoreapp3.0\CapnpC.CSharp.MsBuild.Generation.Tests.dll
+      vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.MsBuild.Generation.Tests\bin\Release\netcoreapp3.1\CapnpC.CSharp.MsBuild.Generation.Tests.dll
       msbuild -t:restore ./MsBuildGenerationTest/MsBuildGenerationTest.csproj /p:Configuration="Debug" /p:PackageReferenceVersion="%VERSION%"
       msbuild ./MsBuildGenerationTest/MsBuildGenerationTest.sln /p:Configuration="Debug" /p:PackageReferenceVersion="%VERSION%"
       vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Debug\net471\Capnp.Net.Runtime.Tests.dll
