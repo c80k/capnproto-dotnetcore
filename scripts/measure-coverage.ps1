@@ -19,6 +19,8 @@ If(!(test-path $coverageReportDir))
       New-Item -ItemType Directory -Force -Path $coverageReportDir
 }
 
+& $openCover -version
+
 & $openCover -target:"$vsTestConsole" `
   -targetArgs:"/inIsolation $runtimeTests /TestCaseFilter:`"TestCategory=Coverage`" /Framework:.NETCoreApp,Version=v2.1 /logger:trx;LogFileName=runtime.trx" `
   -filter:"+[Capnp.Net.Runtime]Capnp.*" `
