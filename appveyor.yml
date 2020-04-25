@@ -55,7 +55,7 @@ artifacts:
  - path: capnpc-csharp\nupkg\*.nupkg
    name: capnpc-csharp
    type: NuGetPackage
- - path: coverage\report
+ - path: coverage
    name: Coverage report
    type: zip
 test_script:
