@@ -1,4 +1,4 @@
-# capnproto-dotnetcore [![Build status](https://ci.appveyor.com/api/projects/status/tx4jjl2etiqve2xg/branch/master?svg=true)](https://ci.appveyor.com/project/c80k/capnproto-dotnetcore/branch/master)
+# capnproto-dotnetcore [![Build status](https://ci.appveyor.com/api/projects/status/tx4jjl2etiqve2xg/branch/master?svg=true)](https://ci.appveyor.com/project/c80k/capnproto-dotnetcore/branch/master) [![Coverage Status](https://coveralls.io/repos/github/c80k/capnproto-dotnetcore/badge.svg)](https://coveralls.io/github/c80k/capnproto-dotnetcore)
 
 A Cap'n Proto implementation for .NET Standard 2.0 (credits to [lostinplace](https://github.com/lostinplace)) and .NET Core 2.1.
 
