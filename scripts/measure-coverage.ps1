@@ -29,7 +29,7 @@ If(!(test-path $coverageReportDir))
   -mergebyhash -register:user -oldStyle
 
 & $openCover -target:"$vsTestConsole" `
-  -targetArgs:"$generatorTests /logger:trx;LogFileName=generator.trx" `
+  -targetArgs:"/noisolation $generatorTests /logger:trx;LogFileName=generator.trx" `
   -filter:"+[CapnpC.CSharp.Generator]CapnpC.CSharp.Generator.* -[CapnpC.CSharp.Generator]CapnpC.CSharp.Generator.Schema.*" `
   -excludebyattribute:"System.CodeDom.Compiler.GeneratedCodeAttribute" `
   -output:"$coverageOutput" `
