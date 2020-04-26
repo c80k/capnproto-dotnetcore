@@ -27,7 +27,8 @@ namespace CapnpC.CSharp.Generator.Tests
         
         private Microsoft.VisualStudio.TestTools.UnitTesting.TestContext _testContext;
         
-        private string[] _featureTags = ((string[])(null));
+        private string[] _featureTags = new string[] {
+                "Coverage"};
         
 #line 1 "CodeGenerator.feature"
 #line hidden
@@ -50,7 +51,8 @@ namespace CapnpC.CSharp.Generator.Tests
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "CodeGenerator", "\tIn order to ensure that the generator backend produces valid output\r\n\tAs a contr" +
                     "ibutor\r\n\tI want to get notified when there is any deviation from reference outpu" +
-                    "t", ProgrammingLanguage.CSharp, ((string[])(null)));
+                    "t", ProgrammingLanguage.CSharp, new string[] {
+                        "Coverage"});
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -96,11 +98,15 @@ namespace CapnpC.CSharp.Generator.Tests
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Comparing backend output with reference")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         public virtual void ComparingBackendOutputWithReference()
         {
-            string[] tagsOfScenario = ((string[])(null));
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Comparing backend output with reference", null, ((string[])(null)));
-#line 6
+            string[] tagsOfScenario = new string[] {
+                    "Coverage"};
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Comparing backend output with reference", null, new string[] {
+                        "Coverage"});
+#line 8
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -120,16 +126,16 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 7
+#line 9
  testRunner.Given("I have a binary code generator request \"test.capnp.bin\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 8
+#line 10
  testRunner.And("my reference output is \"test.cs\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 9
+#line 11
  testRunner.When("I invoke capnpc-csharp", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 10
+#line 12
  testRunner.Then("the generated output must match the reference", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -138,9 +144,15 @@ this.ScenarioInitialize(scenarioInfo);
         
         public virtual void InvalidBinaryCodeGeneratorRequests(string bin, string[] exampleTags)
         {
-            string[] tagsOfScenario = exampleTags;
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Invalid binary code generator requests", null, exampleTags);
-#line 12
+            string[] @__tags = new string[] {
+                    "Coverage"};
+            if ((exampleTags != null))
+            {
+                @__tags = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Concat(@__tags, exampleTags));
+            }
+            string[] tagsOfScenario = @__tags;
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Invalid binary code generator requests", null, @__tags);
+#line 15
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -160,13 +172,13 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 13
+#line 16
  testRunner.Given(string.Format("I have a binary code generator request {0}", bin), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 14
+#line 17
  testRunner.When("I invoke capnpc-csharp", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 15
+#line 18
  testRunner.Then("the invocation must fail", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -176,11 +188,13 @@ this.ScenarioInitialize(scenarioInfo);
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Invalid binary code generator requests: null.bin")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "null.bin")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "null.bin")]
         public virtual void InvalidBinaryCodeGeneratorRequests_Null_Bin()
         {
-#line 12
+#line 15
 this.InvalidBinaryCodeGeneratorRequests("null.bin", ((string[])(null)));
 #line hidden
         }
@@ -188,11 +202,13 @@ this.InvalidBinaryCodeGeneratorRequests("null.bin", ((string[])(null)));
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Invalid binary code generator requests: test.cs")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "test.cs")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "test.cs")]
         public virtual void InvalidBinaryCodeGeneratorRequests_Test_Cs()
         {
-#line 12
+#line 15
 this.InvalidBinaryCodeGeneratorRequests("test.cs", ((string[])(null)));
 #line hidden
         }
@@ -200,11 +216,15 @@ this.InvalidBinaryCodeGeneratorRequests("test.cs", ((string[])(null)));
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Combining frontend and backend")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         public virtual void CombiningFrontendAndBackend()
         {
-            string[] tagsOfScenario = ((string[])(null));
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Combining frontend and backend", null, ((string[])(null)));
-#line 22
+            string[] tagsOfScenario = new string[] {
+                    "Coverage"};
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Combining frontend and backend", null, new string[] {
+                        "Coverage"});
+#line 26
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -224,16 +244,16 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 23
+#line 27
  testRunner.Given("capnp.exe is installed on my system", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 24
+#line 28
  testRunner.And("I have a schema \"UnitTest1.capnp\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 25
+#line 29
  testRunner.When("I try to generate code from that schema", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 26
+#line 30
  testRunner.Then("code generation must succeed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -243,11 +263,15 @@ this.ScenarioInitialize(scenarioInfo);
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Missing frontend")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         public virtual void MissingFrontend()
         {
-            string[] tagsOfScenario = ((string[])(null));
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Missing frontend", null, ((string[])(null)));
-#line 28
+            string[] tagsOfScenario = new string[] {
+                    "Coverage"};
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Missing frontend", null, new string[] {
+                        "Coverage"});
+#line 33
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -267,16 +291,16 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 29
+#line 34
  testRunner.Given("capnp.exe is not installed on my system", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 30
+#line 35
  testRunner.And("I have a schema \"UnitTest1.capnp\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 31
+#line 36
  testRunner.When("I try to generate code from that schema", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 32
+#line 37
  testRunner.Then("the invocation must fail", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -286,11 +310,15 @@ this.ScenarioInitialize(scenarioInfo);
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Schema without ID")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         public virtual void SchemaWithoutID()
         {
-            string[] tagsOfScenario = ((string[])(null));
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Schema without ID", null, ((string[])(null)));
-#line 34
+            string[] tagsOfScenario = new string[] {
+                    "Coverage"};
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Schema without ID", null, new string[] {
+                        "Coverage"});
+#line 40
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -310,22 +338,22 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 35
+#line 41
  testRunner.Given("capnp.exe is installed on my system", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 36
+#line 42
  testRunner.And("I have a schema \"Empty1.capnp\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 37
+#line 43
  testRunner.When("I try to generate code from that schema", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 38
+#line 44
  testRunner.Then("the invocation must fail", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 39
+#line 45
  testRunner.And("the reason must be bad input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 40
+#line 46
  testRunner.And("the error output must contain \"File does not declare an ID\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -335,11 +363,15 @@ this.ScenarioInitialize(scenarioInfo);
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Multiple errors")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         public virtual void MultipleErrors()
         {
-            string[] tagsOfScenario = ((string[])(null));
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Multiple errors", null, ((string[])(null)));
-#line 42
+            string[] tagsOfScenario = new string[] {
+                    "Coverage"};
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Multiple errors", null, new string[] {
+                        "Coverage"});
+#line 49
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -359,22 +391,22 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 43
+#line 50
  testRunner.Given("capnp.exe is installed on my system", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 44
+#line 51
  testRunner.And("I have a schema \"invalid.capnp\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 45
+#line 52
  testRunner.When("I try to generate code from that schema", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 46
+#line 53
  testRunner.Then("the invocation must fail", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 47
+#line 54
  testRunner.And("the reason must be bad input", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 48
+#line 55
  testRunner.And("the error output must contain multiple messages", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -383,9 +415,15 @@ this.ScenarioInitialize(scenarioInfo);
         
         public virtual void ValidGeneratorOutput(string bin, string nullablegen, string nullablesupp, string outcome, string[] exampleTags)
         {
-            string[] tagsOfScenario = exampleTags;
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Valid generator output", null, exampleTags);
-#line 50
+            string[] @__tags = new string[] {
+                    "Coverage"};
+            if ((exampleTags != null))
+            {
+                @__tags = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Concat(@__tags, exampleTags));
+            }
+            string[] tagsOfScenario = @__tags;
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Valid generator output", null, @__tags);
+#line 58
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -405,19 +443,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 51
+#line 59
  testRunner.Given(string.Format("I have a binary code generator request {0}", bin), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 52
+#line 60
  testRunner.And(string.Format("I enable generation of nullable reference types according to {0}", nullablegen), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 53
+#line 61
  testRunner.And(string.Format("I enable the compiler support of nullable reference types according to {0}", nullablesupp), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 54
+#line 62
  testRunner.When("I invoke capnpc-csharp", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 55
+#line 63
  testRunner.Then(string.Format("the invocation must succeed and attempting to compile the generated code gives {0" +
                             "}", outcome), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -428,6 +466,8 @@ this.ScenarioInitialize(scenarioInfo);
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Valid generator output: Variant 0")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 0")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "test.capnp.bin")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:nullablegen", "false")]
@@ -435,7 +475,7 @@ this.ScenarioInitialize(scenarioInfo);
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:outcome", "success")]
         public virtual void ValidGeneratorOutput_Variant0()
         {
-#line 50
+#line 58
 this.ValidGeneratorOutput("test.capnp.bin", "false", "false", "success", ((string[])(null)));
 #line hidden
         }
@@ -443,6 +483,8 @@ this.ValidGeneratorOutput("test.capnp.bin", "false", "false", "success", ((strin
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Valid generator output: Variant 1")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 1")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "test.capnp.bin")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:nullablegen", "true")]
@@ -450,7 +492,7 @@ this.ValidGeneratorOutput("test.capnp.bin", "false", "false", "success", ((strin
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:outcome", "errors")]
         public virtual void ValidGeneratorOutput_Variant1()
         {
-#line 50
+#line 58
 this.ValidGeneratorOutput("test.capnp.bin", "true", "false", "errors", ((string[])(null)));
 #line hidden
         }
@@ -458,6 +500,8 @@ this.ValidGeneratorOutput("test.capnp.bin", "true", "false", "errors", ((string[
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Valid generator output: Variant 2")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 2")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "test.capnp.bin")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:nullablegen", "false")]
@@ -465,7 +509,7 @@ this.ValidGeneratorOutput("test.capnp.bin", "true", "false", "errors", ((string[
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:outcome", "warnings")]
         public virtual void ValidGeneratorOutput_Variant2()
         {
-#line 50
+#line 58
 this.ValidGeneratorOutput("test.capnp.bin", "false", "true", "warnings", ((string[])(null)));
 #line hidden
         }
@@ -473,6 +517,8 @@ this.ValidGeneratorOutput("test.capnp.bin", "false", "true", "warnings", ((strin
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Valid generator output: Variant 3")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 3")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "test.capnp.bin")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:nullablegen", "true")]
@@ -480,7 +526,7 @@ this.ValidGeneratorOutput("test.capnp.bin", "false", "true", "warnings", ((strin
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:outcome", "success")]
         public virtual void ValidGeneratorOutput_Variant3()
         {
-#line 50
+#line 58
 this.ValidGeneratorOutput("test.capnp.bin", "true", "true", "success", ((string[])(null)));
 #line hidden
         }
@@ -488,6 +534,8 @@ this.ValidGeneratorOutput("test.capnp.bin", "true", "true", "success", ((string[
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Valid generator output: Variant 4")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 4")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "Issue19.capnp.bin")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:nullablegen", "false")]
@@ -495,7 +543,7 @@ this.ValidGeneratorOutput("test.capnp.bin", "true", "true", "success", ((string[
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:outcome", "success")]
         public virtual void ValidGeneratorOutput_Variant4()
         {
-#line 50
+#line 58
 this.ValidGeneratorOutput("Issue19.capnp.bin", "false", "false", "success", ((string[])(null)));
 #line hidden
         }
@@ -503,6 +551,8 @@ this.ValidGeneratorOutput("Issue19.capnp.bin", "false", "false", "success", ((st
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Valid generator output: Variant 5")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 5")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "Issue21.capnp.bin")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:nullablegen", "false")]
@@ -510,7 +560,7 @@ this.ValidGeneratorOutput("Issue19.capnp.bin", "false", "false", "success", ((st
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:outcome", "success")]
         public virtual void ValidGeneratorOutput_Variant5()
         {
-#line 50
+#line 58
 this.ValidGeneratorOutput("Issue21.capnp.bin", "false", "false", "success", ((string[])(null)));
 #line hidden
         }
@@ -518,6 +568,8 @@ this.ValidGeneratorOutput("Issue21.capnp.bin", "false", "false", "success", ((st
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Valid generator output: Variant 6")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 6")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "Issue22.capnp.bin")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:nullablegen", "false")]
@@ -525,7 +577,7 @@ this.ValidGeneratorOutput("Issue21.capnp.bin", "false", "false", "success", ((st
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:outcome", "success")]
         public virtual void ValidGeneratorOutput_Variant6()
         {
-#line 50
+#line 58
 this.ValidGeneratorOutput("Issue22.capnp.bin", "false", "false", "success", ((string[])(null)));
 #line hidden
         }
@@ -533,6 +585,8 @@ this.ValidGeneratorOutput("Issue22.capnp.bin", "false", "false", "success", ((st
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Valid generator output: Variant 7")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 7")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "NullableDisable.capnp.bin")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:nullablegen", "true")]
@@ -540,7 +594,7 @@ this.ValidGeneratorOutput("Issue22.capnp.bin", "false", "false", "success", ((st
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:outcome", "success")]
         public virtual void ValidGeneratorOutput_Variant7()
         {
-#line 50
+#line 58
 this.ValidGeneratorOutput("NullableDisable.capnp.bin", "true", "false", "success", ((string[])(null)));
 #line hidden
         }
@@ -548,6 +602,8 @@ this.ValidGeneratorOutput("NullableDisable.capnp.bin", "true", "false", "success
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Valid generator output: Variant 8")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 8")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "NullableDisable.capnp.bin")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:nullablegen", "true")]
@@ -555,7 +611,7 @@ this.ValidGeneratorOutput("NullableDisable.capnp.bin", "true", "false", "success
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:outcome", "warnings")]
         public virtual void ValidGeneratorOutput_Variant8()
         {
-#line 50
+#line 58
 this.ValidGeneratorOutput("NullableDisable.capnp.bin", "true", "true", "warnings", ((string[])(null)));
 #line hidden
         }
@@ -563,6 +619,8 @@ this.ValidGeneratorOutput("NullableDisable.capnp.bin", "true", "true", "warnings
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Valid generator output: Variant 9")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 9")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "NullableEnable.capnp.bin")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:nullablegen", "false")]
@@ -570,7 +628,7 @@ this.ValidGeneratorOutput("NullableDisable.capnp.bin", "true", "true", "warnings
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:outcome", "success")]
         public virtual void ValidGeneratorOutput_Variant9()
         {
-#line 50
+#line 58
 this.ValidGeneratorOutput("NullableEnable.capnp.bin", "false", "true", "success", ((string[])(null)));
 #line hidden
         }
@@ -578,6 +636,8 @@ this.ValidGeneratorOutput("NullableEnable.capnp.bin", "false", "true", "success"
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Valid generator output: Variant 10")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 10")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "NullableEnable.capnp.bin")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:nullablegen", "false")]
@@ -585,7 +645,7 @@ this.ValidGeneratorOutput("NullableEnable.capnp.bin", "false", "true", "success"
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:outcome", "errors")]
         public virtual void ValidGeneratorOutput_Variant10()
         {
-#line 50
+#line 58
 this.ValidGeneratorOutput("NullableEnable.capnp.bin", "false", "false", "errors", ((string[])(null)));
 #line hidden
         }
@@ -593,6 +653,8 @@ this.ValidGeneratorOutput("NullableEnable.capnp.bin", "false", "false", "errors"
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Valid generator output: Variant 11")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 11")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "NullableDisable2.capnp.bin")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:nullablegen", "false")]
@@ -600,7 +662,7 @@ this.ValidGeneratorOutput("NullableEnable.capnp.bin", "false", "false", "errors"
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:outcome", "errors")]
         public virtual void ValidGeneratorOutput_Variant11()
         {
-#line 50
+#line 58
 this.ValidGeneratorOutput("NullableDisable2.capnp.bin", "false", "false", "errors", ((string[])(null)));
 #line hidden
         }
@@ -608,6 +670,8 @@ this.ValidGeneratorOutput("NullableDisable2.capnp.bin", "false", "false", "error
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Valid generator output: Variant 12")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 12")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "NullableDisable2.capnp.bin")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:nullablegen", "false")]
@@ -615,7 +679,7 @@ this.ValidGeneratorOutput("NullableDisable2.capnp.bin", "false", "false", "error
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:outcome", "success")]
         public virtual void ValidGeneratorOutput_Variant12()
         {
-#line 50
+#line 58
 this.ValidGeneratorOutput("NullableDisable2.capnp.bin", "false", "true", "success", ((string[])(null)));
 #line hidden
         }
@@ -623,6 +687,8 @@ this.ValidGeneratorOutput("NullableDisable2.capnp.bin", "false", "true", "succes
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Valid generator output: Variant 13")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 13")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "NullableEnable2.capnp.bin")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:nullablegen", "false")]
@@ -630,7 +696,7 @@ this.ValidGeneratorOutput("NullableDisable2.capnp.bin", "false", "true", "succes
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:outcome", "errors")]
         public virtual void ValidGeneratorOutput_Variant13()
         {
-#line 50
+#line 58
 this.ValidGeneratorOutput("NullableEnable2.capnp.bin", "false", "false", "errors", ((string[])(null)));
 #line hidden
         }
@@ -638,6 +704,8 @@ this.ValidGeneratorOutput("NullableEnable2.capnp.bin", "false", "false", "errors
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Valid generator output: Variant 14")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 14")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "NullableEnable2.capnp.bin")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:nullablegen", "false")]
@@ -645,7 +713,7 @@ this.ValidGeneratorOutput("NullableEnable2.capnp.bin", "false", "false", "errors
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:outcome", "success")]
         public virtual void ValidGeneratorOutput_Variant14()
         {
-#line 50
+#line 58
 this.ValidGeneratorOutput("NullableEnable2.capnp.bin", "false", "true", "success", ((string[])(null)));
 #line hidden
         }
@@ -653,6 +721,8 @@ this.ValidGeneratorOutput("NullableEnable2.capnp.bin", "false", "true", "success
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Valid generator output: Variant 15")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 15")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "rpc-csharp.capnp.bin")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:nullablegen", "true")]
@@ -660,7 +730,7 @@ this.ValidGeneratorOutput("NullableEnable2.capnp.bin", "false", "true", "success
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:outcome", "warnings")]
         public virtual void ValidGeneratorOutput_Variant15()
         {
-#line 50
+#line 58
 this.ValidGeneratorOutput("rpc-csharp.capnp.bin", "true", "true", "warnings", ((string[])(null)));
 #line hidden
         }
@@ -668,6 +738,8 @@ this.ValidGeneratorOutput("rpc-csharp.capnp.bin", "true", "true", "warnings", ((
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Valid generator output: Variant 16")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "CodeGenerator")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("Coverage")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("VariantName", "Variant 16")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:bin", "schema-csharp.capnp.bin")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:nullablegen", "false")]
@@ -675,7 +747,7 @@ this.ValidGeneratorOutput("rpc-csharp.capnp.bin", "true", "true", "warnings", ((
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("Parameter:outcome", "success")]
         public virtual void ValidGeneratorOutput_Variant16()
         {
-#line 50
+#line 58
 this.ValidGeneratorOutput("schema-csharp.capnp.bin", "false", "false", "success", ((string[])(null)));
 #line hidden
         }

@@ -111,7 +111,7 @@ namespace Capnp.Net.Runtime.Tests
         }
 
         [TestMethod]
-        [TestCategory("Coverage")]
+        //[TestCategory("Coverage")]
         public void SafeJoinBusyThread()
         {
             var thread = new Thread(() =>
@@ -189,7 +189,7 @@ namespace Capnp.Net.Runtime.Tests
         }
 
         [TestMethod]
-        [TestCategory("Coverage")]
+        //[TestCategory("Coverage")]
         public void SafeJoinDefensiveThread()
         {
             var thread = new Thread(() =>

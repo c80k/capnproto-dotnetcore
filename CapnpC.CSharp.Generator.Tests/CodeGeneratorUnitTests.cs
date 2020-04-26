@@ -10,6 +10,7 @@ using System.Linq;
 namespace CapnpC.CSharp.Generator.Tests
 {
     [TestClass]
+    [TestCategory("Coverage")]
     public class CodeGeneratorUnitTests
     {
         [TestMethod]

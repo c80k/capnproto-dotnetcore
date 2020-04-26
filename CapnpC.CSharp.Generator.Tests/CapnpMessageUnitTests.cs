@@ -6,6 +6,7 @@ using System.Text;
 namespace CapnpC.CSharp.Generator.Tests
 {
     [TestClass]
+    [TestCategory("Coverage")]
     public class CapnpMessageUnitTests
     {
         [TestMethod]

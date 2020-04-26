@@ -1,39 +1,36 @@
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $rootDir = "$scriptDir\.."
-$coverageDir = "$rootDir\coverage"
-$coverageReportDir = "$rootDir\coverage\report"
-$openCover = "$env:LOCALAPPDATA\Apps\OpenCover\OpenCover.Console.exe"
-$vsTestConsole = where.exe vstest.console
-$coverageOutput = "$coverageDir\coverage.xml"
+$resultsDir = "$rootDir\TestResults"
+$coverageFile = "$resultsDir\*\*.xml"
+$testResultsDir = "$rootDir\TestResults"
+$coverageReportDir = "$rootDir\coverage"
+$generatorTests = "$rootDir\CapnpC.CSharp.Generator.Tests\CapnpC.CSharp.Generator.Tests.csproj"
+$runtimeTests = "$rootDir\Capnp.Net.Runtime.Tests\Capnp.Net.Runtime.Tests.csproj"
 
-$runtimeTests = "$rootDir\Capnp.Net.Runtime.Tests\bin\Release\netcoreapp2.1\Capnp.Net.Runtime.Tests.dll"
-$generatorTests = "$rootDir\CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp3.1\CapnpC.CSharp.Generator.Tests.dll"
-
-If(!(test-path $coverageDir))
-{
-      New-Item -ItemType Directory -Force -Path $coverageDir
+If(test-path $testResultsDir) {
+  Remove-Item -Recurse -Force $testResultsDir
 }
 
-If(!(test-path $coverageReportDir))
-{
-      New-Item -ItemType Directory -Force -Path $coverageReportDir
+If(!(test-path $coverageReportDir)) {
+  New-Item -ItemType Directory -Force -Path $coverageReportDir
 }
 
-& $openCover -version
+& dotnet test $generatorTests `
+  --filter TestCategory=Coverage `
+  --logger console `
+  --configuration Release `
+  --framework netcoreapp3.1 `
+  --collect:"XPlat code coverage" `
+  --results-directory $resultsDir `
+  --settings "$rootDir\coverlet.runsettings"
 
-& $openCover -target:"$vsTestConsole" `
-  -targetArgs:"/inIsolation $runtimeTests /TestCaseFilter:`"TestCategory=Coverage`" /Framework:.NETCoreApp,Version=v2.1 /logger:trx;LogFileName=runtime.trx" `
-  -filter:"+[Capnp.Net.Runtime]Capnp.*" `
-  -excludebyattribute:"System.CodeDom.Compiler.GeneratedCodeAttribute" `
-  -output:"$coverageOutput" `
-  -mergebyhash -register:user -oldStyle
+& dotnet test $runtimeTests `
+  --filter TestCategory=Coverage `
+  --logger console `
+  --configuration Release `
+  --framework netcoreapp3.1 `
+  --collect:"XPlat code coverage" `
+  --results-directory $resultsDir `
+  --settings "$rootDir\coverlet.runsettings"
 
-& $openCover -target:"$vsTestConsole" `
-  -targetArgs:"/inIsolation $generatorTests /logger:trx;LogFileName=generator.trx /Platform:x64" `
-  -filter:"+[CapnpC.CSharp.Generator]CapnpC.CSharp.Generator.* -[CapnpC.CSharp.Generator]CapnpC.CSharp.Generator.Schema.*" `
-  -excludebyattribute:"System.CodeDom.Compiler.GeneratedCodeAttribute" `
-  -output:"$coverageOutput" `
-  -mergeoutput `
-  -mergebyhash -register:user -oldStyle
-
-ReportGenerator.exe -reports:"$coverageOutput" -targetdir:"$coverageReportDir" -reportTypes:"Html"
+  ReportGenerator.exe -reports:"$coverageFile" -targetdir:"$coverageReportDir" -reportTypes:"Html"

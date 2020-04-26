@@ -30,14 +30,9 @@ namespace Capnp.Util
                 {
                     logger.LogError($"Unable to join thread {name}. Thread is in state {thread.ThreadState}.");
                     thread.Interrupt();
-                    if (!thread.Join(timeout / 10))
+                    if (!thread.Join(timeout))
                     {
                         logger.LogError($"Still unable to join thread {name} after Interrupt(). Thread is in state {thread.ThreadState}.");
-                        thread.Abort();
-                        if (thread.Join(timeout / 10))
-                        {
-                            logger.LogError($"Still unable to join thread {name} after Abort(). Thread is in state {thread.ThreadState}.");
-                        }
                     }
                 }
                 catch
