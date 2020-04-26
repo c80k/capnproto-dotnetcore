@@ -19,6 +19,7 @@ init:
 environment:
   COVERALLS_REPO_TOKEN:
     secure: mwxwOymoS7vB56iQN5Obbt8+oMqbRpK8Ei2GZUI7Mm46C8asDR/Wu0RAXYlhp85Q
+  MSBUILDSINGLELOADCONTEXT: '1'
 before_build:
   - cmd: nbgv cloud
   - cmd: dotnet --version
