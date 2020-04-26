@@ -8,7 +8,7 @@
     <DataCollectors>
       <DataCollector friendlyName="XPlat code coverage">
         <Configuration>
-          <Format>cobertura</Format>
+          <Format>opencover</Format>
           <Include>[Capnp.Net.Runtime]Capnp.*,[CapnpC.CSharp.Generator]CapnpC.CSharp.Generator.*</Include>
           <Exclude>[CapnpC.CSharp.Generator]CapnpC.CSharp.Generator.Schema.*</Exclude>
           <ExcludeByAttribute>GeneratedCodeAttribute,CompilerGeneratedAttribute</ExcludeByAttribute>

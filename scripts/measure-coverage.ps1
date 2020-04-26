@@ -33,4 +33,4 @@ If(!(test-path $coverageReportDir)) {
   --results-directory $resultsDir `
   --settings "$rootDir\coverlet.runsettings"
 
-  ReportGenerator.exe -reports:"$coverageFile" -targetdir:"$coverageReportDir" -reportTypes:"Html"
+  ReportGenerator.exe -reports:"$coverageFile" -targetdir:"$coverageReportDir" -reportTypes:"Html;lcov"
