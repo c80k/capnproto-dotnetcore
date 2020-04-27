@@ -27,28 +27,23 @@ Then, for the VS project which hosts your `.capnp` schema definitions:
 Install-Package CapnpC.CSharp.MsBuild.Generation
 ```
 
+### Code generator back end: dotnet tool
+
+The C# code generator back end is available as dotnet tool. It requires a .NET Core 3.1 (or higher) runtime or SDK (type `dotnet` at command line prompt to check whether you already have one). This is the recommended variant. To install it globally, type
+
+```
+dotnet tool install capnpc-csharp --global
+```
+
 ### Code generator back end: Windows command line
 
-The C# code generator back end is available as [Chocolatey](https://chocolatey.org/) package. You may choose between two flavors: The portable version requires a .NET Core 2.1 (or higher) runtime or SDK (type `dotnet` at command line prompt to check whether you already have one). This is the recommended variant. To install, type
-
-```
-choco install capnpc-csharp
-```
-
-The self-contained version does not require .NET Core but runs only on a x86-compatible Windows machine. To install, type
+There is also a self-contained [Chocolatey](https://chocolatey.org/) deployment for Windows (x86). To install, type
 
 ```
 choco install capnpc-csharp-win-x86
 ```
 
-Both versions will also download and install the [Cap'n Proto tool set Chocolatey package](https://www.chocolatey.org/packages/capnproto). Note that the author does not maintain this package and has no influence on its contents.
-
-*Announcement: There is currently an experimental branch for packaging the code generator back end as .NET Core CLI tool. If this approach turns out to be viable, it will probably be superior to the Chocolatey deployment. In that case, the CLI tool capnpc-csharp will be deployed on NuGet.org and the former Chocolatey package will be deprecated. capnpc-csharp-win-x86 will probably be kept (and also maintained).*
-
-
-### Code generator back end: Other OSes
-
-Currently, you are on yourself. Compile the `capnpc-csharp` VS project and install the resulting .NET application manually on your system. This should not be that complicated, see also the [Wiki](https://github.com/c80k/capnproto-dotnetcore/wiki). It would be great to support other package managers, especially [APT](https://wiki.debian.org/Apt). Consider contributing? Author would be happy!
+This variant will also download and install the [Cap'n Proto tool set Chocolatey package](https://www.chocolatey.org/packages/capnproto). Note that the author does not maintain this package and has no influence on its contents.
 
 ### Runtime assembly
 
