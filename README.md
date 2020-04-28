@@ -63,7 +63,7 @@ vcpkg install capnproto
 
 Solution/project structure is as follows:
 - `Capnp.Net.sln` contains these projects:
-  * `Capnp.Net.Runtime` is the runtime implementation, a multi-target (.NET Standard 2.0 + .NET Core 2.1) assembly.
+  * `Capnp.Net.Runtime` is the runtime implementation, a multi-target assembly.
   * `CapnpC.CSharp.Generator` contains the generator backend logic for C# language. It is also a multi-target (.NET Standard 2.0 + .NET Core 2.1) assembly.
   * `capnpc-csharp` is the command line-based generator backend (a .NET Core 2.1 application).
   * `CapnpC.CSharp.MsBuild.Generation` provides the MSBuild integration for the generator backend.
