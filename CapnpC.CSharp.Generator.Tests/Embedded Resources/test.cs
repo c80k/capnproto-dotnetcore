@@ -325,24 +325,42 @@ namespace Capnproto_test.Capnp.Test
             public string TextField => ctx.ReadText(0, null);
             public IReadOnlyList<byte> DataField => ctx.ReadList(1).CastByte();
             public Capnproto_test.Capnp.Test.TestAllTypes.READER StructField => ctx.ReadStruct(2, Capnproto_test.Capnp.Test.TestAllTypes.READER.create);
+            public bool HasStructField => ctx.IsStructFieldNonNull(2);
             public Capnproto_test.Capnp.Test.TestEnum EnumField => (Capnproto_test.Capnp.Test.TestEnum)ctx.ReadDataUShort(288UL, (ushort)0);
             public int VoidList => ctx.ReadList(3).Count;
+            public bool HasVoidList => ctx.IsStructFieldNonNull(3);
             public IReadOnlyList<bool> BoolList => ctx.ReadList(4).CastBool();
+            public bool HasBoolList => ctx.IsStructFieldNonNull(4);
             public IReadOnlyList<sbyte> Int8List => ctx.ReadList(5).CastSByte();
+            public bool HasInt8List => ctx.IsStructFieldNonNull(5);
             public IReadOnlyList<short> Int16List => ctx.ReadList(6).CastShort();
+            public bool HasInt16List => ctx.IsStructFieldNonNull(6);
             public IReadOnlyList<int> Int32List => ctx.ReadList(7).CastInt();
+            public bool HasInt32List => ctx.IsStructFieldNonNull(7);
             public IReadOnlyList<long> Int64List => ctx.ReadList(8).CastLong();
+            public bool HasInt64List => ctx.IsStructFieldNonNull(8);
             public IReadOnlyList<byte> UInt8List => ctx.ReadList(9).CastByte();
+            public bool HasUInt8List => ctx.IsStructFieldNonNull(9);
             public IReadOnlyList<ushort> UInt16List => ctx.ReadList(10).CastUShort();
+            public bool HasUInt16List => ctx.IsStructFieldNonNull(10);
             public IReadOnlyList<uint> UInt32List => ctx.ReadList(11).CastUInt();
+            public bool HasUInt32List => ctx.IsStructFieldNonNull(11);
             public IReadOnlyList<ulong> UInt64List => ctx.ReadList(12).CastULong();
+            public bool HasUInt64List => ctx.IsStructFieldNonNull(12);
             public IReadOnlyList<float> Float32List => ctx.ReadList(13).CastFloat();
+            public bool HasFloat32List => ctx.IsStructFieldNonNull(13);
             public IReadOnlyList<double> Float64List => ctx.ReadList(14).CastDouble();
+            public bool HasFloat64List => ctx.IsStructFieldNonNull(14);
             public IReadOnlyList<string> TextList => ctx.ReadList(15).CastText2();
+            public bool HasTextList => ctx.IsStructFieldNonNull(15);
             public IReadOnlyList<IReadOnlyList<byte>> DataList => ctx.ReadList(16).CastData();
+            public bool HasDataList => ctx.IsStructFieldNonNull(16);
             public IReadOnlyList<Capnproto_test.Capnp.Test.TestAllTypes.READER> StructList => ctx.ReadList(17).Cast(Capnproto_test.Capnp.Test.TestAllTypes.READER.create);
+            public bool HasStructList => ctx.IsStructFieldNonNull(17);
             public IReadOnlyList<Capnproto_test.Capnp.Test.TestEnum> EnumList => ctx.ReadList(18).CastEnums(_0 => (Capnproto_test.Capnp.Test.TestEnum)_0);
+            public bool HasEnumList => ctx.IsStructFieldNonNull(18);
             public int InterfaceList => ctx.ReadList(19).Count;
+            public bool HasInterfaceList => ctx.IsStructFieldNonNull(19);
         }
 
         public class WRITER : SerializerState
@@ -897,24 +915,42 @@ namespace Capnproto_test.Capnp.Test
             public string TextField => ctx.ReadText(0, "foo");
             public IReadOnlyList<byte> DataField => ctx.ReadList(1).CastByte();
             public Capnproto_test.Capnp.Test.TestAllTypes.READER StructField => ctx.ReadStruct(2, Capnproto_test.Capnp.Test.TestAllTypes.READER.create);
+            public bool HasStructField => ctx.IsStructFieldNonNull(2);
             public Capnproto_test.Capnp.Test.TestEnum EnumField => (Capnproto_test.Capnp.Test.TestEnum)ctx.ReadDataUShort(288UL, (ushort)5);
             public int VoidList => ctx.ReadList(3).Count;
+            public bool HasVoidList => ctx.IsStructFieldNonNull(3);
             public IReadOnlyList<bool> BoolList => ctx.ReadList(4).CastBool();
+            public bool HasBoolList => ctx.IsStructFieldNonNull(4);
             public IReadOnlyList<sbyte> Int8List => ctx.ReadList(5).CastSByte();
+            public bool HasInt8List => ctx.IsStructFieldNonNull(5);
             public IReadOnlyList<short> Int16List => ctx.ReadList(6).CastShort();
+            public bool HasInt16List => ctx.IsStructFieldNonNull(6);
             public IReadOnlyList<int> Int32List => ctx.ReadList(7).CastInt();
+            public bool HasInt32List => ctx.IsStructFieldNonNull(7);
             public IReadOnlyList<long> Int64List => ctx.ReadList(8).CastLong();
+            public bool HasInt64List => ctx.IsStructFieldNonNull(8);
             public IReadOnlyList<byte> UInt8List => ctx.ReadList(9).CastByte();
+            public bool HasUInt8List => ctx.IsStructFieldNonNull(9);
             public IReadOnlyList<ushort> UInt16List => ctx.ReadList(10).CastUShort();
+            public bool HasUInt16List => ctx.IsStructFieldNonNull(10);
             public IReadOnlyList<uint> UInt32List => ctx.ReadList(11).CastUInt();
+            public bool HasUInt32List => ctx.IsStructFieldNonNull(11);
             public IReadOnlyList<ulong> UInt64List => ctx.ReadList(12).CastULong();
+            public bool HasUInt64List => ctx.IsStructFieldNonNull(12);
             public IReadOnlyList<float> Float32List => ctx.ReadList(13).CastFloat();
+            public bool HasFloat32List => ctx.IsStructFieldNonNull(13);
             public IReadOnlyList<double> Float64List => ctx.ReadList(14).CastDouble();
+            public bool HasFloat64List => ctx.IsStructFieldNonNull(14);
             public IReadOnlyList<string> TextList => ctx.ReadList(15).CastText2();
+            public bool HasTextList => ctx.IsStructFieldNonNull(15);
             public IReadOnlyList<IReadOnlyList<byte>> DataList => ctx.ReadList(16).CastData();
+            public bool HasDataList => ctx.IsStructFieldNonNull(16);
             public IReadOnlyList<Capnproto_test.Capnp.Test.TestAllTypes.READER> StructList => ctx.ReadList(17).Cast(Capnproto_test.Capnp.Test.TestAllTypes.READER.create);
+            public bool HasStructList => ctx.IsStructFieldNonNull(17);
             public IReadOnlyList<Capnproto_test.Capnp.Test.TestEnum> EnumList => ctx.ReadList(18).CastEnums(_0 => (Capnproto_test.Capnp.Test.TestEnum)_0);
+            public bool HasEnumList => ctx.IsStructFieldNonNull(18);
             public int InterfaceList => ctx.ReadList(19).Count;
+            public bool HasInterfaceList => ctx.IsStructFieldNonNull(19);
         }
 
         public class WRITER : SerializerState
@@ -4868,9 +4904,13 @@ namespace Capnproto_test.Capnp.Test
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
             public Capnproto_test.Capnp.Test.TestUnion.READER S16s8s64s8Set => ctx.ReadStruct(0, Capnproto_test.Capnp.Test.TestUnion.READER.create);
+            public bool HasS16s8s64s8Set => ctx.IsStructFieldNonNull(0);
             public Capnproto_test.Capnp.Test.TestUnion.READER S0sps1s32Set => ctx.ReadStruct(1, Capnproto_test.Capnp.Test.TestUnion.READER.create);
+            public bool HasS0sps1s32Set => ctx.IsStructFieldNonNull(1);
             public Capnproto_test.Capnp.Test.TestUnnamedUnion.READER Unnamed1 => ctx.ReadStruct(2, Capnproto_test.Capnp.Test.TestUnnamedUnion.READER.create);
+            public bool HasUnnamed1 => ctx.IsStructFieldNonNull(2);
             public Capnproto_test.Capnp.Test.TestUnnamedUnion.READER Unnamed2 => ctx.ReadStruct(3, Capnproto_test.Capnp.Test.TestUnnamedUnion.READER.create);
+            public bool HasUnnamed2 => ctx.IsStructFieldNonNull(3);
         }
 
         public class WRITER : SerializerState
@@ -4967,6 +5007,7 @@ namespace Capnproto_test.Capnp.Test
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
             public Capnproto_test.Capnp.Test.TestNestedTypes.NestedStruct.READER TheNestedStruct => ctx.ReadStruct(0, Capnproto_test.Capnp.Test.TestNestedTypes.NestedStruct.READER.create);
+            public bool HasTheNestedStruct => ctx.IsStructFieldNonNull(0);
             public Capnproto_test.Capnp.Test.TestNestedTypes.NestedEnum OuterNestedEnum => (Capnproto_test.Capnp.Test.TestNestedTypes.NestedEnum)ctx.ReadDataUShort(0UL, (ushort)1);
             public Capnproto_test.Capnp.Test.TestNestedTypes.NestedStruct.NestedEnum InnerNestedEnum => (Capnproto_test.Capnp.Test.TestNestedTypes.NestedStruct.NestedEnum)ctx.ReadDataUShort(16UL, (ushort)2);
         }
@@ -5282,15 +5323,25 @@ namespace Capnproto_test.Capnp.Test
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
             public IReadOnlyList<Capnproto_test.Capnp.Test.TestLists.Struct0.READER> List0 => ctx.ReadList(0).Cast(Capnproto_test.Capnp.Test.TestLists.Struct0.READER.create);
+            public bool HasList0 => ctx.IsStructFieldNonNull(0);
             public IReadOnlyList<Capnproto_test.Capnp.Test.TestLists.Struct1.READER> List1 => ctx.ReadList(1).Cast(Capnproto_test.Capnp.Test.TestLists.Struct1.READER.create);
+            public bool HasList1 => ctx.IsStructFieldNonNull(1);
             public IReadOnlyList<Capnproto_test.Capnp.Test.TestLists.Struct8.READER> List8 => ctx.ReadList(2).Cast(Capnproto_test.Capnp.Test.TestLists.Struct8.READER.create);
+            public bool HasList8 => ctx.IsStructFieldNonNull(2);
             public IReadOnlyList<Capnproto_test.Capnp.Test.TestLists.Struct16.READER> List16 => ctx.ReadList(3).Cast(Capnproto_test.Capnp.Test.TestLists.Struct16.READER.create);
+            public bool HasList16 => ctx.IsStructFieldNonNull(3);
             public IReadOnlyList<Capnproto_test.Capnp.Test.TestLists.Struct32.READER> List32 => ctx.ReadList(4).Cast(Capnproto_test.Capnp.Test.TestLists.Struct32.READER.create);
+            public bool HasList32 => ctx.IsStructFieldNonNull(4);
             public IReadOnlyList<Capnproto_test.Capnp.Test.TestLists.Struct64.READER> List64 => ctx.ReadList(5).Cast(Capnproto_test.Capnp.Test.TestLists.Struct64.READER.create);
+            public bool HasList64 => ctx.IsStructFieldNonNull(5);
             public IReadOnlyList<Capnproto_test.Capnp.Test.TestLists.StructP.READER> ListP => ctx.ReadList(6).Cast(Capnproto_test.Capnp.Test.TestLists.StructP.READER.create);
+            public bool HasListP => ctx.IsStructFieldNonNull(6);
             public IReadOnlyList<IReadOnlyList<int>> Int32ListList => ctx.ReadList(7).Cast(_0 => _0.RequireList().CastInt());
+            public bool HasInt32ListList => ctx.IsStructFieldNonNull(7);
             public IReadOnlyList<IReadOnlyList<string>> TextListList => ctx.ReadList(8).Cast(_0 => _0.RequireList().CastText2());
+            public bool HasTextListList => ctx.IsStructFieldNonNull(8);
             public IReadOnlyList<IReadOnlyList<Capnproto_test.Capnp.Test.TestAllTypes.READER>> StructListList => ctx.ReadList(9).Cast(_0 => _0.RequireList().Cast(Capnproto_test.Capnp.Test.TestAllTypes.READER.create));
+            public bool HasStructListList => ctx.IsStructFieldNonNull(9);
         }
 
         public class WRITER : SerializerState
@@ -6436,6 +6487,7 @@ namespace Capnproto_test.Capnp.Test
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
             public Capnproto_test.Capnp.Test.TestLists.READER Lists => ctx.ReadStruct(0, Capnproto_test.Capnp.Test.TestLists.READER.create);
+            public bool HasLists => ctx.IsStructFieldNonNull(0);
         }
 
         public class WRITER : SerializerState
@@ -6696,6 +6748,7 @@ namespace Capnproto_test.Capnp.Test
                 public WHICH which => (WHICH)ctx.ReadDataUShort(48U, (ushort)0);
                 public string Qux => which == WHICH.Qux ? ctx.ReadText(1, null) : default;
                 public IReadOnlyList<int> Corge => which == WHICH.Corge ? ctx.ReadList(1).CastInt() : default;
+                public bool HasCorge => ctx.IsStructFieldNonNull(1);
                 public float Grault => which == WHICH.Grault ? ctx.ReadDataFloat(64UL, 0F) : default;
             }
 
@@ -6857,6 +6910,7 @@ namespace Capnproto_test.Capnp.Test
                 public WHICH which => (WHICH)ctx.ReadDataUShort(96U, (ushort)0);
                 public string Qux => which == WHICH.Qux ? ctx.ReadText(2, null) : default;
                 public IReadOnlyList<int> Corge => which == WHICH.Corge ? ctx.ReadList(2).CastInt() : default;
+                public bool HasCorge => ctx.IsStructFieldNonNull(2);
                 public float Grault => which == WHICH.Grault ? ctx.ReadDataFloat(128UL, 0F) : default;
             }
 
@@ -6954,6 +7008,7 @@ namespace Capnproto_test.Capnp.Test
             public long Old1 => ctx.ReadDataLong(0UL, 0L);
             public string Old2 => ctx.ReadText(0, null);
             public Capnproto_test.Capnp.Test.TestOldVersion.READER Old3 => ctx.ReadStruct(1, Capnproto_test.Capnp.Test.TestOldVersion.READER.create);
+            public bool HasOld3 => ctx.IsStructFieldNonNull(1);
         }
 
         public class WRITER : SerializerState
@@ -7062,6 +7117,7 @@ namespace Capnproto_test.Capnp.Test
             public long Old1 => ctx.ReadDataLong(0UL, 0L);
             public string Old2 => ctx.ReadText(0, null);
             public Capnproto_test.Capnp.Test.TestNewVersion.READER Old3 => ctx.ReadStruct(1, Capnproto_test.Capnp.Test.TestNewVersion.READER.create);
+            public bool HasOld3 => ctx.IsStructFieldNonNull(1);
             public long New1 => ctx.ReadDataLong(64UL, 987L);
             public string New2 => ctx.ReadText(2, "baz");
         }
@@ -7633,7 +7689,9 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public WHICH which => (WHICH)ctx.ReadDataUShort(0U, (ushort)0);
                 public Capnproto_test.Capnp.Test.TestStructUnion.SomeStruct.READER Struct => which == WHICH.Struct ? ctx.ReadStruct(0, Capnproto_test.Capnp.Test.TestStructUnion.SomeStruct.READER.create) : default;
+                public bool HasStruct => ctx.IsStructFieldNonNull(0);
                 public Capnproto_test.Capnp.Test.TestAnyPointer.READER Object => which == WHICH.Object ? ctx.ReadStruct(0, Capnproto_test.Capnp.Test.TestAnyPointer.READER.create) : default;
+                public bool HasObject => ctx.IsStructFieldNonNull(0);
             }
 
             public class WRITER : SerializerState
@@ -7790,6 +7848,7 @@ namespace Capnproto_test.Capnp.Test
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
             public string SomeText => ctx.ReadText(0, null);
             public IReadOnlyList<Capnproto_test.Capnp.Test.TestPrintInlineStructs.InlineStruct.READER> StructList => ctx.ReadList(1).Cast(Capnproto_test.Capnp.Test.TestPrintInlineStructs.InlineStruct.READER.create);
+            public bool HasStructList => ctx.IsStructFieldNonNull(1);
         }
 
         public class WRITER : SerializerState
@@ -8084,8 +8143,10 @@ namespace Capnproto_test.Capnp.Test
             public WHICH which => (WHICH)ctx.ReadDataUShort(0U, (ushort)0);
             public DeserializerState Foo => ctx.StructReadPointer(0);
             public Capnproto_test.Capnp.Test.TestGenerics<TBar, TFoo>.READER Rev => ctx.ReadStruct(1, Capnproto_test.Capnp.Test.TestGenerics<TBar, TFoo>.READER.create);
+            public bool HasRev => ctx.IsStructFieldNonNull(1);
             public ug.READER Ug => which == WHICH.Ug ? new ug.READER(ctx) : default;
             public IReadOnlyList<Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner.READER> List => ctx.ReadList(2).Cast(Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner.READER.create);
+            public bool HasList => ctx.IsStructFieldNonNull(2);
         }
 
         public class WRITER : SerializerState
@@ -8328,7 +8389,9 @@ namespace Capnproto_test.Capnp.Test
                 public DeserializerState Bar => ctx.StructReadPointer(0);
                 public DeserializerState Baz => ctx.StructReadPointer(1);
                 public Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner.READER InnerBound => ctx.ReadStruct(2, Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner.READER.create);
+                public bool HasInnerBound => ctx.IsStructFieldNonNull(2);
                 public Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner.READER InnerUnbound => ctx.ReadStruct(3, Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner.READER.create);
+                public bool HasInnerUnbound => ctx.IsStructFieldNonNull(3);
             }
 
             public class WRITER : SerializerState
@@ -8713,6 +8776,7 @@ namespace Capnproto_test.Capnp.Test
                     public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                     public DeserializerState Qux => ctx.StructReadPointer(0);
                     public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.READER Gen => ctx.ReadStruct(1, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.READER.create);
+                    public bool HasGen => ctx.IsStructFieldNonNull(1);
                 }
 
                 public class WRITER : SerializerState
@@ -8821,9 +8885,13 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public DeserializerState Foo => ctx.StructReadPointer(0);
                 public Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner.READER Inner => ctx.ReadStruct(1, Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner.READER.create);
+                public bool HasInner => ctx.IsStructFieldNonNull(1);
                 public Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<object>.READER Inner2 => ctx.ReadStruct(2, Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<object>.READER.create);
+                public bool HasInner2 => ctx.IsStructFieldNonNull(2);
                 public Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<string>.READER Inner2Bind => ctx.ReadStruct(3, Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<string>.READER.create);
+                public bool HasInner2Bind => ctx.IsStructFieldNonNull(3);
                 public Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<string>.READER Inner2Text => ctx.ReadStruct(4, Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.Inner2<string>.READER.create);
+                public bool HasInner2Text => ctx.IsStructFieldNonNull(4);
                 public DeserializerState RevFoo => ctx.StructReadPointer(5);
             }
 
@@ -8916,6 +8984,7 @@ namespace Capnproto_test.Capnp.Test
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
             public Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.READER Value => ctx.ReadStruct(0, Capnproto_test.Capnp.Test.TestGenerics<TFoo, TBar>.READER.create);
+            public bool HasValue => ctx.IsStructFieldNonNull(0);
         }
 
         public class WRITER : SerializerState
@@ -8976,6 +9045,7 @@ namespace Capnproto_test.Capnp.Test
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
             public Capnproto_test.Capnp.Test.TestGenericsWrapper<string, Capnproto_test.Capnp.Test.TestAllTypes>.READER Value => ctx.ReadStruct(0, Capnproto_test.Capnp.Test.TestGenericsWrapper<string, Capnproto_test.Capnp.Test.TestAllTypes>.READER.create);
+            public bool HasValue => ctx.IsStructFieldNonNull(0);
         }
 
         public class WRITER : SerializerState
@@ -9700,24 +9770,42 @@ namespace Capnproto_test.Capnp.Test
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.READER Basic => ctx.ReadStruct(0, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.READER.create);
+            public bool HasBasic => ctx.IsStructFieldNonNull(0);
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner.READER Inner => ctx.ReadStruct(1, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner.READER.create);
+            public bool HasInner => ctx.IsStructFieldNonNull(1);
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<string>.READER Inner2 => ctx.ReadStruct(2, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<string>.READER.create);
+            public bool HasInner2 => ctx.IsStructFieldNonNull(2);
             public Capnproto_test.Capnp.Test.TestGenerics<object, object>.READER Unspecified => ctx.ReadStruct(3, Capnproto_test.Capnp.Test.TestGenerics<object, object>.READER.create);
+            public bool HasUnspecified => ctx.IsStructFieldNonNull(3);
             public Capnproto_test.Capnp.Test.TestGenerics<object, object>.Inner2<string>.READER UnspecifiedInner => ctx.ReadStruct(4, Capnproto_test.Capnp.Test.TestGenerics<object, object>.Inner2<string>.READER.create);
+            public bool HasUnspecifiedInner => ctx.IsStructFieldNonNull(4);
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, string>.READER Default => ctx.ReadStruct(5, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, string>.READER.create);
+            public bool HasDefault => ctx.IsStructFieldNonNull(5);
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, string>.Inner.READER DefaultInner => ctx.ReadStruct(6, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, string>.Inner.READER.create);
+            public bool HasDefaultInner => ctx.IsStructFieldNonNull(6);
             public Capnproto_test.Capnp.Test.TestUseGenerics.READER DefaultUser => ctx.ReadStruct(7, Capnproto_test.Capnp.Test.TestUseGenerics.READER.create);
+            public bool HasDefaultUser => ctx.IsStructFieldNonNull(7);
             public Capnproto_test.Capnp.Test.TestGenericsWrapper<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.READER Wrapper => ctx.ReadStruct(8, Capnproto_test.Capnp.Test.TestGenericsWrapper<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.READER.create);
+            public bool HasWrapper => ctx.IsStructFieldNonNull(8);
             public Capnproto_test.Capnp.Test.TestGenericsWrapper<string, Capnproto_test.Capnp.Test.TestAllTypes>.READER DefaultWrapper => ctx.ReadStruct(9, Capnproto_test.Capnp.Test.TestGenericsWrapper<string, Capnproto_test.Capnp.Test.TestAllTypes>.READER.create);
+            public bool HasDefaultWrapper => ctx.IsStructFieldNonNull(9);
             public Capnproto_test.Capnp.Test.TestGenericsWrapper2.READER DefaultWrapper2 => ctx.ReadStruct(10, Capnproto_test.Capnp.Test.TestGenericsWrapper2.READER.create);
+            public bool HasDefaultWrapper2 => ctx.IsStructFieldNonNull(10);
             public Capnproto_test.Capnp.Test.TestAllTypes.READER AliasFoo => ctx.ReadStruct(11, Capnproto_test.Capnp.Test.TestAllTypes.READER.create);
+            public bool HasAliasFoo => ctx.IsStructFieldNonNull(11);
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner.READER AliasInner => ctx.ReadStruct(12, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner.READER.create);
+            public bool HasAliasInner => ctx.IsStructFieldNonNull(12);
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<object>.READER AliasInner2 => ctx.ReadStruct(13, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<object>.READER.create);
+            public bool HasAliasInner2 => ctx.IsStructFieldNonNull(13);
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<IReadOnlyList<uint>>.READER AliasInner2Bind => ctx.ReadStruct(14, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<IReadOnlyList<uint>>.READER.create);
+            public bool HasAliasInner2Bind => ctx.IsStructFieldNonNull(14);
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<string>.READER AliasInner2Text => ctx.ReadStruct(15, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, Capnproto_test.Capnp.Test.TestAnyPointer>.Inner2<string>.READER.create);
+            public bool HasAliasInner2Text => ctx.IsStructFieldNonNull(15);
             public string AliasRev => ctx.ReadText(16, "text");
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, IReadOnlyList<uint>>.UseAliases.READER UseAliases => ctx.ReadStruct(17, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, IReadOnlyList<uint>>.UseAliases.READER.create);
+            public bool HasUseAliases => ctx.IsStructFieldNonNull(17);
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.ITestInterface, string>.READER Cap => ctx.ReadStruct(18, Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.ITestInterface, string>.READER.create);
+            public bool HasCap => ctx.IsStructFieldNonNull(18);
             public Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, IReadOnlyList<uint>>.IInterface<IReadOnlyList<byte>> GenericCap => ctx.ReadCap<Capnproto_test.Capnp.Test.TestGenerics<Capnproto_test.Capnp.Test.TestAllTypes, IReadOnlyList<uint>>.IInterface<IReadOnlyList<byte>>>(19);
         }
 
@@ -10414,6 +10502,7 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator DeserializerState(READER reader) => reader.ctx;
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public Capnproto_test.Capnp.Test.TestAllTypes.READER S => ctx.ReadStruct(0, Capnproto_test.Capnp.Test.TestAllTypes.READER.create);
+                public bool HasS => ctx.IsStructFieldNonNull(0);
             }
 
             public class WRITER : SerializerState
@@ -11254,6 +11343,7 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public string S => ctx.ReadText(0, null);
                 public Capnproto_test.Capnp.Test.TestPipeline.Box.READER OutBox => ctx.ReadStruct(1, Capnproto_test.Capnp.Test.TestPipeline.Box.READER.create);
+                public bool HasOutBox => ctx.IsStructFieldNonNull(1);
             }
 
             public class WRITER : SerializerState
@@ -11338,6 +11428,7 @@ namespace Capnproto_test.Capnp.Test
                 public Capnproto_test.Capnp.Test.ITestInterface Cap => ctx.ReadCap<Capnproto_test.Capnp.Test.ITestInterface>(0);
                 public DeserializerState Obj => ctx.StructReadPointer(1);
                 public IReadOnlyList<Capnproto_test.Capnp.Test.ITestInterface> List => ctx.ReadCapList<Capnproto_test.Capnp.Test.ITestInterface>(2);
+                public bool HasList => ctx.IsStructFieldNonNull(2);
             }
 
             public class WRITER : SerializerState
@@ -11539,6 +11630,7 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public string S => ctx.ReadText(0, null);
                 public Capnproto_test.Capnp.Test.TestPipeline.AnyBox.READER OutBox => ctx.ReadStruct(1, Capnproto_test.Capnp.Test.TestPipeline.AnyBox.READER.create);
+                public bool HasOutBox => ctx.IsStructFieldNonNull(1);
             }
 
             public class WRITER : SerializerState
@@ -14978,6 +15070,7 @@ namespace Capnproto_test.Capnp.Test
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
             public Capnproto_test.Capnp.Test.TestMembrane.IThing Cap => ctx.ReadCap<Capnproto_test.Capnp.Test.TestMembrane.IThing>(0);
             public IReadOnlyList<Capnproto_test.Capnp.Test.TestMembrane.IThing> List => ctx.ReadCapList<Capnproto_test.Capnp.Test.TestMembrane.IThing>(1);
+            public bool HasList => ctx.IsStructFieldNonNull(1);
         }
 
         public class WRITER : SerializerState
@@ -15044,6 +15137,7 @@ namespace Capnproto_test.Capnp.Test
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
             public IReadOnlyList<Capnproto_test.Capnp.Test.TestTransferCap.Element.READER> List => ctx.ReadList(0).Cast(Capnproto_test.Capnp.Test.TestTransferCap.Element.READER.create);
+            public bool HasList => ctx.IsStructFieldNonNull(0);
         }
 
         public class WRITER : SerializerState
@@ -15828,6 +15922,7 @@ namespace Capnproto_test.Capnp.Test
             public static implicit operator DeserializerState(READER reader) => reader.ctx;
             public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
             public Capnproto_test.Capnp.Test.TestSturdyRefHostId.READER HostId => ctx.ReadStruct(0, Capnproto_test.Capnp.Test.TestSturdyRefHostId.READER.create);
+            public bool HasHostId => ctx.IsStructFieldNonNull(0);
             public DeserializerState ObjectId => ctx.StructReadPointer(1);
         }
 
@@ -16433,6 +16528,7 @@ namespace Capnproto_test.Capnp.Test
                 public WHICH which => (WHICH)ctx.ReadDataUShort(48U, (ushort)0);
                 public badlyNamedGroup.READER BadlyNamedGroup => which == WHICH.BadlyNamedGroup ? new badlyNamedGroup.READER(ctx) : default;
                 public Capnproto_test.Capnp.Test.TestNameAnnotation.NestedStruct.READER Baz => which == WHICH.Baz ? ctx.ReadStruct(0, Capnproto_test.Capnp.Test.TestNameAnnotation.NestedStruct.READER.create) : default;
+                public bool HasBaz => ctx.IsStructFieldNonNull(0);
             }
 
             public class WRITER : SerializerState
@@ -16564,6 +16660,7 @@ namespace Capnproto_test.Capnp.Test
                 public static implicit operator READER(DeserializerState ctx) => new READER(ctx);
                 public bool BadNestedFieldName => ctx.ReadDataBool(0UL, false);
                 public Capnproto_test.Capnp.Test.TestNameAnnotation.NestedStruct.READER AnotherBadNestedFieldName => ctx.ReadStruct(0, Capnproto_test.Capnp.Test.TestNameAnnotation.NestedStruct.READER.create);
+                public bool HasAnotherBadNestedFieldName => ctx.IsStructFieldNonNull(0);
             }
 
             public class WRITER : SerializerState

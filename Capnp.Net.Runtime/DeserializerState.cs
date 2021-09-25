@@ -643,6 +643,31 @@ namespace Capnp
         }
 
         /// <summary>
+        /// Convenience method. Given this state represents a struct, determines if a field is non-null.
+        /// </summary>
+        /// <param name="index">index within this struct's pointer table</param>
+        /// <returns>true if the field is non-null, false otherwise</returns>
+        /// <exception cref="IndexOutOfRangeException">negative or too large index</exception>
+        /// <exception cref="DeserializationException">state does not represent a struct, invalid pointer,
+        /// non-struct pointer</exception>
+        public bool IsStructFieldNonNull(int index)
+        {
+            if (Kind != ObjectKind.Struct && Kind != ObjectKind.Nil)
+            {
+                throw new DeserializationException("This is not a struct");
+            }
+
+            if (index < 0 || index >= StructPtrCount)
+            {
+                throw new IndexOutOfRangeException($"Invalid index {index}. Must be [0, {StructPtrCount}).");
+            }
+
+            var pointerOffset = index + StructDataCount;
+            WirePointer pointer = CurrentSegment[Offset + pointerOffset];
+            return !pointer.IsNull;
+        }
+
+        /// <summary>
         /// Given this state represents a capability, returns its index into the capability table.
         /// </summary>
         public uint CapabilityIndex => Kind == ObjectKind.Capability ? BytesTraversedOrData : ~0u;
