@@ -264,6 +264,21 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 creator, null, field.DiscValue.HasValue);
         }
 
+        PropertyDeclarationSyntax MakeHasStructProperty(Field field)
+        {
+            var propertyType = _names.Type<bool>(Nullability.NonNullable);
+            var propertyName = "Has" + _names.GetCodeIdentifier(field).ToString();
+
+            return MakeReadProperty(
+                propertyType,
+                propertyName,
+                nameof(Capnp.DeserializerState.IsStructFieldNonNull),
+                (int)field.Offset,
+                null,
+                null,
+                false);
+        }
+
         PropertyDeclarationSyntax MakeReadGroupProperty(Field field)
         {
             var type = QualifiedName(
@@ -630,6 +645,18 @@ namespace CapnpC.CSharp.Generator.CodeGen
             }
         }
 
+        PropertyDeclarationSyntax MakeHasValueFieldProperty(Field field)
+        {
+            switch (field.Type.Tag)
+            {
+                case TypeTag.Struct:
+                case TypeTag.List:
+                    return MakeHasStructProperty(field);
+                default:
+                    return null;
+            }
+        }
+
         public StructDeclarationSyntax MakeReaderStruct(TypeDefinition def)
         {
             var readerDecl = StructDeclaration(_names.ReaderStruct.ToString()).AddModifiers(Public);
@@ -652,6 +679,12 @@ namespace CapnpC.CSharp.Generator.CodeGen
                 if (propDecl != null)
                 {
                     readerDecl = readerDecl.AddMembers(propDecl);
+                }
+
+                var hasValueDecl = MakeHasValueFieldProperty(field);
+                if (hasValueDecl != null)
+                {
+                    readerDecl = readerDecl.AddMembers(hasValueDecl);
                 }
             }
 
