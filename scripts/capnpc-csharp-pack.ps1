@@ -8,8 +8,9 @@ $csprojDir = "$scriptDir\..\capnpc-csharp"
 $csprojFile = "capnpc-csharp.csproj"
 $installDir = "$chocoDir\install"
 
-dotnet build -c Release "$scriptDir\..\Capnp.Net.sln"
-dotnet publish -c Release -r win-x86 --self-contained -o "$chocoDir\$id_win_x86\bin" "$csprojDir\$csprojFile"
+dotnet clean -c Release "$scriptDir\..\Capnp.Net.sln" --verbosity m
+dotnet build -c Release "$scriptDir\..\Capnp.Net.sln" --verbosity m
+dotnet publish -c Release -r win-x86 --self-contained -o "$chocoDir\$id_win_x86\bin" "$csprojDir\$csprojFile" --verbosity m
 # dotnet publish -c Release -o "$chocoDir\$id\bin" "$csprojDir\$csprojFile"
 
 If(!(test-path $installDir))
