@@ -9,7 +9,7 @@
 #include <capnp/capability.h>
 #endif  // !CAPNP_LITE
 
-#if CAPNP_VERSION != 7000
+#if CAPNP_VERSION != 8000
 #error "Version mismatch between generated code and library headers.  You must use the same version of the Cap'n Proto compiler and library."
 #endif
 
@@ -1809,7 +1809,7 @@ extern const ::capnp::_::ConstStruct< ::capnproto_test::capnp::test::TestPrintIn
 extern const ::capnp::_::ConstStruct< ::capnproto_test::capnp::test::TestAllTypes> DERIVED_CONSTANT;
 extern const ::capnp::_::ConstStruct< ::capnproto_test::capnp::test::TestGenerics< ::capnproto_test::capnp::test::TestAllTypes,  ::capnp::Text>> GENERIC_CONSTANT;
 extern const ::capnp::_::ConstData<831> EMBEDDED_DATA;
-extern const ::capnp::_::ConstText<4235> EMBEDDED_TEXT;
+extern const ::capnp::_::ConstText<4236> EMBEDDED_TEXT;
 extern const ::capnp::_::ConstStruct< ::capnproto_test::capnp::test::TestAllTypes> EMBEDDED_STRUCT;
 extern const ::capnp::_::ConstText<10> NON_ASCII_TEXT;
 struct TestAnyPointerConstants {
@@ -10378,7 +10378,8 @@ class TestGenerics<Foo, Bar>::Inner2<Baz>::DeepNest<Qux>::DeepNestInterface<Quux
 public:
   typedef DeepNestInterface Serves;
 
-  ::kj::Promise<void> dispatchCall(uint64_t interfaceId, uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCall(
+      uint64_t interfaceId, uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context)
       override;
 
@@ -10393,7 +10394,8 @@ protected:
         .template castAs<typename  ::capnproto_test::capnp::test::TestGenerics<Foo, Bar>::template Inner2<Baz>::template DeepNest<Qux>::template DeepNestInterface<Quux>>();
   }
 
-  ::kj::Promise<void> dispatchCallInternal(uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
+      uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
 };
 #endif  // !CAPNP_LITE
@@ -10689,7 +10691,8 @@ class TestGenerics<Foo, Bar>::Interface<Qux>::Server
 public:
   typedef Interface Serves;
 
-  ::kj::Promise<void> dispatchCall(uint64_t interfaceId, uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCall(
+      uint64_t interfaceId, uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context)
       override;
 
@@ -10703,7 +10706,8 @@ protected:
         .template castAs<typename  ::capnproto_test::capnp::test::TestGenerics<Foo, Bar>::template Interface<Qux>>();
   }
 
-  ::kj::Promise<void> dispatchCallInternal(uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
+      uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
 };
 #endif  // !CAPNP_LITE
@@ -11278,7 +11282,8 @@ class TestImplicitMethodParams::Server
 public:
   typedef TestImplicitMethodParams Serves;
 
-  ::kj::Promise<void> dispatchCall(uint64_t interfaceId, uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCall(
+      uint64_t interfaceId, uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context)
       override;
 
@@ -11292,7 +11297,8 @@ protected:
         .template castAs< ::capnproto_test::capnp::test::TestImplicitMethodParams>();
   }
 
-  ::kj::Promise<void> dispatchCallInternal(uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
+      uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
 };
 #endif  // !CAPNP_LITE
@@ -11444,7 +11450,8 @@ class TestImplicitMethodParamsInGeneric<V>::Server
 public:
   typedef TestImplicitMethodParamsInGeneric Serves;
 
-  ::kj::Promise<void> dispatchCall(uint64_t interfaceId, uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCall(
+      uint64_t interfaceId, uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context)
       override;
 
@@ -11458,7 +11465,8 @@ protected:
         .template castAs< ::capnproto_test::capnp::test::TestImplicitMethodParamsInGeneric<V>>();
   }
 
-  ::kj::Promise<void> dispatchCallInternal(uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
+      uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
 };
 #endif  // !CAPNP_LITE
@@ -12279,7 +12287,8 @@ class TestInterface::Server
 public:
   typedef TestInterface Serves;
 
-  ::kj::Promise<void> dispatchCall(uint64_t interfaceId, uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCall(
+      uint64_t interfaceId, uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context)
       override;
 
@@ -12302,7 +12311,8 @@ protected:
         .template castAs< ::capnproto_test::capnp::test::TestInterface>();
   }
 
-  ::kj::Promise<void> dispatchCallInternal(uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
+      uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
 };
 #endif  // !CAPNP_LITE
@@ -12801,7 +12811,8 @@ class TestExtends::Server
 public:
   typedef TestExtends Serves;
 
-  ::kj::Promise<void> dispatchCall(uint64_t interfaceId, uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCall(
+      uint64_t interfaceId, uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context)
       override;
 
@@ -12822,7 +12833,8 @@ protected:
         .template castAs< ::capnproto_test::capnp::test::TestExtends>();
   }
 
-  ::kj::Promise<void> dispatchCallInternal(uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
+      uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
 };
 #endif  // !CAPNP_LITE
@@ -13142,7 +13154,8 @@ class TestExtends2::Server
 public:
   typedef TestExtends2 Serves;
 
-  ::kj::Promise<void> dispatchCall(uint64_t interfaceId, uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCall(
+      uint64_t interfaceId, uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context)
       override;
 
@@ -13153,7 +13166,8 @@ protected:
         .template castAs< ::capnproto_test::capnp::test::TestExtends2>();
   }
 
-  ::kj::Promise<void> dispatchCallInternal(uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
+      uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
 };
 #endif  // !CAPNP_LITE
@@ -13193,7 +13207,8 @@ class TestPipeline::Server
 public:
   typedef TestPipeline Serves;
 
-  ::kj::Promise<void> dispatchCall(uint64_t interfaceId, uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCall(
+      uint64_t interfaceId, uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context)
       override;
 
@@ -13216,7 +13231,8 @@ protected:
         .template castAs< ::capnproto_test::capnp::test::TestPipeline>();
   }
 
-  ::kj::Promise<void> dispatchCallInternal(uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
+      uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
 };
 #endif  // !CAPNP_LITE
@@ -13968,7 +13984,8 @@ class TestCallOrder::Server
 public:
   typedef TestCallOrder Serves;
 
-  ::kj::Promise<void> dispatchCall(uint64_t interfaceId, uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCall(
+      uint64_t interfaceId, uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context)
       override;
 
@@ -13983,7 +14000,8 @@ protected:
         .template castAs< ::capnproto_test::capnp::test::TestCallOrder>();
   }
 
-  ::kj::Promise<void> dispatchCallInternal(uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
+      uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
 };
 #endif  // !CAPNP_LITE
@@ -14171,7 +14189,8 @@ class TestTailCallee::Server
 public:
   typedef TestTailCallee Serves;
 
-  ::kj::Promise<void> dispatchCall(uint64_t interfaceId, uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCall(
+      uint64_t interfaceId, uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context)
       override;
 
@@ -14185,7 +14204,8 @@ protected:
         .template castAs< ::capnproto_test::capnp::test::TestTailCallee>();
   }
 
-  ::kj::Promise<void> dispatchCallInternal(uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
+      uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
 };
 #endif  // !CAPNP_LITE
@@ -14408,7 +14428,8 @@ class TestTailCaller::Server
 public:
   typedef TestTailCaller Serves;
 
-  ::kj::Promise<void> dispatchCall(uint64_t interfaceId, uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCall(
+      uint64_t interfaceId, uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context)
       override;
 
@@ -14422,7 +14443,8 @@ protected:
         .template castAs< ::capnproto_test::capnp::test::TestTailCaller>();
   }
 
-  ::kj::Promise<void> dispatchCallInternal(uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
+      uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
 };
 #endif  // !CAPNP_LITE
@@ -14547,7 +14569,8 @@ class TestHandle::Server
 public:
   typedef TestHandle Serves;
 
-  ::kj::Promise<void> dispatchCall(uint64_t interfaceId, uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCall(
+      uint64_t interfaceId, uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context)
       override;
 
@@ -14558,7 +14581,8 @@ protected:
         .template castAs< ::capnproto_test::capnp::test::TestHandle>();
   }
 
-  ::kj::Promise<void> dispatchCallInternal(uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
+      uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
 };
 #endif  // !CAPNP_LITE
@@ -14620,7 +14644,8 @@ class TestMoreStuff::Server
 public:
   typedef TestMoreStuff Serves;
 
-  ::kj::Promise<void> dispatchCall(uint64_t interfaceId, uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCall(
+      uint64_t interfaceId, uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context)
       override;
 
@@ -14683,7 +14708,8 @@ protected:
         .template castAs< ::capnproto_test::capnp::test::TestMoreStuff>();
   }
 
-  ::kj::Promise<void> dispatchCallInternal(uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
+      uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
 };
 #endif  // !CAPNP_LITE
@@ -16848,7 +16874,8 @@ class TestMembrane::Server
 public:
   typedef TestMembrane Serves;
 
-  ::kj::Promise<void> dispatchCall(uint64_t interfaceId, uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCall(
+      uint64_t interfaceId, uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context)
       override;
 
@@ -16877,7 +16904,8 @@ protected:
         .template castAs< ::capnproto_test::capnp::test::TestMembrane>();
   }
 
-  ::kj::Promise<void> dispatchCallInternal(uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
+      uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
 };
 #endif  // !CAPNP_LITE
@@ -16915,7 +16943,8 @@ class TestMembrane::Thing::Server
 public:
   typedef Thing Serves;
 
-  ::kj::Promise<void> dispatchCall(uint64_t interfaceId, uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCall(
+      uint64_t interfaceId, uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context)
       override;
 
@@ -16932,7 +16961,8 @@ protected:
         .template castAs< ::capnproto_test::capnp::test::TestMembrane::Thing>();
   }
 
-  ::kj::Promise<void> dispatchCallInternal(uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
+      uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
 };
 #endif  // !CAPNP_LITE
@@ -18127,7 +18157,8 @@ class TestKeywordMethods::Server
 public:
   typedef TestKeywordMethods Serves;
 
-  ::kj::Promise<void> dispatchCall(uint64_t interfaceId, uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCall(
+      uint64_t interfaceId, uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context)
       override;
 
@@ -18154,7 +18185,8 @@ protected:
         .template castAs< ::capnproto_test::capnp::test::TestKeywordMethods>();
   }
 
-  ::kj::Promise<void> dispatchCallInternal(uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
+      uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
 };
 #endif  // !CAPNP_LITE
@@ -18765,7 +18797,8 @@ class TestAuthenticatedBootstrap<VatId>::Server
 public:
   typedef TestAuthenticatedBootstrap Serves;
 
-  ::kj::Promise<void> dispatchCall(uint64_t interfaceId, uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCall(
+      uint64_t interfaceId, uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context)
       override;
 
@@ -18780,7 +18813,8 @@ protected:
         .template castAs< ::capnproto_test::capnp::test::TestAuthenticatedBootstrap<VatId>>();
   }
 
-  ::kj::Promise<void> dispatchCallInternal(uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
+      uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
 };
 #endif  // !CAPNP_LITE
@@ -19884,7 +19918,8 @@ class RenamedInterface::Server
 public:
   typedef RenamedInterface Serves;
 
-  ::kj::Promise<void> dispatchCall(uint64_t interfaceId, uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCall(
+      uint64_t interfaceId, uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context)
       override;
 
@@ -19899,7 +19934,8 @@ protected:
         .template castAs< ::capnproto_test::capnp::test::RenamedInterface>();
   }
 
-  ::kj::Promise<void> dispatchCallInternal(uint16_t methodId,
+  ::capnp::Capability::Server::DispatchCallResult dispatchCallInternal(
+      uint16_t methodId,
       ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context);
 };
 #endif  // !CAPNP_LITE
@@ -28487,7 +28523,7 @@ template <typename Foo, typename Bar>
 template <typename Baz>
 template <typename Qux>
 template <typename Quux>
-::kj::Promise<void> TestGenerics<Foo, Bar>::Inner2<Baz>::DeepNest<Qux>::DeepNestInterface<Quux>::Server::dispatchCall(
+::capnp::Capability::Server::DispatchCallResult TestGenerics<Foo, Bar>::Inner2<Baz>::DeepNest<Qux>::DeepNestInterface<Quux>::Server::dispatchCall(
     uint64_t interfaceId, uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (interfaceId) {
@@ -28501,13 +28537,16 @@ template <typename Foo, typename Bar>
 template <typename Baz>
 template <typename Qux>
 template <typename Quux>
-::kj::Promise<void> TestGenerics<Foo, Bar>::Inner2<Baz>::DeepNest<Qux>::DeepNestInterface<Quux>::Server::dispatchCallInternal(
+::capnp::Capability::Server::DispatchCallResult TestGenerics<Foo, Bar>::Inner2<Baz>::DeepNest<Qux>::DeepNestInterface<Quux>::Server::dispatchCallInternal(
     uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (methodId) {
     case 0:
-      return call(::capnp::Capability::Server::internalGetTypedContext<
-          typename  ::capnproto_test::capnp::test::TestGenerics<Foo, Bar>::template Inner2<Baz>::template DeepNest<Qux>::template DeepNestInterface<Quux>::CallParams, typename  ::capnproto_test::capnp::test::TestGenerics<Foo, Bar>::template Inner2<Baz>::template DeepNest<Qux>::template DeepNestInterface<Quux>::CallResults>(context));
+      return {
+        call(::capnp::Capability::Server::internalGetTypedContext<
+            typename  ::capnproto_test::capnp::test::TestGenerics<Foo, Bar>::template Inner2<Baz>::template DeepNest<Qux>::template DeepNestInterface<Quux>::CallParams, typename  ::capnproto_test::capnp::test::TestGenerics<Foo, Bar>::template Inner2<Baz>::template DeepNest<Qux>::template DeepNestInterface<Quux>::CallResults>(context)),
+        false
+      };
     default:
       (void)context;
       return ::capnp::Capability::Server::internalUnimplemented(
@@ -28867,7 +28906,7 @@ template <typename Qux>
 }
 template <typename Foo, typename Bar>
 template <typename Qux>
-::kj::Promise<void> TestGenerics<Foo, Bar>::Interface<Qux>::Server::dispatchCall(
+::capnp::Capability::Server::DispatchCallResult TestGenerics<Foo, Bar>::Interface<Qux>::Server::dispatchCall(
     uint64_t interfaceId, uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (interfaceId) {
@@ -28879,13 +28918,16 @@ template <typename Qux>
 }
 template <typename Foo, typename Bar>
 template <typename Qux>
-::kj::Promise<void> TestGenerics<Foo, Bar>::Interface<Qux>::Server::dispatchCallInternal(
+::capnp::Capability::Server::DispatchCallResult TestGenerics<Foo, Bar>::Interface<Qux>::Server::dispatchCallInternal(
     uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (methodId) {
     case 0:
-      return call(::capnp::Capability::Server::internalGetTypedContext<
-          typename  ::capnproto_test::capnp::test::TestGenerics<Foo, Bar>::template Inner2< ::capnp::Text>, typename  ::capnproto_test::capnp::test::TestGenerics<Foo, Bar>::template Interface<Qux>::CallResults>(context));
+      return {
+        call(::capnp::Capability::Server::internalGetTypedContext<
+            typename  ::capnproto_test::capnp::test::TestGenerics<Foo, Bar>::template Inner2< ::capnp::Text>, typename  ::capnproto_test::capnp::test::TestGenerics<Foo, Bar>::template Interface<Qux>::CallResults>(context)),
+        false
+      };
     default:
       (void)context;
       return ::capnp::Capability::Server::internalUnimplemented(
@@ -29831,7 +29873,7 @@ template <typename V>
       0xdf9ccdeb81a704c9ull, 0);
 }
 template <typename V>
-::kj::Promise<void> TestImplicitMethodParamsInGeneric<V>::Server::dispatchCall(
+::capnp::Capability::Server::DispatchCallResult TestImplicitMethodParamsInGeneric<V>::Server::dispatchCall(
     uint64_t interfaceId, uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (interfaceId) {
@@ -29842,13 +29884,16 @@ template <typename V>
   }
 }
 template <typename V>
-::kj::Promise<void> TestImplicitMethodParamsInGeneric<V>::Server::dispatchCallInternal(
+::capnp::Capability::Server::DispatchCallResult TestImplicitMethodParamsInGeneric<V>::Server::dispatchCallInternal(
     uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (methodId) {
     case 0:
-      return call(::capnp::Capability::Server::internalGetTypedContext<
-          typename  ::capnproto_test::capnp::test::TestImplicitMethodParamsInGeneric<V>::template CallParams<>,  ::capnproto_test::capnp::test::TestGenerics< ::capnp::AnyPointer,  ::capnp::AnyPointer>>(context));
+      return {
+        call(::capnp::Capability::Server::internalGetTypedContext<
+            typename  ::capnproto_test::capnp::test::TestImplicitMethodParamsInGeneric<V>::template CallParams<>,  ::capnproto_test::capnp::test::TestGenerics< ::capnp::AnyPointer,  ::capnp::AnyPointer>>(context)),
+        false
+      };
     default:
       (void)context;
       return ::capnp::Capability::Server::internalUnimplemented(
@@ -33401,7 +33446,7 @@ template <typename VatId>
       0xea72cc77253798cdull, 0);
 }
 template <typename VatId>
-::kj::Promise<void> TestAuthenticatedBootstrap<VatId>::Server::dispatchCall(
+::capnp::Capability::Server::DispatchCallResult TestAuthenticatedBootstrap<VatId>::Server::dispatchCall(
     uint64_t interfaceId, uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (interfaceId) {
@@ -33412,13 +33457,16 @@ template <typename VatId>
   }
 }
 template <typename VatId>
-::kj::Promise<void> TestAuthenticatedBootstrap<VatId>::Server::dispatchCallInternal(
+::capnp::Capability::Server::DispatchCallResult TestAuthenticatedBootstrap<VatId>::Server::dispatchCallInternal(
     uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (methodId) {
     case 0:
-      return getCallerId(::capnp::Capability::Server::internalGetTypedContext<
-          typename  ::capnproto_test::capnp::test::TestAuthenticatedBootstrap<VatId>::GetCallerIdParams, typename  ::capnproto_test::capnp::test::TestAuthenticatedBootstrap<VatId>::GetCallerIdResults>(context));
+      return {
+        getCallerId(::capnp::Capability::Server::internalGetTypedContext<
+            typename  ::capnproto_test::capnp::test::TestAuthenticatedBootstrap<VatId>::GetCallerIdParams, typename  ::capnproto_test::capnp::test::TestAuthenticatedBootstrap<VatId>::GetCallerIdResults>(context)),
+        false
+      };
     default:
       (void)context;
       return ::capnp::Capability::Server::internalUnimplemented(

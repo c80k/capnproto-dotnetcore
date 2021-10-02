@@ -21,12 +21,10 @@
     <ClCompile Include="CapnpCompatTest.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="test.capnp.c++" />
   </ItemGroup>
   <ItemGroup>
     <None Include="test.capnp">
-      <Filter>Schema</Filter>
-    </None>
-    <None Include="test.capnp.c++">
       <Filter>Schema</Filter>
     </None>
   </ItemGroup>

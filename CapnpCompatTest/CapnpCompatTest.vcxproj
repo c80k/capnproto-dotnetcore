@@ -97,6 +97,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>ws2_32.lib;capnp.lib;capnp-rpc.lib;kj.lib;kj-async.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>capnp compile -oc++ test.capnp</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>re-compile test.capnp</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -112,6 +118,12 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>capnp compile -oc++ test.capnp</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>re-compile test.capnp</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -132,6 +144,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>ws2_32.lib;capnp.lib;capnp-rpc.lib;kj.lib;kj-async.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>capnp compile -oc++ test.capnp</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>re-compile test.capnp</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -151,6 +169,12 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>capnp compile -oc++ test.capnp</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>re-compile test.capnp</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CapnpCompatTest.cpp" />

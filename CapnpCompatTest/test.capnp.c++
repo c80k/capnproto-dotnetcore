@@ -11914,7 +11914,7 @@ static const ::capnp::_::AlignedData<553> b_8e59556fb309253f = {
       0,   0,   0,   0,   0,   0,   0,   0,
      12,   0,   0,   0,   0,   0,   0,   0,
       0,   0,   0,   0,   0,   0,   0,   0,
-      1,   0,   0,   0,  98, 132,   0,   0,
+      1,   0,   0,   0, 106, 132,   0,   0,
      40, 118, 111, 105, 100,  70, 105, 101,
     108, 100,  32,  61,  32, 118, 111, 105,
     100,  44,  32,  98, 111, 111, 108,  70,
@@ -12444,7 +12444,7 @@ static const ::capnp::_::AlignedData<553> b_8e59556fb309253f = {
      32, 101, 110, 117, 109,  76, 105, 115,
     116,  32,  61,  32,  91, 102, 111, 111,
      44,  32, 103,  97, 114, 112, 108, 121,
-     93,  41,  10,   0,   0,   0,   0,   0, }
+     93,  41,  13,  10,   0,   0,   0,   0, }
 };
 ::capnp::word const* const bp_8e59556fb309253f = b_8e59556fb309253f.words;
 #if !CAPNP_LITE
@@ -18930,7 +18930,7 @@ constexpr ::capnp::_::RawSchema const* TestGenericsWrapper2::_capnpPrivate::sche
       "test.capnp:TestImplicitMethodParams", "call",
       0x8b9717a3f8d85a9aull, 0);
 }
-::kj::Promise<void> TestImplicitMethodParams::Server::dispatchCall(
+::capnp::Capability::Server::DispatchCallResult TestImplicitMethodParams::Server::dispatchCall(
     uint64_t interfaceId, uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (interfaceId) {
@@ -18940,13 +18940,16 @@ constexpr ::capnp::_::RawSchema const* TestGenericsWrapper2::_capnpPrivate::sche
       return internalUnimplemented("test.capnp:TestImplicitMethodParams", interfaceId);
   }
 }
-::kj::Promise<void> TestImplicitMethodParams::Server::dispatchCallInternal(
+::capnp::Capability::Server::DispatchCallResult TestImplicitMethodParams::Server::dispatchCallInternal(
     uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (methodId) {
     case 0:
-      return call(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestImplicitMethodParams::CallParams<>,  ::capnproto_test::capnp::test::TestGenerics< ::capnp::AnyPointer,  ::capnp::AnyPointer>>(context));
+      return {
+        call(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestImplicitMethodParams::CallParams<>,  ::capnproto_test::capnp::test::TestGenerics< ::capnp::AnyPointer,  ::capnp::AnyPointer>>(context)),
+        false
+      };
     default:
       (void)context;
       return ::capnp::Capability::Server::internalUnimplemented(
@@ -19044,7 +19047,7 @@ const ::capnp::_::ConstStruct< ::capnproto_test::capnp::test::TestPrintInlineStr
 const ::capnp::_::ConstStruct< ::capnproto_test::capnp::test::TestAllTypes> DERIVED_CONSTANT(::capnp::schemas::b_a4764c3483341eeb.words + 23);
 const ::capnp::_::ConstStruct< ::capnproto_test::capnp::test::TestGenerics< ::capnproto_test::capnp::test::TestAllTypes,  ::capnp::Text>> GENERIC_CONSTANT(::capnp::schemas::b_b70341f0dafa28ef.words + 41);
 const ::capnp::_::ConstData<831> EMBEDDED_DATA(::capnp::schemas::b_d7c0fea759d6a0cf.words + 23);
-const ::capnp::_::ConstText<4235> EMBEDDED_TEXT(::capnp::schemas::b_8e59556fb309253f.words + 23);
+const ::capnp::_::ConstText<4236> EMBEDDED_TEXT(::capnp::schemas::b_8e59556fb309253f.words + 23);
 const ::capnp::_::ConstStruct< ::capnproto_test::capnp::test::TestAllTypes> EMBEDDED_STRUCT(::capnp::schemas::b_dec09c6791841ebb.words + 23);
 const ::capnp::_::ConstText<10> NON_ASCII_TEXT(::capnp::schemas::b_fb7ed666617fb649.words + 23);
 // TestAnyPointerConstants
@@ -19087,7 +19090,7 @@ TestInterface::Client::bazRequest(::kj::Maybe< ::capnp::MessageSize> sizeHint) {
       "test.capnp:TestInterface", "baz",
       0x88eb12a0e0af92b2ull, 2);
 }
-::kj::Promise<void> TestInterface::Server::dispatchCall(
+::capnp::Capability::Server::DispatchCallResult TestInterface::Server::dispatchCall(
     uint64_t interfaceId, uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (interfaceId) {
@@ -19097,19 +19100,28 @@ TestInterface::Client::bazRequest(::kj::Maybe< ::capnp::MessageSize> sizeHint) {
       return internalUnimplemented("test.capnp:TestInterface", interfaceId);
   }
 }
-::kj::Promise<void> TestInterface::Server::dispatchCallInternal(
+::capnp::Capability::Server::DispatchCallResult TestInterface::Server::dispatchCallInternal(
     uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (methodId) {
     case 0:
-      return foo(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestInterface::FooParams,  ::capnproto_test::capnp::test::TestInterface::FooResults>(context));
+      return {
+        foo(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestInterface::FooParams,  ::capnproto_test::capnp::test::TestInterface::FooResults>(context)),
+        false
+      };
     case 1:
-      return bar(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestInterface::BarParams,  ::capnproto_test::capnp::test::TestInterface::BarResults>(context));
+      return {
+        bar(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestInterface::BarParams,  ::capnproto_test::capnp::test::TestInterface::BarResults>(context)),
+        false
+      };
     case 2:
-      return baz(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestInterface::BazParams,  ::capnproto_test::capnp::test::TestInterface::BazResults>(context));
+      return {
+        baz(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestInterface::BazParams,  ::capnproto_test::capnp::test::TestInterface::BazResults>(context)),
+        false
+      };
     default:
       (void)context;
       return ::capnp::Capability::Server::internalUnimplemented(
@@ -19204,7 +19216,7 @@ TestExtends::Client::graultRequest(::kj::Maybe< ::capnp::MessageSize> sizeHint) 
       "test.capnp:TestExtends", "grault",
       0xe4e9bac98670b748ull, 2);
 }
-::kj::Promise<void> TestExtends::Server::dispatchCall(
+::capnp::Capability::Server::DispatchCallResult TestExtends::Server::dispatchCall(
     uint64_t interfaceId, uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (interfaceId) {
@@ -19216,19 +19228,28 @@ TestExtends::Client::graultRequest(::kj::Maybe< ::capnp::MessageSize> sizeHint) 
       return internalUnimplemented("test.capnp:TestExtends", interfaceId);
   }
 }
-::kj::Promise<void> TestExtends::Server::dispatchCallInternal(
+::capnp::Capability::Server::DispatchCallResult TestExtends::Server::dispatchCallInternal(
     uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (methodId) {
     case 0:
-      return qux(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestExtends::QuxParams,  ::capnproto_test::capnp::test::TestExtends::QuxResults>(context));
+      return {
+        qux(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestExtends::QuxParams,  ::capnproto_test::capnp::test::TestExtends::QuxResults>(context)),
+        false
+      };
     case 1:
-      return corge(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestAllTypes,  ::capnproto_test::capnp::test::TestExtends::CorgeResults>(context));
+      return {
+        corge(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestAllTypes,  ::capnproto_test::capnp::test::TestExtends::CorgeResults>(context)),
+        false
+      };
     case 2:
-      return grault(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestExtends::GraultParams,  ::capnproto_test::capnp::test::TestAllTypes>(context));
+      return {
+        grault(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestExtends::GraultParams,  ::capnproto_test::capnp::test::TestAllTypes>(context)),
+        false
+      };
     default:
       (void)context;
       return ::capnp::Capability::Server::internalUnimplemented(
@@ -19277,7 +19298,7 @@ constexpr ::capnp::_::RawSchema const* TestExtends::GraultParams::_capnpPrivate:
 #endif  // !CAPNP_LITE
 
 #if !CAPNP_LITE
-::kj::Promise<void> TestExtends2::Server::dispatchCall(
+::capnp::Capability::Server::DispatchCallResult TestExtends2::Server::dispatchCall(
     uint64_t interfaceId, uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (interfaceId) {
@@ -19291,7 +19312,7 @@ constexpr ::capnp::_::RawSchema const* TestExtends::GraultParams::_capnpPrivate:
       return internalUnimplemented("test.capnp:TestExtends2", interfaceId);
   }
 }
-::kj::Promise<void> TestExtends2::Server::dispatchCallInternal(
+::capnp::Capability::Server::DispatchCallResult TestExtends2::Server::dispatchCallInternal(
     uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (methodId) {
@@ -19341,7 +19362,7 @@ TestPipeline::Client::getAnyCapRequest(::kj::Maybe< ::capnp::MessageSize> sizeHi
       "test.capnp:TestPipeline", "getAnyCap",
       0xa5a404caa61d4cd0ull, 2);
 }
-::kj::Promise<void> TestPipeline::Server::dispatchCall(
+::capnp::Capability::Server::DispatchCallResult TestPipeline::Server::dispatchCall(
     uint64_t interfaceId, uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (interfaceId) {
@@ -19351,19 +19372,28 @@ TestPipeline::Client::getAnyCapRequest(::kj::Maybe< ::capnp::MessageSize> sizeHi
       return internalUnimplemented("test.capnp:TestPipeline", interfaceId);
   }
 }
-::kj::Promise<void> TestPipeline::Server::dispatchCallInternal(
+::capnp::Capability::Server::DispatchCallResult TestPipeline::Server::dispatchCallInternal(
     uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (methodId) {
     case 0:
-      return getCap(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestPipeline::GetCapParams,  ::capnproto_test::capnp::test::TestPipeline::GetCapResults>(context));
+      return {
+        getCap(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestPipeline::GetCapParams,  ::capnproto_test::capnp::test::TestPipeline::GetCapResults>(context)),
+        false
+      };
     case 1:
-      return testPointers(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestPipeline::TestPointersParams,  ::capnproto_test::capnp::test::TestPipeline::TestPointersResults>(context));
+      return {
+        testPointers(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestPipeline::TestPointersParams,  ::capnproto_test::capnp::test::TestPipeline::TestPointersResults>(context)),
+        false
+      };
     case 2:
-      return getAnyCap(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestPipeline::GetAnyCapParams,  ::capnproto_test::capnp::test::TestPipeline::GetAnyCapResults>(context));
+      return {
+        getAnyCap(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestPipeline::GetAnyCapParams,  ::capnproto_test::capnp::test::TestPipeline::GetAnyCapResults>(context)),
+        false
+      };
     default:
       (void)context;
       return ::capnp::Capability::Server::internalUnimplemented(
@@ -19454,7 +19484,7 @@ TestCallOrder::Client::getCallSequenceRequest(::kj::Maybe< ::capnp::MessageSize>
       "test.capnp:TestCallOrder", "getCallSequence",
       0xa0e77035bdff0051ull, 0);
 }
-::kj::Promise<void> TestCallOrder::Server::dispatchCall(
+::capnp::Capability::Server::DispatchCallResult TestCallOrder::Server::dispatchCall(
     uint64_t interfaceId, uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (interfaceId) {
@@ -19464,13 +19494,16 @@ TestCallOrder::Client::getCallSequenceRequest(::kj::Maybe< ::capnp::MessageSize>
       return internalUnimplemented("test.capnp:TestCallOrder", interfaceId);
   }
 }
-::kj::Promise<void> TestCallOrder::Server::dispatchCallInternal(
+::capnp::Capability::Server::DispatchCallResult TestCallOrder::Server::dispatchCallInternal(
     uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (methodId) {
     case 0:
-      return getCallSequence(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestCallOrder::GetCallSequenceParams,  ::capnproto_test::capnp::test::TestCallOrder::GetCallSequenceResults>(context));
+      return {
+        getCallSequence(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestCallOrder::GetCallSequenceParams,  ::capnproto_test::capnp::test::TestCallOrder::GetCallSequenceResults>(context)),
+        false
+      };
     default:
       (void)context;
       return ::capnp::Capability::Server::internalUnimplemented(
@@ -19513,7 +19546,7 @@ TestTailCallee::Client::fooRequest(::kj::Maybe< ::capnp::MessageSize> sizeHint) 
       "test.capnp:TestTailCallee", "foo",
       0xddd699207eb8e23bull, 0);
 }
-::kj::Promise<void> TestTailCallee::Server::dispatchCall(
+::capnp::Capability::Server::DispatchCallResult TestTailCallee::Server::dispatchCall(
     uint64_t interfaceId, uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (interfaceId) {
@@ -19523,13 +19556,16 @@ TestTailCallee::Client::fooRequest(::kj::Maybe< ::capnp::MessageSize> sizeHint) 
       return internalUnimplemented("test.capnp:TestTailCallee", interfaceId);
   }
 }
-::kj::Promise<void> TestTailCallee::Server::dispatchCallInternal(
+::capnp::Capability::Server::DispatchCallResult TestTailCallee::Server::dispatchCallInternal(
     uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (methodId) {
     case 0:
-      return foo(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestTailCallee::FooParams,  ::capnproto_test::capnp::test::TestTailCallee::TailResult>(context));
+      return {
+        foo(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestTailCallee::FooParams,  ::capnproto_test::capnp::test::TestTailCallee::TailResult>(context)),
+        false
+      };
     default:
       (void)context;
       return ::capnp::Capability::Server::internalUnimplemented(
@@ -19572,7 +19608,7 @@ TestTailCaller::Client::fooRequest(::kj::Maybe< ::capnp::MessageSize> sizeHint) 
       "test.capnp:TestTailCaller", "foo",
       0x870bf40110ce3035ull, 0);
 }
-::kj::Promise<void> TestTailCaller::Server::dispatchCall(
+::capnp::Capability::Server::DispatchCallResult TestTailCaller::Server::dispatchCall(
     uint64_t interfaceId, uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (interfaceId) {
@@ -19582,13 +19618,16 @@ TestTailCaller::Client::fooRequest(::kj::Maybe< ::capnp::MessageSize> sizeHint) 
       return internalUnimplemented("test.capnp:TestTailCaller", interfaceId);
   }
 }
-::kj::Promise<void> TestTailCaller::Server::dispatchCallInternal(
+::capnp::Capability::Server::DispatchCallResult TestTailCaller::Server::dispatchCallInternal(
     uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (methodId) {
     case 0:
-      return foo(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestTailCaller::FooParams,  ::capnproto_test::capnp::test::TestTailCallee::TailResult>(context));
+      return {
+        foo(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestTailCaller::FooParams,  ::capnproto_test::capnp::test::TestTailCallee::TailResult>(context)),
+        false
+      };
     default:
       (void)context;
       return ::capnp::Capability::Server::internalUnimplemented(
@@ -19613,7 +19652,7 @@ constexpr ::capnp::_::RawSchema const* TestTailCaller::FooParams::_capnpPrivate:
 #endif  // !CAPNP_LITE
 
 #if !CAPNP_LITE
-::kj::Promise<void> TestHandle::Server::dispatchCall(
+::capnp::Capability::Server::DispatchCallResult TestHandle::Server::dispatchCall(
     uint64_t interfaceId, uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (interfaceId) {
@@ -19623,7 +19662,7 @@ constexpr ::capnp::_::RawSchema const* TestTailCaller::FooParams::_capnpPrivate:
       return internalUnimplemented("test.capnp:TestHandle", interfaceId);
   }
 }
-::kj::Promise<void> TestHandle::Server::dispatchCallInternal(
+::capnp::Capability::Server::DispatchCallResult TestHandle::Server::dispatchCallInternal(
     uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (methodId) {
@@ -19773,7 +19812,7 @@ TestMoreStuff::Client::methodWithNullDefaultRequest(::kj::Maybe< ::capnp::Messag
       "test.capnp:TestMoreStuff", "methodWithNullDefault",
       0xddc70bf9784133cfull, 12);
 }
-::kj::Promise<void> TestMoreStuff::Server::dispatchCall(
+::capnp::Capability::Server::DispatchCallResult TestMoreStuff::Server::dispatchCall(
     uint64_t interfaceId, uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (interfaceId) {
@@ -19785,49 +19824,88 @@ TestMoreStuff::Client::methodWithNullDefaultRequest(::kj::Maybe< ::capnp::Messag
       return internalUnimplemented("test.capnp:TestMoreStuff", interfaceId);
   }
 }
-::kj::Promise<void> TestMoreStuff::Server::dispatchCallInternal(
+::capnp::Capability::Server::DispatchCallResult TestMoreStuff::Server::dispatchCallInternal(
     uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (methodId) {
     case 0:
-      return callFoo(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMoreStuff::CallFooParams,  ::capnproto_test::capnp::test::TestMoreStuff::CallFooResults>(context));
+      return {
+        callFoo(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMoreStuff::CallFooParams,  ::capnproto_test::capnp::test::TestMoreStuff::CallFooResults>(context)),
+        false
+      };
     case 1:
-      return callFooWhenResolved(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMoreStuff::CallFooWhenResolvedParams,  ::capnproto_test::capnp::test::TestMoreStuff::CallFooWhenResolvedResults>(context));
+      return {
+        callFooWhenResolved(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMoreStuff::CallFooWhenResolvedParams,  ::capnproto_test::capnp::test::TestMoreStuff::CallFooWhenResolvedResults>(context)),
+        false
+      };
     case 2:
-      return neverReturn(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMoreStuff::NeverReturnParams,  ::capnproto_test::capnp::test::TestMoreStuff::NeverReturnResults>(context));
+      return {
+        neverReturn(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMoreStuff::NeverReturnParams,  ::capnproto_test::capnp::test::TestMoreStuff::NeverReturnResults>(context)),
+        false
+      };
     case 3:
-      return hold(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMoreStuff::HoldParams,  ::capnproto_test::capnp::test::TestMoreStuff::HoldResults>(context));
+      return {
+        hold(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMoreStuff::HoldParams,  ::capnproto_test::capnp::test::TestMoreStuff::HoldResults>(context)),
+        false
+      };
     case 4:
-      return callHeld(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMoreStuff::CallHeldParams,  ::capnproto_test::capnp::test::TestMoreStuff::CallHeldResults>(context));
+      return {
+        callHeld(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMoreStuff::CallHeldParams,  ::capnproto_test::capnp::test::TestMoreStuff::CallHeldResults>(context)),
+        false
+      };
     case 5:
-      return getHeld(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMoreStuff::GetHeldParams,  ::capnproto_test::capnp::test::TestMoreStuff::GetHeldResults>(context));
+      return {
+        getHeld(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMoreStuff::GetHeldParams,  ::capnproto_test::capnp::test::TestMoreStuff::GetHeldResults>(context)),
+        false
+      };
     case 6:
-      return echo(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMoreStuff::EchoParams,  ::capnproto_test::capnp::test::TestMoreStuff::EchoResults>(context));
+      return {
+        echo(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMoreStuff::EchoParams,  ::capnproto_test::capnp::test::TestMoreStuff::EchoResults>(context)),
+        false
+      };
     case 7:
-      return expectCancel(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMoreStuff::ExpectCancelParams,  ::capnproto_test::capnp::test::TestMoreStuff::ExpectCancelResults>(context));
+      return {
+        expectCancel(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMoreStuff::ExpectCancelParams,  ::capnproto_test::capnp::test::TestMoreStuff::ExpectCancelResults>(context)),
+        false
+      };
     case 8:
-      return methodWithDefaults(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMoreStuff::MethodWithDefaultsParams,  ::capnproto_test::capnp::test::TestMoreStuff::MethodWithDefaultsResults>(context));
+      return {
+        methodWithDefaults(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMoreStuff::MethodWithDefaultsParams,  ::capnproto_test::capnp::test::TestMoreStuff::MethodWithDefaultsResults>(context)),
+        false
+      };
     case 9:
-      return getHandle(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMoreStuff::GetHandleParams,  ::capnproto_test::capnp::test::TestMoreStuff::GetHandleResults>(context));
+      return {
+        getHandle(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMoreStuff::GetHandleParams,  ::capnproto_test::capnp::test::TestMoreStuff::GetHandleResults>(context)),
+        false
+      };
     case 10:
-      return getNull(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMoreStuff::GetNullParams,  ::capnproto_test::capnp::test::TestMoreStuff::GetNullResults>(context));
+      return {
+        getNull(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMoreStuff::GetNullParams,  ::capnproto_test::capnp::test::TestMoreStuff::GetNullResults>(context)),
+        false
+      };
     case 11:
-      return getEnormousString(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMoreStuff::GetEnormousStringParams,  ::capnproto_test::capnp::test::TestMoreStuff::GetEnormousStringResults>(context));
+      return {
+        getEnormousString(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMoreStuff::GetEnormousStringParams,  ::capnproto_test::capnp::test::TestMoreStuff::GetEnormousStringResults>(context)),
+        false
+      };
     case 12:
-      return methodWithNullDefault(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMoreStuff::MethodWithNullDefaultParams,  ::capnproto_test::capnp::test::TestMoreStuff::MethodWithNullDefaultResults>(context));
+      return {
+        methodWithNullDefault(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMoreStuff::MethodWithNullDefaultParams,  ::capnproto_test::capnp::test::TestMoreStuff::MethodWithNullDefaultResults>(context)),
+        false
+      };
     default:
       (void)context;
       return ::capnp::Capability::Server::internalUnimplemented(
@@ -20102,7 +20180,7 @@ TestMembrane::Client::waitForeverRequest(::kj::Maybe< ::capnp::MessageSize> size
       "test.capnp:TestMembrane", "waitForever",
       0xc07d8dcd80a69c0cull, 4);
 }
-::kj::Promise<void> TestMembrane::Server::dispatchCall(
+::capnp::Capability::Server::DispatchCallResult TestMembrane::Server::dispatchCall(
     uint64_t interfaceId, uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (interfaceId) {
@@ -20112,25 +20190,40 @@ TestMembrane::Client::waitForeverRequest(::kj::Maybe< ::capnp::MessageSize> size
       return internalUnimplemented("test.capnp:TestMembrane", interfaceId);
   }
 }
-::kj::Promise<void> TestMembrane::Server::dispatchCallInternal(
+::capnp::Capability::Server::DispatchCallResult TestMembrane::Server::dispatchCallInternal(
     uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (methodId) {
     case 0:
-      return makeThing(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMembrane::MakeThingParams,  ::capnproto_test::capnp::test::TestMembrane::MakeThingResults>(context));
+      return {
+        makeThing(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMembrane::MakeThingParams,  ::capnproto_test::capnp::test::TestMembrane::MakeThingResults>(context)),
+        false
+      };
     case 1:
-      return callPassThrough(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMembrane::CallPassThroughParams,  ::capnproto_test::capnp::test::TestMembrane::Result>(context));
+      return {
+        callPassThrough(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMembrane::CallPassThroughParams,  ::capnproto_test::capnp::test::TestMembrane::Result>(context)),
+        false
+      };
     case 2:
-      return callIntercept(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMembrane::CallInterceptParams,  ::capnproto_test::capnp::test::TestMembrane::Result>(context));
+      return {
+        callIntercept(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMembrane::CallInterceptParams,  ::capnproto_test::capnp::test::TestMembrane::Result>(context)),
+        false
+      };
     case 3:
-      return loopback(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMembrane::LoopbackParams,  ::capnproto_test::capnp::test::TestMembrane::LoopbackResults>(context));
+      return {
+        loopback(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMembrane::LoopbackParams,  ::capnproto_test::capnp::test::TestMembrane::LoopbackResults>(context)),
+        false
+      };
     case 4:
-      return waitForever(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMembrane::WaitForeverParams,  ::capnproto_test::capnp::test::TestMembrane::WaitForeverResults>(context));
+      return {
+        waitForever(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMembrane::WaitForeverParams,  ::capnproto_test::capnp::test::TestMembrane::WaitForeverResults>(context)),
+        false
+      };
     default:
       (void)context;
       return ::capnp::Capability::Server::internalUnimplemented(
@@ -20167,7 +20260,7 @@ TestMembrane::Thing::Client::interceptRequest(::kj::Maybe< ::capnp::MessageSize>
       "test.capnp:TestMembrane.Thing", "intercept",
       0x9352e4e41f173917ull, 1);
 }
-::kj::Promise<void> TestMembrane::Thing::Server::dispatchCall(
+::capnp::Capability::Server::DispatchCallResult TestMembrane::Thing::Server::dispatchCall(
     uint64_t interfaceId, uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (interfaceId) {
@@ -20177,16 +20270,22 @@ TestMembrane::Thing::Client::interceptRequest(::kj::Maybe< ::capnp::MessageSize>
       return internalUnimplemented("test.capnp:TestMembrane.Thing", interfaceId);
   }
 }
-::kj::Promise<void> TestMembrane::Thing::Server::dispatchCallInternal(
+::capnp::Capability::Server::DispatchCallResult TestMembrane::Thing::Server::dispatchCallInternal(
     uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (methodId) {
     case 0:
-      return passThrough(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMembrane::Thing::PassThroughParams,  ::capnproto_test::capnp::test::TestMembrane::Result>(context));
+      return {
+        passThrough(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMembrane::Thing::PassThroughParams,  ::capnproto_test::capnp::test::TestMembrane::Result>(context)),
+        false
+      };
     case 1:
-      return intercept(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestMembrane::Thing::InterceptParams,  ::capnproto_test::capnp::test::TestMembrane::Result>(context));
+      return {
+        intercept(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestMembrane::Thing::InterceptParams,  ::capnproto_test::capnp::test::TestMembrane::Result>(context)),
+        false
+      };
     default:
       (void)context;
       return ::capnp::Capability::Server::internalUnimplemented(
@@ -20355,7 +20454,7 @@ TestKeywordMethods::Client::returnRequest(::kj::Maybe< ::capnp::MessageSize> siz
       "test.capnp:TestKeywordMethods", "return",
       0x9ae342d394247cfcull, 3);
 }
-::kj::Promise<void> TestKeywordMethods::Server::dispatchCall(
+::capnp::Capability::Server::DispatchCallResult TestKeywordMethods::Server::dispatchCall(
     uint64_t interfaceId, uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (interfaceId) {
@@ -20365,22 +20464,34 @@ TestKeywordMethods::Client::returnRequest(::kj::Maybe< ::capnp::MessageSize> siz
       return internalUnimplemented("test.capnp:TestKeywordMethods", interfaceId);
   }
 }
-::kj::Promise<void> TestKeywordMethods::Server::dispatchCallInternal(
+::capnp::Capability::Server::DispatchCallResult TestKeywordMethods::Server::dispatchCallInternal(
     uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (methodId) {
     case 0:
-      return delete_(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestKeywordMethods::DeleteParams,  ::capnproto_test::capnp::test::TestKeywordMethods::DeleteResults>(context));
+      return {
+        delete_(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestKeywordMethods::DeleteParams,  ::capnproto_test::capnp::test::TestKeywordMethods::DeleteResults>(context)),
+        false
+      };
     case 1:
-      return class_(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestKeywordMethods::ClassParams,  ::capnproto_test::capnp::test::TestKeywordMethods::ClassResults>(context));
+      return {
+        class_(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestKeywordMethods::ClassParams,  ::capnproto_test::capnp::test::TestKeywordMethods::ClassResults>(context)),
+        false
+      };
     case 2:
-      return void_(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestKeywordMethods::VoidParams,  ::capnproto_test::capnp::test::TestKeywordMethods::VoidResults>(context));
+      return {
+        void_(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestKeywordMethods::VoidParams,  ::capnproto_test::capnp::test::TestKeywordMethods::VoidResults>(context)),
+        false
+      };
     case 3:
-      return return_(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::TestKeywordMethods::ReturnParams,  ::capnproto_test::capnp::test::TestKeywordMethods::ReturnResults>(context));
+      return {
+        return_(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::TestKeywordMethods::ReturnParams,  ::capnproto_test::capnp::test::TestKeywordMethods::ReturnResults>(context)),
+        false
+      };
     default:
       (void)context;
       return ::capnp::Capability::Server::internalUnimplemented(
@@ -20559,7 +20670,7 @@ RenamedInterface::Client::renamedMethodRequest(::kj::Maybe< ::capnp::MessageSize
       "test.capnp:TestNameAnnotationInterface", "renamedMethod",
       0xd112a69d31ed918bull, 0);
 }
-::kj::Promise<void> RenamedInterface::Server::dispatchCall(
+::capnp::Capability::Server::DispatchCallResult RenamedInterface::Server::dispatchCall(
     uint64_t interfaceId, uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (interfaceId) {
@@ -20569,13 +20680,16 @@ RenamedInterface::Client::renamedMethodRequest(::kj::Maybe< ::capnp::MessageSize
       return internalUnimplemented("test.capnp:TestNameAnnotationInterface", interfaceId);
   }
 }
-::kj::Promise<void> RenamedInterface::Server::dispatchCallInternal(
+::capnp::Capability::Server::DispatchCallResult RenamedInterface::Server::dispatchCallInternal(
     uint16_t methodId,
     ::capnp::CallContext< ::capnp::AnyPointer, ::capnp::AnyPointer> context) {
   switch (methodId) {
     case 0:
-      return renamedMethod(::capnp::Capability::Server::internalGetTypedContext<
-           ::capnproto_test::capnp::test::RenamedInterface::RenamedMethodParams,  ::capnproto_test::capnp::test::RenamedInterface::RenamedMethodResults>(context));
+      return {
+        renamedMethod(::capnp::Capability::Server::internalGetTypedContext<
+             ::capnproto_test::capnp::test::RenamedInterface::RenamedMethodParams,  ::capnproto_test::capnp::test::RenamedInterface::RenamedMethodResults>(context)),
+        false
+      };
     default:
       (void)context;
       return ::capnp::Capability::Server::internalUnimplemented(

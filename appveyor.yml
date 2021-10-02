@@ -9,6 +9,8 @@ install:
   - cd c:\tools\vcpkg
   - vcpkg integrate install
   - vcpkg install capnproto
+  - set PATH_COPY=%PATH%
+  - set PATH=%PATH%;c:\tools\vcpkg\installed\x86-windows\tools\capnproto
   - cd %APPVEYOR_BUILD_FOLDER%
   - dotnet tool install -g nbgv
   - choco install reportgenerator.portable --version=4.5.6 --force -y
@@ -63,7 +65,6 @@ test_script:
       nbgv get-version -v NuGetPackageVersion >> version.txt
       set /P VERSION=< version.txt
       vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp3.1\CapnpC.CSharp.Generator.Tests.dll
-      choco install capnproto --source="https://chocolatey.org/api/v2" --force -y
       cd %APPVEYOR_BUILD_FOLDER%\capnpc-csharp
       dotnet tool install --global --add-source ./nupkg capnpc-csharp --version %VERSION%
       cd %APPVEYOR_BUILD_FOLDER%\install-test
@@ -77,7 +78,7 @@ test_script:
       choco install capnpc-csharp-win-x86 --source=".;https://chocolatey.org/api/v2" --force -y --version %VERSION% --pre
       cd %APPVEYOR_BUILD_FOLDER%\install-test
       compile-test
-      choco uninstall capnpc-csharp-win-x86 -y
+      set PATH=%PATH_COPY%
       notinstalled-test
       cd %APPVEYOR_BUILD_FOLDER%
       vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.MsBuild.Generation.Tests\bin\Release\netcoreapp3.1\CapnpC.CSharp.MsBuild.Generation.Tests.dll
