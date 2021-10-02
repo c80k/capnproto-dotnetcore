@@ -34,10 +34,10 @@ before_build:
   - cmd: dotnet restore ./CapnpC.CSharp.MsBuild.Generation.Tests/CapnpC.CSharp.MsBuild.Generation.Tests.csproj --verbosity m  
   - cmd: dotnet restore ./capnpc-csharp/capnpc-csharp.csproj --verbosity m  
 build_script:
-  - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Debug"
-  - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Release"
-  - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Debug"
-  - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Release"
+  - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Debug" -V:m
+  - cmd: msbuild ./Capnp.Net.sln /p:Configuration="Release" -V:m
+  - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Debug" -V:m
+  - cmd: msbuild ./CapnpCompatTest.sln /p:Configuration="Release" -V:m
   - ps: scripts\capnpc-csharp-pack.ps1
 after_build:
   # For once the build has completed
