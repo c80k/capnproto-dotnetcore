@@ -12,7 +12,7 @@ install:
   - set PATH_COPY=%PATH%
   - set PATH=%PATH%;c:\tools\vcpkg\installed\x86-windows\tools\capnproto
   - cd %APPVEYOR_BUILD_FOLDER%
-  - dotnet tool install -g nbgv
+  - dotnet tool install -g nbgv --version 3.1.74
   - choco install reportgenerator.portable --version=4.5.6 --force -y
   - dotnet tool install -g coveralls.net --version 1.0.0
 init:
