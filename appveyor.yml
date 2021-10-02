@@ -62,8 +62,8 @@ artifacts:
    type: zip
 test_script:
   - cmd: |
-      nbgv get-version -v NuGetPackageVersion >> version.txt
-      set /P VERSION=< version.txt
+      nbgv get-version -v NuGetPackageVersion >> myversion.txt
+      set /P VERSION=< myversion.txt
       vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp3.1\CapnpC.CSharp.Generator.Tests.dll
       cd %APPVEYOR_BUILD_FOLDER%\capnpc-csharp
       dotnet tool install --global --add-source ./nupkg capnpc-csharp --version %VERSION%
