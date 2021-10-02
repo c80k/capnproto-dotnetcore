@@ -75,10 +75,11 @@ test_script:
       cd %APPVEYOR_BUILD_FOLDER%\install-test
       notinstalled-test
       cd %APPVEYOR_BUILD_FOLDER%\chocolatey\install
+      choco install capnproto --source="https://chocolatey.org/api/v2" --force -y
       choco install capnpc-csharp-win-x86 --source=".;https://chocolatey.org/api/v2" --force -y --version %VERSION% --pre
       cd %APPVEYOR_BUILD_FOLDER%\install-test
       compile-test
-      set PATH=%PATH_COPY%
+      choco uninstall capnpc-csharp-win-x86 -y
       notinstalled-test
       cd %APPVEYOR_BUILD_FOLDER%
       vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.MsBuild.Generation.Tests\bin\Release\netcoreapp3.1\CapnpC.CSharp.MsBuild.Generation.Tests.dll
