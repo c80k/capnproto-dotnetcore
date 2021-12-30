@@ -41,7 +41,7 @@ namespace CapnpC.CSharp.MsBuild.Generation
             if (!string.IsNullOrWhiteSpace(importPaths))
             {
                 job.AdditionalArguments.AddRange(importPaths.Split(new char[] { ';' }, 
-                    StringSplitOptions.RemoveEmptyEntries).Select(p => $"-I\"{p.TrimEnd('\\')}\""));
+                    StringSplitOptions.RemoveEmptyEntries).Select(p => $"-I{p}"));
             }
 
             string sourcePrefix = item.GetMetadata("SourcePrefix");

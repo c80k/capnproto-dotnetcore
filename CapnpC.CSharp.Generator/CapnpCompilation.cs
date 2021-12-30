@@ -76,7 +76,10 @@ namespace CapnpC.CSharp.Generator
                 var argList = new List<string>();
                 argList.Add("compile");
                 argList.Add($"-o-");
-                argList.AddRange(arguments);
+                foreach (var arg in arguments)
+                {
+                    argList.Add($"\"{arg.TrimEnd('\\')}\"");
+                }
 
                 compiler.StartInfo.FileName = CapnpCompilerFilename;
                 compiler.StartInfo.Arguments = string.Join(" ", argList);
