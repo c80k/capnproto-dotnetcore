@@ -609,7 +609,9 @@ namespace Capnp
         /// non-list-of-pointers pointer, traversal limit exceeded</exception>
         public ListOfCapsDeserializer<T> ReadCapList<T>(int index) where T : class
         {
-            return StructReadPointer(index).RequireCapList<T>();
+            var list = StructReadPointer(index).RequireCapList<T>();
+            list.AddRef();
+            return list;
         }
 
         /// <summary>

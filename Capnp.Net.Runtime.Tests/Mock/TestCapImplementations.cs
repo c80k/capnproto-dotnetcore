@@ -1434,5 +1434,28 @@ namespace Capnp.Net.Runtime.Tests.GenImpls
         }
     }
 
+
+    class Issue62Impl : IIssue62
+
+    {
+        public Task<IReadOnlyList<Issue62.ICapElement>> ListOfCaps(CancellationToken cancellationToken_ = default)
+            => Task.FromResult(new Issue62.ICapElement[] { new ICapElementImpl() } as IReadOnlyList<Issue62.ICapElement>);
+
+        public void Dispose()
+        {
+        }
+
+        class ICapElementImpl : Issue62.ICapElement
+        {
+            public void Dispose()
+            {
+            }
+
+            public async Task Method(CancellationToken cancellationToken_ = default)
+            {
+            }
+        }
+    }
+
     #endregion
 }

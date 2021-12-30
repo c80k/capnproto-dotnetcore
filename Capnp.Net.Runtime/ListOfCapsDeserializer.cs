@@ -16,6 +16,15 @@ namespace Capnp
             Rpc.CapabilityReflection.ValidateCapabilityInterface(typeof(T));
         }
 
+        internal void AddRef()
+        {
+            int count = Count;
+            for (var i = 0; i < count; i++)
+            {
+                State.DecodeCapPointer(i).AddRef();
+            }
+        }
+
         /// <summary>
         /// Returns the capability at given index.
         /// </summary>

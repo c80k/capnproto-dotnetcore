@@ -180,6 +180,51 @@ namespace Capnp.Net.Runtime.Tests
             }
         }
 
+        private class DisposableCollection : IDisposable
+        {
+            public DisposableCollection(IEnumerable<IDisposable> disposables)
+            {
+                Disposables = disposables;
+            }
+
+            private IEnumerable<IDisposable> Disposables { get; }
+
+            void IDisposable.Dispose()
+            {
+                foreach (var disposable in Disposables)
+                {
+                    disposable.Dispose();
+                }
+            }
+        }
+
+        [TestMethod]
+        public void LifecycleForListOfCaps()
+        {
+            (var addr, int port) = TcpManager.Instance.GetLocalAddressAndPort();
+            using (var server = SetupServer(addr, port))
+            {
+                server.Main = new Issue62Impl();
+
+                using (var client = SetupClient(addr, port))
+                {
+                    //client.WhenConnected.Wait();
+
+                    using (var main = client.GetMain<CapnpGen.IIssue62>())
+                    {
+                        var listOfCapsTask = main.ListOfCaps();
+                        Assert.IsTrue(listOfCapsTask.Wait(MediumNonDbgTimeout));
+                        var list = listOfCapsTask.Result;
+                        using (new DisposableCollection(list))
+                        {
+                            var capAPT = list[0].Method();
+                            Assert.IsTrue(capAPT.Wait(MediumNonDbgTimeout));
+                        }
+                    }
+                }
+            }
+        }
+
         [TestMethod]
         public void ExportCapToThirdParty()
         {
