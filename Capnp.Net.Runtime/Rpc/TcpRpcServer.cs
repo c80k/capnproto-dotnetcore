@@ -131,8 +131,22 @@ namespace Capnp.Rpc
             public OutboundTcpEndpoint? OutboundEp { get; private set; }
             public RpcEngine.RpcEndpoint? InboundEp { get; private set; }
             public Thread? PumpRunner { get; private set; }
-            public int? LocalPort => ((IPEndPoint)Client.Client.LocalEndPoint)?.Port;
-            public int? RemotePort => ((IPEndPoint)Client.Client.RemoteEndPoint)?.Port;
+            public int? LocalPort
+            {
+                get
+                {
+                    var ep = Client.Client.LocalEndPoint as IPEndPoint;
+                    return ep != null ? (int?)ep.Port : null;
+                }
+            }
+            public int? RemotePort
+            {
+                get
+                {
+                    var ep = Client.Client.RemoteEndPoint as IPEndPoint;
+                    return ep != null ? (int?)ep.Port : null;
+                }
+            }
             public long RecvCount => InboundEp?.RecvCount ?? 0;
             public long SendCount => InboundEp?.SendCount ?? 0;
             public bool IsComputing => PumpRunner?.ThreadState == ThreadState.Running;

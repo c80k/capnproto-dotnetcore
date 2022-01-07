@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net6.0;netstandard2.0;netstandard2.1</TargetFrameworks>
     <RootNamespace>Capnp</RootNamespace>
     <LangVersion>8.0</LangVersion>
     <Nullable>Enable</Nullable>
