@@ -31,7 +31,7 @@ namespace CapnpC.CSharp.Generator.Tests.Util
                 "Capnp.Net.Runtime",
                 "bin",
                 "Debug",
-                "net6",
+                "net6.0",
                 "Capnp.Net.Runtime.dll"));
 
             var parseOptions = CSharpParseOptions.Default;
