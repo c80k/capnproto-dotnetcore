@@ -19,7 +19,7 @@ If(!(test-path $coverageReportDir)) {
   --filter TestCategory=Coverage `
   --logger console `
   --configuration Release `
-  --framework netcoreapp3.1 `
+  --framework net6 `
   --collect:"XPlat code coverage" `
   --results-directory $resultsDir `
   --settings "$rootDir\coverlet.runsettings"
@@ -28,7 +28,7 @@ If(!(test-path $coverageReportDir)) {
   --filter TestCategory=Coverage `
   --logger console `
   --configuration Release `
-  --framework netcoreapp3.1 `
+  --framework net6 `
   --collect:"XPlat code coverage" `
   --results-directory $resultsDir `
   --settings "$rootDir\coverlet.runsettings"

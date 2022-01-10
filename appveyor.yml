@@ -64,13 +64,13 @@ test_script:
   - cmd: |
       nbgv get-version -v NuGetPackageVersion >> myversion.txt
       set /P VERSION=< myversion.txt
-      vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp3.1\CapnpC.CSharp.Generator.Tests.dll
+      vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\net6\CapnpC.CSharp.Generator.Tests.dll
       cd %APPVEYOR_BUILD_FOLDER%\capnpc-csharp
       dotnet tool install --global --add-source ./nupkg capnpc-csharp --version %VERSION%
       cd %APPVEYOR_BUILD_FOLDER%\install-test
       compile-test
       cd %APPVEYOR_BUILD_FOLDER%
-      vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\netcoreapp3.1\CapnpC.CSharp.Generator.Tests.dll
+      vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.Generator.Tests\bin\Release\net6\CapnpC.CSharp.Generator.Tests.dll
       dotnet tool uninstall --global capnpc-csharp
       cd %APPVEYOR_BUILD_FOLDER%\install-test
       notinstalled-test
@@ -82,11 +82,11 @@ test_script:
       choco uninstall capnpc-csharp-win-x86 -y
       notinstalled-test
       cd %APPVEYOR_BUILD_FOLDER%
-      vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.MsBuild.Generation.Tests\bin\Release\netcoreapp3.1\CapnpC.CSharp.MsBuild.Generation.Tests.dll
+      vstest.console /logger:Appveyor /inIsolation CapnpC.CSharp.MsBuild.Generation.Tests\bin\Release\net6\CapnpC.CSharp.MsBuild.Generation.Tests.dll
       msbuild -t:restore ./MsBuildGenerationTest/MsBuildGenerationTest.csproj /p:Configuration="Debug" /p:PackageReferenceVersion="%VERSION%" -V:m
       msbuild ./MsBuildGenerationTest/MsBuildGenerationTest.sln /p:Configuration="Debug" /p:PackageReferenceVersion="%VERSION%" -V:m
       vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Debug\net471\Capnp.Net.Runtime.Tests.dll
-      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\netcoreapp3.1\Capnp.Net.Runtime.Tests.dll
+      vstest.console /logger:Appveyor /inIsolation Capnp.Net.Runtime.Tests\bin\Release\net6\Capnp.Net.Runtime.Tests.dll
       powershell -File .\scripts\measure-coverage.ps1
       csmacnz.Coveralls --lcov -i "coverage\lcov.info" --repoToken %COVERALLS_REPO_TOKEN%
 on_finish :
