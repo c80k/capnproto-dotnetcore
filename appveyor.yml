@@ -20,7 +20,7 @@ init:
   - cmd: git config --global core.autocrlf true
 environment:
   COVERALLS_REPO_TOKEN:
-    secure: us+8V9O13Dcp1EVoC1F1ERQk1Va4XJlAh3y7TW0YbinY89RX054LW1XBBzED0Onb
+    secure: mwxwOymoS7vB56iQN5Obbt8+oMqbRpK8Ei2GZUI7Mm46C8asDR/Wu0RAXYlhp85Q
   MSBUILDSINGLELOADCONTEXT: '1'
 before_build:
   - cmd: nbgv cloud
